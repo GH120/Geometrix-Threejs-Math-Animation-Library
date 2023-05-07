@@ -5,20 +5,21 @@ export class Triangle{
     constructor(){
 
         this.angleCount = 10;
+        this.angleRadius = 1;
         this.grossura = 0.05
         this.cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.sphereGeometry =   new THREE.SphereGeometry(0.1);
         this.sphereMaterial =   new THREE.MeshBasicMaterial({ color: 0x8c8c8c });
 
         this.positions = [
-            [0,0,-1],
-            [0,-1,-1],
-            [-1,-1,-1],
+            [0,0,0],
+            [0,-1,0],
+            [-1,-1,0],
         ]
 
-        this.positions = this.positions.map(vetor => vetor.map(n => n*5))
+        this.positions = this.positions.map(vetor => vetor.map(n => n*3))
 
-        this.positions = this.positions.map(vetor => [vetor[0]+5, vetor[1]+5, vetor[2]]);
+        this.positions = this.positions.map(vetor => [vetor[0]+3, vetor[1]+3, vetor[2]]);
     }
 
     renderVertices(){
@@ -94,8 +95,8 @@ export class Triangle{
                 //Interpola entre os dois vetores para conseguir um ponto do angulo
                 vetor.lerpVectors(vetor2,vetor1, i/this.angleCount).normalize();
 
-                const x = position[0] - vetor.x*0.4;
-                const y = position[1] - vetor.y*0.4;
+                const x = position[0] - vetor.x*this.angleRadius;
+                const y = position[1] - vetor.y*this.angleRadius;
                 sectorVertices.push(position[0], position[1], position[2])
                 sectorVertices.push(...last);
                 sectorVertices.push(x, y, position[2]);
@@ -110,6 +111,8 @@ export class Triangle{
 
             // Create the sector mesh and add it to the scene
             const sectorMesh = new THREE.Mesh(sectorGeometry, sectorMaterial);
+
+            sectorMesh.onHover = (onHover) => console.log(onHover);
 
             return sectorMesh;
         });

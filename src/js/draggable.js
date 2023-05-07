@@ -14,8 +14,6 @@ export class Draggable {
       new THREE.MeshBasicMaterial({color:0xffffff})
     );
 
-    this.plane.position.z = -5;
-
     // Add event listeners for mouse down, move, and up events
     window.addEventListener('mousedown', this.onMouseDown.bind(this), false);
     window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
@@ -24,6 +22,26 @@ export class Draggable {
   }
 
   onMouseDown(event) {
+
+    const point = this.intersectouObjeto(event, this.object);
+
+    if(point) this.dragging = true;
+  }
+
+  onMouseMove(event) {
+
+    if (this.dragging) {
+
+      const point = this.intersectouObjeto(event, this.plane);
+
+      if(point) this.object.position.copy(point);
+    }
+  }
+  
+
+  
+  intersectouObjeto(event, objeto){
+
     // Calculate the mouse position in normalized device coordinates (-1 to +1)
     const mouse = new THREE.Vector2(
       (event.clientX / window.innerWidth) * 2 - 1,
@@ -34,35 +52,14 @@ export class Draggable {
     // Raycast to determine the intersection point between the mouse and the object's plane
     this.raycaster.setFromCamera(mouse, this.camera);
     
-    const intersects = this.raycaster.intersectObject(this.object);
+    const intersects = this.raycaster.intersectObject(objeto);
 
     if (intersects.length > 0) {
-      this.dragging = true;
+      // Update the object's position to the intersection point
+      return intersects[0].point;
     }
-  }
 
-  onMouseMove(event) {
-    // Check if the object is being dragged
-    if (this.dragging) {
-      // Calculate the mouse position in normalized device coordinates (-1 to +1)
-      const mouse = new THREE.Vector2(
-        (event.clientX / window.innerWidth) * 2 - 1,
-        -(event.clientY / window.innerHeight) * 2 + 1
-      );
-      
-
-      // Raycast to determine the intersection point between the mouse and the object's plane
-      this.raycaster.setFromCamera(mouse, this.camera);
-      
-      const intersects = this.raycaster.intersectObject(this.plane);
-
-      console.log(intersects);
-
-      if (intersects.length > 0) {
-        // Update the object's position to the intersection point
-        this.object.position.copy(intersects[0].point);
-      }
-    }
+    return null;
   }
 
   onMouseUp() {

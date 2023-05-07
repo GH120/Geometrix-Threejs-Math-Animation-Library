@@ -64,11 +64,13 @@ export class Triangle{
     renderAngles(){
 
         const sectorMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000});
+        
+        const positions = this.vertices.map(vertex => [vertex.position.x, vertex.position.y, vertex.position.z]);
 
-        this.angles = this.positions.map( (position, index) =>{
+        this.angles = positions.map( (position, index) =>{
 
-            const seguinte = this.positions[(index+1)%this.positions.length];
-            const anterior = this.positions[(index+2)%this.positions.length];
+            const seguinte = positions[(index+1)%this.positions.length];
+            const anterior = positions[(index+2)%this.positions.length];
 
             // Create the geometry for the sector
             const sectorGeometry = new THREE.BufferGeometry();
@@ -92,8 +94,8 @@ export class Triangle{
                 //Interpola entre os dois vetores para conseguir um ponto do angulo
                 vetor.lerpVectors(vetor2,vetor1, i/this.angleCount).normalize();
 
-                const x = position[0] - vetor.x;
-                const y = position[1] - vetor.y;
+                const x = position[0] - vetor.x*0.4;
+                const y = position[1] - vetor.y*0.4;
                 sectorVertices.push(position[0], position[1], position[2])
                 sectorVertices.push(...last);
                 sectorVertices.push(x, y, position[2]);
@@ -125,6 +127,16 @@ export class Triangle{
         });
         this.renderEdges();
         this.edges.map(edge => scene.add(edge));
+
+        this.angles.map(angle => {
+
+            angle.geometry.dispose();
+            angle.material.dispose();
+            scene.remove(angle);
+            
+        });
+        this.renderAngles();
+        this.angles.map(angle => scene.add(angle));
     }
 
 

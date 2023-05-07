@@ -4,6 +4,7 @@ export class Triangle{
 
     constructor(){
 
+        this.angleCount = 10;
         this.grossura = 0.05
         this.cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.sphereGeometry =   new THREE.SphereGeometry(0.1);
@@ -58,6 +59,60 @@ export class Triangle{
 
 
         return cano;
+    }
+
+    renderAngles(){
+
+        const sectorMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000});
+
+        this.angles = this.positions.map( (position, index) =>{
+
+            const seguinte = this.positions[(index+1)%this.positions.length];
+            const anterior = this.positions[(index+2)%this.positions.length];
+
+            // Create the geometry for the sector
+            const sectorGeometry = new THREE.BufferGeometry();
+            const sectorVertices = [];
+
+            const diferenca = (origem, destino, eixo) => (destino[eixo] - origem[eixo]);
+
+            const CriarVetor = (origem, destino) => new THREE.Vector3( ...[0,1,2].map(eixo => diferenca(destino, origem, eixo)));
+
+            //Dois vetores apontando para os vértices opostos a esse
+            const vetor1 = CriarVetor(position, seguinte).normalize();
+            const vetor2 = CriarVetor(position, anterior).normalize();
+
+
+            let last = [position[0], position[1], position[2]];
+
+            for (let i = 0; i <= this.angleCount; i++) {
+
+                const vetor = new THREE.Vector3(0,0,0);
+                
+                //Interpola entre os dois vetores para conseguir um ponto do angulo
+                vetor.lerpVectors(vetor2,vetor1, i/this.angleCount).normalize();
+
+                const x = position[0] - vetor.x;
+                const y = position[1] - vetor.y;
+                sectorVertices.push(position[0], position[1], position[2])
+                sectorVertices.push(...last);
+                sectorVertices.push(x, y, position[2]);
+
+                last = [x,y,position[2]];
+            }
+
+            sectorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(sectorVertices, 3));
+
+            sectorGeometry.computeVertexNormals();
+
+
+            // Create the sector mesh and add it to the scene
+            const sectorMesh = new THREE.Mesh(sectorGeometry, sectorMaterial);
+
+            return sectorMesh;
+        });
+
+        return this;
     }
 
     update(scene){

@@ -23,12 +23,17 @@ scene.background = new THREE.TextureLoader().load(grid);
 
 const triangle = new Triangle()
                     .renderVertices()
-                    .renderEdges();
+                    .renderEdges()
+                    .renderAngles();
 
+
+console.log(triangle);
 triangle.vertices.map(vertex => new Draggable(vertex,camera));
 
 triangle.vertices.map(vertex => console.log(vertex));
 triangle.vertices.map(vertex => scene.add(vertex));
+
+triangle.angles.map(angle => scene.add(angle));
 triangle.edges.map(edge => scene.add(edge))
 
 camera.position.z = 5;

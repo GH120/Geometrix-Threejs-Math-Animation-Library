@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
+import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
+
 import {Triangle} from './triangle';
 import {Draggable} from './draggable';
 import {Hoverable} from './hoverable';
@@ -14,12 +16,18 @@ const renderer = new THREE.WebGLRenderer();
 renderer.antialias = true;
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
-// const orbit = new OrbitControls(camera, renderer.domElement);
+//const orbit = new OrbitControls(camera, renderer.domElement);
 
 scene.background = new THREE.TextureLoader().load(grid);
 
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = 'absolute';
+labelRenderer.domElement.style.top = '0px';
+document.body.appendChild(labelRenderer.domElement);
 
-const triangle = new Triangle()
+
+const triangle = new Triangle(scene)
                     .renderVertices()
                     .renderEdges()
                     .renderAngles();
@@ -30,9 +38,24 @@ triangle.vertices.map(vertex => new Draggable(vertex,camera));
 
 triangle.vertices.map(vertex => scene.add(vertex));
 
-triangle.angles.map(angle => scene.add(angle));
-triangle.angles.map(angle => new Hoverable(angle, camera));
-triangle.edges.map(edge => scene.add(edge))
+triangle.angles.map(angle => {
+  console.log(angle);
+  scene.add(angle)
+});
+triangle.angles.map(angle => {
+
+  console.log(angle);
+
+  // const p = document.createElement('p');
+  // p.textContent = "teste";
+  // const cPointLabel = new CSS2DObject(p);
+  // scene.add(cPointLabel);
+  // cPointLabel.position.set(...angle.position);
+  
+
+  return new Hoverable(angle, camera)
+});
+triangle.edges.map(edge => scene.add(edge));
 
 camera.position.z = 5;
 
@@ -60,6 +83,14 @@ function animate() {
     triangle.update(scene);
     attOptions();
     renderer.render( scene, camera );
-  }
-  animate();
+    labelRenderer.render( scene, camera );
+}
+animate();
+
+window.addEventListener('resize', function() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
   

@@ -1,0 +1,16 @@
+15
+88C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\package.json133280168353395244 0
+93C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\package-lock.json133280168353390259 0
+86C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\.gitignore133280168353280356 0
+82C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\src\js133280168353576440 1
+85C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\README.md133280168353300306 0
+79C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\src133280168353522743 1
+96C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\src\assets\grid.webp133280168353512760 0
+86C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\src\assets133280168353485859 1
+90C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\src\index.html133280168353522743 0
+95C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\src\js\draggable.js133280168353541549 0
+95C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\src\assets\grid.jpg133280168353455920 0
+95C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\src\js\hoverable.js133280168353551533 0
+91C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\src\js\index.js133280168353561490 0
+94C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\src\js\triangle.js133280168353576440 0
+96C:\Users\danys\Desktop\thomaz\PROGRAMACAO\javascript\webgl\projeto2\Threejs\src\assets\grid.avif133280168353434706 0

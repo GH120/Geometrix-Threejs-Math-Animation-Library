@@ -1,8 +1,9 @@
 import * as THREE from 'three';
+import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 export class Triangle{
 
-    constructor(){
+    constructor(scene = null){
 
         this.angleCount = 10;
         this.angleRadius = 1;
@@ -10,6 +11,7 @@ export class Triangle{
         this.cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.sphereGeometry =   new THREE.SphereGeometry(0.1);
         this.sphereMaterial =   new THREE.MeshBasicMaterial({ color: 0x8c8c8c });
+        this.scene = scene;
 
         this.positions = [
             [0,0,0],
@@ -35,7 +37,18 @@ export class Triangle{
 
     renderEdges(){
 
-        this.edges = this.vertices.map((esfera, indice) => this.createEdge(esfera,indice));
+        this.edges = this.vertices.map((esfera, indice) => {
+            
+            // console.log("ESFERA: ", esfera.position);
+
+            // const p = document.createElement('p');
+            // p.textContent = "teste";
+            // const cPointLabel = new CSS2DObject(p);
+            // this.scene.add(cPointLabel);
+            // cPointLabel.position.set(...esfera.position);
+            
+            return this.createEdge(esfera,indice);
+        });
 
         return this;
     }
@@ -62,13 +75,31 @@ export class Triangle{
         return cano;
     }
 
+    renderText() {
+        this.pObjs = this.vertices.map((esfera) => {
+            return this.createText("teste", esfera);
+        });
+
+        return this;
+    }
+
+    createText(texto, esfera) { 
+        const p = document.createElement('p');
+        p.textContent = texto;
+        const cPointLabel = new CSS2DObject(p);
+        // this.scene.add(cPointLabel);
+        cPointLabel.position.set(...esfera.position);
+
+        return cPointLabel;
+    }
+
     renderAngles(){
 
         const sectorMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000});
         
         const positions = this.vertices.map(vertex => [vertex.position.x, vertex.position.y, vertex.position.z]);
 
-        this.angles = positions.map( (position, index) =>{
+        this.angles = positions.map( (position, index) => {
 
             const seguinte = positions[(index+1)%this.positions.length];
             const anterior = positions[(index+2)%this.positions.length];
@@ -84,13 +115,16 @@ export class Triangle{
             //Dois vetores apontando para os vértices opostos a esse
             const vetor1 = CriarVetor(position, seguinte).normalize();
             const vetor2 = CriarVetor(position, anterior).normalize();
+            let angulo = vetor1.angleTo(vetor2);
 
 
             let last = [position[0], position[1], position[2]];
 
             for (let i = 0; i <= this.angleCount; i++) {
 
+                // const vetorlast = new THREE.Vector3(...last);
                 const vetor = new THREE.Vector3(0,0,0);
+                // console.log(vetorlast);
                 
                 //Interpola entre os dois vetores para conseguir um ponto do angulo
                 vetor.lerpVectors(vetor2,vetor1, i/this.angleCount).normalize();
@@ -105,6 +139,12 @@ export class Triangle{
             }
 
             sectorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(sectorVertices, 3));
+            const posicoes = sectorGeometry.getAttribute('position').array;
+            // console.log(posicoes);
+            // console.log(angulo * (180 / Math.PI));
+
+            sectorGeometry.setAttribute('angulo', new THREE.Float32BufferAttribute([angulo], 1));
+            sectorGeometry.setAttribute('anguloGraus', new THREE.Float32BufferAttribute([angulo * (180 / Math.PI)], 1));
 
             sectorGeometry.computeVertexNormals();
 
@@ -112,7 +152,13 @@ export class Triangle{
             // Create the sector mesh and add it to the scene
             const sectorMesh = new THREE.Mesh(sectorGeometry, sectorMaterial);
 
-            sectorMesh.onHover = (onHover) => console.log(onHover);
+            sectorMesh.onHover = (onHover) => {
+                console.log("ANGULO: " + onHover);
+                if (onHover) {
+                    console.log(sectorMesh);
+                    // console.log(angulo * (180 / Math.PI));
+                }
+            }
 
             return sectorMesh;
         });
@@ -121,6 +167,8 @@ export class Triangle{
     }
 
     update(scene){
+
+        // adicionando vertices
         this.edges.map(edge => {
 
             edge.geometry.dispose();
@@ -131,6 +179,16 @@ export class Triangle{
         this.renderEdges();
         this.edges.map(edge => scene.add(edge));
 
+        // adicionando texto do angulo
+        if (this.pObjs) {
+            this.pObjs.map(p => {
+                scene.remove(p);
+            });
+        }
+        this.renderText();
+        this.pObjs.map(p => scene.add(p));
+
+        // retirada e colocada dos angulos
         this.angles.map(angle => {
 
             angle.geometry.dispose();
@@ -141,6 +199,5 @@ export class Triangle{
         this.renderAngles();
         this.angles.map(angle => scene.add(angle));
     }
-
 
 }

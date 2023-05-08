@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
+import {Draggable} from './draggable';
+import {Hoverable} from './hoverable';
 
 export class Triangle{
 
@@ -65,18 +67,18 @@ export class Triangle{
 
     renderText() {
         this.pObjs = this.vertices.map((esfera, indice) => {
-            return this.createText("teste", esfera);
+            return {elemento: this.createText("teste", esfera.position), on:false};
         });
 
         return this;
     }
 
-    createText(texto, esfera) { 
+    createText(texto, position) { 
         const p = document.createElement('p');
         p.textContent = texto;
         const cPointLabel = new CSS2DObject(p);
         // this.scene.add(cPointLabel);
-        cPointLabel.position.set(...esfera.position);
+        cPointLabel.position.set(...position);
 
         return cPointLabel;
     }
@@ -105,9 +107,6 @@ export class Triangle{
             const vetor2 = CriarVetor(position, anterior).normalize();
             let angulo = vetor1.angleTo(vetor2);
 
-            if (this.pObjs)
-                this.pObjs[index].element.textContent = (angulo * (180 / Math.PI)).toFixed();
-
 
             let last = [position[0], position[1], position[2]];
 
@@ -131,8 +130,6 @@ export class Triangle{
 
             sectorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(sectorVertices, 3));
             const posicoes = sectorGeometry.getAttribute('position').array;
-            // console.log(posicoes);
-            // console.log(angulo * (180 / Math.PI));
 
             sectorGeometry.setAttribute('angulo', new THREE.Float32BufferAttribute([angulo], 1));
             sectorGeometry.setAttribute('anguloGraus', new THREE.Float32BufferAttribute([angulo * (180 / Math.PI)], 1));
@@ -144,15 +141,31 @@ export class Triangle{
             const sectorMesh = new THREE.Mesh(sectorGeometry, sectorMaterial);
 
             sectorMesh.onHover = (onHover) => {
-                console.log("ANGULO: " + onHover);
                 if (onHover) {
-                    console.log(sectorMesh);
-                    // console.log(angulo * (180 / Math.PI));
+                    const elemento = this.pObjs[index].elemento;
+                    elemento.element.textContent = (angulo * (180 / Math.PI)).toFixed() + "°";
+
+                    const vetor = new THREE.Vector3(0,0,0).lerpVectors(vetor2,vetor1,0.5).normalize();
+
+                    elemento.vetor = vetor;
+
+                    this.pObjs[index].on = true;
+                }
+                else{
+                    this.pObjs[index].on = false;
                 }
             }
 
             return sectorMesh;
         });
+
+        return this;
+    }
+
+    createControlers(camera){
+
+        this.hoverable = this.angles.map(angle => new Hoverable(angle, camera));
+        this.draggable = this.vertices.map(vertex => new Draggable(vertex,camera));
 
         return this;
     }
@@ -172,12 +185,21 @@ export class Triangle{
 
         // adicionando texto do angulo
         if (this.pObjs) {
-            this.pObjs.map(p => {
-                scene.remove(p);
+            this.pObjs.map((objeto, index) => {
+
+                scene.remove(objeto.elemento);
+
+                if(objeto.on) {
+                    scene.add(objeto.elemento);
+                }
+
+                objeto.elemento.position.copy(this.vertices[index].position);
+
+                // if(objeto.elemento.objeto.elemento.position.x += objeto.elemento.vetor[0];
+                
             });
         }
-        this.renderText();
-        this.pObjs.map(p => scene.add(p));
+
 
         // retirada e colocada dos angulos
         this.angles.map(angle => {
@@ -189,6 +211,7 @@ export class Triangle{
         });
         this.renderAngles();
         this.angles.map(angle => scene.add(angle));
+        this.angles.map((angle,index) => this.hoverable[index].object = angle);
     }
 
 }

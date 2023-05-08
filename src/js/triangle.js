@@ -37,19 +37,7 @@ export class Triangle{
 
     renderEdges(){
 
-        this.edges = this.vertices.map((esfera, indice) => {
-            
-            // console.log("ESFERA: ", esfera.position);
-
-            // const p = document.createElement('p');
-            // p.textContent = "teste";
-            // const cPointLabel = new CSS2DObject(p);
-            // this.scene.add(cPointLabel);
-            // cPointLabel.position.set(...esfera.position);
-            
-            return this.createEdge(esfera,indice);
-        });
-
+        this.edges = this.vertices.map((esfera, indice) => this.createEdge(esfera,indice));
         return this;
     }
 
@@ -76,7 +64,7 @@ export class Triangle{
     }
 
     renderText() {
-        this.pObjs = this.vertices.map((esfera) => {
+        this.pObjs = this.vertices.map((esfera, indice) => {
             return this.createText("teste", esfera);
         });
 
@@ -116,6 +104,9 @@ export class Triangle{
             const vetor1 = CriarVetor(position, seguinte).normalize();
             const vetor2 = CriarVetor(position, anterior).normalize();
             let angulo = vetor1.angleTo(vetor2);
+
+            if (this.pObjs)
+                this.pObjs[index].element.textContent = (angulo * (180 / Math.PI)).toFixed();
 
 
             let last = [position[0], position[1], position[2]];

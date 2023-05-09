@@ -37,11 +37,6 @@ console.log(triangle);
 
 triangle.vertices.map(vertex => scene.add(vertex));
 
-triangle.angles.map(angle => {
-  console.log(angle);
-  scene.add(angle)
-});
-
 triangle.edges.map(edge => scene.add(edge));
 
 camera.position.z = 5;

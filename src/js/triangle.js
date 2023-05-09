@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import {Draggable} from './draggable';
 import {Hoverable} from './hoverable';
+import {Angle} from './angle';
 
 export class Triangle{
 
@@ -91,72 +92,11 @@ export class Triangle{
 
         this.angles = positions.map( (position, index) => {
 
-            const seguinte = positions[(index+1)%this.positions.length];
-            const anterior = positions[(index+2)%this.positions.length];
-
-            // Create the geometry for the sector
-            const sectorGeometry = new THREE.BufferGeometry();
-            const sectorVertices = [];
-
-            const diferenca = (origem, destino, eixo) => (destino[eixo] - origem[eixo]);
-
-            const CriarVetor = (origem, destino) => new THREE.Vector3( ...[0,1,2].map(eixo => diferenca(destino, origem, eixo)));
-
-            //Dois vetores apontando para os vértices opostos a esse
-            const vetor1 = CriarVetor(position, seguinte).normalize();
-            const vetor2 = CriarVetor(position, anterior).normalize();
-            let angulo = vetor1.angleTo(vetor2);
-
-
-            let last = [position[0], position[1], position[2]];
-
-            for (let i = 0; i <= this.angleCount; i++) {
-
-                // const vetorlast = new THREE.Vector3(...last);
-                const vetor = new THREE.Vector3(0,0,0);
-                // console.log(vetorlast);
-                
-                //Interpola entre os dois vetores para conseguir um ponto do angulo
-                vetor.lerpVectors(vetor2,vetor1, i/this.angleCount).normalize();
-
-                const x = position[0] - vetor.x*this.angleRadius;
-                const y = position[1] - vetor.y*this.angleRadius;
-                sectorVertices.push(position[0], position[1], position[2])
-                sectorVertices.push(...last);
-                sectorVertices.push(x, y, position[2]);
-
-                last = [x,y,position[2]];
-            }
-
-            sectorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(sectorVertices, 3));
-            const posicoes = sectorGeometry.getAttribute('position').array;
-
-            sectorGeometry.setAttribute('angulo', new THREE.Float32BufferAttribute([angulo], 1));
-            sectorGeometry.setAttribute('anguloGraus', new THREE.Float32BufferAttribute([angulo * (180 / Math.PI)], 1));
-
-            sectorGeometry.computeVertexNormals();
-
-
-            // Create the sector mesh and add it to the scene
-            const sectorMesh = new THREE.Mesh(sectorGeometry, sectorMaterial);
-
-            sectorMesh.onHover = (onHover) => {
-                if (onHover) {
-                    const elemento = this.pObjs[index].elemento;
-                    elemento.element.textContent = (angulo * (180 / Math.PI)).toFixed() + "°";
-
-                    const vetor = new THREE.Vector3(0,0,0).lerpVectors(vetor2,vetor1,0.5).normalize();
-
-                    elemento.vetor = vetor;
-
-                    this.pObjs[index].on = true;
-                }
-                else{
-                    this.pObjs[index].on = false;
-                }
-            }
-
-            return sectorMesh;
+            new Angle()
+            .setPositions(positions,index)
+            .getVetores()
+            .renderMalha()
+            .setText(this.pObjs)
         });
 
         return this;
@@ -200,18 +140,24 @@ export class Triangle{
             });
         }
 
+        const positions = this.vertices.map(vertex => [vertex.position.x, vertex.position.y, vertex.position.z]);
 
         // retirada e colocada dos angulos
-        this.angles.map(angle => {
+        this.angles.map((angle, index) => {
 
-            angle.geometry.dispose();
-            angle.material.dispose();
-            scene.remove(angle);
-            
+            angle.mesh.geometry.dispose();
+            angle.mesh.material.dispose();
+            scene.remove(angle.mesh);
+
+            angle
+            .setPositions(positions,index)
+            .getVetores()
+            .renderMalha()
+
+            scene.add(angle.mesh);
+
+            this.hoverable[index].object = angle     
         });
-        this.renderAngles();
-        this.angles.map(angle => scene.add(angle));
-        this.angles.map((angle,index) => this.hoverable[index].object = angle);
     }
 
 }

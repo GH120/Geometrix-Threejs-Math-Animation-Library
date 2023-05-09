@@ -2,35 +2,27 @@ import * as THREE from 'three';
 
 export class Angle{
 
-    constructor(positions, index, textObjects){
+    constructor(){
 
         this.angleCount = 10;
 
-        const position = positions[index];
-        const seguinte = positions[(index+1)%this.positions.length];
-        const anterior = positions[(index+2)%this.positions.length];
+        // const posicoes = sectorGeometry.getAttribute('position').array;
 
-        // Create the geometry for the sector
-        const sectorGeometry = new THREE.BufferGeometry();
-        const sectorVertices = [];
-
-        getVetores();
-        renderMalha();
-
-        const posicoes = sectorGeometry.getAttribute('position').array;
-
-        sectorGeometry.setAttribute('angulo', new THREE.Float32BufferAttribute([angulo], 1));
-        sectorGeometry.setAttribute('anguloGraus', new THREE.Float32BufferAttribute([angulo * (180 / Math.PI)], 1));
-
-        // Create the sector mesh and add it to the scene
-        this.mesh = new THREE.Mesh(sectorGeometry, sectorMaterial);
-
-        this.pObjs = textObjects
-        this.mesh.onHover = this.onHover;
+        // sectorGeometry.setAttribute('angulo', new THREE.Float32BufferAttribute([angulo], 1));
+        // sectorGeometry.setAttribute('anguloGraus', new THREE.Float32BufferAttribute([angulo * (180 / Math.PI)], 1));
 
     }
 
-    getVetores(positions, index){
+    setPositions(positions, index){
+
+        this.position = positions[index];
+        this.seguinte = positions[(index+1)%this.positions.length];
+        this.anterior = positions[(index+2)%this.positions.length];
+
+        return this;
+    }
+
+    getVetores(){
 
         const diferenca = (origem, destino, eixo) => (destino[eixo] - origem[eixo]);
 
@@ -41,17 +33,21 @@ export class Angle{
         this.vetor2 = CriarVetor(position, anterior).normalize();
 
         this.angulo = vetor1.angleTo(vetor2);
+        
+        return this;
     }
 
     renderMalha(){
+
+        // Create the geometry for the sector
+        const sectorGeometry = new THREE.BufferGeometry();
+        const sectorVertices = [];
 
         let last = [position[0], position[1], position[2]];
 
         for (let i = 0; i <= this.angleCount; i++) {
 
-            // const vetorlast = new THREE.Vector3(...last);
             const vetor = new THREE.Vector3(0,0,0);
-            // console.log(vetorlast);
             
             //Interpola entre os dois vetores para conseguir um ponto do angulo
             vetor.lerpVectors(this.vetor2, this.vetor1, i/this.angleCount).normalize();
@@ -66,6 +62,13 @@ export class Angle{
         }
 
         sectorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(sectorVertices, 3));
+
+        // Cria a malha
+        this.mesh = new THREE.Mesh(sectorGeometry, sectorMaterial);
+
+        this.mesh.onHover = this.onHover;
+
+        return this;
     }
 
     onHover(onHover){
@@ -76,9 +79,9 @@ export class Angle{
 
             const elemento = this.pObjs[index].elemento;
 
-            elemento.element.textContent = (angulo * (180 / Math.PI)).toFixed() + "°";
+            elemento.element.textContent = (this.angulo * (180 / Math.PI)).toFixed() + "°";
 
-            const vetor = new THREE.Vector3(0,0,0).lerpVectors(vetor2,vetor1,0.5).normalize();
+            const vetor = new THREE.Vector3(0,0,0).lerpVectors(this.vetor2,this.vetor1,0.5).normalize();
 
             elemento.vetor = vetor;
 
@@ -89,7 +92,9 @@ export class Angle{
         }
     }
 
-    addText(textObjects){
+    setText(textObjects){
         this.pObjs = textObjects;
+
+        return this;
     }
 }

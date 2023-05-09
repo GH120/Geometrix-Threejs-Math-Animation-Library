@@ -39,6 +39,8 @@ triangle.vertices.map(vertex => scene.add(vertex));
 
 triangle.edges.map(edge => scene.add(edge));
 
+triangle.angles.map(angle => scene.add(angle.mesh))
+
 camera.position.z = 5;
 
 const gui = new dat.GUI();

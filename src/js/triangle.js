@@ -8,9 +8,8 @@ class Angle{
     constructor(){
 
         this.angleCount = 10;
+        this.angleRadius = 1;
         this.sectorMaterial = new THREE.MeshBasicMaterial({color:0xff0000})
-
-        console.log("yes1")
 
         // const posicoes = sectorGeometry.getAttribute('position').array;
 
@@ -20,8 +19,6 @@ class Angle{
     }
 
     setPositions(positions, index){
-
-        console.log(positions,index)
 
         this.position = positions[index];
         this.seguinte = positions[(index+1)%positions.length];
@@ -85,6 +82,7 @@ class Angle{
         if(!this.pObjs) return;
 
         if (onHover) {
+            console.log(onHover)
 
             const elemento = this.pObjs[index].elemento;
 
@@ -114,7 +112,6 @@ export class Triangle{
     constructor(scene = null){
 
         this.angleCount = 10;
-        this.angleRadius = 1;
         this.grossura = 0.05
         this.cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.sphereGeometry =   new THREE.SphereGeometry(0.1);
@@ -194,9 +191,7 @@ export class Triangle{
         
         const positions = this.vertices.map(vertex => [vertex.position.x, vertex.position.y, vertex.position.z]);
 
-        const copia = positions.map(p => p);
-
-        this.angle = positions.map( (position, index) => 
+        this.angles = positions.map( (position, index) => 
                                                             new Angle()
                                                             .setPositions(positions,index)
                                                             .getVetores()
@@ -210,7 +205,7 @@ export class Triangle{
 
     createControlers(camera){
 
-        // this.hoverable = this.angles.map(angle => new Hoverable(angle, camera));
+        this.hoverable = this.angles.map(angle => new Hoverable(angle.mesh, camera));
         this.draggable = this.vertices.map(vertex => new Draggable(vertex,camera));
 
         return this;
@@ -228,6 +223,42 @@ export class Triangle{
         });
         this.renderEdges();
         this.edges.map(edge => scene.add(edge));
+
+        if (this.pObjs) {
+            this.pObjs.map((objeto, index) => {
+
+                scene.remove(objeto.elemento);
+
+                if(objeto.on) {
+                    scene.add(objeto.elemento);
+                }
+
+                objeto.elemento.position.copy(this.vertices[index].position);
+
+                // if(objeto.elemento.objeto.elemento.position.x += objeto.elemento.vetor[0];
+                
+            });
+        }
+
+        const positions = this.vertices.map(vertex => [vertex.position.x, vertex.position.y, vertex.position.z]);
+
+        this.angles.map((angle, index) => {
+
+            angle.mesh.geometry.dispose();
+            angle.mesh.material.dispose();
+            scene.remove(angle.mesh);
+
+            angle
+            .setPositions(positions,index)
+            .getVetores()
+            .renderMalha()
+
+            scene.add(angle.mesh);
+
+            // this.hoverable[index].object = angle.mesh  
+        });
+
+        
     }
 
 }

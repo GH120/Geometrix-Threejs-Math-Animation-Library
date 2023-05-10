@@ -5,9 +5,11 @@ import {Hoverable} from './hoverable';
 
 class Angle{
 
-    constructor(){
+    constructor(vertices, index){
 
-        this.angleCount = 2;
+        this.vertices = vertices;
+        this.index = index;
+        this.angleCount = 10;
         this.angleRadius = 1;
         this.sectorMaterial = new THREE.MeshBasicMaterial({color:0xff0000})
 
@@ -18,7 +20,17 @@ class Angle{
 
     }
 
-    setPositions(positions, index){
+    render(){
+        this.setPositions();
+        this.getVetores();
+        this.renderMalha();
+        return this;
+    }
+
+    setPositions(){
+
+        const index     = this.index;
+        const positions = this.vertices.map(vertex => [vertex.position.x, vertex.position.y, vertex.position.z]);
 
         this.position = positions[index];
         this.seguinte = positions[(index+1)%positions.length];
@@ -88,11 +100,11 @@ class Angle{
 
             elemento.element.textContent = (this.angulo * (180 / Math.PI)).toFixed() + "°";
 
-            const vetor = new THREE.Vector3(0,0,0).lerpVectors(this.vetor2,this.vetor1,0.5).multiplyScalar(1.5);
+            const vetor = new THREE.Vector3(0,0,0).lerpVectors(this.vetor2,this.vetor1,0.5).normalize().multiplyScalar(1.2*this.angleRadius);
 
             const position = this.text.getPosition()
 
-            const newPosition = position.clone().sub(vetor).add(new THREE.Vector3(0.2,0.2,0))
+            const newPosition = position.clone().sub(vetor).add(new THREE.Vector3(0.15,0.15,0))
 
             elemento.position.copy(newPosition)
 
@@ -100,7 +112,6 @@ class Angle{
         }
         else{
             this.text.on = false;
-
         }
     }
 
@@ -108,6 +119,20 @@ class Angle{
         this.text = text;
 
         return this;
+    }
+
+    update(scene){
+
+        this.mesh.geometry.dispose();
+        this.mesh.material.dispose();
+        scene.remove(this.mesh);
+        scene.remove(this.text.elemento)
+
+        this.render();
+
+        scene.add(this.mesh);
+        if(this.text.on)
+        scene.add(this.text.elemento)
     }
 }
 
@@ -193,17 +218,12 @@ export class Triangle{
     renderAngles(){
 
         const sectorMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000});
-        
-        const positions = this.vertices.map(vertex => [vertex.position.x, vertex.position.y, vertex.position.z]);
 
-        this.angles = positions.map( (position, index) => 
-                                                            new Angle()
-                                                            .setPositions(positions,index)
-                                                            .getVetores()
-                                                            .setText(this.pObjs[index])
-                                                            .renderMalha()
-                                                           
-        );
+        const vertices = this.vertices;
+        
+        this.angles = vertices.map( (vertex, index) => new Angle(vertices, index)
+                                                        .setText(this.pObjs[index])
+                                                        .render());
 
         return this;
     }
@@ -226,43 +246,14 @@ export class Triangle{
             scene.remove(edge);
             
         });
+
         this.renderEdges();
+        
         this.edges.map(edge => scene.add(edge));
 
-        if (this.pObjs) {
-            this.pObjs.map((objeto, index) => {
+        this.angles.map(angle => angle.update(scene))
 
-                scene.remove(objeto.elemento);
-
-                if(objeto.on) {
-                    scene.add(objeto.elemento);
-                }
-
-            });
-        }
-
-        const positions = this.vertices.map(vertex => [vertex.position.x, vertex.position.y, vertex.position.z]);
-
-        this.angles.map((angle, index) => {
-
-            angle.mesh.geometry.dispose();
-            angle.mesh.material.dispose();
-            scene.remove(angle.mesh);
-
-            angle
-            .setPositions(positions,index)
-            .getVetores()
-            .renderMalha()
-
-            scene.add(angle.mesh);
-
-            // console.log(angle.pObjs)
-
-            this.hoverable[index].object = angle.mesh 
-            
-        });
-
-        
+        this.hoverable.map((hover, index) => hover.object = this.angles[index].mesh)  
     }
 
 }

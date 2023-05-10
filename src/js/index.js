@@ -58,7 +58,7 @@ gui.add(options, 'raio do ângulo', 0.05, 3);
 function attOptions() {
   triangle.grossura = options.grossura;
   triangle.sphereGeometry = new THREE.SphereGeometry(options["tamanho da esfera"]);
-  triangle.angleRadius = options["raio do ângulo"]
+  triangle.angles.map(angle => angle.angleRadius = options["raio do ângulo"])
 }
 
 

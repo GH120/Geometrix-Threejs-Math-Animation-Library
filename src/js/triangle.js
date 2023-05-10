@@ -155,14 +155,12 @@ class Angle{
 
 export class Triangle{
 
-    constructor(scene){
+    constructor(){
 
-        this.angleCount = 10;
         this.grossura = 0.05
         this.cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.sphereGeometry =   new THREE.SphereGeometry(0.1);
         this.sphereMaterial =   new THREE.MeshBasicMaterial({ color: 0x8c8c8c });
-        this.scene = scene;
 
         this.positions = [
             [0,0,0],
@@ -253,8 +251,17 @@ export class Triangle{
         this.hoverable.map(hover => hover.observer = this);
         this.draggable.map(dragg => dragg.observer = this);
 
-        console.log(this.hoverable)
+        return this;
+    }
 
+    addToScene(scene){
+
+        this.scene = scene;
+
+        this.vertices.map(vertex => scene.add(vertex));
+        this.edges.map(   edge   => scene.add(edge));
+        this.angles.map(  angle  => scene.add(angle.mesh));
+        
         return this;
     }
 

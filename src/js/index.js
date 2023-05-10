@@ -7,13 +7,15 @@ import grid from '../assets/grid.avif';
 import * as dat from 'dat.gui';
 
 
+//setup Threejs
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
-//const orbit = new OrbitControls(camera, renderer.domElement);
+
+camera.position.z = 5;
 
 scene.background = new THREE.TextureLoader().load(grid);
 
@@ -23,25 +25,17 @@ labelRenderer.domElement.style.position = 'absolute';
 labelRenderer.domElement.style.top = '0px';
 document.body.appendChild(labelRenderer.domElement);
 
-
-const triangle = new Triangle(scene)
+//Cria o triângulo
+const triangle = new Triangle()
                     .renderVertices()
                     .renderEdges()
                     .renderText()
                     .renderAngles()
-                    .createControlers(camera);
+                    .createControlers(camera)
+                    .addToScene(scene);
 
 
-console.log(triangle);
-
-triangle.vertices.map(vertex => scene.add(vertex));
-
-triangle.edges.map(edge => scene.add(edge));
-
-triangle.angles.map(angle => scene.add(angle.mesh))
-
-camera.position.z = 5;
-
+////////////////////////////Interfáce gráfica/////////////////////////////////////
 const gui = new dat.GUI();
 
 const options = {
@@ -50,20 +44,20 @@ const options = {
   "raio do ângulo": 0.7
 };
 
-gui.add(options, 'grossura', 0.01, 0.2);
-gui.add(options, 'tamanho da esfera', 0.1, 2);
-gui.add(options, 'raio do ângulo', 0.05, 3);
+gui.add(options, 'grossura', 0.01, 0.2).onChange( () => triangle.update());
+gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => triangle.update());
+gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => triangle.update());
 
 function attOptions() {
   triangle.grossura = options.grossura;
   triangle.sphereGeometry = new THREE.SphereGeometry(options["tamanho da esfera"]);
   triangle.angles.map(angle => angle.angleRadius = options["raio do ângulo"])
 }
+////////////////////////////////////////////////////////////////////////////////////
 
-
+//Loop de animação
 function animate() {
     requestAnimationFrame( animate );
-    // triangle.update(scene);
     attOptions();
     renderer.render( scene, camera );
     labelRenderer.render( scene, camera );

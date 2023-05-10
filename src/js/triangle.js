@@ -7,7 +7,7 @@ class Angle{
 
     constructor(){
 
-        this.angleCount = 10;
+        this.angleCount = 2;
         this.angleRadius = 1;
         this.sectorMaterial = new THREE.MeshBasicMaterial({color:0xff0000})
 
@@ -72,35 +72,40 @@ class Angle{
         // // Cria a malha
         this.mesh = new THREE.Mesh(sectorGeometry, this.sectorMaterial);
 
-        this.mesh.onHover = this.onHover;
+        if(this.text) this.mesh.text = this.text;
+
+        this.mesh.onHover = this.onHover.bind(this);
 
         return this;
     }
 
     onHover(onHover){
 
-        if(!this.pObjs) return;
-
         if (onHover) {
-            console.log(onHover)
 
-            const elemento = this.pObjs[index].elemento;
+
+            const elemento = this.text.elemento;
 
             elemento.element.textContent = (this.angulo * (180 / Math.PI)).toFixed() + "°";
 
-            const vetor = new THREE.Vector3(0,0,0).lerpVectors(this.vetor2,this.vetor1,0.5).normalize();
+            const vetor = new THREE.Vector3(0,0,0).lerpVectors(this.vetor2,this.vetor1,0.5).multiplyScalar(1.5);
 
-            elemento.vetor = vetor;
+            const position = this.text.getPosition()
 
-            this.pObjs[index].on = true;
+            const newPosition = position.clone().sub(vetor).add(new THREE.Vector3(0.2,0.2,0))
+
+            elemento.position.copy(newPosition)
+
+            this.text.on = true;
         }
         else{
-            this.pObjs[index].on = false;
+            this.text.on = false;
+
         }
     }
 
-    setText(textObjects){
-        this.pObjs = textObjects;
+    setText(text){
+        this.text = text;
 
         return this;
     }
@@ -168,7 +173,7 @@ export class Triangle{
 
     renderText() {
         this.pObjs = this.vertices.map((esfera, indice) => {
-            return {elemento: this.createText("teste", esfera.position), on:false};
+            return {elemento: this.createText("teste", esfera.position), on:false, getPosition: () => esfera.position};
         });
 
 
@@ -195,8 +200,8 @@ export class Triangle{
                                                             new Angle()
                                                             .setPositions(positions,index)
                                                             .getVetores()
+                                                            .setText(this.pObjs[index])
                                                             .renderMalha()
-                                                            .setText(this.pObjs)
                                                            
         );
 
@@ -233,10 +238,6 @@ export class Triangle{
                     scene.add(objeto.elemento);
                 }
 
-                objeto.elemento.position.copy(this.vertices[index].position);
-
-                // if(objeto.elemento.objeto.elemento.position.x += objeto.elemento.vetor[0];
-                
             });
         }
 
@@ -255,7 +256,10 @@ export class Triangle{
 
             scene.add(angle.mesh);
 
-            // this.hoverable[index].object = angle.mesh  
+            // console.log(angle.pObjs)
+
+            this.hoverable[index].object = angle.mesh 
+            
         });
 
         

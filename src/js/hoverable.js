@@ -21,9 +21,11 @@ export class Hoverable {
     //Ignora se continua no mesmo estado
     if(this.isInside == isInside) return;
 
-
     //Caso contrário, chama a função que controla a ação
     this.onHover(isInside);
+
+    //Manda o triangulo atualizar
+    this.notify()
 
     this.isInside = isInside;
   }
@@ -48,5 +50,12 @@ export class Hoverable {
     }
 
     return null;
+  }
+
+  notify(){
+
+    if(this.observer)
+
+    this.observer.update();
   }
 }

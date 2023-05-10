@@ -10,8 +10,7 @@ import * as dat from 'dat.gui';
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-const renderer = new THREE.WebGLRenderer();
-renderer.antialias = true;
+const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 //const orbit = new OrbitControls(camera, renderer.domElement);
@@ -64,7 +63,7 @@ function attOptions() {
 
 function animate() {
     requestAnimationFrame( animate );
-    triangle.update(scene);
+    // triangle.update(scene);
     attOptions();
     renderer.render( scene, camera );
     labelRenderer.render( scene, camera );

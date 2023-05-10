@@ -34,8 +34,13 @@ export class Draggable {
 
       const point = this.intersectouObjeto(event, this.plane);
 
-      if(point) this.object.position.copy(point);
+      if(!point) return;
+
+      this.object.position.copy(point);
+
+      this.notify();
     }
+    
   }
   
 
@@ -64,5 +69,12 @@ export class Draggable {
 
   onMouseUp() {
     this.dragging = false;
+  }
+
+  notify(){
+
+    if(this.observer)
+
+    this.observer.update();
   }
 }

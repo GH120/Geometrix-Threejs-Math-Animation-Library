@@ -46,10 +46,22 @@ class Angle{
         const CriarVetor = (origem, destino) => new THREE.Vector3( ...[0,1,2].map(eixo => diferenca(destino, origem, eixo)));
 
         //Dois vetores apontando para os vértices opostos a esse
-        this.vetor1 = CriarVetor(this.position, this.seguinte).normalize();
-        this.vetor2 = CriarVetor(this.position, this.anterior).normalize();
+        let vetor1 = CriarVetor(this.position, this.seguinte).normalize();
+        let vetor2 = CriarVetor(this.position, this.anterior).normalize();
 
-        this.angulo = this.vetor1.angleTo(this.vetor2);
+        //Se estiverem no sentido horário, inverter sua ordem
+        const sentidoHorario = new THREE.Vector3(0,0,0).crossVectors(vetor1, vetor2).dot(new THREE.Vector3(0,0,1)) > 0;
+
+        if(sentidoHorario){
+            const vetor = vetor1;
+            vetor1 = vetor2;
+            vetor2 = vetor;
+        }
+
+        
+        this.vetor1 = vetor1;
+        this.vetor2 = vetor2;
+        this.angulo = vetor1.angleTo(vetor2);
         
         return this;
     }
@@ -59,33 +71,37 @@ class Angle{
         // Create the geometry for the sector
         const sectorGeometry = new THREE.BufferGeometry();
         const sectorVertices = [];
-        const position = this.position;
+        const center = this.position;
 
-        let last = [position[0], position[1], position[2]];
+        // console.log(sentidoHorario)
+
+        let last = [...center];
 
         for (let i = 0; i <= this.angleCount; i++) {
 
             const vetor = new THREE.Vector3(0,0,0);
             
-            //Interpola entre os dois vetores para conseguir um ponto do angulo
+            //Interpola entre os dois vetores para conseguir o novo ponto
             vetor.lerpVectors(this.vetor2, this.vetor1, i/this.angleCount).normalize();
 
-            const x = position[0] - vetor.x*this.angleRadius;
-            const y = position[1] - vetor.y*this.angleRadius;
-            sectorVertices.push(position[0], position[1], position[2])
-            sectorVertices.push(...last);
-            sectorVertices.push(x, y, position[2]);
+            const x = center[0] - vetor.x*this.angleRadius;
+            const y = center[1] - vetor.y*this.angleRadius;
+            const z = center[2];
 
-            last = [x,y,position[2]];
+            //Desenha o triângulo (posição do centro, posição anterior, posição atual)
+            sectorVertices.push(...center)
+            sectorVertices.push(...last);
+            sectorVertices.push(x, y, z);
+
+            last = [x,y,z];
         }
 
         sectorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(sectorVertices, 3));
 
-        // // Cria a malha
+        // Cria a malha
         this.mesh = new THREE.Mesh(sectorGeometry, this.sectorMaterial);
 
-        if(this.text) this.mesh.text = this.text;
-
+        //Quando o onHover for acionado no mesh, ele vai chamar o onHover do Angle
         this.mesh.onHover = this.onHover.bind(this);
 
         return this;
@@ -139,7 +155,7 @@ class Angle{
 
 export class Triangle{
 
-    constructor(scene = null){
+    constructor(scene){
 
         this.angleCount = 10;
         this.grossura = 0.05
@@ -208,6 +224,7 @@ export class Triangle{
     createText(texto, position) { 
         const p = document.createElement('p');
         p.textContent = texto;
+        p.style = "font-size: 14px; font-weight: bold; color: #333;";
         const cPointLabel = new CSS2DObject(p);
         // this.scene.add(cPointLabel);
         cPointLabel.position.set(...position);
@@ -230,13 +247,20 @@ export class Triangle{
 
     createControlers(camera){
 
-        this.hoverable = this.angles.map(angle => new Hoverable(angle.mesh, camera));
-        this.draggable = this.vertices.map(vertex => new Draggable(vertex,camera));
+        this.hoverable = this.angles.map(   angle  => new Hoverable(angle.mesh, camera));
+        this.draggable = this.vertices.map( vertex => new Draggable(vertex    , camera));
+
+        this.hoverable.map(hover => hover.observer = this);
+        this.draggable.map(dragg => dragg.observer = this);
+
+        console.log(this.hoverable)
 
         return this;
     }
 
-    update(scene){
+    update(){
+
+        const scene = this.scene;
 
         // adicionando vertices
         this.edges.map(edge => {

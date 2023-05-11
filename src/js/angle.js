@@ -1,25 +1,31 @@
 import * as THREE from 'three';
 
-export default class Angle{
+export class Angle{
 
-    constructor(){
+    constructor(vertices, index){
 
-        this.angleCount = 10;
-
-        console.log("yes1")
-
-        // const posicoes = sectorGeometry.getAttribute('position').array;
-
-        // sectorGeometry.setAttribute('angulo', new THREE.Float32BufferAttribute([angulo], 1));
-        // sectorGeometry.setAttribute('anguloGraus', new THREE.Float32BufferAttribute([angulo * (180 / Math.PI)], 1));
+        this.vertices = vertices;
+        this.index = index;
+        this.angleRadius = 1;
+        this.sectorMaterial = new THREE.MeshBasicMaterial({color:0xff0000})
 
     }
 
-    setPositions(positions, index){
+    render(){
+        this.setPositions();
+        this.getVetores();
+        this.renderMalha();
+        return this;
+    }
+
+    setPositions(){
+
+        const index     = this.index;
+        const positions = this.vertices.map(vertex => [vertex.position.x, vertex.position.y, vertex.position.z]);
 
         this.position = positions[index];
-        this.seguinte = positions[(index+1)%this.positions.length];
-        this.anterior = positions[(index+2)%this.positions.length];
+        this.seguinte = positions[(index+1)%positions.length];
+        this.anterior = positions[(index+2)%positions.length];
 
         return this;
     }
@@ -31,9 +37,21 @@ export default class Angle{
         const CriarVetor = (origem, destino) => new THREE.Vector3( ...[0,1,2].map(eixo => diferenca(destino, origem, eixo)));
 
         //Dois vetores apontando para os vértices opostos a esse
-        this.vetor1 = CriarVetor(position, seguinte).normalize();
-        this.vetor2 = CriarVetor(position, anterior).normalize();
+        let vetor1 = CriarVetor(this.position, this.seguinte).normalize();
+        let vetor2 = CriarVetor(this.position, this.anterior).normalize();
 
+        //Se estiverem no sentido horário, inverter sua ordem
+        const sentidoHorario = new THREE.Vector3(0,0,0).crossVectors(vetor1, vetor2).dot(new THREE.Vector3(0,0,1)) > 0;
+
+        if(sentidoHorario){
+            const vetor = vetor1;
+            vetor1 = vetor2;
+            vetor2 = vetor;
+        }
+
+        
+        this.vetor1 = vetor1;
+        this.vetor2 = vetor2;
         this.angulo = vetor1.angleTo(vetor2);
         
         return this;
@@ -44,59 +62,83 @@ export default class Angle{
         // Create the geometry for the sector
         const sectorGeometry = new THREE.BufferGeometry();
         const sectorVertices = [];
+        const center = this.position;
 
-        let last = [position[0], position[1], position[2]];
+        let last = [...center];
 
-        for (let i = 0; i <= this.angleCount; i++) {
+        //Numero de segmentos de triangulos a serem desenhados
+        const segmentos = Math.round(this.angulo*180/Math.PI);
+
+        for (let i = 0; i <= segmentos; i++) {
 
             const vetor = new THREE.Vector3(0,0,0);
             
-            //Interpola entre os dois vetores para conseguir um ponto do angulo
-            vetor.lerpVectors(this.vetor2, this.vetor1, i/this.angleCount).normalize();
+            //Interpola entre os dois vetores para conseguir o novo ponto
+            vetor.lerpVectors(this.vetor2, this.vetor1, i/segmentos).normalize();
 
-            const x = position[0] - vetor.x*this.angleRadius;
-            const y = position[1] - vetor.y*this.angleRadius;
-            sectorVertices.push(position[0], position[1], position[2])
+            const x = center[0] - vetor.x*this.angleRadius;
+            const y = center[1] - vetor.y*this.angleRadius;
+            const z = center[2];
+
+            //Desenha o triângulo (posição do centro, posição anterior, posição atual)
+            sectorVertices.push(...center);
             sectorVertices.push(...last);
-            sectorVertices.push(x, y, position[2]);
+            sectorVertices.push(x, y, z);
 
-            last = [x,y,position[2]];
+            last = [x,y,z];
         }
 
         sectorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(sectorVertices, 3));
 
         // Cria a malha
-        this.mesh = new THREE.Mesh(sectorGeometry, sectorMaterial);
+        this.mesh = new THREE.Mesh(sectorGeometry, this.sectorMaterial);
 
-        this.mesh.onHover = this.onHover;
+        //Quando o onHover for acionado no mesh, ele vai chamar o onHover do Angle
+        this.mesh.onHover = this.onHover.bind(this);
 
         return this;
     }
 
     onHover(onHover){
 
-        if(!this.pObjs) return;
-
         if (onHover) {
 
-            const elemento = this.pObjs[index].elemento;
+            const elemento = this.text.elemento;
 
             elemento.element.textContent = (this.angulo * (180 / Math.PI)).toFixed() + "°";
 
-            const vetor = new THREE.Vector3(0,0,0).lerpVectors(this.vetor2,this.vetor1,0.5).normalize();
+            const vetor = new THREE.Vector3(0,0,0).lerpVectors(this.vetor2,this.vetor1,0.5).normalize().multiplyScalar(1.2*this.angleRadius);
 
-            elemento.vetor = vetor;
+            const position = this.text.getPosition()
 
-            this.pObjs[index].on = true;
+            const newPosition = position.clone().sub(vetor).add(new THREE.Vector3(0.15,0.15,0))
+
+            elemento.position.copy(newPosition)
+
+            this.text.on = true;
         }
         else{
-            this.pObjs[index].on = false;
+            this.text.on = false;
         }
     }
 
-    setText(textObjects){
-        this.pObjs = textObjects;
+    setText(text){
+        this.text = text;
 
         return this;
+    }
+
+    update(scene){
+
+        this.mesh.geometry.dispose();
+        this.mesh.material.dispose();
+        scene.remove(this.mesh);
+        scene.remove(this.text.elemento)
+
+        this.render();
+
+        scene.add(this.mesh);
+        if(this.text.on)
+        scene.add(this.text.elemento)
     }
 }

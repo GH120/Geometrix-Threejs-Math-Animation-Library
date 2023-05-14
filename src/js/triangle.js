@@ -96,11 +96,8 @@ export class Triangle{
 
     createControlers(camera){
 
-        this.hoverable = this.angles.map(   angle  => new Hoverable(angle.mesh, camera));
-        this.draggable = this.vertices.map( vertex => new Draggable(vertex    , camera));
-
-        this.hoverable.map(hover => hover.observer = this);
-        this.draggable.map(dragg => dragg.observer = this);
+        this.hoverable = this.angles.map(   angle  => new Hoverable(angle.mesh, camera).addObserver(angle));
+        this.draggable = this.vertices.map( vertex => new Draggable(vertex    , camera).addObserver(this));
 
         return this;
     }
@@ -111,8 +108,8 @@ export class Triangle{
 
         this.vertices.map(vertex => scene.add(vertex));
         this.edges.map(   edge   => scene.add(edge));
-        this.angles.map(  angle  => scene.add(angle.mesh));
-        
+        this.angles.map(  angle  => angle.addToScene(scene));
+
         return this;
     }
 
@@ -133,9 +130,11 @@ export class Triangle{
         
         this.edges.map(edge => scene.add(edge));
 
-        this.angles.map(angle => angle.update(scene))
+        //Atualiza a malha dos ângulos
+        this.angles.map(angle => angle.update())
 
-        this.hoverable.map((hover, index) => hover.object = this.angles[index].mesh)  
+        //Manda os controlers de hover apontarem para a nova malha
+        this.hoverable.map((hover, index) => hover.object = this.angles[index].mesh);
     }
 
 }

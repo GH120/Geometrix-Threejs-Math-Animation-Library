@@ -93,9 +93,6 @@ export class Angle{
         // Cria a malha
         this.mesh = new THREE.Mesh(sectorGeometry, this.sectorMaterial);
 
-        //Quando o onHover for acionado no mesh, ele vai chamar o onHover do Angle
-        this.mesh.onHover = this.onHover.bind(this);
-
         return this;
     }
 
@@ -128,7 +125,9 @@ export class Angle{
         return this;
     }
 
-    update(scene){
+    update(){
+
+        const scene = this.scene;
 
         this.mesh.geometry.dispose();
         this.mesh.material.dispose();
@@ -138,7 +137,13 @@ export class Angle{
         this.render();
 
         scene.add(this.mesh);
+
         if(this.text.on)
         scene.add(this.text.elemento)
+    }
+
+    addToScene(scene){
+        this.scene = scene;
+        return this;
     }
 }

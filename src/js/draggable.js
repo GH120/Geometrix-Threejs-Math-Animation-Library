@@ -38,6 +38,7 @@ export class Draggable {
 
       this.object.position.copy(point);
 
+      //Manda o triangulo atualizar a cena
       this.notify();
     }
     
@@ -76,5 +77,10 @@ export class Draggable {
     if(this.observer)
 
     this.observer.update();
+  }
+
+  addObserver(observer){
+    this.observer = observer;
+    return this;
   }
 }

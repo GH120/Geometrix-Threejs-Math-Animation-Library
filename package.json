@@ -1,23 +1,19 @@
 {
-  "name": "threejs",
+  "name": "ensino",
   "version": "1.0.0",
-  "description": "��#\u0000 \u0000T\u0000h\u0000r\u0000e\u0000e\u0000j\u0000s\u0000\r\u0000 \u0000",
+  "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/GH120/Threejs.git"
-  },
+  "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/GH120/Threejs/issues"
-  },
-  "homepage": "https://github.com/GH120/Threejs#readme",
   "dependencies": {
+    "dat": "^14.0.3",
+    "dat.gui": "^0.7.9",
+    "parcel": "^2.8.3",
     "three": "^0.152.2"
-  },
-  "devDependencies": {}
+  }
 }

@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 
 export class Hoverable {
+
   constructor(object, camera) {
 
     this.object = object;
     this.camera = camera;
     this.raycaster = new THREE.Raycaster();
-
-    this.onHover = object.onHover;
+    this.observers = [];
 
     this.onMouseMove = this.onMouseMove.bind(this);
 
@@ -21,9 +21,8 @@ export class Hoverable {
     //Ignora se continua no mesmo estado
     if(this.isInside == isInside) return;
 
-
-    //Caso contrário, chama a função que controla a ação
-    this.onHover(isInside);
+    //Manda os observadores atualizarem
+    this.notify(isInside)
 
     this.isInside = isInside;
   }
@@ -48,5 +47,17 @@ export class Hoverable {
     }
 
     return null;
+  }
+
+  notify(isInside){
+    for(const observer of this.observers) {
+      observer.onHover(isInside);
+      observer.update();
+    }
+  }
+
+  addObserver(observer){
+      this.observers.push(observer);
+      return this;
   }
 }

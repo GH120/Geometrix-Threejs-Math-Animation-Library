@@ -75,7 +75,6 @@ export class Triangle{
         const p = document.createElement('p');
         p.textContent = texto;
         const cPointLabel = new CSS2DObject(p);
-        // this.scene.add(cPointLabel);
         cPointLabel.position.set(...esfera.position);
 
         return cPointLabel;
@@ -106,7 +105,7 @@ export class Triangle{
             let angulo = vetor1.angleTo(vetor2);
 
             if (this.pObjs)
-                this.pObjs[index].element.textContent = (angulo * (180 / Math.PI)).toFixed();
+                this.pObjs[index].element.textContent = (angulo * (180 / Math.PI)).toFixed() + "º";
 
 
             let last = [position[0], position[1], position[2]];

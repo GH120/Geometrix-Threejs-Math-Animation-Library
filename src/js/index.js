@@ -10,13 +10,16 @@ import * as dat from 'dat.gui';
 
 
 const scene = new THREE.Scene();
+const width = window.innerWidth;
+const height = window.innerHeight;
 
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+// const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 0.1, 10 );
 const renderer = new THREE.WebGLRenderer();
 renderer.antialias = true;
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
-//const orbit = new OrbitControls(camera, renderer.domElement);
+const orbit = new OrbitControls(camera, renderer.domElement);
 
 scene.background = new THREE.TextureLoader().load(grid);
 
@@ -27,7 +30,7 @@ labelRenderer.domElement.style.top = '0px';
 document.body.appendChild(labelRenderer.domElement);
 
 
-const triangle = new Triangle(scene)
+const triangle = new Triangle()
                     .renderVertices()
                     .renderEdges()
                     .renderAngles();
@@ -38,23 +41,8 @@ triangle.vertices.map(vertex => new Draggable(vertex,camera));
 
 triangle.vertices.map(vertex => scene.add(vertex));
 
-triangle.angles.map(angle => {
-  console.log(angle);
-  scene.add(angle)
-});
-triangle.angles.map(angle => {
-
-  console.log(angle);
-
-  // const p = document.createElement('p');
-  // p.textContent = "teste";
-  // const cPointLabel = new CSS2DObject(p);
-  // scene.add(cPointLabel);
-  // cPointLabel.position.set(...angle.position);
-  
-
-  return new Hoverable(angle, camera)
-});
+triangle.angles.map(angle => scene.add(angle));
+triangle.angles.map(angle => new Hoverable(angle, camera));
 triangle.edges.map(edge => scene.add(edge));
 
 camera.position.z = 5;

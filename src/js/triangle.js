@@ -116,6 +116,8 @@ export class Triangle{
             return {elemento: this.createText("teste", esfera.position), on:false, getPosition: () => esfera.position};
         });
 
+        // this.nome = {elemento: this.createText("teste", this.vertices[0].position)};
+
 
         return this;
     }
@@ -146,6 +148,7 @@ export class Triangle{
         this.vertices.map(vertex => scene.add(vertex));
         this.edges.map(   edge   => edge.addToScene(scene));
         this.angles.map(  angle  => angle.addToScene(scene));
+        // scene.add(this.nome.elemento);
 
         return this;
     }
@@ -153,6 +156,8 @@ export class Triangle{
     update(){
 
         const scene = this.scene;
+
+        console.log(this.isoceles());
         
         //Atualiza as malhas das arestas
         this.edges.map(edge => edge.update());
@@ -171,6 +176,14 @@ export class Triangle{
     }
 
     isoceles(){
-        return this.angles.map()
+
+        const igual = (a,b) => Math.abs(a.angulo - b.angulo) < Math.PI/135;
+
+        for(const angulo1 of this.angles)
+            for(const angulo2 of this.angles)
+                if(angulo1 != angulo2 && igual(angulo1,angulo2))
+                    return true;
+        
+        return false;
     }
 }

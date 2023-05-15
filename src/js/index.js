@@ -65,7 +65,11 @@ let guiControls = {
       funcaoOnHover = SenoOnHover;
     }
 
-    triangle.hoverable.map((hover,index) => hover.observers[1] = (new funcaoOnHover(triangle, index)))
+    if(funcaoOnHover != null) 
+      triangle.hoverable.map((hover,index) => hover.observers[1] = (new funcaoOnHover(triangle, index)));
+
+    else
+      triangle.hoverable.map((hover,index) => hover.observers[1] = null)
   }
 };
 

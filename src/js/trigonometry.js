@@ -3,9 +3,9 @@ import * as THREE from 'three';
 //Como a lógica geral é só pegar dois lados, seno, cosseno e tangente só mudam o get
 export class TrigOnHover {
 
-    constructor(triangulo, angulo){
+    constructor(triangulo, index){
         this.triangulo = triangulo;
-        this.angulo = angulo;
+        this.index = (index+1)%3;
     }
 
     getHipotenusa(){
@@ -24,7 +24,7 @@ export class TrigOnHover {
         
         const Hipotenusa = this.getHipotenusa();
 
-        const indice = this.angulo.index;
+        const indice = this.index;
 
         const anterior = this.triangulo.edges[(indice+2)%3];
 
@@ -34,7 +34,7 @@ export class TrigOnHover {
     }
 
     getOposto(){
-        const indice = this.angulo.index;
+        const indice = this.index;
 
         const proximo = indice;
 
@@ -70,19 +70,23 @@ export class TrigOnHover {
         //divisor.material = new MeshBasicMaterial({color:0xff0000})
         //dividendo.material = new MeshBasicMaterial({color:0x0000ff})
 
+        if(!this.triangulo.retangulo()) return;
+
         const dividendo = this.dividendo();
         const divisor   = this.divisor();
 
         if(isInside){
 
-            this.memory = [dividendo.material, divisor.material];
+            // this.memory = [dividendo.material, divisor.material];
 
             dividendo.material = new THREE.MeshBasicMaterial({color:0x0000aa});
             divisor.material   = new THREE.MeshBasicMaterial({color:0x880000});
+
+            if(dividendo == divisor) dividendo.material = new THREE.MeshBasicMaterial({color:0x8800aa});
         }
-        else if(this.memory){
-            dividendo.material = this.memory[0];
-            divisor.material   = this.memory[1];
+        else{
+            dividendo.material = new THREE.MeshBasicMaterial({ color: 0xe525252 });
+            divisor.material   = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         }
     }
 
@@ -112,6 +116,14 @@ export class CossenoOnHover extends TrigOnHover{
     divisor(){
         return this.getHipotenusa()
     }
+
+    onHover(isInside){
+        const angle = this.triangulo.angles[(this.index+2)%3];
+
+        if(Math.abs(angle.angulo-Math.PI/2) < 0.001) return;
+
+        super.onHover(isInside);
+    }
 }
 
 export class TangenteOnHover extends TrigOnHover{
@@ -122,6 +134,14 @@ export class TangenteOnHover extends TrigOnHover{
 
     divisor(){
         return this.getAdjacente();
+    }
+
+    onHover(isInside){
+        const angle = this.triangulo.angles[(this.index+2)%3];
+
+        if(Math.abs(angle.angulo-Math.PI/2) < 0.001) return;
+
+        super.onHover(isInside);
     }
 }
 

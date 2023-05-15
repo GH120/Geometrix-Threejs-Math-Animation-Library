@@ -51,6 +51,7 @@ export class Hoverable {
 
   notify(isInside){
     for(const observer of this.observers) {
+      if(observer == null) continue;
       observer.onHover(isInside);
       observer.update();
     }

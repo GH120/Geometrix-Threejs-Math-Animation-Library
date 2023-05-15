@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
+import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './trigonometry';
 
 import {Triangle} from './triangle';
 import grid from '../assets/grid.avif';
@@ -38,15 +39,48 @@ const triangle = new Triangle()
 ////////////////////////////Interfáce gráfica/////////////////////////////////////
 const gui = new dat.GUI();
 
+let guiControls = {
+  trigFunction: 'default',
+  toggleFunction: function() {
+
+    let funcaoOnHover;
+
+    if (guiControls.trigFunction === 'seno') {
+      guiControls.trigFunction = 'cosseno';
+      button.name('Mostrando cosseno');
+      funcaoOnHover = CossenoOnHover;
+    } else if(guiControls.trigFunction === 'cosseno'){
+      guiControls.trigFunction = 'tangente';
+      button.name('Mostrando tangente');
+      funcaoOnHover = TangenteOnHover;
+    }
+    else if(guiControls.trigFunction === 'tangente'){
+      guiControls.trigFunction = 'default';
+      button.name('Mostrando nada');
+      funcaoOnHover = null;
+    }
+    else{
+      guiControls.trigFunction = 'seno';
+      button.name('Mostrando seno');
+      funcaoOnHover = SenoOnHover;
+    }
+
+    triangle.hoverable.map((hover,index) => hover.observers[1] = (new funcaoOnHover(triangle, index)))
+  }
+};
+
+
 const options = {
   "tamanho da esfera": 0.1,
   "grossura": 0.05,
-  "raio do ângulo": 0.7
+  "raio do ângulo": 0.7,
 };
 
 gui.add(options, 'grossura', 0.01, 0.2).onChange( () => triangle.update());
 gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => triangle.update());
 gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => triangle.update());
+let button = gui.add(guiControls, 'toggleFunction');
+button.name("Mostrando nada")
 
 function attOptions() {
   triangle.grossura = options.grossura;

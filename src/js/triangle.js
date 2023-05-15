@@ -147,9 +147,6 @@ export class Triangle{
         this.edges.map(   edge   => edge.addToScene(scene));
         this.angles.map(  angle  => angle.addToScene(scene));
 
-        const seno = new SenoOnHover(this, this.angles[1]);
-        this.hoverable[0].addObserver(seno);
-
         return this;
     }
 
@@ -157,6 +154,7 @@ export class Triangle{
 
         const scene = this.scene;
         
+        //Atualiza as malhas das arestas
         this.edges.map(edge => edge.update());
 
         //Atualiza a malha dos ângulos
@@ -164,12 +162,15 @@ export class Triangle{
 
         //Manda os controlers de hover apontarem para a nova malha
         this.hoverable.map((hover, index) => hover.object = this.angles[index].mesh);
-
-        // const seno = new SenoOnHover(this, this.angles[1]);
-
-        // console.log(seno.getHipotenusa().geometry.parameters.height);
-        // console.log(seno.getRatio());
-        // console.log(seno.getAdjacente());
     }
 
+    retangulo(){
+        return this.angles.map(angle => angle.angulo)
+                          .filter(angulo => Math.abs(angulo - Math.PI/2) < 0.01)
+                          .reduce((ehNoventaGraus, existe) => existe || ehNoventaGraus, false);
+    }
+
+    isoceles(){
+        return this.angles.map()
+    }
 }

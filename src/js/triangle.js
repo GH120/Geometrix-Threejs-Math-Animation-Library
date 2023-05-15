@@ -3,15 +3,76 @@ import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import {Draggable} from './draggable';
 import {Hoverable} from './hoverable';
 import {Angle} from './angle';
+import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './trigonometry';
+
+class Edge {
+
+    constructor(triangle, index){
+        this.triangle = triangle;
+        this.index    = index;
+        this.material = new THREE.MeshBasicMaterial({ color: 0xe525252 });
+        this.grossura = 0.05;
+
+        this.renderMalha();
+    }
+
+    renderMalha(){
+
+        const vertices       = this.triangle.vertices;
+        
+        const proximo        = (this.index+1)%vertices.length;
+
+        const esfera         = vertices[this.index];
+        const esferaSeguinte = vertices[proximo];
+
+        const media     = (eixo) => (esfera.position[eixo] + esferaSeguinte.position[eixo])/2;
+        const diferenca = (eixo) => (-esfera.position[eixo] + esferaSeguinte.position[eixo]);
+
+        const tamanho = ["x","y","z"].map(eixo => diferenca(eixo)).map(d => d*d).reduce((a,b) => a+b , 0);
+
+        const cylinderGeometry = new THREE.CylinderGeometry(this.grossura, this.grossura, Math.sqrt(tamanho), 16);
+
+        const cano = new THREE.Mesh(cylinderGeometry, this.material);
+        cano.position.set(media("x"), media("y"), media("z"));
+
+        cano.lookAt(esferaSeguinte.position);
+
+        cano.rotateX(Math.PI/2);
+
+        this.mesh = cano;
+
+        return this;
+    }
+
+    addToScene(scene){
+        this.scene = scene;
+        this.scene.add(this.mesh)
+        return this;
+    }
+
+    update(){
+        this.mesh.geometry.dispose();
+        this.mesh.material.dispose();
+        this.scene.remove(this.mesh);
+
+        this.renderMalha();
+
+        this.scene.add(this.mesh);
+    }
+
+    getLength(){
+        return (this.mesh)? this.mesh.geometry.parameters.height : 0;
+    }
+}
 
 export class Triangle{
 
     constructor(){
 
         this.grossura = 0.05
-        this.cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.sphereGeometry =   new THREE.SphereGeometry(0.1);
         this.sphereMaterial =   new THREE.MeshBasicMaterial({ color: 0x8c8c8c });
+        this.cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xe525252 });
 
         this.positions = [
             [0,0,0],
@@ -35,30 +96,19 @@ export class Triangle{
     }
 
     renderEdges(){
-        this.edges = this.vertices.map((esfera, indice) => this.createEdge(esfera,indice));
+        this.edges = this.vertices.map((esfera, indice) => new Edge(this,indice));
         return this;
     }
 
-    createEdge(esfera,indice){
+    renderAngles(){
 
-        const esferaSeguinte = this.vertices[(indice+1)%this.vertices.length];
+        const vertices = this.vertices;
+        
+        this.angles = vertices.map( (vertex, index) => new Angle(vertices, index)
+                                                        .setText(this.pObjs[index])
+                                                        .render());
 
-        const media     = (eixo) => (esfera.position[eixo] + esferaSeguinte.position[eixo])/2;
-        const diferenca = (eixo) => (-esfera.position[eixo] + esferaSeguinte.position[eixo]);
-
-        const tamanho = ["x","y","z"].map(eixo => diferenca(eixo)).map(d => d*d).reduce((a,b) => a+b , 0);
-
-        const cylinderGeometry = new THREE.CylinderGeometry(this.grossura, this.grossura, Math.sqrt(tamanho), 16);
-
-        const cano = new THREE.Mesh(cylinderGeometry, this.cylinderMaterial);
-        cano.position.set(media("x"), media("y"), media("z"));
-
-        cano.lookAt(esferaSeguinte.position);
-
-        cano.rotateX(Math.PI/2);
-
-
-        return cano;
+        return this;
     }
 
     renderText() {
@@ -81,19 +131,6 @@ export class Triangle{
         return cPointLabel;
     }
 
-    renderAngles(){
-
-        const sectorMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000});
-
-        const vertices = this.vertices;
-        
-        this.angles = vertices.map( (vertex, index) => new Angle(vertices, index)
-                                                        .setText(this.pObjs[index])
-                                                        .render());
-
-        return this;
-    }
-
     createControlers(camera){
 
         this.hoverable = this.angles.map(   angle  => new Hoverable(angle.mesh, camera).addObserver(angle));
@@ -107,8 +144,11 @@ export class Triangle{
         this.scene = scene;
 
         this.vertices.map(vertex => scene.add(vertex));
-        this.edges.map(   edge   => scene.add(edge));
+        this.edges.map(   edge   => edge.addToScene(scene));
         this.angles.map(  angle  => angle.addToScene(scene));
+
+        const seno = new SenoOnHover(this, this.angles[1]);
+        this.hoverable[0].addObserver(seno);
 
         return this;
     }
@@ -116,25 +156,20 @@ export class Triangle{
     update(){
 
         const scene = this.scene;
-
-        // adicionando vertices
-        this.edges.map(edge => {
-
-            edge.geometry.dispose();
-            edge.material.dispose();
-            scene.remove(edge);
-            
-        });
-
-        this.renderEdges();
         
-        this.edges.map(edge => scene.add(edge));
+        this.edges.map(edge => edge.update());
 
         //Atualiza a malha dos ângulos
         this.angles.map(angle => angle.update())
 
         //Manda os controlers de hover apontarem para a nova malha
         this.hoverable.map((hover, index) => hover.object = this.angles[index].mesh);
+
+        // const seno = new SenoOnHover(this, this.angles[1]);
+
+        // console.log(seno.getHipotenusa().geometry.parameters.height);
+        // console.log(seno.getRatio());
+        // console.log(seno.getAdjacente());
     }
 
 }

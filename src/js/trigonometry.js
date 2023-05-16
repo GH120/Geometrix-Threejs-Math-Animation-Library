@@ -104,7 +104,12 @@ export class TrigOnHover {
 
         const position = vertice.position.clone().add(deslocamento)
 
-        const string = `$$ \\${this.name}(${Math.round(angulo.degrees)}°) = $$`;
+        const colorirTexto = (texto,cor) => texto.split('').map(letra => `\\color{${cor}}` + letra+ " ").reduce((a,b) => a+b, "");
+        
+        const string = `$$ \\${this.name}(${Math.round(angulo.degrees)}°) = 
+                             ${colorirTexto("Cateto","blue")} ~ ${colorirTexto("oposto","blue")}/${colorirTexto("Hipotenusa","red")}
+                        $$`;
+
 
         const text  = this.triangulo.createText(string, position);
 

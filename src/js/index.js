@@ -68,7 +68,7 @@ let guiControls = {
     }
 
     if(funcaoOnHover != null) 
-      triangle.hoverable.map((hover,index) => hover.observers[1] = (new funcaoOnHover(triangle, index)));
+      triangle.hoverable.map((hover,index) => hover.observers[1] = (new funcaoOnHover().setTriangulo(triangle, index)));
 
     else
       triangle.hoverable.map((hover,index) => hover.observers[1] = null)

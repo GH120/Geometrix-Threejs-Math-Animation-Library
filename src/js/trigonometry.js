@@ -1,11 +1,13 @@
 import * as THREE from 'three';
+import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 //Como a lógica geral é só pegar dois lados, seno, cosseno e tangente só mudam o get
 export class TrigOnHover {
 
-    constructor(triangulo, index){
+    setTriangulo(triangulo, index){
         this.triangulo = triangulo;
         this.index = (index+1)%3;
+        return this;
     }
 
     getHipotenusa(){
@@ -55,6 +57,25 @@ export class TrigOnHover {
         return this;
     }
 
+    updateText(){
+        const scene = this.triangulo.scene; 
+
+        if(!scene) return;
+
+        scene.remove(this.text);
+
+        const string = this.name + "(" + this.triangulo.angles[this.index].angulo*(180/Math.PI) + "°" + ")";
+
+        const vertice = this.triangulo.vertices[(this.index+2)%3];
+
+        const text  = this.triangulo.createText(string, vertice.position);
+
+        this.text = text;
+
+        scene.add(this.text);
+        
+    }
+
     createProp(){
         //Cria uma visualização para o seno como uma animação
         //Inicialmente pensando em adicionar uma transição que pega o cateto oposto e translada ele
@@ -93,10 +114,16 @@ export class TrigOnHover {
     update(){
         this.dividendo().update();
         this.divisor().update();
+        this.updateText();
     }
 }
 
 export class SenoOnHover extends TrigOnHover{
+
+    constructor(){
+        super();
+        this.name = "sen";
+    }
 
     dividendo(){
         return this.getOposto();
@@ -108,6 +135,11 @@ export class SenoOnHover extends TrigOnHover{
 }
 
 export class CossenoOnHover extends TrigOnHover{
+
+    constructor(){
+        super();
+        this.name = "cos";
+    }
 
     dividendo(){
         return this.getAdjacente();
@@ -127,6 +159,11 @@ export class CossenoOnHover extends TrigOnHover{
 }
 
 export class TangenteOnHover extends TrigOnHover{
+
+    constructor(){
+        super();
+        this.name = "tan";
+    }
 
     dividendo(){
         return this.getOposto();

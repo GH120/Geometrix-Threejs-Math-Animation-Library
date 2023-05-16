@@ -146,4 +146,8 @@ export class Angle{
         this.scene = scene;
         return this;
     }
+
+    get degrees(){
+        return this.angulo*(180/Math.PI);
+    }
 }

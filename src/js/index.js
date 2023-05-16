@@ -72,6 +72,8 @@ let guiControls = {
 
     else
       triangle.hoverable.map((hover,index) => hover.observers[1] = null)
+
+    console.log(triangle.hoverable);
   }
 };
 

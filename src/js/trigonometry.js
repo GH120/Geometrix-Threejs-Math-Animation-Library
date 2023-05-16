@@ -57,25 +57,6 @@ export class TrigOnHover {
         return this;
     }
 
-    updateText(){
-        const scene = this.triangulo.scene; 
-
-        if(!scene) return;
-
-        scene.remove(this.text);
-
-        const string = this.name + "(" + this.triangulo.angles[this.index].angulo*(180/Math.PI) + "°" + ")";
-
-        const vertice = this.triangulo.vertices[(this.index+2)%3];
-
-        const text  = this.triangulo.createText(string, vertice.position);
-
-        this.text = text;
-
-        scene.add(this.text);
-        
-    }
-
     createProp(){
         //Cria uma visualização para o seno como uma animação
         //Inicialmente pensando em adicionar uma transição que pega o cateto oposto e translada ele
@@ -86,10 +67,6 @@ export class TrigOnHover {
     onHover(isInside){
         //muda a cor das aréstas do triângulo utilizadas no seno
         //Vermelho hipotenusa, azul o cateto oposto
-        //Adicionar nomes dos catetos?
-
-        //divisor.material = new MeshBasicMaterial({color:0xff0000})
-        //dividendo.material = new MeshBasicMaterial({color:0x0000ff})
 
         if(!this.triangulo.retangulo()) return;
 
@@ -97,8 +74,6 @@ export class TrigOnHover {
         const divisor   = this.divisor();
 
         if(isInside){
-
-            // this.memory = [dividendo.material, divisor.material];
 
             dividendo.material = new THREE.MeshBasicMaterial({color:0x0000aa});
             divisor.material   = new THREE.MeshBasicMaterial({color:0x880000});
@@ -109,12 +84,45 @@ export class TrigOnHover {
             dividendo.material = new THREE.MeshBasicMaterial({ color: 0xe525252 });
             divisor.material   = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         }
+
+        this.updateText(isInside);
+    }
+
+    updateText(isInside){
+
+        const scene = this.triangulo.scene; 
+
+        if(!scene) return;
+
+        scene.remove(this.text);
+
+        const vertice = this.triangulo.vertices[(this.index+2)%3];
+
+        const angulo = this.triangulo.angles[(this.index+2)%3];
+
+        const deslocamento = new THREE.Vector3(0,0,0).lerpVectors(angulo.vetor1, angulo.vetor2, 0.5);
+
+        const position = vertice.position.clone().add(deslocamento)
+
+        const string = `$$ \\${this.name}(${Math.round(angulo.degrees)}°) = $$`;
+
+        const text  = this.triangulo.createText(string, position);
+
+        this.text = text;
+
+        //Carrega o Latex
+        MathJax.Hub.Queue(function() {
+            const element = text.element;
+            MathJax.Hub.Typeset([element]);
+        });
+
+        if(isInside) scene.add(this.text);
+        
     }
 
     update(){
         this.dividendo().update();
         this.divisor().update();
-        this.updateText();
     }
 }
 
@@ -122,7 +130,7 @@ export class SenoOnHover extends TrigOnHover{
 
     constructor(){
         super();
-        this.name = "sen";
+        this.name = "sin";
     }
 
     dividendo(){

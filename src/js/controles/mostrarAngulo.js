@@ -11,7 +11,7 @@ export class MostrarAngulo{
 
     }
 
-    createText(getPosition){
+    createText(){
         const p = document.createElement('p');
         p.textContent = "teste";
         p.style = "font-size: 14px; font-weight: bold; color: #333;";

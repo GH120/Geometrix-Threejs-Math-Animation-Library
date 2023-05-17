@@ -109,7 +109,7 @@ export class TrigOnHover {
     }
 
 
-    //Provavelmente mais viável criar um handler de equações
+    //Provavelmente mais viável criar um handler de equações, muito denso esse método sozinho
     updateEquacao(isInside){
 
         const scene = this.triangulo.scene; 
@@ -135,11 +135,15 @@ export class TrigOnHover {
 
         const arredondar = (numero, casas) => parseFloat(numero.toFixed(casas));
 
-        const mostrarRaiz = (valor) => {
+        const mostrarRaiz = (lado) => {
+
+            const valor = lado.length;
+
+            if(lado != this.hipotenusa) return arredondar(valor,3);
 
             const quadrado = arredondar(valor*valor,2);
 
-            return (Math.sqrt(quadrado) % 1 == 0)? arredondar(valor,3) : `\\sqrt${quadrado}`;
+            return (Math.sqrt(quadrado) % 1 == 0)? arredondar(valor,3) : `\\sqrt{${quadrado}}`;
         }
 
         //String de latex
@@ -153,10 +157,10 @@ export class TrigOnHover {
 
                             =
                             \\frac{
-                                \\color{blue}{${arredondar(this.dividendo.length,3)}}
+                                \\color{blue}{${mostrarRaiz(this.dividendo)}}
                             }
                             {
-                                \\color{red}{${mostrarRaiz(this.divisor.length)}}
+                                \\color{red}{${mostrarRaiz(this.divisor)}}
                             }
 
                             \\approx

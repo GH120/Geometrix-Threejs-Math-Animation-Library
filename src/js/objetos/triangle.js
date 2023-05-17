@@ -7,6 +7,7 @@ import {Angle} from './angle';
 import {Edge} from './edge.js';
 
 import {SenoOnHover, CossenoOnHover, TangenteOnHover} from '../controles/trigonometry';
+import { MostrarTipo } from '../controles/mostrarTipo';
 
 
 export class Triangle{
@@ -61,10 +62,12 @@ export class Triangle{
         //É um observer, quando onHover é acionado, adiciona ou remove o texto do ângulo
         this.mostrarAngulo = this.angles.map((angle, index) => new MostrarAngulo(angle, this.vertices[index]));
         this.colorirIsoceles = new ColorirIsoceles(this);
+        this.mostrarTipo = new MostrarTipo(this);
 
         // //Liga esses observers ao hover, quando hover é acionado, ele notifica para mostrar o ângulo
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
+        this.draggable.map(draggable => draggable.addObserver(this.mostrarTipo));
 
         return this;
     }
@@ -78,6 +81,7 @@ export class Triangle{
         this.angles.map(  angle  => angle.addToScene(scene));
 
         this.mostrarAngulo.map(m => m.addToScene(scene));
+        this.mostrarTipo.addToScene(scene);
 
         this.update();
 
@@ -99,8 +103,7 @@ export class Triangle{
     }
 
     retangulo(){
-        return this.angles.map(angle => angle.angulo)
-                          .filter(angulo => Math.abs(angulo - Math.PI/2) < 0.01)
+        return this.angles.map(angulo => Math.abs(angulo.degrees - 90) < 1)
                           .reduce((ehNoventaGraus, existe) => existe || ehNoventaGraus, false);
     }
 

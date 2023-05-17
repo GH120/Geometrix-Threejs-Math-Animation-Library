@@ -41,6 +41,7 @@ export class MostrarTipo {
         const p = document.createElement('p');
         p.textContent = "teste";
         p.style = "font-size: 30px; font-weight: bold; color: #333;";
+        p.style.fontFamily = "Playfair Display, serif"
         const cPointLabel = new CSS2DObject(p);
 
         this.text = cPointLabel;

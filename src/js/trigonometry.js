@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 //Como a lógica geral é só pegar dois lados, seno, cosseno e tangente só mudam o get
+//Os dois lados são o divisor e o dividendo
+
+//get função é sintaxe do javascript para rodar toda vez que for pegar um valor
+//get hipotenusa siginifica que this.hipotenusa é o mesmo de chamar getHipotenusa();
 export class TrigOnHover {
 
     setTriangulo(triangulo, index){
@@ -92,6 +96,8 @@ export class TrigOnHover {
         this.updateEquacao(isInside);
     }
 
+
+    //Provavelmente mais viável criar um handler de equações
     updateEquacao(isInside){
 
         const scene = this.triangulo.scene; 
@@ -100,6 +106,8 @@ export class TrigOnHover {
 
         scene.remove(this.equation);
 
+
+        //Obter posição do texto
         const vertice = this.triangulo.vertices[(this.index+2)%3];
 
         const angulo = this.triangulo.angles[(this.index+2)%3];
@@ -108,6 +116,17 @@ export class TrigOnHover {
 
         const position = vertice.position.clone().add(deslocamento)
 
+
+        //Ideia: criar um handler de equações do latex, para ele decompor ela em passos
+
+        //Mostrar raiz quando houver
+        const quadrado = this.divisor.length*this.divisor.length;
+
+        const arredondar = parseFloat(quadrado.toFixed(1));
+
+        const raiz = (Math.sqrt(arredondar) % 1 == 0)? Math.sqrt(arredondar) : `\\sqrt${arredondar}`;
+
+        //String de latex
         const latex = `$$ \\${this.name}(${Math.round(angulo.degrees)}°) = 
                             \\frac{
                                 \\color{blue}{${this.dividendo.nome}}
@@ -121,9 +140,18 @@ export class TrigOnHover {
                                 \\color{blue}{${this.dividendo.length}}
                             }
                             {
-                                \\color{red}{${this.divisor.length}}
+                                \\color{red}{${raiz}}
                             }
-                            = \\color{purple}{${this.ratio}}
+
+                            \\approx
+
+                            \\frac{
+                                \\color{blue}{${this.dividendo.length}}
+                            }
+                            {
+                                \\color{red}{${this.divisor.length.toFixed(3)}}
+                            }
+                            \\approx \\color{purple}{${this.ratio.toFixed(4)}}
                         $$`;
 
 
@@ -131,7 +159,7 @@ export class TrigOnHover {
 
         this.equation = equation;
 
-        //Carrega o Latex
+        //Carrega o Latex, atualizando o elemento <p> do html
         MathJax.Hub.Queue(function() {
             const element = equation.element;
             MathJax.Hub.Typeset([element]);

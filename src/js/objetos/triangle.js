@@ -60,7 +60,7 @@ export class Triangle{
         this.draggable = this.vertices.map( vertex => new Draggable(vertex    , camera).addObserver(this));
 
         //É um observer, quando onHover é acionado, adiciona ou remove o texto do ângulo
-        this.mostrarAngulo = this.angles.map((angle, index) => new MostrarAngulo(angle, this.vertices[index]));
+        this.mostrarAngulo = this.angles.map((angle, index) => new MostrarAngulo(this, index));
         this.colorirIsoceles = new ColorirIsoceles(this);
         this.mostrarTipo = new MostrarTipo(this);
 

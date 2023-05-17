@@ -3,10 +3,11 @@ import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 export class MostrarAngulo{
 
-    constructor(angulo, vertice){
+    constructor(triangulo, index){
 
-        this.vertice = vertice;
-        this.angulo = angulo;
+        this.triangulo = triangulo;
+        this.vertice = triangulo.vertices[index];
+        this.angulo = triangulo.angles[index];
         this.createText();
 
     }
@@ -34,9 +35,9 @@ export class MostrarAngulo{
 
             const vetor = new THREE.Vector3(0,0,0).lerpVectors(angulo.vetor2,angulo.vetor1,0.5).normalize().multiplyScalar(1.2*angulo.angleRadius);
 
-            const position = this.vertice.position;
+            const position = this.vertice.position.clone();
 
-            const newPosition = position.clone().sub(vetor).add(new THREE.Vector3(0.15,0.15,0))
+            const newPosition = position.sub(vetor).add(new THREE.Vector3(0.15,0.15,0))
 
             elemento.position.copy(newPosition)
 
@@ -60,5 +61,9 @@ export class MostrarAngulo{
     addToScene(scene){
         this.scene = scene;
         return this;
+    }
+
+    get centro(){
+        return this.triangulo.vertices.map(vertice => vertice.position.clone()).reduce((a,b) => a.add(b), new THREE.Vector3(0,0,0)).multiplyScalar(1/3);
     }
 }

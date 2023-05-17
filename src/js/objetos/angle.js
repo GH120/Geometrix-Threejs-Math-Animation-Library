@@ -95,36 +95,7 @@ export class Angle{
 
         return this;
     }
-
-    onHover(onHover){
-
-        if (onHover) {
-
-            const elemento = this.text.elemento;
-
-            elemento.element.textContent = (this.angulo * (180 / Math.PI)).toFixed() + "°";
-
-            const vetor = new THREE.Vector3(0,0,0).lerpVectors(this.vetor2,this.vetor1,0.5).normalize().multiplyScalar(1.2*this.angleRadius);
-
-            const position = this.text.getPosition()
-
-            const newPosition = position.clone().sub(vetor).add(new THREE.Vector3(0.15,0.15,0))
-
-            elemento.position.copy(newPosition)
-
-            this.text.on = true;
-        }
-        else{
-            this.text.on = false;
-        }
-    }
-
-    setText(text){
-        this.text = text;
-
-        return this;
-    }
-
+    
     update(){
 
         const scene = this.scene;
@@ -132,14 +103,10 @@ export class Angle{
         this.mesh.geometry.dispose();
         this.mesh.material.dispose();
         scene.remove(this.mesh);
-        scene.remove(this.text.elemento)
 
         this.render();
 
         scene.add(this.mesh);
-
-        if(this.text.on)
-        scene.add(this.text.elemento)
     }
 
     addToScene(scene){

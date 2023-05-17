@@ -6,6 +6,7 @@ export class Draggable {
     this.camera = camera;
     this.object = object;
     this.dragging = false;
+    this.observers = [];
 
     this.raycaster = new THREE.Raycaster();
 
@@ -73,14 +74,11 @@ export class Draggable {
   }
 
   notify(){
-
-    if(this.observer)
-
-    this.observer.update();
+    for(const observer of this.observers) if(observer) observer.update();
   }
 
   addObserver(observer){
-    this.observer = observer;
+    this.observers.push(observer);
     return this;
-  }
+}
 }

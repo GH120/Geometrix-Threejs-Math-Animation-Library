@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
+
 
 //Como a lógica geral é só pegar dois lados, seno, cosseno e tangente só mudam o get
 //Os dois lados são o divisor e o dividendo
@@ -95,6 +97,17 @@ export class TrigOnHover {
         this.updateEquacao(isInside);
     }
 
+    createText(texto, position) { 
+        const p = document.createElement('p');
+        p.textContent = texto;
+        p.style = "font-size: 14px; font-weight: bold; color: #333;";
+        const cPointLabel = new CSS2DObject(p);
+        // this.scene.add(cPointLabel);
+        cPointLabel.position.set(...position);
+
+        return cPointLabel;
+    }
+
 
     //Provavelmente mais viável criar um handler de equações
     updateEquacao(isInside){
@@ -140,7 +153,7 @@ export class TrigOnHover {
 
                             =
                             \\frac{
-                                \\color{blue}{${mostrarRaiz(this.dividendo.length)}}
+                                \\color{blue}{${arredondar(this.dividendo.length,3)}}
                             }
                             {
                                 \\color{red}{${mostrarRaiz(this.divisor.length)}}
@@ -158,7 +171,7 @@ export class TrigOnHover {
                         $$`;
 
 
-        const equation  = this.triangulo.createText(latex, position);
+        const equation  = this.createText(latex, position);
 
         this.equation = equation;
 

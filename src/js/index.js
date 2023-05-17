@@ -32,7 +32,6 @@ document.body.appendChild(labelRenderer.domElement);
 const triangle = new Triangle()
                     .renderVertices()
                     .renderEdges()
-                    .renderText()
                     .renderAngles()
                     .createControlers(camera)
                     .addToScene(scene);
@@ -82,11 +81,21 @@ const options = {
   "tamanho da esfera": 0.1,
   "grossura": 0.05,
   "raio do ângulo": 0.7,
+  "atualizar": false
 };
 
 gui.add(options, 'grossura', 0.01, 0.2).onChange( () => triangle.update());
 gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => triangle.update());
 gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => triangle.update());
+
+// gui.add({onClick: () => options.atualizar = !options.atualizar},'onClick').nome("atualizar todo frame")
+
+const buttonProperties = {
+  onClick: () => options.atualizar = !options.atualizar
+};
+
+// Step 3: Add the button to the GUI
+gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
 let button = gui.add(guiControls, 'toggleFunction');
 button.name("Mostrando nada")
 
@@ -101,6 +110,7 @@ function attOptions() {
 function animate() {
     requestAnimationFrame( animate );
     attOptions();
+    if(options.atualizar) triangle.update();
     renderer.render( scene, camera );
     labelRenderer.render( scene, camera );
 }

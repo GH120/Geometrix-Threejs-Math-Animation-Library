@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import {Draggable} from '../controles/draggable';
 import {Hoverable} from '../controles/hoverable';
+import {MostrarAngulo} from '../controles/mostrarAngulo';
+import { ColorirIsoceles } from '../controles/colorirIsoceles';
 import {Angle} from './angle';
 import {Edge} from './edge.js';
 
@@ -47,39 +48,23 @@ export class Triangle{
 
         const vertices = this.vertices;
         
-        this.angles = vertices.map( (vertex, index) => new Angle(vertices, index)
-                                                        .setText(this.pObjs[index])
-                                                        .render());
+        this.angles = vertices.map( (vertex, index) => new Angle(vertices, index).render());
 
         return this;
-    }
-
-    renderText() {
-        this.pObjs = this.vertices.map((esfera, indice) => {
-            return {elemento: this.createText("teste", esfera.position), on:false, getPosition: () => esfera.position};
-        });
-
-        // this.nome = {elemento: this.createText("teste", this.vertices[0].position)};
-
-
-        return this;
-    }
-
-    createText(texto, position) { 
-        const p = document.createElement('p');
-        p.textContent = texto;
-        p.style = "font-size: 14px; font-weight: bold; color: #333;";
-        const cPointLabel = new CSS2DObject(p);
-        // this.scene.add(cPointLabel);
-        cPointLabel.position.set(...position);
-
-        return cPointLabel;
     }
 
     createControlers(camera){
 
-        this.hoverable = this.angles.map(   angle  => new Hoverable(angle.mesh, camera).addObserver(angle));
+        this.hoverable = this.angles.map(   angle  => new Hoverable(angle.mesh, camera));
         this.draggable = this.vertices.map( vertex => new Draggable(vertex    , camera).addObserver(this));
+
+        //É um observer, quando onHover é acionado, adiciona ou remove o texto do ângulo
+        this.mostrarAngulo = this.angles.map((angle, index) => new MostrarAngulo(angle, this.vertices[index]));
+        this.colorirIsoceles = new ColorirIsoceles(this);
+
+        // //Liga esses observers ao hover, quando hover é acionado, ele notifica para mostrar o ângulo
+        this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
+        this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
 
         return this;
     }
@@ -91,7 +76,10 @@ export class Triangle{
         this.vertices.map(vertex => scene.add(vertex));
         this.edges.map(   edge   => edge.addToScene(scene));
         this.angles.map(  angle  => angle.addToScene(scene));
-        // scene.add(this.nome.elemento);
+
+        this.mostrarAngulo.map(m => m.addToScene(scene));
+
+        this.update();
 
         return this;
     }
@@ -100,8 +88,6 @@ export class Triangle{
 
         const scene = this.scene;
 
-        console.log(this.isoceles());
-        
         //Atualiza as malhas das arestas
         this.edges.map(edge => edge.update());
 
@@ -120,7 +106,7 @@ export class Triangle{
 
     isoceles(){
 
-        const igual = (a,b) => Math.abs(a.angulo - b.angulo) < Math.PI/135;
+        const igual = (a,b) => Math.abs(a.angulo - b.angulo) < Math.PI/90;
 
         for(const angulo1 of this.angles)
             for(const angulo2 of this.angles)

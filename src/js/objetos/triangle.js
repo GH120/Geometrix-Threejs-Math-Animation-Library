@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
-import {Draggable} from './draggable';
-import {Hoverable} from './hoverable';
+import {Draggable} from '../controles/draggable';
+import {Hoverable} from '../controles/hoverable';
 import {Angle} from './angle';
-import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './trigonometry';
+import {SenoOnHover, CossenoOnHover, TangenteOnHover} from '../controles/trigonometry';
 
 class Edge {
 

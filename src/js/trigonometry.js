@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 //Como a lógica geral é só pegar dois lados, seno, cosseno e tangente só mudam o get
 //Os dois lados são o divisor e o dividendo
@@ -120,11 +119,15 @@ export class TrigOnHover {
         //Ideia: criar um handler de equações do latex, para ele decompor ela em passos
 
         //Mostrar raiz quando houver
-        const quadrado = this.divisor.length*this.divisor.length;
 
-        const arredondar = parseFloat(quadrado.toFixed(1));
+        const arredondar = (numero, casas) => parseFloat(numero.toFixed(casas));
 
-        const raiz = (Math.sqrt(arredondar) % 1 == 0)? Math.sqrt(arredondar) : `\\sqrt${arredondar}`;
+        const mostrarRaiz = (valor) => {
+
+            const quadrado = arredondar(valor*valor,2);
+
+            return (Math.sqrt(quadrado) % 1 == 0)? arredondar(valor,3) : `\\sqrt${quadrado}`;
+        }
 
         //String de latex
         const latex = `$$ \\${this.name}(${Math.round(angulo.degrees)}°) = 
@@ -137,21 +140,21 @@ export class TrigOnHover {
 
                             =
                             \\frac{
-                                \\color{blue}{${this.dividendo.length}}
+                                \\color{blue}{${mostrarRaiz(this.dividendo.length)}}
                             }
                             {
-                                \\color{red}{${raiz}}
+                                \\color{red}{${mostrarRaiz(this.divisor.length)}}
                             }
 
                             \\approx
 
                             \\frac{
-                                \\color{blue}{${this.dividendo.length}}
+                                \\color{blue}{${arredondar(this.dividendo.length,3)}}
                             }
                             {
-                                \\color{red}{${this.divisor.length.toFixed(3)}}
+                                \\color{red}{${arredondar(this.divisor.length,3)}}
                             }
-                            \\approx \\color{purple}{${this.ratio.toFixed(4)}}
+                            \\approx \\color{purple}{${arredondar(this.ratio,3)}}
                         $$`;
 
 

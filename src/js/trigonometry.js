@@ -10,46 +10,50 @@ export class TrigOnHover {
         return this;
     }
 
-    getHipotenusa(){
-
-        const getLength = (cilindro) => (cilindro)? cilindro.getLength() : 0;
+    get hipotenusa(){
 
         const Hipotenusa = this.triangulo.edges.reduce((
-            edge, longest) => (getLength(edge) < getLength(longest))? longest : edge, 
-            null
+            edge, longest) => (edge.length < longest.length)? longest : edge, 
+            {length:0}
         );
+
+        Hipotenusa.nome = "Hipotenusa";
 
         return Hipotenusa;
     }
 
-    getAdjacente(){
+    get adjacente(){
         
-        const Hipotenusa = this.getHipotenusa();
+        const Hipotenusa = this.hipotenusa;
 
         const indice = this.index;
 
         const anterior = this.triangulo.edges[(indice+2)%3];
 
-        const adjacente = [this.triangulo.edges[(indice+1)%3], anterior].filter(lado => lado != Hipotenusa)
+        const adjacente = [this.triangulo.edges[(indice+1)%3], anterior].filter(lado => lado != Hipotenusa)[0];
 
-        return adjacente[0];
+        adjacente.nome = "Cateto~adjacente";
+
+        return adjacente;
     }
 
-    getOposto(){
+    get oposto(){
         const indice = this.index;
 
         const proximo = indice;
 
         const oposto = this.triangulo.edges[proximo];
 
+        oposto.nome = "Cateto~oposto";
+
         return oposto;
     }
 
     //Só mudando esse daqui dá para instanciar seno,cosseno e tangente
-    getRatio(){
+    get ratio(){
 
         //retorna o lado dividendo e o lado divisor
-        return this.dividendo().getLength()/this.divisor().getLength();
+        return this.dividendo.length/this.divisor.length;
     }
 
     addToScene(scene){
@@ -70,8 +74,8 @@ export class TrigOnHover {
 
         if(!this.triangulo.retangulo()) return;
 
-        const dividendo = this.dividendo();
-        const divisor   = this.divisor();
+        const dividendo = this.dividendo;
+        const divisor   = this.divisor;
 
         if(isInside){
 
@@ -85,49 +89,61 @@ export class TrigOnHover {
             divisor.material   = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         }
 
-        this.updateText(isInside);
+        this.updateEquacao(isInside);
     }
 
-    updateText(isInside){
+    updateEquacao(isInside){
 
         const scene = this.triangulo.scene; 
 
         if(!scene) return;
 
-        scene.remove(this.text);
+        scene.remove(this.equation);
 
         const vertice = this.triangulo.vertices[(this.index+2)%3];
 
         const angulo = this.triangulo.angles[(this.index+2)%3];
 
-        const deslocamento = new THREE.Vector3(0,0,0).lerpVectors(angulo.vetor1, angulo.vetor2, 0.5);
+        const deslocamento = new THREE.Vector3(0,0,0).lerpVectors(angulo.vetor1, angulo.vetor2, 0.5).multiplyScalar(2);
 
         const position = vertice.position.clone().add(deslocamento)
 
-        const colorirTexto = (texto,cor) => texto.split('').map(letra => `\\color{${cor}}` + letra+ " ").reduce((a,b) => a+b, "");
-        
-        const string = `$$ \\${this.name}(${Math.round(angulo.degrees)}°) = 
-                             ${colorirTexto("Cateto","blue")} ~ ${colorirTexto("oposto","blue")}/${colorirTexto("Hipotenusa","red")}
+        const latex = `$$ \\${this.name}(${Math.round(angulo.degrees)}°) = 
+                            \\frac{
+                                \\color{blue}{${this.dividendo.nome}}
+                            }
+                            {
+                                \\color{red}{${this.divisor.nome}}
+                            }
+
+                            =
+                            \\frac{
+                                \\color{blue}{${this.dividendo.length}}
+                            }
+                            {
+                                \\color{red}{${this.divisor.length}}
+                            }
+                            = \\color{purple}{${this.ratio}}
                         $$`;
 
 
-        const text  = this.triangulo.createText(string, position);
+        const equation  = this.triangulo.createText(latex, position);
 
-        this.text = text;
+        this.equation = equation;
 
         //Carrega o Latex
         MathJax.Hub.Queue(function() {
-            const element = text.element;
+            const element = equation.element;
             MathJax.Hub.Typeset([element]);
         });
 
-        if(isInside) scene.add(this.text);
+        if(isInside) scene.add(this.equation);
         
     }
 
     update(){
-        this.dividendo().update();
-        this.divisor().update();
+        this.dividendo.update();
+        this.divisor.update();
     }
 }
 
@@ -138,12 +154,12 @@ export class SenoOnHover extends TrigOnHover{
         this.name = "sin";
     }
 
-    dividendo(){
-        return this.getOposto();
+    get dividendo(){
+        return this.oposto;
     }
 
-    divisor(){
-        return this.getHipotenusa()
+    get divisor(){
+        return this.hipotenusa
     }
 }
 
@@ -154,12 +170,12 @@ export class CossenoOnHover extends TrigOnHover{
         this.name = "cos";
     }
 
-    dividendo(){
-        return this.getAdjacente();
+    get dividendo(){
+        return this.adjacente;
     }
 
-    divisor(){
-        return this.getHipotenusa()
+    get divisor(){
+        return this.hipotenusa
     }
 
     onHover(isInside){
@@ -178,12 +194,12 @@ export class TangenteOnHover extends TrigOnHover{
         this.name = "tan";
     }
 
-    dividendo(){
-        return this.getOposto();
+    get dividendo(){
+        return this.oposto;
     }
 
-    divisor(){
-        return this.getAdjacente();
+    get divisor(){
+        return this.adjacente;
     }
 
     onHover(isInside){

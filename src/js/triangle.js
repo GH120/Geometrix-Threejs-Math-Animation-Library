@@ -60,7 +60,7 @@ class Edge {
         this.scene.add(this.mesh);
     }
 
-    getLength(){
+    get length(){
         return (this.mesh)? this.mesh.geometry.parameters.height : 0;
     }
 }

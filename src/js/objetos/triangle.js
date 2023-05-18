@@ -56,15 +56,17 @@ export class Triangle{
 
     createControlers(camera){
 
-        this.hoverable = this.angles.map(   angle  => new Hoverable(angle.mesh, camera));
-        this.draggable = this.vertices.map( vertex => new Draggable(vertex    , camera).addObserver(this));
+        this.hoverable = this.angles.map(   angle  => new Hoverable(angle , camera));
+        this.draggable = this.vertices.map( vertex => new Draggable(vertex, camera).addObserver(this));
 
         //É um observer, quando onHover é acionado, adiciona ou remove o texto do ângulo
         this.mostrarAngulo = this.angles.map((angle, index) => new MostrarAngulo(this, index));
+        //É um observer, colore os ângulos quando o triangulo é isóceles/equilatero
         this.colorirIsoceles = new ColorirIsoceles(this);
+        //É um observer, mostra o tipo desse triângulo
         this.mostrarTipo = new MostrarTipo(this);
 
-        // //Liga esses observers ao hover, quando hover é acionado, ele notifica para mostrar o ângulo
+        // //Liga esses observers ao hover/drag, quando acionados, eles avisam todos os observers
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
         this.draggable.map(draggable => draggable.addObserver(this.mostrarTipo));
@@ -97,9 +99,6 @@ export class Triangle{
 
         //Atualiza a malha dos ângulos
         this.angles.map(angle => angle.update())
-
-        //Manda os controlers de hover apontarem para a nova malha
-        this.hoverable.map((hover, index) => hover.object = this.angles[index].mesh);
     }
 
     retangulo(){
@@ -127,7 +126,7 @@ export class Triangle{
     }
 
     equilatero(){
-        
+
         const arredondar = valor => parseFloat(valor.toFixed());
 
         const igual = (alpha,beta) => Math.abs(arredondar(alpha.degrees) - arredondar(beta.degrees)) == 0;

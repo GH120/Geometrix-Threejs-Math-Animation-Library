@@ -117,4 +117,8 @@ export class Angle{
     get degrees(){
         return this.angulo*(180/Math.PI);
     }
+    
+    get hitbox(){
+        return this.mesh;
+    }
 }

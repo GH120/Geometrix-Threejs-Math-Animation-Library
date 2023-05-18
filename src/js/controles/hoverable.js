@@ -27,7 +27,7 @@ export class Hoverable {
     this.isInside = isInside;
   }
 
-  intersectouObjeto(event, objeto){
+  intersectouObjeto(event){
 
     // Calculate the mouse position in normalized device coordinates (-1 to +1)
     const mouse = new THREE.Vector2(
@@ -38,8 +38,10 @@ export class Hoverable {
 
     // Raycast to determine the intersection point between the mouse and the object's plane
     this.raycaster.setFromCamera(mouse, this.camera);
+
+    const hitbox = this.object.hitbox;
     
-    const intersects = this.raycaster.intersectObject(this.object);
+    const intersects = this.raycaster.intersectObject(hitbox);
 
     if (intersects.length > 0) {
       // Update the object's position to the intersection point

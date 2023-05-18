@@ -14,9 +14,9 @@ export class MostrarTipo {
 
         const maiorAngulo = this.triangulo.angles.reduce((a,b) => (a.degrees > b.degrees)? a : b, 0);
         
-        tipo += (this.triangulo.retangulo())? "Retângulo " : (maiorAngulo.degrees > 90)? "Obtusângulo " : "";
+        tipo += (this.triangulo.retangulo())? "Retângulo " : (maiorAngulo.degrees > 90)? "Obtusângulo " : "Acutângulo ";
 
-        tipo += (this.triangulo.isoceles())? "Isoceles" : "Escaleno";
+        tipo += (this.triangulo.isoceles())? (this.triangulo.equilatero())? "Equilatero " : "Isoceles" : "Escaleno";
 
         this.text.position.copy(this.centro.add(new THREE.Vector3(0,this.raio+0.3,0)));
 

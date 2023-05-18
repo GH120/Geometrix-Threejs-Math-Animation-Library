@@ -103,13 +103,20 @@ export class Triangle{
     }
 
     retangulo(){
-        return this.angles.map(angulo => Math.abs(angulo.degrees - 90) < 1)
+
+        const arredondar = valor => parseFloat(valor.toFixed());
+
+        const igual = (alpha,beta) => Math.abs(arredondar(alpha) - arredondar(beta)) == 0;
+        
+        return this.angles.map(angulo => igual(angulo.degrees, 90))
                           .reduce((ehNoventaGraus, existe) => existe || ehNoventaGraus, false);
     }
 
     isoceles(){
 
-        const igual = (a,b) => Math.abs(a.angulo - b.angulo) < Math.PI/90;
+        const arredondar = valor => parseFloat(valor.toFixed());
+
+        const igual = (alpha,beta) => Math.abs(arredondar(alpha.degrees) - arredondar(beta.degrees)) == 0;
 
         for(const angulo1 of this.angles)
             for(const angulo2 of this.angles)
@@ -117,5 +124,19 @@ export class Triangle{
                     return true;
         
         return false;
+    }
+
+    equilatero(){
+        
+        const arredondar = valor => parseFloat(valor.toFixed());
+
+        const igual = (alpha,beta) => Math.abs(arredondar(alpha.degrees) - arredondar(beta.degrees)) == 0;
+
+        for(const angulo1 of this.angles)
+            for(const angulo2 of this.angles)
+                if(!igual(angulo1,angulo2))
+                    return false;
+        
+        return true;
     }
 }

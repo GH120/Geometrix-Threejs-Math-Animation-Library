@@ -2,11 +2,14 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './controles/trigonometry';
+import {Animacao} from './animacoes/animation';
 
 import {Triangle} from './objetos/triangle';
 import grid from '../assets/grid.avif';
 import * as dat from 'dat.gui';
 
+//Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
+//triangulo.hitbox = new Plane().setPosition(triangulo.center)
 
 //setup Threejs
 const scene = new THREE.Scene();
@@ -106,9 +109,43 @@ function attOptions() {
 }
 ////////////////////////////////////////////////////////////////////////////////////
 
+//Exemplos de animações
+const mudarCor = new Animacao(triangle.angles[1])
+                    .setValorInicial(0x000000)
+                    .setValorFinal(0x0000ff)
+                    .setDuration(300)
+                    .setInterpolacao(function(inicial,final,peso){
+                      // console.log(inicial,final,peso)
+                      return( inicial*(1-peso)*(1-peso)*(1-peso) + final*peso*peso*peso);
+                    })
+                    .setUpdateFunction(function(valor){
+                      this.objeto.sectorMaterial = new THREE.MeshBasicMaterial({color:valor});
+                      console.log(valor);
+                      this.objeto.update();
+                    });
+
+
+const mover = new Animacao(triangle.edges[0])
+                  .setValorInicial(new THREE.Vector3(3,1.5,0))
+                  .setValorFinal(new THREE.Vector3(-5,1.5,0))
+                  .setDuration(3000)
+                  .setInterpolacao(function(inicial,final,peso){
+                    return new THREE.Vector3(0,0,0).lerpVectors(inicial,final,peso);
+                  })
+                  .setUpdateFunction(function(valor){
+                    console.log(valor)
+                    this.objeto.mesh.position.copy(valor)
+                  });
+
+const frames1 = mover.getFrames();
+const frames2 = mudarCor.getFrames();
+
+
 //Loop de animação
 function animate() {
     requestAnimationFrame( animate );
+    // frames1.next();
+    // frames2.next();
     attOptions();
     if(options.atualizar) triangle.update();
     renderer.render( scene, camera );

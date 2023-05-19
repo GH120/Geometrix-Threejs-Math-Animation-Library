@@ -99,6 +99,7 @@ const buttonProperties = {
 };
 
 // Step 3: Add the button to the GUI
+gui.add( {onClick: () => frames1 = divisao.getFrames()}, 'onClick').name('Mostrar animação de divisão');
 gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
 let button = gui.add(guiControls, 'toggleFunction');
 button.name("Mostrando nada")
@@ -110,7 +111,7 @@ function attOptions() {
 }
 ////////////////////////////////////////////////////////////////////////////////////
 
-//Exemplos de animações
+//Exemplos de animações, depois refatorar
 const mudarCor = new Animacao(triangle.angles[1])
                     .setValorInicial(0x000000)
                     .setValorFinal(0x0000ff)
@@ -140,14 +141,14 @@ const divisao = new Divisao(triangle.edges[0], triangle.edges[2]);
 
 divisao.animar();
 
-const frames1 = divisao.getFrames();
+let frames1 = null;
 const frames2 = mudarCor.getFrames();
 
 
 //Loop de animação
 function animate() {
     requestAnimationFrame( animate );
-    frames1.next();
+    if(frames1) frames1.next();
     frames2.next();
     attOptions();
     if(options.atualizar) triangle.update();

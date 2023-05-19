@@ -66,7 +66,7 @@ export class Triangle{
         //É um observer, mostra o tipo desse triângulo
         this.mostrarTipo = new MostrarTipo(this);
 
-        // //Liga esses observers ao hover/drag, quando acionados, eles avisam todos os observers
+        // //Liga esses observers ao hover/drag, quando acionados, eles avisam seus observers
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
         this.draggable.map(draggable => draggable.addObserver(this.mostrarTipo));

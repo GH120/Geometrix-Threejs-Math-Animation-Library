@@ -3,6 +3,7 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './controles/trigonometry';
 import {Animacao} from './animacoes/animation';
+import {Divisao} from './animacoes/divisao';
 
 import {Triangle} from './objetos/triangle';
 import grid from '../assets/grid.avif';
@@ -115,12 +116,10 @@ const mudarCor = new Animacao(triangle.angles[1])
                     .setValorFinal(0x0000ff)
                     .setDuration(300)
                     .setInterpolacao(function(inicial,final,peso){
-                      // console.log(inicial,final,peso)
                       return( inicial*(1-peso)*(1-peso)*(1-peso) + final*peso*peso*peso);
                     })
                     .setUpdateFunction(function(valor){
                       this.objeto.sectorMaterial = new THREE.MeshBasicMaterial({color:valor});
-                      console.log(valor);
                       this.objeto.update();
                     });
 
@@ -137,15 +136,19 @@ const mover = new Animacao(triangle.edges[0])
                     this.objeto.mesh.position.copy(valor)
                   });
 
-const frames1 = mover.getFrames();
+const divisao = new Divisao(triangle.edges[0], triangle.edges[2]);
+
+divisao.animar();
+
+const frames1 = divisao.getFrames();
 const frames2 = mudarCor.getFrames();
 
 
 //Loop de animação
 function animate() {
     requestAnimationFrame( animate );
-    // frames1.next();
-    // frames2.next();
+    frames1.next();
+    frames2.next();
     attOptions();
     if(options.atualizar) triangle.update();
     renderer.render( scene, camera );

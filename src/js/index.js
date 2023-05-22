@@ -124,26 +124,12 @@ const mudarCor = new Animacao(triangle.angles[1])
                       this.objeto.update();
                     });
 
-
-const mover = new Animacao(triangle.edges[0])
-                  .setValorInicial(new THREE.Vector3(3,1.5,0))
-                  .setValorFinal(new THREE.Vector3(-5,1.5,0))
-                  .setDuration(3000)
-                  .setInterpolacao(function(inicial,final,peso){
-                    return new THREE.Vector3(0,0,0).lerpVectors(inicial,final,peso);
-                  })
-                  .setUpdateFunction(function(valor){
-                    console.log(valor)
-                    this.objeto.mesh.position.copy(valor)
-                  });
-
 const divisao = new Divisao(triangle.edges[0], triangle.edges[2]);
 
 divisao.animar();
 
 //Atualiza a animação quando o triângulo é alterado
 triangle.draggable.map(drag => drag.addObserver({update:() => divisao.animar()}));
-triangle.hoverable.map(hover => hover.addObserver({update: () => divisao.animar()}))
 
 let frames1 = null;
 const frames2 = mudarCor.getFrames();

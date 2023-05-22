@@ -30,6 +30,16 @@ export class Animacao {
         return this;
     }
 
+    manterExecucao(){
+        this.update(this.valorFinal);
+        return this;
+    }
+
+    terminarExecucao(){
+        this.update(this.valorInicial);
+        return this;
+    }
+
     *getFrames(){
 
         for(let frame = 1; frame <= this.frames; frame++){
@@ -46,5 +56,6 @@ export class Animacao {
 
             yield valor;
         }
+
     }
 }

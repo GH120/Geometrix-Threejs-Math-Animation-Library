@@ -13,7 +13,12 @@ export class TrigOnHover {
     setTriangulo(triangulo, index){
         this.triangulo = triangulo;
         this.index = (index+1)%3;
-        this.animar = false;
+        this.animar = true;
+        return this;
+    }
+
+    setPilhaAnimacao(pilha){
+        this.pilha = pilha;
         return this;
     }
 
@@ -73,12 +78,11 @@ export class TrigOnHover {
         //Inicialmente pensando em adicionar uma transição que pega o cateto oposto e translada ele
         //para a parte direita da tela, com cor (azul?) e fazer o mesmo para a hipotenusa(vermelha?)
         //assim, vai ter uma superposição dos dois lados esticados verticalmente, podendo fazer uma razão geométrica
-        console.log(this.animar)
-        if(!this.animar) return;
+        if(!this.animar || !this.pilha) return;
 
         const divisao = new Divisao(this.dividendo, this.divisor);
 
-        this.frames = divisao.animar().getFrames();
+        this.pilha.push(divisao.animar().getFrames());
     }
 
     onHover(isInside){

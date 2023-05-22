@@ -2,7 +2,7 @@ export class Animacao {
 
     constructor(objeto){
         this.objeto = objeto;
-        this.frame = 0;
+        this.frames = 0;
     }
 
     setValorInicial(valorInicial){

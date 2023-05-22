@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
+import {Divisao} from '../animacoes/divisao';
 
 
 //Como a lógica geral é só pegar dois lados, seno, cosseno e tangente só mudam o get
@@ -12,6 +13,7 @@ export class TrigOnHover {
     setTriangulo(triangulo, index){
         this.triangulo = triangulo;
         this.index = (index+1)%3;
+        this.animar = false;
         return this;
     }
 
@@ -71,6 +73,12 @@ export class TrigOnHover {
         //Inicialmente pensando em adicionar uma transição que pega o cateto oposto e translada ele
         //para a parte direita da tela, com cor (azul?) e fazer o mesmo para a hipotenusa(vermelha?)
         //assim, vai ter uma superposição dos dois lados esticados verticalmente, podendo fazer uma razão geométrica
+        console.log(this.animar)
+        if(!this.animar) return;
+
+        const divisao = new Divisao(this.dividendo, this.divisor);
+
+        this.frames = divisao.animar().getFrames();
     }
 
     onHover(isInside){
@@ -189,9 +197,11 @@ export class TrigOnHover {
         
     }
 
+    //O problema está aqui
     update(){
         this.dividendo.update();
         this.divisor.update();
+        this.createProp();
     }
 }
 

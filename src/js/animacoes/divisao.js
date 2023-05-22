@@ -9,6 +9,8 @@ export class Divisao extends Animacao{
         this.divisor = lado2;
     }
     
+    //Problema na interpolação de quatérnios, resolver depois...
+    //Por enquanto, usar a cópia
     animar(){
         const angle = Math.PI; // 180 degrees in radians
 
@@ -16,14 +18,15 @@ export class Divisao extends Animacao{
 
         const quaternionFinal = new THREE.Quaternion().setFromAxisAngle(axis, angle);
 
-        let quaternionInicial = this.dividendo.mesh.quaternion;
+        const quaternionInicial = this.dividendo.mesh.quaternion;
 
+        //Gambiarra1
         const girar = new Animacao(this.dividendo)
                       .setValorInicial(quaternionInicial)
                       .setValorFinal(quaternionFinal)
                       .setDuration(1200)
                       .setInterpolacao(function(inicial,final,peso){
-                        return new THREE.Quaternion().slerpQuaternions(inicial,final,peso);
+                        return new THREE.Quaternion().slerpQuaternions(this.objeto.mesh.quaternion,final,peso);
                       })
                       .setUpdateFunction(function(quaternion){
                         this.objeto.mesh.quaternion.copy(quaternion);
@@ -44,14 +47,15 @@ export class Divisao extends Animacao{
                         this.objeto.mesh.position.copy(position);
                       })
         
-        quaternionInicial = this.divisor.mesh.quaternion;
+        const quaternionInicial2 = this.divisor.mesh.quaternion;
 
+        //Gambiarra2
         const girar2 = new Animacao(this.divisor)
-                        .setValorInicial(quaternionInicial)
+                        .setValorInicial(quaternionInicial2)
                         .setValorFinal(quaternionFinal)
                         .setDuration(1200)
                         .setInterpolacao(function(inicial,final,peso){
-                            return new THREE.Quaternion().slerpQuaternions(inicial,final,peso);
+                            return new THREE.Quaternion().slerpQuaternions(this.objeto.mesh.quaternion,final,peso);
                         })
                         .setUpdateFunction(function(quaternion){
                             this.objeto.mesh.quaternion.copy(quaternion);
@@ -75,6 +79,8 @@ export class Divisao extends Animacao{
         
         
         this.animations = [mover,girar,mover2,girar2].map(animation => animation.getFrames());
+
+        return this;
     }
 
     *getFrames(){

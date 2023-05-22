@@ -46,6 +46,7 @@ export class Edge {
     }
 
     update(){
+        
         this.mesh.geometry.dispose();
         this.mesh.material.dispose();
         this.scene.remove(this.mesh);
@@ -57,5 +58,9 @@ export class Edge {
 
     get length(){
         return (this.mesh)? this.mesh.geometry.parameters.height : 0;
+    }
+
+    get quaternion(){
+        return this.mesh.quaternion;
     }
 }

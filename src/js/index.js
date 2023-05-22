@@ -70,9 +70,9 @@ let guiControls = {
       funcaoOnHover = SenoOnHover;
     }
 
-    if(funcaoOnHover != null) 
+    if(funcaoOnHover != null){ 
       triangle.hoverable.map((hover,index) => hover.observers[1] = (new funcaoOnHover().setTriangulo(triangle, index)));
-
+    }
     else
       triangle.hoverable.map((hover,index) => hover.observers[1] = null)
 
@@ -99,7 +99,7 @@ const buttonProperties = {
 };
 
 // Step 3: Add the button to the GUI
-gui.add( {onClick: () => frames1 = divisao.getFrames()}, 'onClick').name('Mostrar animação de divisão');
+gui.add( {onClick: () => frames1 = divisao.animar().getFrames()}, 'onClick').name('Mostrar animação de divisão');
 gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
 let button = gui.add(guiControls, 'toggleFunction');
 button.name("Mostrando nada")
@@ -140,6 +140,10 @@ const mover = new Animacao(triangle.edges[0])
 const divisao = new Divisao(triangle.edges[0], triangle.edges[2]);
 
 divisao.animar();
+
+//Atualiza a animação quando o triângulo é alterado
+triangle.draggable.map(drag => drag.addObserver({update:() => divisao.animar()}));
+triangle.hoverable.map(hover => hover.addObserver({update: () => divisao.animar()}))
 
 let frames1 = null;
 const frames2 = mudarCor.getFrames();

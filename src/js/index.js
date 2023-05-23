@@ -85,12 +85,14 @@ const options = {
   "tamanho da esfera": 0.1,
   "grossura": 0.05,
   "raio do ângulo": 0.7,
-  "atualizar": false
+  "atualizar": false,
+  "duração da animação":90
 };
 
 gui.add(options, 'grossura', 0.01, 0.2).onChange( () => triangle.update());
 gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => triangle.update());
 gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => triangle.update());
+gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
 
 // gui.add({onClick: () => options.atualizar = !options.atualizar},'onClick').nome("atualizar todo frame")
 

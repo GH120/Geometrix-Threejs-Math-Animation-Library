@@ -126,7 +126,7 @@ const mudarCor = new Animacao(triangle.angles[1])
                       this.objeto.update();
                     });
 
-const divisao = new Divisao(triangle.edges[0], triangle.edges[2]);
+const divisao = new Divisao(triangle.edges[0], triangle.edges[2]).addToScene(scene);
 
 divisao.animar();
 

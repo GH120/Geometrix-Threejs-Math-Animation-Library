@@ -77,55 +77,83 @@ export class Divisao extends Animacao{
     //Esses clones são sobrepostos de modo a cobrir o dividendo
     dividir(){
 
-        let numero = 0;
+        const divisor   = this.divisor.length;
+        const dividendo = this.dividendo.length;
 
-        let divisor   = this.divisor.length;
-        let dividendo = this.dividendo.length;
+        const numero = dividendo/divisor;
 
-        for(let i = 0; i < 10; i++){
+        const resto = numero%1;
 
-            const clones = dividendo/divisor;
+        const clones = numero - resto;
 
-            const potencia = 10 ** -i;
+        const animacoes = [];
 
-            numero += (clones - clones%1) * potencia;
+        for(let i = 0; i < clones; i++){
+          const copia = this.divisor.mesh.clone();
 
-            dividendo = dividendo%divisor;
-            divisor   /= 10;
+          this.scene.add(copia);
 
-            //Yield a clone, dividendo, divisor
+          const altura = divisor*i-(dividendo-divisor)/2
+
+          const posicaoFinal = this.dividendo.mesh.position.clone()
+                               .add(new THREE.Vector3(0,altura,0.005))
+
+          const animacao =  new Animacao(copia)
+                            .setValorInicial(this.divisor.mesh.position.clone())
+                            .setValorFinal(posicaoFinal)
+                            .setDuration(50)
+                            .setDelay(this.delay)
+                            .setInterpolacao(function(inicial,final,peso){
+                                return new THREE.Vector3().lerpVectors(inicial,final,peso);
+                            })
+                            .setUpdateFunction(function(posicao){
+                                this.objeto.position.copy(posicao);
+                            })
+                            .setOnTermino(() => this.scene.remove(copia))
+
+          animacoes.push(animacao);
         }
-    }
 
-    turno(numeroDeClones, numero, dividendo, divisor){
-
-      //Torna o tamanho do divisor para o seu novo tamanho
-      //Cria o numeroDeClones do lado divisor, de tamanho divisor
-      //Mapeia cada um para adicionar a cena
-      //Vai criar uma animação para cada um para ir de sua posição original a posição de altura h
-      //h vai ser a altura atingida até aquele ponto(this.dividendo.length-dividendo) + n*divisor, onde n é o número do clone
-      //Retorna o array das animações
+        return animacoes;
     }
 
     *getFrames(){
-
-        this.dividir();
 
         this.animations.map(animation => animation.setDuration(this.frames));
 
         const action = this.animations.map(animation => animation.getFrames());
 
-        //Muda cada ação individual a cada frame
+        //Yield retorna cada ação individual a cada frame
+        //Move os dois lados para ficarem verticalmente lado a lado no canto direito
         for(let i =0; i < this.frames; i++){
             yield action.map(action => action.next());
         }
 
-        //Mantém o resultado final da animação em estado de inércia
-        for(let i=0; i < this.delay; i++){
-            yield this.animations.map(animation => animation.manterExecucao());
+        const dividir = this.dividir();
+
+        const animarDivisao = dividir.map(divisao => divisao.getFrames());
+
+        for(const divisao of animarDivisao){
+          yield* divisao;
         }
+
+        //Mantém o resultado final da animação em estado de inércia e anima a divisão
+        for(let i=0; i < this.delay; i++){
+            yield [
+              this.animations.map(animation => animation.manterExecucao()),
+              dividir.map(animation => animation.manterExecucao())
+            ];
+        }
+
+        //Remove os componentes da divisão da cena
+        dividir.map(animacao => animacao.onTermino());
 
         //Volta a animação ao estado inicial, como se nada tivesse acontecido
         yield this.animations.map(animation => animation.terminarExecucao());
+    }
+
+    addToScene(scene){
+      this.scene = scene;
+      return this;
     }
 }

@@ -3,6 +3,7 @@ export class Animacao {
     constructor(objeto){
         this.objeto = objeto;
         this.frames = 0;
+        this.delay = 0;
     }
 
     setValorInicial(valorInicial){
@@ -20,6 +21,11 @@ export class Animacao {
         return this;
     }
 
+    setDelay(delay){
+        this.delay = delay;
+        return this;
+    }
+
     setInterpolacao(interpolacao){
         this.interpolacao = interpolacao;
         return this;
@@ -27,6 +33,11 @@ export class Animacao {
 
     setUpdateFunction(update){
         this.update = update;
+        return this;
+    }
+
+    setOnTermino(onTermino){
+        this.onTermino = onTermino;
         return this;
     }
 

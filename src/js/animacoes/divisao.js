@@ -37,12 +37,15 @@ export class Divisao extends Animacao{
 
     //Animação para mover um lado
     mover(lado, posicaoInicial, posicaoFinal){
+      
+      //Uma curva de bezier para tornar a animação mais fluida
+      const curva = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
 
       return new Animacao(lado)
                 .setValorInicial(posicaoInicial)
                 .setValorFinal(posicaoFinal)
                 .setInterpolacao(function(inicial,final,peso){
-                  return new THREE.Vector3().lerpVectors(inicial,final,peso);
+                  return new THREE.Vector3().lerpVectors(inicial,final,curva(peso));
                 })
                 .setUpdateFunction(function(position){
                   this.objeto.mesh.position.copy(position);
@@ -52,11 +55,14 @@ export class Divisao extends Animacao{
     //Animação para girar um lado
     girar(lado, quaternionInicial, quaternionFinal){
 
+      //Uma curva de bezier para tornar a animação mais fluida
+      const curva = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
+
       return new Animacao(lado)
                 .setValorInicial(quaternionInicial)
                 .setValorFinal(quaternionFinal)
                 .setInterpolacao(function(inicial,final,peso){
-                  return new THREE.Quaternion().slerpQuaternions(inicial,final,peso);
+                  return new THREE.Quaternion().slerpQuaternions(inicial,final,curva(peso));
                 })
                 .setUpdateFunction(function(quaternion){
                   this.objeto.mesh.quaternion.copy(quaternion);

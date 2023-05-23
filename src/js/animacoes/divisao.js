@@ -9,6 +9,7 @@ export class Divisao extends Animacao{
         this.divisor = lado2;
         this.frames = 90;
         this.delay = 45;
+        this.dividir();
     }
 
     //Cria as animações a serem usadas
@@ -33,7 +34,7 @@ export class Divisao extends Animacao{
       this.animations = [mover,girar,mover2,girar2];
 
       return this;
-  }
+    }
 
     //Animação para mover um lado
     mover(lado, posicaoInicial, posicaoFinal){
@@ -69,7 +70,46 @@ export class Divisao extends Animacao{
                 });
     }
 
+    //Agora que os lados estão juntos, fazer a animação da divisão
+    //A lógica do algoritmo é a seguinte: 
+    //Se o lado divisor for maior, então ele gera um lado 10x menor para ser o novo divisor
+    //Senão, o divisor é clonado o número de vezes que ele cabe no dividendo, sobrando o resto
+    //Esses clones são sobrepostos de modo a cobrir o dividendo
+    dividir(){
+
+        let numero = 0;
+
+        let divisor   = this.divisor.length;
+        let dividendo = this.dividendo.length;
+
+        for(let i = 0; i < 10; i++){
+
+            const clones = dividendo/divisor;
+
+            const potencia = 10 ** -i;
+
+            numero += (clones - clones%1) * potencia;
+
+            dividendo = dividendo%divisor;
+            divisor   /= 10;
+
+            //Yield a clone, dividendo, divisor
+        }
+    }
+
+    turno(numeroDeClones, numero, dividendo, divisor){
+
+      //Torna o tamanho do divisor para o seu novo tamanho
+      //Cria o numeroDeClones do lado divisor, de tamanho divisor
+      //Mapeia cada um para adicionar a cena
+      //Vai criar uma animação para cada um para ir de sua posição original a posição de altura h
+      //h vai ser a altura atingida até aquele ponto(this.dividendo.length-dividendo) + n*divisor, onde n é o número do clone
+      //Retorna o array das animações
+    }
+
     *getFrames(){
+
+        this.dividir();
 
         this.animations.map(animation => animation.setDuration(this.frames));
 

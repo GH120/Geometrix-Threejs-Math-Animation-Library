@@ -101,7 +101,7 @@ const buttonProperties = {
 };
 
 // Step 3: Add the button to the GUI
-gui.add( {onClick: () => frames1 = divisao.animar().getFrames()}, 'onClick').name('Mostrar animação de divisão');
+gui.add( {onClick: () => frames1 = divisao.getFrames()}, 'onClick').name('Mostrar animação de divisão');
 gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
 let button = gui.add(guiControls, 'toggleFunction');
 button.name("Mostrando nada")
@@ -127,11 +127,6 @@ const mudarCor = new Animacao(triangle.angles[1])
                     });
 
 const divisao = new Divisao(triangle.edges[0], triangle.edges[2]).addToScene(scene);
-
-divisao.animar();
-
-//Atualiza a animação quando o triângulo é alterado
-triangle.draggable.map(drag => drag.addObserver({update:() => divisao.animar()}));
 
 let frames1 = null;
 const frames2 = mudarCor.getFrames();

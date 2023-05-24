@@ -9,11 +9,40 @@ export class Divisao extends Animacao{
         this.divisor = lado2;
         this.frames = 90;
         this.delay = 45;
-        this.dividir();
+    }
+
+    *getFrames(){
+
+        //Posiciona primeiro os lados no canto direito
+        const posicionar       = this.posicionar().setDuration(this.frames);
+        const posicionarFrames = posicionar.getFrames();
+
+        yield* posicionarFrames;
+
+
+        //Depois executa o algoritmo da divisão
+        const dividir       = this.dividir();
+        const dividirFrames = dividir.getFrames();
+
+        yield* dividirFrames;
+
+        //Mantém o resultado final da animação em estado de inércia e anima a divisão
+        for(let i=0; i < this.delay; i++){
+            yield [
+              posicionar.manterExecucao(),
+              dividir.manterExecucao()
+            ]
+        }
+
+        //Remove os componentes da divisão da cena
+        dividir.onTermino();
+
+        //Volta os lados para sua posição e orientação originais
+        posicionar.terminarExecucao();
     }
 
     //Cria as animações a serem usadas
-    animar(){
+    posicionar(){
 
       const posicaoInicial = this.dividendo.mesh.position.clone();
       const posicaoFinal = new THREE.Vector3(3,0,0).add(posicaoInicial);
@@ -31,43 +60,7 @@ export class Divisao extends Animacao{
       const quaternionInicial2 = this.divisor.mesh.quaternion.clone();
       const girar2 = this.girar(this.divisor, quaternionInicial2, quaternionFinal)
       
-      this.posicionar = new Animacao.simultanea(mover,girar,mover2,girar2);
-
-      return this;
-    }
-
-    //Animação para mover um lado
-    mover(lado, posicaoInicial, posicaoFinal){
-      
-      //Uma curva de bezier para tornar a animação mais fluida
-      const curva = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
-
-      return new Animacao(lado)
-                .setValorInicial(posicaoInicial)
-                .setValorFinal(posicaoFinal)
-                .setInterpolacao(function(inicial,final,peso){
-                  return new THREE.Vector3().lerpVectors(inicial,final,curva(peso));
-                })
-                .setUpdateFunction(function(position){
-                  this.objeto.mesh.position.copy(position);
-                })
-    }
-
-    //Animação para girar um lado
-    girar(lado, quaternionInicial, quaternionFinal){
-
-      //Uma curva de bezier para tornar a animação mais fluida
-      const curva = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
-
-      return new Animacao(lado)
-                .setValorInicial(quaternionInicial)
-                .setValorFinal(quaternionFinal)
-                .setInterpolacao(function(inicial,final,peso){
-                  return new THREE.Quaternion().slerpQuaternions(inicial,final,curva(peso));
-                })
-                .setUpdateFunction(function(quaternion){
-                  this.objeto.mesh.quaternion.copy(quaternion);
-                });
+      return Animacao.simultanea(mover,girar,mover2,girar2);
     }
 
     //Agora que os lados estão juntos, fazer a animação da divisão
@@ -154,35 +147,38 @@ export class Divisao extends Animacao{
         return Animacao.sequencial(...dividir);
     }
 
-    *getFrames(){
+    //Animação para mover um lado
+    mover(lado, posicaoInicial, posicaoFinal){
+      
+      //Uma curva de bezier para tornar a animação mais fluida
+      const curva = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
 
-        const posicionar = this.posicionar;
+      return new Animacao(lado)
+                .setValorInicial(posicaoInicial)
+                .setValorFinal(posicaoFinal)
+                .setInterpolacao(function(inicial,final,peso){
+                  return new THREE.Vector3().lerpVectors(inicial,final,curva(peso));
+                })
+                .setUpdateFunction(function(position){
+                  this.objeto.mesh.position.copy(position);
+                })
+    }
 
-        posicionar.setDuration(this.frames)
+    //Animação para girar um lado
+    girar(lado, quaternionInicial, quaternionFinal){
 
-        const posicionarFrames = this.posicionar.getFrames();
+      //Uma curva de bezier para tornar a animação mais fluida
+      const curva = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
 
-        yield* posicionarFrames;
-
-        const dividir = this.dividir();
-
-        const dividirFrames = dividir.getFrames();
-
-        yield* dividirFrames;
-
-        //Mantém o resultado final da animação em estado de inércia e anima a divisão
-        for(let i=0; i < this.delay; i++){
-            yield [
-              posicionar.manterExecucao(),
-              dividir.manterExecucao()
-            ]
-        }
-
-        //Remove os componentes da divisão da cena
-        dividir.onTermino();
-
-        //Volta os lados para sua posição e orientação originais
-        posicionar.terminarExecucao();
+      return new Animacao(lado)
+                .setValorInicial(quaternionInicial)
+                .setValorFinal(quaternionFinal)
+                .setInterpolacao(function(inicial,final,peso){
+                  return new THREE.Quaternion().slerpQuaternions(inicial,final,curva(peso));
+                })
+                .setUpdateFunction(function(quaternion){
+                  this.objeto.mesh.quaternion.copy(quaternion);
+                });
     }
 
     addToScene(scene){

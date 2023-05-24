@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "deploy":"gh-pages -d src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,6 +14,7 @@
   "dependencies": {
     "dat": "^14.0.3",
     "dat.gui": "^0.7.9",
+    "gh-pages": "^5.0.0",
     "parcel": "^2.8.3",
     "three": "^0.152.2"
   }

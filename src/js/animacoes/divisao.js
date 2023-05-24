@@ -31,7 +31,7 @@ export class Divisao extends Animacao{
       const quaternionInicial2 = this.divisor.mesh.quaternion.clone();
       const girar2 = this.girar(this.divisor, quaternionInicial2, quaternionFinal)
       
-      this.animations = [mover,girar,mover2,girar2];
+      this.posicionar = new Animacao.simultanea(mover,girar,mover2,girar2);
 
       return this;
     }
@@ -86,7 +86,7 @@ export class Divisao extends Animacao{
 
         const clones = numero - resto;
 
-        const animacoes = [];
+        const dividir = [];
 
         for(let i = 0; i < clones; i++){
           
@@ -103,7 +103,7 @@ export class Divisao extends Animacao{
 
           const curva = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
 
-          const animacao =  new Animacao(copia)
+          const mover =  new Animacao(copia)
                             .setValorInicial(posicaoInicial)
                             .setValorFinal(posicaoFinal)
                             .setDuration(this.frames/2)
@@ -126,10 +126,21 @@ export class Divisao extends Animacao{
 
           const quaternionFinal  = quaternionInicial.clone().multiply(rotacao);
 
-          const giro =      new Animacao(copia)
+          const giro1 =      new Animacao(copia)
+                            .setValorInicial(quaternionInicial)
+                            .setValorFinal(quaternionFinal)
+                            .setDuration(this.frames/4)
+                            .setInterpolacao(function(inicial,final,peso){
+                              return new THREE.Quaternion().slerpQuaternions(inicial,final,curva(peso));
+                            })
+                            .setUpdateFunction(function(quaternion){
+                              this.objeto.quaternion.copy(quaternion);
+                            })
+
+          const giro2 =      new Animacao(copia)
                             .setValorInicial(quaternionFinal)
                             .setValorFinal(quaternionInicial)
-                            .setDuration(this.frames/2)
+                            .setDuration(this.frames/4)
                             .setInterpolacao(function(inicial,final,peso){
                               return new THREE.Quaternion().slerpQuaternions(inicial,final,curva(peso));
                             })
@@ -137,45 +148,41 @@ export class Divisao extends Animacao{
                               this.objeto.quaternion.copy(quaternion);
                             })
           
-          animacoes.push(Animacao.juntar(animacao,giro))
+          dividir.push(Animacao.simultanea(mover,Animacao.sequencial(giro1,giro2)))
         }
 
-        return animacoes;
+        return Animacao.sequencial(...dividir);
     }
 
     *getFrames(){
 
-        this.animations.map(animation => animation.setDuration(this.frames));
+        const posicionar = this.posicionar;
 
-        const action = this.animations.map(animation => animation.getFrames());
+        posicionar.setDuration(this.frames)
 
-        //Yield retorna cada ação individual a cada frame
-        //Move os dois lados para ficarem verticalmente lado a lado no canto direito
-        for(let i =0; i < this.frames; i++){
-            yield action.map(action => action.next());
-        }
+        const posicionarFrames = this.posicionar.getFrames();
+
+        yield* posicionarFrames;
 
         const dividir = this.dividir();
 
-        const animarDivisao = dividir.map(divisao => divisao.getFrames());
+        const dividirFrames = dividir.getFrames();
 
-        for(const divisao of animarDivisao){
-          yield* divisao;
-        }
+        yield* dividirFrames;
 
         //Mantém o resultado final da animação em estado de inércia e anima a divisão
         for(let i=0; i < this.delay; i++){
             yield [
-              this.animations.map(animation => animation.manterExecucao()),
-              dividir.map(animation => animation.manterExecucao())
-            ];
+              posicionar.manterExecucao(),
+              dividir.manterExecucao()
+            ]
         }
 
         //Remove os componentes da divisão da cena
-        dividir.map(animacao => animacao.onTermino());
+        dividir.onTermino();
 
-        //Volta a animação ao estado inicial, como se nada tivesse acontecido
-        yield this.animations.map(animation => animation.terminarExecucao());
+        //Volta os lados para sua posição e orientação originais
+        posicionar.terminarExecucao();
     }
 
     addToScene(scene){

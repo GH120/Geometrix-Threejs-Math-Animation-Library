@@ -74,7 +74,7 @@ export class Animacao {
 
     }
 
-    static juntar(...animacoes){
+    static simultanea(...animacoes){
 
         const animacaoJunta = new Animacao();
         
@@ -90,14 +90,58 @@ export class Animacao {
             }
         }
 
+        animacaoJunta.setDuration = function(frames){
+            animacoes.map(animacao => animacao.setDuration(frames));
+            return this;
+        }
+
         animacaoJunta.manterExecucao = function(){
             animacoes.map(animacao => animacao.manterExecucao())
+            return this;
         }
 
         animacaoJunta.onTermino = function(){
             animacoes.map(animacao => animacao.onTermino())
+            return this;
+        }
+
+        animacaoJunta.terminarExecucao = function(){
+            animacoes.map(animacao => animacao.terminarExecucao());
+            return this;
         }
 
         return animacaoJunta;
+    }
+
+    static sequencial(...animacoes){
+        
+        const animacaoSequencial = new Animacao();
+        
+        animacaoSequencial.getFrames = function* (){
+
+            const actions = animacoes.map(animacao => animacao.getFrames());
+
+            for(const action of actions) yield* action;
+        }
+
+        animacaoSequencial.manterExecucao = function(){
+            animacoes.map(animacao => animacao.manterExecucao())
+        }
+
+        animacaoSequencial.onTermino = function(){
+            animacoes.map(animacao => animacao.onTermino())
+        }
+
+        animacaoSequencial.setDuration = function(frames){
+            animacoes.map(animacao => animacao.setDuration(frames));
+            return this;
+        }
+
+        animacaoSequencial.terminarExecucao = function(){
+            animacoes.map(animacao => animacao.terminarExecucao());
+            return this;
+        }
+
+        return animacaoSequencial;
     }
 }

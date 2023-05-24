@@ -89,29 +89,55 @@ export class Divisao extends Animacao{
         const animacoes = [];
 
         for(let i = 0; i < clones; i++){
+          
           const copia = this.divisor.mesh.clone();
 
           this.scene.add(copia);
 
           const altura = divisor*i-(dividendo-divisor)/2
 
+          const posicaoInicial = copia.position.clone();
+
           const posicaoFinal = this.dividendo.mesh.position.clone()
                                .add(new THREE.Vector3(0,altura,0.005))
 
+          const curva = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
+
           const animacao =  new Animacao(copia)
-                            .setValorInicial(this.divisor.mesh.position.clone())
+                            .setValorInicial(posicaoInicial)
                             .setValorFinal(posicaoFinal)
-                            .setDuration(50)
+                            .setDuration(this.frames/2)
                             .setDelay(this.delay)
                             .setInterpolacao(function(inicial,final,peso){
-                                return new THREE.Vector3().lerpVectors(inicial,final,peso);
+                                return new THREE.Vector3().lerpVectors(inicial,final,curva(peso));
                             })
                             .setUpdateFunction(function(posicao){
                                 this.objeto.position.copy(posicao);
                             })
                             .setOnTermino(() => this.scene.remove(copia))
+          
+          const direcao = new THREE.Vector3().subVectors(posicaoFinal, posicaoInicial);
 
-          animacoes.push(animacao);
+          const angulo = new THREE.Vector3(-1,0,0).angleTo(direcao);
+
+          const rotacao = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), angulo/10);
+
+          const quaternionInicial = copia.quaternion.clone(); 
+
+          const quaternionFinal  = quaternionInicial.clone().multiply(rotacao);
+
+          const giro =      new Animacao(copia)
+                            .setValorInicial(quaternionFinal)
+                            .setValorFinal(quaternionInicial)
+                            .setDuration(this.frames/2)
+                            .setInterpolacao(function(inicial,final,peso){
+                              return new THREE.Quaternion().slerpQuaternions(inicial,final,curva(peso));
+                            })
+                            .setUpdateFunction(function(quaternion){
+                              this.objeto.quaternion.copy(quaternion);
+                            })
+          
+          animacoes.push(Animacao.juntar(animacao,giro))
         }
 
         return animacoes;

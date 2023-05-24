@@ -51,6 +51,10 @@ export class Animacao {
         return this;
     }
 
+    onTermino(){
+        return null;
+    }
+
     *getFrames(){
 
         for(let frame = 1; frame <= this.frames; frame++){
@@ -68,5 +72,32 @@ export class Animacao {
             yield valor;
         }
 
+    }
+
+    static juntar(...animacoes){
+
+        const animacaoJunta = new Animacao();
+        
+        animacaoJunta.getFrames = function* (){
+
+            const actions = animacoes.map(animacao => animacao.getFrames());
+
+            const duracao = animacoes.map(animacao => animacao.frames)
+                                    .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
+
+            for(let frame = 1; frame <= duracao; frame++){
+                yield actions.map(action => action.next());
+            }
+        }
+
+        animacaoJunta.manterExecucao = function(){
+            animacoes.map(animacao => animacao.manterExecucao())
+        }
+
+        animacaoJunta.onTermino = function(){
+            animacoes.map(animacao => animacao.onTermino())
+        }
+
+        return animacaoJunta;
     }
 }

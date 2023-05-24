@@ -27,7 +27,7 @@ export class Divisao extends Animacao{
 
         yield* dividirFrames;
 
-        //Mantém o resultado final da animação em estado de inércia e anima a divisão
+        //Mantém o resultado final da animação em estado de inércia
         for(let i=0; i < this.delay; i++){
             yield [
               posicionar.manterExecucao(),
@@ -42,7 +42,6 @@ export class Divisao extends Animacao{
         posicionar.terminarExecucao();
     }
 
-    //Cria as animações a serem usadas
     posicionar(){
 
       const posicaoInicial = this.dividendo.mesh.position.clone();

@@ -4,6 +4,8 @@ import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRend
 import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './controles/trigonometry';
 import {Animacao} from './animacoes/animation';
 import {Divisao} from './animacoes/divisao';
+import {Programa} from './programa'
+
 
 import {Triangle} from './objetos/triangle';
 import grid from '../assets/grid.avif';
@@ -37,7 +39,6 @@ const triangle = new Triangle()
                     .renderVertices()
                     .renderEdges()
                     .renderAngles()
-                    .createControlers(camera)
                     .addToScene(scene);
 
 
@@ -130,6 +131,8 @@ const divisao = new Divisao(triangle.edges[0], triangle.edges[2]).addToScene(sce
 
 let frames1 = null;
 const frames2 = mudarCor.getFrames();
+
+const programa = new Programa(triangle,scene,camera);
 
 
 //Loop de animação

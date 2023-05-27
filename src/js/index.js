@@ -34,28 +34,19 @@ labelRenderer.domElement.style.position = 'absolute';
 labelRenderer.domElement.style.top = '0px';
 document.body.appendChild(labelRenderer.domElement);
 
-//Cria o triângulo
+//Cria o triângulo e o programa
 const triangle = new Triangle()
                     .renderVertices()
                     .renderEdges()
                     .renderAngles()
                     .addToScene(scene);
 
+const programa = new Programa(triangle,scene,camera);
 
 ////////////////////////////Interfáce gráfica/////////////////////////////////////
 const gui = new dat.GUI();
 
-let guiControls = {
-  trigFunction: 'default',
-  toggleFunction: function() {
-
-    programa.mudarFuncaoTrigonometrica();
-
-    button.name(`Mostrando ${programa.estado.nome}`);
-  }
-};
-
-
+//Configurações
 const options = {
   "tamanho da esfera": 0.1,
   "grossura": 0.05,
@@ -69,22 +60,21 @@ const options = {
       }
   }
 };
+//Atualizar configurações
+function attOptions() {
+  triangle.edges.map(edge => edge.grossura = options.grossura);
+  triangle.sphereGeometry = new THREE.SphereGeometry(options["tamanho da esfera"]);
+  triangle.angles.map(angle => angle.angleRadius = options["raio do ângulo"])
+}
 
+//Botões da interface
 gui.add(options, 'grossura', 0.01, 0.2).onChange( () => triangle.update());
 gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => triangle.update());
 gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => triangle.update());
 gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
 gui.add( {onClick: () => frames1 = divisao.getFrames()}, 'onClick').name('Mostrar animação de divisão');
 gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
-let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction');
-
-button.name('Mostrando nada');
-
-function attOptions() {
-  triangle.edges.map(edge => edge.grossura = options.grossura);
-  triangle.sphereGeometry = new THREE.SphereGeometry(options["tamanho da esfera"]);
-  triangle.angles.map(angle => angle.angleRadius = options["raio do ângulo"])
-}
+let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('Mostrando nada');
 ////////////////////////////////////////////////////////////////////////////////////
 
 //Exemplos de animações, depois refatorar
@@ -100,20 +90,15 @@ const mudarCor = new Animacao(triangle.angles[1])
                       this.objeto.update();
                     });
 
-const divisao = new Divisao(triangle.edges[0], triangle.edges[2]).addToScene(scene);
+programa.animar(mudarCor);
 
-let frames1 = null;
-const frames2 = mudarCor.getFrames();
-
-const programa = new Programa(triangle,scene,camera);
 
 
 //Loop de animação
 function animate() {
     requestAnimationFrame( animate );
-    if(frames1) frames1.next();
-    frames2.next();
     attOptions();
+    programa.frames.map(frame => frame.next());
     if(options.atualizar) triangle.update();
     renderer.render( scene, camera );
     labelRenderer.render( scene, camera );

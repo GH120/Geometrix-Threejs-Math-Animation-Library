@@ -100,7 +100,16 @@ export class Programa {
 
         if(trigHandler == null) return this;
 
-        const adicionarObserver = (hoverable,index) => hoverable.addObserver(new trigHandler().setTriangulo(this.triangulo,index));
+        const adicionarObserver = (hoverable,index) => {
+
+            const handler = new trigHandler().setTriangulo(this.triangulo,index);
+
+            handler.addToScene(this.scene);
+
+            handler.animar = (animacao) => this.animar(animacao);
+
+            hoverable.addObserver(handler);
+        }
 
         this.hoverable.map(adicionarObserver);
 

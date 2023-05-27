@@ -13,12 +13,7 @@ export class TrigOnHover {
     setTriangulo(triangulo, index){
         this.triangulo = triangulo;
         this.index = (index+1)%3;
-        this.animar = true;
-        return this;
-    }
-
-    setPilhaAnimacao(pilha){
-        this.pilha = pilha;
+        this.animando = true;
         return this;
     }
 
@@ -78,11 +73,11 @@ export class TrigOnHover {
         //Inicialmente pensando em adicionar uma transição que pega o cateto oposto e translada ele
         //para a parte direita da tela, com cor (azul?) e fazer o mesmo para a hipotenusa(vermelha?)
         //assim, vai ter uma superposição dos dois lados esticados verticalmente, podendo fazer uma razão geométrica
-        if(!this.animar || !this.pilha) return;
+        if(!this.animando || !this.scene) return;
 
-        const divisao = new Divisao(this.dividendo, this.divisor);
+        const divisao = new Divisao(this.dividendo, this.divisor).addToScene(this.scene);
 
-        this.pilha.push(divisao.animar().getFrames());
+        this.animar(divisao);
     }
 
     onHover(isInside){
@@ -100,6 +95,8 @@ export class TrigOnHover {
             divisor.material   = new THREE.MeshBasicMaterial({color:0x880000});
 
             if(dividendo == divisor) dividendo.material = new THREE.MeshBasicMaterial({color:0x8800aa});
+
+            this.createProp();
         }
         else{
             dividendo.material = new THREE.MeshBasicMaterial({ color: 0xe525252 });
@@ -205,7 +202,6 @@ export class TrigOnHover {
     update(){
         this.dividendo.update();
         this.divisor.update();
-        this.createProp();
     }
 }
 

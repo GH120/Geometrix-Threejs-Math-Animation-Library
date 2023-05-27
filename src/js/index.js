@@ -73,7 +73,7 @@ gui.add(options, 'grossura', 0.01, 0.2).onChange( () => triangle.update());
 gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => triangle.update());
 gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => triangle.update());
 gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
-// gui.add( {onClick: () => frames1 = divisao.getFrames()}, 'onClick').name('Mostrar animação de divisão');
+gui.add( {onClick: () => programa.trigonometria.map(trig => trig.animando = !trig.animando)}, 'onClick').name('Mostrar animação de divisão');
 gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
 let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('Mostrando nada');
 ////////////////////////////////////////////////////////////////////////////////////
@@ -82,18 +82,16 @@ let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('
 const mudarCor = new Animacao(triangle.angles[1])
                     .setValorInicial(0x000000)
                     .setValorFinal(0x0000ff)
-                    .setDuration(300)
+                    .setDuration(30)
                     .setInterpolacao(function(inicial,final,peso){
                       return( inicial*(1-peso)*(1-peso)*(1-peso) + final*peso*peso*peso);
                     })
                     .setUpdateFunction(function(valor){
                       this.objeto.sectorMaterial = new THREE.MeshBasicMaterial({color:valor});
                       this.objeto.update();
-                    });
+                    })
 
 programa.animar(mudarCor);
-
-
 
 //Loop de animação
 function animate() {

@@ -18,7 +18,13 @@ export class MostrarTipo {
 
         tipo += (this.triangulo.isoceles())? (this.triangulo.equilatero())? "Equilatero " : "Isoceles" : "Escaleno";
 
-        this.text.position.copy(this.centro.add(new THREE.Vector3(0,this.raio+0.3,0)));
+        const posicaoMaisAlta = this.triangulo.vertices.map(vertice => vertice.position)
+                                                       .reduce((a,b) =>(a.y>b.y)? a : b)
+                                                       .clone();
+
+        this.text.position.copy(this.centro);
+
+        this.text.position.y = posicaoMaisAlta.y + Math.sqrt(this.raio/10);
 
         this.text.element.textContent = tipo;
 

@@ -17,7 +17,7 @@ export class Programa {
         this.scene  = scene;
         this.camera = camera;
         this.frames = [];
-        this.trigonometria = null;
+        this.trigonometria = [];
 
         this.createControlers();
         this.createHandlers();
@@ -111,6 +111,8 @@ export class Programa {
             handler.addToScene(this.scene);
 
             handler.animar = (animacao) => this.animar(animacao);
+
+            this.trigonometria[index] = handler;
 
             hoverable.addObserver(handler);
         }

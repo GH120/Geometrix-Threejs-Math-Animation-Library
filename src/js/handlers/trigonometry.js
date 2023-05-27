@@ -13,7 +13,7 @@ export class TrigOnHover {
     setTriangulo(triangulo, index){
         this.triangulo = triangulo;
         this.index = (index+1)%3;
-        this.animando = true;
+        this.animando = false;
         return this;
     }
 
@@ -78,6 +78,9 @@ export class TrigOnHover {
         const divisao = new Divisao(this.dividendo, this.divisor).addToScene(this.scene);
 
         this.animar(divisao);
+
+        //Mudar depois, o programa deveria cuidar das múltiplas animações
+        this.animando = false;
     }
 
     onHover(isInside){

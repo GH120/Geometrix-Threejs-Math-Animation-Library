@@ -6,7 +6,7 @@ export class Angle{
 
         this.vertices = vertices;
         this.index = index;
-        this.angleRadius = 1;
+        this.angleRadius = 0.7;
         this.sectorMaterial = new THREE.MeshBasicMaterial({color:0xff0000})
 
     }

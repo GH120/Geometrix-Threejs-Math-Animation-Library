@@ -51,33 +51,13 @@ let guiControls = {
 
     let funcaoOnHover;
 
-    if (guiControls.trigFunction === 'seno') {
-      guiControls.trigFunction = 'cosseno';
-      button.name('Mostrando cosseno');
-      funcaoOnHover = CossenoOnHover;
-    } else if(guiControls.trigFunction === 'cosseno'){
-      guiControls.trigFunction = 'tangente';
-      button.name('Mostrando tangente');
-      funcaoOnHover = TangenteOnHover;
-    }
-    else if(guiControls.trigFunction === 'tangente'){
-      guiControls.trigFunction = 'default';
-      button.name('Mostrando nada');
-      funcaoOnHover = null;
-    }
-    else{
-      guiControls.trigFunction = 'seno';
-      button.name('Mostrando seno');
-      funcaoOnHover = SenoOnHover;
-    }
+    programa.mudarFuncaoTrigonometrica();
 
-    if(funcaoOnHover != null){ 
-      triangle.hoverable.map((hover,index) => hover.observers[1] = (new funcaoOnHover().setTriangulo(triangle, index)));
-    }
-    else
-      triangle.hoverable.map((hover,index) => hover.observers[1] = null)
+    const traducao = (nome) => (nome == "sin")? "seno"    : 
+                               (nome == "cos")? "cosseno" : 
+                               (nome == "tan")? "tangente": "nada";
 
-    console.log(triangle.hoverable);
+    button.name(`Mostrando ${traducao(programa.estado.nome)}`);
   }
 };
 
@@ -101,7 +81,6 @@ const buttonProperties = {
   onClick: () => options.atualizar = !options.atualizar
 };
 
-// Step 3: Add the button to the GUI
 gui.add( {onClick: () => frames1 = divisao.getFrames()}, 'onClick').name('Mostrar animação de divisão');
 gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
 let button = gui.add(guiControls, 'toggleFunction');

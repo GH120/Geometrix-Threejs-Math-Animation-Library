@@ -5,6 +5,10 @@ import { ColorirIsoceles } from './handlers/colorirIsoceles';
 import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './handlers/trigonometry';
 import { MostrarTipo } from './handlers/mostrarTipo';
 
+//Responsável por adiconar os controles de arrasto e hover
+//liga os handlers aos controlers
+//handlers são objetos que fazem ações quando acionados pelos controles
+//Nesse caso, são os handlers que mostram o texto, criam animações, mudam cor...
 export class Programa {
 
     constructor(triangle, scene, camera){
@@ -12,11 +16,13 @@ export class Programa {
         this.scene  = scene;
         this.camera = camera;
         this.frames = [];
+        this.trigonometria = null;
 
         this.createControlers();
         this.createHandlers();
         this.setUpAnimar();
         this.addToScene(scene);
+        this.getEstados();
     }
 
     createControlers(){
@@ -75,5 +81,42 @@ export class Programa {
         return this;
     }
 
-    
+    mudarFuncaoTrigonometrica(){    
+
+        //Remove o handler atual
+        const notTrigFunction = (observer) => observer.name != this.estado.name;
+
+        const removerObserver = (observable) => observable.removeObserver(notTrigFunction);
+
+        this.hoverable.map(removerObserver);
+
+        //Muda o estado
+        const indice = this.estado.index;
+
+        this.estado = this.estados[(indice+1)%4];
+
+        //Adiciona o novo handler 
+        const trigHandler = this.estado.funcao;
+
+        if(trigHandler == null) return this;
+
+        const adicionarObserver = (hoverable,index) => hoverable.addObserver(new trigHandler().setTriangulo(this.triangulo,index));
+
+        this.hoverable.map(adicionarObserver);
+
+        return this;
+    }
+
+    getEstados(){
+        this.estados = [
+            {name: "nada",    funcao: null,            index:0},
+            {name: "sin",     funcao: SenoOnHover,     index:1},
+            {name: "cos",     funcao: CossenoOnHover,  index:2},
+            {name: "tan",     funcao: TangenteOnHover, index:3}
+        ];
+
+        this.estado = this.estados[0];
+
+        return this;
+    }
 }

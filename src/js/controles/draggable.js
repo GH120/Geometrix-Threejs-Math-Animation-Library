@@ -80,5 +80,11 @@ export class Draggable {
   addObserver(observer){
     this.observers.push(observer);
     return this;
-}
+  }
+
+  removeObserver(criteria){
+    this.observers = this.observers.filter(criteria);
+    console.log(this.observers)
+    return this;
+  }
 }

@@ -1,9 +1,9 @@
 import {Draggable} from './controles/draggable';
 import {Hoverable} from './controles/hoverable';
-import {MostrarAngulo} from './controles/mostrarAngulo';
-import { ColorirIsoceles } from './controles/colorirIsoceles';
-import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './controles/trigonometry';
-import { MostrarTipo } from './controles/mostrarTipo';
+import {MostrarAngulo} from './handlers/mostrarAngulo';
+import { ColorirIsoceles } from './handlers/colorirIsoceles';
+import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './handlers/trigonometry';
+import { MostrarTipo } from './handlers/mostrarTipo';
 
 export class Programa {
 

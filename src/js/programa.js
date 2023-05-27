@@ -4,6 +4,7 @@ import {MostrarAngulo} from './handlers/mostrarAngulo';
 import { ColorirIsoceles } from './handlers/colorirIsoceles';
 import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './handlers/trigonometry';
 import { MostrarTipo } from './handlers/mostrarTipo';
+import { MoverVertice } from './handlers/moverVertice';
 
 //Responsável por adiconar os controles de arrasto e hover
 //liga os handlers aos controlers
@@ -32,7 +33,7 @@ export class Programa {
 
         
         this.hoverable = triangulo.angles.map(   angle  => new Hoverable(angle , camera));
-        this.draggable = triangulo.vertices.map( vertex => new Draggable(vertex, camera).addObserver(triangulo));
+        this.draggable = triangulo.vertices.map( vertex => new Draggable(vertex, camera));
 
         return this;
     }
@@ -41,6 +42,8 @@ export class Programa {
 
         const triangulo = this.triangulo;
 
+        //É um observer, quando há um arraste do objeto, ele move o objeto para a nova posição
+        this.moverVertice = triangulo.vertices.map(vertex => new MoverVertice(triangulo, vertex));
         //É um observer, quando onHover é acionado, adiciona ou remove o texto do ângulo
         this.mostrarAngulo = triangulo.angles.map((angle, index) => new MostrarAngulo(triangulo, index));
         //É um observer, colore os ângulos quando o triangulo é isóceles/equilatero
@@ -50,10 +53,11 @@ export class Programa {
 
         // //Liga esses observers ao hover/drag, quando acionados, eles avisam seus observers
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
+        this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
-        this.draggable.map(draggable => draggable.addObserver(this.mostrarTipo));
+        this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
 
-        this.handlers = [...this.mostrarAngulo, this.colorirIsoceles, this.mostrarTipo];
+        this.handlers = [...this.moverVertice, ...this.mostrarAngulo, this.colorirIsoceles, this.mostrarTipo];
         
         return this;
     }

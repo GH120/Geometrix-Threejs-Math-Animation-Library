@@ -37,10 +37,8 @@ export class Draggable {
 
       if(!point) return;
 
-      this.object.position.copy(point);
-
-      //Manda o triangulo atualizar a cena
-      this.notify();
+      //Notifica todos os observadores da nova posição
+      this.notify(point);
     }
     
   }
@@ -73,8 +71,8 @@ export class Draggable {
     this.dragging = false;
   }
 
-  notify(){
-    for(const observer of this.observers) if(observer) observer.update();
+  notify(point){
+    for(const observer of this.observers) if(observer) observer.update(point);
   }
 
   addObserver(observer){

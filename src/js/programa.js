@@ -109,10 +109,10 @@ export class Programa {
 
     getEstados(){
         this.estados = [
-            {name: "nada",    funcao: null,            index:0},
-            {name: "sin",     funcao: SenoOnHover,     index:1},
-            {name: "cos",     funcao: CossenoOnHover,  index:2},
-            {name: "tan",     funcao: TangenteOnHover, index:3}
+            {name: "nada",    funcao: null,            index:0, nome:"nada"},
+            {name: "sin",     funcao: SenoOnHover,     index:1, nome:"seno"},
+            {name: "cos",     funcao: CossenoOnHover,  index:2, nome:"cosseno"},
+            {name: "tan",     funcao: TangenteOnHover, index:3, nome:"tangente"}
         ];
 
         this.estado = this.estados[0];

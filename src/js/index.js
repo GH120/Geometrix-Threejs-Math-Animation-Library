@@ -49,15 +49,9 @@ let guiControls = {
   trigFunction: 'default',
   toggleFunction: function() {
 
-    let funcaoOnHover;
-
     programa.mudarFuncaoTrigonometrica();
 
-    const traducao = (nome) => (nome == "sin")? "seno"    : 
-                               (nome == "cos")? "cosseno" : 
-                               (nome == "tan")? "tangente": "nada";
-
-    button.name(`Mostrando ${traducao(programa.estado.nome)}`);
+    button.name(`Mostrando ${programa.estado.nome}`);
   }
 };
 
@@ -67,27 +61,27 @@ const options = {
   "grossura": 0.05,
   "raio do ângulo": 0.7,
   "atualizar": false,
-  "duração da animação":90
+  "duração da animação":90,
+
+  mudarFuncaoTrigonometrica: {
+      toggleFunction: function() { 
+        button.name(`Mostrando ${programa.mudarFuncaoTrigonometrica().estado.nome}`);
+      }
+  }
 };
 
 gui.add(options, 'grossura', 0.01, 0.2).onChange( () => triangle.update());
 gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => triangle.update());
 gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => triangle.update());
 gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
-
-// gui.add({onClick: () => options.atualizar = !options.atualizar},'onClick').nome("atualizar todo frame")
-
-const buttonProperties = {
-  onClick: () => options.atualizar = !options.atualizar
-};
-
 gui.add( {onClick: () => frames1 = divisao.getFrames()}, 'onClick').name('Mostrar animação de divisão');
 gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
-let button = gui.add(guiControls, 'toggleFunction');
-button.name("Mostrando nada")
+let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction');
+
+button.name('Mostrando nada');
 
 function attOptions() {
-  triangle.grossura = options.grossura;
+  triangle.edges.map(edge => edge.grossura = options.grossura);
   triangle.sphereGeometry = new THREE.SphereGeometry(options["tamanho da esfera"]);
   triangle.angles.map(angle => angle.angleRadius = options["raio do ângulo"])
 }

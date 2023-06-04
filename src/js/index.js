@@ -124,7 +124,17 @@ const posicaoInicial = coordenadas.map((eixo, i) => new THREE.Vector3(coordenada
                                   .map(vetor => vetor.multiplyScalar(circle.raio))
                                   .map(vetor => vetor.add(circle.centro));
 
-const posicaoFinal = posicaoInicial.map((vetor, i) => (i%2)? new THREE.Vector3(Math.PI*(i*2/2160 - 1),0,0) : new THREE.Vector3(Math.PI*(i*2/2160 - 1),circle.grossura,0))
+const pontoInterior = (i) =>  new THREE.Vector3(Math.PI*(Math.floor(i/6)*2/360-1),circle.grossura,0);
+
+const pontoExterior = (i) =>  new THREE.Vector3(Math.PI*(Math.floor(i/6)*2/360-1) ,      0       ,0);
+
+const posicaoFinal = posicaoInicial.map((vetor, i) => (i%6 == 0)? pontoInterior(i-7) : 
+                                                      (i%6 == 1)? pontoExterior(i-7) :
+                                                      (i%6 == 2)? pontoInterior(i): 
+                                                      (i%6 == 4)? pontoExterior(i) : 
+                                                      (i%6 == 5)? pontoExterior(i+7) :
+                                                      (i%6 == 3)? pontoInterior(i): null
+                                                      )
                                    .map(vetor => vetor.multiplyScalar(circle.raio))
 
 

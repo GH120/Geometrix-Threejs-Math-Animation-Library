@@ -108,4 +108,14 @@ export class Triangle{
         
         return true;
     }
+
+    get centro(){
+        return this.triangulo.vertices.map(vertice => vertice.position.clone())
+                                      .reduce((a,b) => a.add(b), new THREE.Vector3(0,0,0))
+                                      .multiplyScalar(1/3);
+    }
+
+    get raio(){
+        return this.triangulo.vertices[0].position.clone().sub(this.centro).length();
+    }
 }

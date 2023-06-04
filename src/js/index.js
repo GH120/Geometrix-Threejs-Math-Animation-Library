@@ -4,7 +4,8 @@ import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRend
 import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './handlers/trigonometry';
 import {Animacao} from './animacoes/animation';
 import {Divisao} from './animacoes/divisao';
-import {Programa} from './programa'
+import {Programa} from './programa';
+import Circle from './objetos/circle';
 
 
 import {Triangle} from './objetos/triangle';
@@ -40,6 +41,10 @@ const triangle = new Triangle()
                     .renderEdges()
                     .renderAngles()
                     .addToScene(scene);
+
+const circle = new Circle(new THREE.Vector3(1.5,1.5,0), 2.17,0.05);
+
+scene.add(circle.mesh);
 
 const programa = new Programa(triangle,scene,camera);
 
@@ -82,15 +87,71 @@ let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('
 const mudarCor = new Animacao(triangle.angles[1])
                     .setValorInicial(0x000000)
                     .setValorFinal(0x0000ff)
-                    .setDuration(30)
+                    .setDuration(300)
                     .setInterpolacao(function(inicial,final,peso){
                       return( inicial*(1-peso)*(1-peso)*(1-peso) + final*peso*peso*peso);
                     })
                     .setUpdateFunction(function(valor){
                       this.objeto.sectorMaterial = new THREE.MeshBasicMaterial({color:valor});
                       this.objeto.update();
-                    })
+                    });
 
+const curva = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
+
+//Animação para criar círculo
+const criarCirculo = new Animacao(circle)
+                     .setValorInicial(0)
+                     .setValorFinal(360)
+                     .setDuration(300)
+                     .setInterpolacao(function(inicial, final, peso){
+                        return inicial*(1-curva(peso)) + final*curva(peso);
+                     })
+                     .setUpdateFunction(function(angulo){
+                        scene.remove(this.objeto.mesh);
+
+                        this.objeto.construirMesh(angulo);
+                        
+                        scene.add(this.objeto.mesh);
+                     });
+
+//Animação para linearizar círculo
+const coordenadas = circle.getPontos(360);
+
+const posicaoInicial = coordenadas.map((eixo, i) => new THREE.Vector3(coordenadas[i], 
+                                                                      coordenadas[i+1], 
+                                                                      coordenadas[i+2]))
+                                  .filter((vetor, i) => i%3 == 0)
+                                  .map(vetor => vetor.multiplyScalar(circle.raio))
+                                  .map(vetor => vetor.add(circle.centro));
+
+const posicaoFinal = posicaoInicial.map((vetor, i) => (i%2)? new THREE.Vector3(Math.PI*(i*2/2160 - 1),0,0) : new THREE.Vector3(Math.PI*(i*2/2160 - 1),circle.grossura,0))
+                                   .map(vetor => vetor.multiplyScalar(circle.raio))
+
+
+const linearizarCirculo = new Animacao(circle)
+                          .setValorInicial(posicaoInicial)
+                          .setValorFinal(posicaoFinal)
+                          .setDuration(200)
+                          .setInterpolacao(function(inicial,final,peso){
+                            return inicial.map((vetor,i) => new THREE.Vector3().lerpVectors(vetor,final[i], curva(peso)));
+                          })
+                          .setUpdateFunction(function(pontos){
+
+                            scene.remove(this.objeto.mesh);
+
+                            const coordenadas = [].concat(...pontos.map(ponto => ponto.toArray()));
+
+                            const geometry = new THREE.BufferGeometry();
+
+                            geometry.setAttribute('position', new THREE.Float32BufferAttribute(coordenadas,3));
+
+                            this.objeto.mesh = new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:0x00ff00}));
+
+                            scene.add(this.objeto.mesh);
+                          })
+
+//Adiciona as animações ao programa
+programa.animar(Animacao.sequencial(criarCirculo, linearizarCirculo));
 programa.animar(mudarCor);
 
 //Loop de animação

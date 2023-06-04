@@ -4,7 +4,9 @@ import {MostrarAngulo} from './handlers/mostrarAngulo';
 import { ColorirIsoceles } from './handlers/colorirIsoceles';
 import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './handlers/trigonometry';
 import { MostrarTipo } from './handlers/mostrarTipo';
-import { MoverVertice } from './handlers/moverVertice';
+import  MoverVertice  from './handlers/moverVertice';
+import Circle from './objetos/circle';
+import * as THREE from 'three'
 
 //Responsável por adiconar os controles de arrasto e hover
 //liga os handlers aos controlers
@@ -17,6 +19,7 @@ export class Programa {
         this.scene  = scene;
         this.camera = camera;
         this.frames = [];
+        this.animacoes = [];
         this.trigonometria = [];
 
         this.createControlers();
@@ -78,9 +81,10 @@ export class Programa {
     }
 
     animar(animacao){
+
         this.frames.push(animacao.getFrames());
 
-        console.log(this.frames);
+        this.animacoes.push(animacao);
 
         return this;
     }
@@ -133,5 +137,14 @@ export class Programa {
         this.estado = this.estados[0];
 
         return this;
+    }
+
+    adicionarCirculo(circle){
+
+        this.scene.add(circle.hitbox)
+
+        new Draggable(circle.hitbox,this.camera).addObserver(new MoverVertice(circle, circle.hitbox));
+
+        this.scene.add(circle.mesh);
     }
 }

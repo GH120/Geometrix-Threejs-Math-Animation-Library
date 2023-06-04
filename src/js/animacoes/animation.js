@@ -69,7 +69,7 @@ export class Animacao {
 
             this.update(valor);
 
-            yield valor;
+            yield frame;
         }
 
     }
@@ -116,6 +116,8 @@ export class Animacao {
     static sequencial(...animacoes){
         
         const animacaoSequencial = new Animacao();
+
+        animacaoSequencial.children = animacoes;
         
         animacaoSequencial.getFrames = function* (){
 

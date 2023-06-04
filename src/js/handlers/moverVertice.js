@@ -2,10 +2,10 @@ import * as THREE from 'three';
 
 //Preciso adicionar smoothing para valores como 30°, 45°, 60° e 90°
 //Implementar o smoothing como o vídeo do autotargeting ensinou
-export class MoverVertice{
+export default class MoverVertice{
 
-    constructor(triangulo, vertice){
-        this.triangulo = triangulo;
+    constructor(objeto, vertice){
+        this.objeto = objeto;
         this.vertice = vertice;
     }
 
@@ -17,9 +17,11 @@ export class MoverVertice{
 
         const speed = new THREE.Vector3().subVectors(point, this.vertice.position);
 
+        console.log(point, this.vertice)
+
         this.vertice.position.copy(point);
 
-        this.triangulo.update();
+        this.objeto.update();
     }
 
     //Retorna os pontos focais, ou seja, os pontos que iriam satisfazer um dos requisitos

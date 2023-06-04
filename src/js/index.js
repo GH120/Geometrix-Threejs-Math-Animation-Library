@@ -4,6 +4,8 @@ import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRend
 import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './handlers/trigonometry';
 import {Animacao} from './animacoes/animation';
 import {Divisao} from './animacoes/divisao';
+import { Draggable } from './controles/draggable';
+import MoverVertice from './handlers/moverVertice';
 import {Programa} from './programa';
 import Circle from './objetos/circle';
 
@@ -42,11 +44,11 @@ const triangle = new Triangle()
                     .renderAngles()
                     .addToScene(scene);
 
-const circle = new Circle(new THREE.Vector3(1.5,1.5,0), 2.17,0.05);
-
-scene.add(circle.mesh);
+const circle = new Circle(new THREE.Vector3(-1.5,-1.5,0), 2.17,0.05);
 
 const programa = new Programa(triangle,scene,camera);
+
+programa.adicionarCirculo(circle);
 
 ////////////////////////////Interfáce gráfica/////////////////////////////////////
 const gui = new dat.GUI();
@@ -110,6 +112,8 @@ const criarCirculo = new Animacao(circle)
                         scene.remove(this.objeto.mesh);
 
                         this.objeto.construirMesh(angulo);
+
+                        this.objeto.update();
                         
                         scene.add(this.objeto.mesh);
                      });
@@ -122,7 +126,6 @@ const posicaoInicial = coordenadas.map((eixo, i) => new THREE.Vector3(coordenada
                                                                       coordenadas[i+2]))
                                   .filter((vetor, i) => i%3 == 0)
                                   .map(vetor => vetor.multiplyScalar(circle.raio))
-                                  .map(vetor => vetor.add(circle.centro));
 
 const pontoInterior = (i) =>  new THREE.Vector3(Math.PI*(Math.floor(i/6)*2/360-1),circle.grossura,0);
 
@@ -136,8 +139,11 @@ const posicaoFinal = posicaoInicial.map((vetor, i) => (i%6 == 0)? pontoInterior(
                                                       (i%6 == 3)? pontoInterior(i): null
                                                       )
                                    .map(vetor => vetor.multiplyScalar(circle.raio))
+                                   .map(vetor => vetor.sub(circle.centro));
 
-
+//Add a fading effect to the triangles as they are placed
+//Maybe create a 'dotted line' class?
+//On hover, they would showcase each 
 const linearizarCirculo = new Animacao(circle)
                           .setValorInicial(posicaoInicial)
                           .setValorFinal(posicaoFinal)
@@ -157,12 +163,53 @@ const linearizarCirculo = new Animacao(circle)
 
                             this.objeto.mesh = new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:0x00ff00}));
 
+                            this.objeto.update();
+
                             scene.add(this.objeto.mesh);
-                          })
+                          });
+
+const gerarCicloTrigonometrico = new Animacao(circle)
+                                 .setValorInicial(0)
+                                 .setValorFinal(2*Math.PI)
+                                 .setDuration(300)
+                                 .setInterpolacao((a,b,p) => b*p)
+                                 .setUpdateFunction(function(angulo){
+
+                                    if(Math.round(angulo*180/Math.PI)%15 != 0) return;
+                                    
+                                    const novoTriangulo = new Triangle();
+                                    novoTriangulo.sphereGeometry = new THREE.SphereGeometry(0.04);
+
+                                    const centro = circle.centro.toArray();
+                                    
+                                    novoTriangulo.positions = [[0,0,0],
+                                                               [Math.cos(angulo), 0, 0],
+                                                               [Math.cos(angulo), Math.sin(angulo), 0]]
+                                                               .map(position => position.map(eixo => eixo*circle.raio))
+                                                               .map(position => position.map((eixo,i) => eixo + centro[i]))
+
+                                    // novoTriangulo.positions.map(position => position.map)
+
+                                    novoTriangulo
+                                    .renderVertices()
+                                    .renderEdges()
+                                    .renderAngles()
+                                    .addToScene(scene);
+
+                                    novoTriangulo.angles.map(angle => angle.angleRadius = 0.1);
+                                    novoTriangulo.edges.map(edge => edge.grossura = 0.03)
+                                    
+                                    novoTriangulo.renderVertices();
+
+                                    novoTriangulo.update();
+                                 });
 
 //Adiciona as animações ao programa
-programa.animar(Animacao.sequencial(criarCirculo, linearizarCirculo));
+// programa.animar(Animacao.sequencial(criarCirculo, linearizarCirculo));
 programa.animar(mudarCor);
+programa.animar(Animacao.simultanea(gerarCicloTrigonometrico, criarCirculo))
+
+console.log(programa)
 
 //Loop de animação
 function animate() {

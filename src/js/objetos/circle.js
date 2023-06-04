@@ -3,11 +3,17 @@ import * as THREE from 'three'
 export default class Circle{
 
     constructor(centro, raio, grossura = 0.01){
+
+        this.hitbox = new THREE.Mesh(new THREE.SphereGeometry(0.5));
+
+        this.hitbox.visible = false;
+
         this.centro = centro;
         this.raio = raio;
         this.grossura = grossura;
 
         this.construirMesh();
+        this.update();
     }
 
     getPontos(resolucao){
@@ -44,15 +50,21 @@ export default class Circle{
                                      (i%3==2)? this.centro.z : null;
 
         posicoes = posicoes.map(coordenada => coordenada*this.raio);
-        posicoes = posicoes.map((coordenada, indice) => coordenada + getCoordenada(indice));
 
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(posicoes, 3));
 
         this.mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:0xff0000}));
     }
 
-    setFromTriangle(triangulo){
-        
-        const posicoes = triangulo.vertices.map(vertice => vertice.positions.clone());
+    update(){
+        this.mesh.position.copy(this.centro);
+    }
+
+    get centro(){
+        return this.hitbox.position.clone();
+    }
+
+    set centro(centro){
+        this.hitbox.position.copy(centro);
     }
 }

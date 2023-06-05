@@ -56,6 +56,42 @@ export default class Circle{
         this.mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:0xff0000}));
     }
 
+    circunscrever(triangulo){
+
+        const posicoes = triangulo.vertices.map(vertice => vertice.position.clone());
+
+        const P1 =  posicoes[0];
+        const P2 =  posicoes[1];
+        const P3 =  posicoes[2];
+ 
+        let chute = triangulo.centro.clone();
+
+        const R1 = ponto => ponto.clone().sub(P1);
+        const R2 = ponto => ponto.clone().sub(P2);
+        const R3 = ponto => ponto.clone().sub(P3);
+
+        //Método das bissetrizes 2D
+        for(let i = 0; i < 10; i++){
+            const modulo1 = R1(chute).length() - R2(chute).length();
+            const modulo2 = R2(chute).length() - R3(chute).length();
+
+            const direcao1  = R1(chute).normalize();
+            const direcao2  = R2(chute).normalize();
+
+            const valor = modulo => modulo/2;
+
+            direcao1.multiplyScalar(valor(modulo1));
+            direcao2.multiplyScalar(valor(modulo2));
+            
+            chute.sub(direcao1.add(direcao2));
+
+            console.log(modulo1, modulo2);
+        }
+
+        this.centro = chute;
+        this.update();
+    }
+
     update(){
         this.mesh.position.copy(this.centro);
     }

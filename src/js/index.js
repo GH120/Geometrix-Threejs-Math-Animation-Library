@@ -13,6 +13,7 @@ import Circle from './objetos/circle';
 import {Triangle} from './objetos/triangle';
 import grid from '../assets/grid.avif';
 import * as dat from 'dat.gui';
+import Circunscrever from './animacoes/circunscrever';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
@@ -46,9 +47,11 @@ const triangle = new Triangle()
 
 const circle = new Circle(new THREE.Vector3(-1.5,-1.5,0), 2.17,0.05);
 
+circle.circunscrever(triangle);
+
 const programa = new Programa(triangle,scene,camera);
 
-programa.adicionarCirculo(circle);
+//programa.adicionarCirculo(circle);
 
 ////////////////////////////Interfáce gráfica/////////////////////////////////////
 const gui = new dat.GUI();
@@ -81,6 +84,7 @@ gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => triangle.update())
 gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => triangle.update());
 gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
 gui.add( {onClick: () => programa.trigonometria.map(trig => trig.animando = !trig.animando)}, 'onClick').name('Mostrar animação de divisão');
+gui.add( {onClick: () => {const anim = new Circunscrever(triangle,scene); programa.adicionarCirculo(anim.circulo); programa.animar(anim)}},'onClick').name('Animação de circunscrever triângulo');
 gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
 let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('Mostrando nada');
 ////////////////////////////////////////////////////////////////////////////////////
@@ -101,22 +105,7 @@ const mudarCor = new Animacao(triangle.angles[1])
 const curva = (x) => -(Math.cos(Math.PI * x) - 1) / 2;
 
 //Animação para criar círculo
-const criarCirculo = new Animacao(circle)
-                     .setValorInicial(0)
-                     .setValorFinal(360)
-                     .setDuration(300)
-                     .setInterpolacao(function(inicial, final, peso){
-                        return inicial*(1-curva(peso)) + final*curva(peso);
-                     })
-                     .setUpdateFunction(function(angulo){
-                        scene.remove(this.objeto.mesh);
-
-                        this.objeto.construirMesh(angulo);
-
-                        this.objeto.update();
-                        
-                        scene.add(this.objeto.mesh);
-                     });
+const criarCirculo = new Circunscrever(triangle,scene)
 
 //Animação para linearizar círculo
 const coordenadas = circle.getPontos(360);
@@ -204,10 +193,12 @@ const gerarCicloTrigonometrico = new Animacao(circle)
                                     novoTriangulo.update();
                                  });
 
+// programa.adicionarCirculo(criarCirculo.circulo)
 //Adiciona as animações ao programa
 // programa.animar(Animacao.sequencial(criarCirculo, linearizarCirculo));
 programa.animar(mudarCor);
-programa.animar(Animacao.simultanea(gerarCicloTrigonometrico, criarCirculo))
+// programa.animar(Animacao.simultanea(gerarCicloTrigonometrico, criarCirculo))
+// programa.animar(criarCirculo);
 
 console.log(programa)
 

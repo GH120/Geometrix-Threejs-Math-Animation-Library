@@ -103,4 +103,8 @@ export default class Circle{
     set centro(centro){
         this.hitbox.position.copy(centro);
     }
+
+    get length(){
+        return 2*Math.PI*this.raio;
+    }
 }

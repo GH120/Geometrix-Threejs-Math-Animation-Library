@@ -73,6 +73,8 @@ export class Divisao extends Animacao{
         const divisor   = this.divisor.length;
         const dividendo = this.dividendo.length;
 
+        console.log(dividendo, divisor);
+
         const numero = dividendo/divisor;
 
         const resto = numero%1;

@@ -193,6 +193,8 @@ const gerarCicloTrigonometrico = new Animacao(circle)
                                     novoTriangulo.update();
                                  });
 
+                                 
+
 // programa.adicionarCirculo(criarCirculo.circulo)
 //Adiciona as animações ao programa
 // programa.animar(Animacao.sequencial(criarCirculo, linearizarCirculo));

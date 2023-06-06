@@ -9,39 +9,10 @@ export class Tracejado{
         this.altura  = altura;
         this.spacing = spacingRatio;
 
-        // this.renderMalha();
-        this.renderMesh();
+        this.renderMalha();
     }
 
     renderMalha(){
-
-        const tracejado = new THREE.Group();
-
-        const quantidade = this.length/(this.altura*(1+this.spacing));
-
-        const quadrados = [];
-
-        for(let i = 0; i < quantidade; i++){
-            quadrados.push(
-                new THREE.Mesh(
-                    new THREE.PlaneGeometry(this.width/2, this.height/2), 
-                    new THREE.MeshBasicMaterial({color:0x808080})
-                )
-            );
-        }
-
-        const interpolar = indice => this.origem.clone().lerp(this.destino, indice*this.length/this.altura);
-
-        quadrados.map((quadrado, indice) => quadrado.position.copy(interpolar(indice)));
-
-        console.log(quadrados);
-
-        quadrados.map(quadrado => tracejado.add(quadrado));
-
-        this.mesh = tracejado;
-    }
-
-    renderMesh(){
 
         const tracejado = new THREE.Group();
 

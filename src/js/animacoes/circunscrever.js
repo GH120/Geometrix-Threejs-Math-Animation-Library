@@ -50,7 +50,7 @@ export default class Circunscrever extends Animacao {
         const R3 = ponto => ponto.clone().sub(P3);
 
         //Método das bissetrizes 2D
-        for(let i = 0; i < 10; i++){
+        for(let i = 0; i < 100; i++){
             const modulo1 = R1(chute).length() - R2(chute).length();
             const modulo2 = R2(chute).length() - R3(chute).length();
 

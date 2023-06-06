@@ -14,6 +14,7 @@ import {Triangle} from './objetos/triangle';
 import grid from '../assets/grid.avif';
 import * as dat from 'dat.gui';
 import Circunscrever from './animacoes/circunscrever';
+import {Tracejado} from './objetos/Tracejado';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
@@ -37,6 +38,10 @@ labelRenderer.setSize(window.innerWidth, window.innerHeight);
 labelRenderer.domElement.style.position = 'absolute';
 labelRenderer.domElement.style.top = '0px';
 document.body.appendChild(labelRenderer.domElement);
+
+const tracejado = new Tracejado(new THREE.Vector3(0,0,0), new THREE.Vector3(3,1.5,0));
+console.log(tracejado);
+scene.add(tracejado.mesh)
 
 //Cria o triângulo e o programa
 const triangle = new Triangle()
@@ -84,7 +89,7 @@ gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => triangle.update())
 gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => triangle.update());
 gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
 gui.add( {onClick: () => programa.trigonometria.map(trig => trig.animando = !trig.animando)}, 'onClick').name('Mostrar animação de divisão');
-gui.add( {onClick: () => {const anim = new Circunscrever(triangle,scene); programa.adicionarCirculo(anim.circulo); programa.animar(anim)}},'onClick').name('Animação de circunscrever triângulo');
+gui.add( {onClick: () => programa.circunscrever()},'onClick').name('Animação de circunscrever triângulo');
 gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
 let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('Mostrando nada');
 ////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +138,7 @@ const posicaoFinal = posicaoInicial.map((vetor, i) => (i%6 == 0)? pontoInterior(
 //Add a fading effect to the triangles as they are placed
 //Maybe create a 'dotted line' class?
 //On hover, they would showcase each 
-const linearizarCirculo = new Animacao(circle)
+const linearizarCirculo = new Animacao(criarCirculo.circulo)
                           .setValorInicial(posicaoInicial)
                           .setValorFinal(posicaoFinal)
                           .setDuration(200)
@@ -193,12 +198,17 @@ const gerarCicloTrigonometrico = new Animacao(circle)
                                     novoTriangulo.update();
                                  });
 
-                                 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// Possiveis ações/animações que o programa roda///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // programa.adicionarCirculo(criarCirculo.circulo)
 //Adiciona as animações ao programa
 // programa.animar(Animacao.sequencial(criarCirculo, linearizarCirculo));
-programa.animar(mudarCor);
+// programa.animar(mudarCor);
+// circle.centro = new THREE.Vector3(-1.7,-1.7,0);
+// criarCirculo.circulo.centro = circle.centro;
 // programa.animar(Animacao.simultanea(gerarCicloTrigonometrico, criarCirculo))
 // programa.animar(criarCirculo);
 

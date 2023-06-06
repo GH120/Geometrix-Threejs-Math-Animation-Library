@@ -7,6 +7,7 @@ import { MostrarTipo } from './handlers/mostrarTipo';
 import  MoverVertice  from './handlers/moverVertice';
 import Circle from './objetos/circle';
 import * as THREE from 'three'
+import Circunscrever from './animacoes/circunscrever';
 
 //Responsável por adiconar os controles de arrasto e hover
 //liga os handlers aos controlers
@@ -135,6 +136,18 @@ export class Programa {
         ];
 
         this.estado = this.estados[0];
+
+        return this;
+    }
+
+    circunscrever(){
+        const criarCirculo = new Circunscrever(this.triangulo, this.scene);
+
+        this.circulo = criarCirculo.circulo;
+
+        this.adicionarCirculo(criarCirculo.circulo);
+
+        this.animar(criarCirculo);
 
         return this;
     }

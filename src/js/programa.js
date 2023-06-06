@@ -8,6 +8,7 @@ import  MoverVertice  from './handlers/moverVertice';
 import Circle from './objetos/circle';
 import * as THREE from 'three'
 import Circunscrever from './animacoes/circunscrever';
+import { MostrarBissetriz } from './handlers/mostrarBissetriz';
 
 //Responsável por adiconar os controles de arrasto e hover
 //liga os handlers aos controlers
@@ -54,14 +55,21 @@ export class Programa {
         this.colorirIsoceles = new ColorirIsoceles(triangulo);
         //É um observer, mostra o tipo desse triângulo
         this.mostrarTipo = new MostrarTipo(triangulo);
+        //É um observer, mostra a bissetriz do ângulo
+        this.bissetrizes = triangulo.angles.map(angle => new MostrarBissetriz(triangulo, angle));
 
         // //Liga esses observers ao hover/drag, quando acionados, eles avisam seus observers
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
+        this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
         this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
 
-        this.handlers = [...this.moverVertice, ...this.mostrarAngulo, this.colorirIsoceles, this.mostrarTipo];
+        this.handlers = [...this.moverVertice,
+                         ...this.mostrarAngulo,
+                         ...this.bissetrizes, 
+                         this.colorirIsoceles, 
+                         this.mostrarTipo];
         
         return this;
     }
@@ -69,6 +77,7 @@ export class Programa {
     addToScene(scene){
         this.mostrarAngulo.map(m => m.addToScene(scene));
         this.mostrarTipo.addToScene(scene);
+        this.bissetrizes.map(bissetriz => bissetriz.addToScene(scene));
 
         return this;
     }

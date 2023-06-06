@@ -2,12 +2,13 @@ import * as THREE from 'three';
 
 export class Tracejado{
 
-    constructor(origem, destino, largura=0.05, altura=0.2, spacingRatio=1){
+    constructor(origem, destino, largura=0.01, altura=0.1, spacingRatio=1){
         this.origem  = origem;
         this.destino = destino;
         this.largura = largura;
         this.altura  = altura;
         this.spacing = spacingRatio;
+        this.material = new THREE.MeshBasicMaterial({color:0xf00f00});
 
         this.renderMalha();
     }
@@ -42,7 +43,7 @@ export class Tracejado{
 
             geometry.setAttribute('position', new THREE.Float32BufferAttribute(quadrado,3));
 
-            const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:0xf00f00}));
+            const mesh = new THREE.Mesh(geometry, this.material);
 
             const origem = this.origem.clone().add(direcao.clone().multiplyScalar(i*(1+this.spacing)));
 
@@ -57,5 +58,20 @@ export class Tracejado{
 
     get length(){
         return this.origem.clone().sub(this.destino).length();
+    }
+
+    addToScene(scene){
+        this.scene = scene;
+        scene.add(this.mesh);
+        return this;
+    }
+
+    update(){
+        
+        this.scene.remove(this.mesh);
+
+        this.renderMalha();
+
+        this.scene.add(this.mesh);
     }
 }

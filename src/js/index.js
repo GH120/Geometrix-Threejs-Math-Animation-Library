@@ -39,9 +39,9 @@ labelRenderer.domElement.style.position = 'absolute';
 labelRenderer.domElement.style.top = '0px';
 document.body.appendChild(labelRenderer.domElement);
 
-const tracejado = new Tracejado(new THREE.Vector3(0,0,0), new THREE.Vector3(3,1.5,0));
-console.log(tracejado);
-scene.add(tracejado.mesh)
+// const tracejado = new Tracejado(new THREE.Vector3(0,0,0), new THREE.Vector3(3,1.5,0));
+// console.log(tracejado);
+// scene.add(tracejado.mesh)
 
 //Cria o triângulo e o programa
 const triangle = new Triangle()
@@ -96,11 +96,23 @@ let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('
 
 //Exemplos de animações, depois refatorar
 const mudarCor = new Animacao(triangle.angles[1])
-                    .setValorInicial(0x000000)
-                    .setValorFinal(0x0000ff)
+                    .setValorInicial(0x00f00a)
+                    .setValorFinal(0x0f00ff)
                     .setDuration(300)
-                    .setInterpolacao(function(inicial,final,peso){
-                      return( inicial*(1-peso)*(1-peso)*(1-peso) + final*peso*peso*peso);
+                    .setInterpolacao(function (color1, color2, weight) {
+                        const r1 = (color1 >> 16) & 0xff;
+                        const g1 = (color1 >> 8) & 0xff;
+                        const b1 = color1 & 0xff;
+                      
+                        const r2 = (color2 >> 16) & 0xff;
+                        const g2 = (color2 >> 8) & 0xff;
+                        const b2 = color2 & 0xff;
+                      
+                        const r = Math.round(r1 + weight * (r2 - r1));
+                        const g = Math.round(g1 + weight * (g2 - g1));
+                        const b = Math.round(b1 + weight * (b2 - b1));
+                      
+                        return (r << 16) | (g << 8) | b;
                     })
                     .setUpdateFunction(function(valor){
                       this.objeto.sectorMaterial = new THREE.MeshBasicMaterial({color:valor});
@@ -184,11 +196,20 @@ const gerarCicloTrigonometrico = new Animacao(circle)
 
                                     // novoTriangulo.positions.map(position => position.map)
 
+                                    novoTriangulo.renderEdges = function(){
+                                      this.edges = this.vertices.map((vertex,index) => new Tracejado(vertex.position.clone(), this.vertices[(index+1)%3].position.clone(),0.02));
+                                      return this;
+                                    } 
+
                                     novoTriangulo
                                     .renderVertices()
                                     .renderEdges()
                                     .renderAngles()
                                     .addToScene(scene);
+
+                                    novoTriangulo.edges.map(edge => edge.material = new THREE.MeshBasicMaterial({color:0x808080}))
+
+                                    console.log(novoTriangulo)
 
                                     novoTriangulo.angles.map(angle => angle.angleRadius = 0.1);
                                     novoTriangulo.edges.map(edge => edge.grossura = 0.03)
@@ -206,10 +227,10 @@ const gerarCicloTrigonometrico = new Animacao(circle)
 // programa.adicionarCirculo(criarCirculo.circulo)
 //Adiciona as animações ao programa
 // programa.animar(Animacao.sequencial(criarCirculo, linearizarCirculo));
-// programa.animar(mudarCor);
-// circle.centro = new THREE.Vector3(-1.7,-1.7,0);
-// criarCirculo.circulo.centro = circle.centro;
-// programa.animar(Animacao.simultanea(gerarCicloTrigonometrico, criarCirculo))
+programa.animar(mudarCor);
+circle.centro = new THREE.Vector3(-1.7,-1.7,0);
+criarCirculo.circulo.centro = circle.centro;
+programa.animar(Animacao.simultanea(gerarCicloTrigonometrico, criarCirculo))
 // programa.animar(criarCirculo);
 
 console.log(programa)

@@ -17,7 +17,7 @@ export default class MoverVertice{
 
         const speed = new THREE.Vector3().subVectors(point, this.vertice.position);
 
-        console.log(point, this.vertice)
+        // console.log(point, this.vertice)
 
         this.vertice.position.copy(point);
 

@@ -7,6 +7,7 @@ export class Angle{
         this.vertices = vertices;
         this.index = index;
         this.angleRadius = 0.7;
+        this.grossura = 0.15;
         this.sectorMaterial = new THREE.MeshBasicMaterial({color:0xff0000})
 
     }
@@ -90,10 +91,61 @@ export class Angle{
 
         sectorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(sectorVertices, 3));
 
+        if(Math.round(this.angulo*180/Math.PI) == 90){
+            this.mesh = this.anguloReto;
+            return this;
+        }
+
         // Cria a malha
         this.mesh = new THREE.Mesh(sectorGeometry, this.sectorMaterial);
 
         return this;
+    }
+
+    get anguloReto(){
+
+        const grossura = this.grossura;
+        const raio     = this.angleRadius;
+
+        //Triangulo esquerdo e direito do quadrado base
+        const trianguloEsquerdo  = [[0,0,0], [1,0,0],[1,1,0]];
+        const trianguloDireito   = [[1,1,0], [0,1,0],[0,0,0]];
+
+        const quadrado = [...trianguloDireito, ...trianguloEsquerdo];
+
+        //Constroi os lados do quadrado oco copiando o quadrado base e alterando suas proporções
+        const left   =  quadrado.map(array => new THREE.Vector3(...array))
+                                .map(vetor => vetor.setX(vetor.x*grossura));
+        const right  =  quadrado.map(array => new THREE.Vector3(...array))
+                                .map(vetor => vetor.setX(vetor.x*grossura + 1 - grossura));
+        const bottom =  quadrado.map(array => new THREE.Vector3(...array))
+                                .map(vetor => vetor.setY(vetor.y*grossura));
+        const top    =  quadrado.map(array => new THREE.Vector3(...array))
+                                .map(vetor => vetor.setY(vetor.y*grossura + 1 - grossura));
+        
+        const vetores  = [...left, ...top];
+
+        vetores.map(v => v.setY(v.y - 1));
+        vetores.map(v => v.multiplyScalar(raio*0.7));
+        
+        //Concatena os vetores que representam os pontos em um só array de eixos
+        const posicoes = [].concat(...vetores.map(vetor => vetor.toArray()));
+
+        //Cria a buffer geometry e atribui a posição os valores das posições
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(posicoes, 3));
+
+        const mesh = new THREE.Mesh(geometry, this.sectorMaterial);
+
+        const vetor = this.vetor1.clone().lerp(this.vetor2, 0.5).multiplyScalar(raio*Math.sqrt(2));
+
+        const posicao = new THREE.Vector3(...this.position).sub(vetor);
+
+        mesh.position.copy(posicao);
+
+        // mesh.lookAt(new THREE.Vector3(-1,-1,0))
+
+        return mesh;
     }
     
     update(){

@@ -56,6 +56,43 @@ circle.circunscrever(triangle);
 
 const programa = new Programa(triangle,scene,camera);
 
+// const w = 1; // Width of the square
+
+// const halfWidth = w / 2;
+
+// const positions = [
+//   0,0,0,
+//   0,1,0,
+//   1,0,0,
+//   1,1,0,
+
+//   0,0,0,
+//   0,0.9,0,
+//   0.9,0,0,
+//   0.9,0.9,0
+// ];
+
+// const indices = [
+//   0, 1, 2,  // Triangle 1 (Bottom side)
+//   0, 2, 3,  // Triangle 2 (Bottom side)
+
+//   0, 4, 1,  // Triangle 3 (Left side)
+//   1, 4, 5,  // Triangle 4 (Left side)
+
+//   1, 5, 2,  // Triangle 5 (Right side)
+//   2, 5, 6,  // Triangle 6 (Right side)
+
+//   2, 6, 3,  // Triangle 7 (Top side)
+//   3, 6, 7,  // Triangle 8 (Top side)
+// ];
+
+// // Create the BufferGeometry
+// const geometry = new THREE.BufferGeometry();
+// geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+// geometry.setIndex(indices);
+
+// scene.add(new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:0x000ff0})));
+
 //programa.adicionarCirculo(circle);
 
 ////////////////////////////Interfáce gráfica/////////////////////////////////////

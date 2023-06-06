@@ -1,6 +1,7 @@
 import MostrarTracejado from "../animacoes/mostrarTracejado";
 import { Tracejado } from "../objetos/Tracejado";
 
+//No ato de criar uma bissetriz, criar um novo triangulo?
 export class MostrarBissetriz{
 
     constructor(triangulo, angulo, scene){

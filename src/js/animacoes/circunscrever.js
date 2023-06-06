@@ -63,8 +63,6 @@ export default class Circunscrever extends Animacao {
             direcao2.multiplyScalar(valor(modulo2));
             
             chute.sub(direcao1.add(direcao2));
-
-            console.log(modulo1, modulo2);
         }
 
         const centro = chute;

@@ -234,7 +234,7 @@ class Refatorada {
         if(this.voltar) this.update(this.valorInicial);
 
         //Se tiver uma função ao terminar, executa ela
-        this.onTermino();
+        yield this.onTermino();
     }
 }
 
@@ -246,13 +246,13 @@ class AnimacaoSimultanea extends Refatorada{
         this.animacoes = animacoes;
         this.frames = animacoes.map(animacao => animacao.frames).reduce((maior, atual) => (maior > atual)? maior : atual);
 
-        //Enquanto ela não terminar, as animações não voltarão ao inicio
-        this.animacoes.map(animacao => animacao.voltarAoInicio(false));
+        //Todas as animações vão manter sua execução até o termino dessa
+        //Revisar isso depois
+        this.manterExecucaoTodos(true);
     }
 
     //Opcional, ao invés do padrão, onde alguns podem manter e outros não, força todas as animações a um mesmo padrão
     manterExecucaoTodos(trueOrFalse){
-        this.manter = trueOrFalse;
         this.animacoes.map(animacao => animacao.manterExecucao(trueOrFalse));
         this.animacoes.map(animacao => animacao.voltarAoInicio(false));
         return this;
@@ -267,15 +267,20 @@ class AnimacaoSimultanea extends Refatorada{
         const duracao = animacoes.map(animacao => animacao.frames)
                                 .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
 
+        //Avança os frames simultâneamente das animações
         for(let frame = 1; frame <= duracao; frame++){
             yield actions.map(action => action.next());
         }
 
+        //Mantém a execução do frame final de todas as animações
         while(this.manter){
             yield actions.map(actions => actions.next());
         }
 
-        if(this.voltar) this.animacoes.map(animacao => animacao.update(animacao.valorInicial));
+        //Termina a execução
+        animacoes.map(animacao => animacao.manter = false);
+
+        actions.map(action => action.next());
 
         this.onTermino();
     }
@@ -284,9 +289,65 @@ class AnimacaoSimultanea extends Refatorada{
         animacoes.map(animacao => animacao.setDuration(frames));
         return this;
     }
+}
 
-    terminarExecucao = function(){
-        animacoes.map(animacao => animacao.terminarExecucao());
+class AnimacaoSequencial extends Refatorada{
+
+    constructor(...animacoes){
+        super();
+
+        this.animacoes = animacoes;
+        this.frames = animacoes.map(animacao => animacao.frames)
+                               .reduce((acumulado, atual) => acumulado + atual, 0);
+    }
+
+    //Opcional, ao invés do padrão, onde alguns podem manter e outros não, força todas as animações a um mesmo padrão
+    manterExecucaoTodos(trueOrFalse){
+        this.animacoes.map(animacao => animacao.manterExecucao(trueOrFalse));
+        this.animacoes.map(animacao => animacao.voltarAoInicio(false));
+        return this;
+    }
+
+    getFrames = function* (){
+
+        const animacoes = this.animacoes;
+
+        const duracao = animacoes.map(animacao => animacao.frames)
+                                 .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
+        
+        const completedActions = [];
+
+        for(const animacao of animacoes){
+
+            const action = animacao.getFrames();
+
+            //Retorna um por um os frames da animação atual
+            for(let i = 0; i < animacao.frames; i++){
+                yield action.next();
+            }
+
+            //Quando terminada, adicionar as completadas
+            completedActions.push(action);
+
+            //Mantém a execução opcionalmente das animações completas
+            completedActions.map(completed => completed.next());
+        }
+
+        //Mantém a execução do frame final de todas as animações
+        while(this.manter){
+            yield actions.map(actions => actions.next());
+        }
+
+        //Termina a execução
+        animacoes.map(animacao => animacao.manter = false);
+
+        actions.map(action => action.next());
+
+        this.onTermino();
+    }
+
+    setDuration = function(frames){
+        animacoes.map(animacao => animacao.setDuration(frames));
         return this;
     }
 }

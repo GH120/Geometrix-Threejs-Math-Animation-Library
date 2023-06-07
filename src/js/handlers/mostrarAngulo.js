@@ -8,6 +8,7 @@ export class MostrarAngulo{
         this.triangulo = triangulo;
         this.vertice = triangulo.vertices[index];
         this.angulo = triangulo.angles[index];
+        this.estado  = {};
         this.createText();
 
     }
@@ -50,11 +51,15 @@ export class MostrarAngulo{
         }
     }
 
-    update(){
+    update(novoEstado){
+
+        this.estado = {...this.estado, ...novoEstado};
 
         const scene = this.scene;
 
         scene.remove(this.text.elemento)
+
+        this.onHover(this.estado.dentro);
 
         if(this.text.on)
             scene.add(this.text.elemento)

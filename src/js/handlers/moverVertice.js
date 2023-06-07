@@ -9,7 +9,11 @@ export default class MoverVertice{
         this.vertice = vertice;
     }
 
-    update(point){
+    update(novoEstado){
+
+        this.estado = {...this.estado, ...novoEstado};
+
+        const point = this.estado.position;
 
         if(!point) return;
 

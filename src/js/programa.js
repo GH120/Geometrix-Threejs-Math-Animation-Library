@@ -62,6 +62,8 @@ export class Programa {
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
+        this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
+        this.draggable.map((draggable,index) => draggable.addObserver(this.mostrarAngulo[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
         this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
 
@@ -92,7 +94,11 @@ export class Programa {
 
     animar(animacao){
 
-        this.frames.push(animacao.getFrames());
+        animacao.animationFrames = animacao.getFrames();
+
+        console.log(animacao, "hies")
+
+        this.frames.push(animacao.animationFrames);
 
         this.animacoes.push(animacao);
 

@@ -201,10 +201,13 @@ export class TrigOnHover {
         
     }
 
-    //O problema está aqui
-    update(){
+    update(estadoNovo){
+        //Atualiza o estado com a informação nova do controler
+        this.estado = {...estadoNovo, ...this.estado};
+        
         this.dividendo.update();
         this.divisor.update();
+        this.onHover(this.estado.dentro);
     }
 }
 

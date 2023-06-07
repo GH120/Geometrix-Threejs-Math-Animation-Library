@@ -11,26 +11,42 @@ export class MostrarBissetriz{
         this.ladoOposto = triangulo.edges[(angulo.index+1)%3];
         this.scene = scene;
         this.tracejado = {mesh:null};
-    }
-    update(){
-
+        this.estado = {};
     }
 
-    onHover(inside){
+    update(estadoNovo){
+
+        this.estado = {...this.estado, ...estadoNovo};
 
         this.scene.remove(this.tracejado.mesh);
+
+        const inside = this.estado.dentro;
 
         if(inside){
             const origem  = this.vertice.position.clone();
             const destino = this.ladoOposto.mesh.position.clone();
 
-            console.log(origem, destino)
-
             this.tracejado = new Tracejado(origem,destino);
             this.scene.add(this.tracejado.mesh);
 
-            this.animar(new MostrarTracejado(this.tracejado, this.scene));
+            const animacao = new MostrarTracejado(this.tracejado, this.scene);
+
+            if(this.novaAnimacao(animacao)) this.animar(animacao);
         }
+    }
+
+    novaAnimacao(animacao){
+
+        if(this.animacao && this.animacao.animationFrames.next().done){
+            this.animacao = animacao;
+            return true;
+        }
+
+        if(this.animacao) return false;
+
+        this.animacao = animacao;
+
+        return true;
     }
 
     addToScene(scene){

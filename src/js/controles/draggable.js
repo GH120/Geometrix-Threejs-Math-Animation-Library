@@ -38,7 +38,7 @@ export class Draggable {
       if(!point) return;
 
       //Notifica todos os observadores da nova posição
-      this.notify(point);
+      this.notify({position: point});
     }
     
   }
@@ -71,8 +71,8 @@ export class Draggable {
     this.dragging = false;
   }
 
-  notify(point){
-    for(const observer of this.observers) if(observer) observer.update(point);
+  notify(estado){
+    for(const observer of this.observers) if(observer) observer.update(estado);
   }
 
   addObserver(observer){

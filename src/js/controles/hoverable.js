@@ -22,7 +22,7 @@ export class Hoverable {
     if(this.isInside == isInside) return;
 
     //Manda os observadores atualizarem
-    this.notify(isInside)
+    this.notify({dentro: isInside});
 
     this.isInside = isInside;
   }
@@ -51,11 +51,10 @@ export class Hoverable {
     return null;
   }
 
-  notify(isInside){
+  notify(estado){
     for(const observer of this.observers) {
       if(observer == null) continue;
-      observer.onHover(isInside);
-      observer.update();
+      observer.update(estado);
     }
   }
 

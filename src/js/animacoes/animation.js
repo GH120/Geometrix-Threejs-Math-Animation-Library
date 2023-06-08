@@ -210,7 +210,8 @@ export class AnimacaoSequencial extends Animacao{
             //Mantém a execução opcionalmente das animações completas
             completedActions.map(completed => completed.next());
         }
-
+        
+        //Delay final ao terminar execução
         for(let frame = this.frames; frame < this.frames + this.delay; frame++){
             yield completedActions.map(action => action.next());
         }

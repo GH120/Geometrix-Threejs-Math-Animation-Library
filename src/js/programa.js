@@ -9,6 +9,7 @@ import Circle from './objetos/circle';
 import * as THREE from 'three'
 import Circunscrever from './animacoes/circunscrever';
 import { MostrarBissetriz } from './handlers/mostrarBissetriz';
+import { Clickable, MultipleClickable } from './controles/clickable';
 
 //Responsável por adiconar os controles de arrasto e hover
 //liga os handlers aos controlers
@@ -36,7 +37,9 @@ export class Programa {
         const triangulo = this.triangulo;
         const camera = this.camera;
 
+        const selecionar = new MultipleClickable(triangulo.angles, camera)
         
+        this.clickable = triangulo.angles.map(   angle  => selecionar);
         this.hoverable = triangulo.angles.map(   angle  => new Hoverable(angle , camera));
         this.draggable = triangulo.vertices.map( vertex => new Draggable(vertex, camera));
 
@@ -61,8 +64,9 @@ export class Programa {
         // //Liga esses observers ao hover/drag, quando acionados, eles avisam seus observers
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
-        this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
+        this.clickable.map((clickable, index)=> clickable.addObserver(this.bissetrizes[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
+        this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.mostrarAngulo[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
         this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));

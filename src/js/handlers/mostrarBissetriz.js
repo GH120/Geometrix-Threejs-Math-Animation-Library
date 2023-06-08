@@ -5,12 +5,14 @@ import { Tracejado } from "../objetos/Tracejado";
 export class MostrarBissetriz{
 
     constructor(triangulo, angulo, scene){
+        
         this.triangulo = triangulo;
         this.angulo = angulo;
         this.vertice = triangulo.vertices[angulo.index];
         this.ladoOposto = triangulo.edges[(angulo.index+1)%3];
         this.scene = scene;
-        this.estado = {};
+
+        this.estado = {selecionado:false, clicados:[]};
 
         const origem  = this.vertice.position.clone();
         const destino = this.ladoOposto.mesh.position.clone();
@@ -37,7 +39,13 @@ export class MostrarBissetriz{
             if(this.novaAnimacao(animacao)) this.animar(animacao);
         }
         else{
-            //if !this.estado.clicado
+            //Ignora remoção se clicado
+
+            if(this.estaSelecionado()){
+                this.scene.add(this.tracejado.mesh);
+                return;
+            }
+
             if(this.animacao) this.animacao.animationFrames.return();
         }
     }
@@ -55,6 +63,23 @@ export class MostrarBissetriz{
         this.animacao = animacao;
 
         return true;
+    }
+
+    //Determina se o ultimo clique seleciona ou deseleciona 
+    estaSelecionado(){
+
+        const JaSelecionado = this.estado.selecionado;
+
+        const selecionados  = this.estado.clicados.filter(colisao => colisao != null)
+                                                 .map(colisao => colisao.object);
+
+        const clicouNoVazio = this.estado.clicados.filter(colisao => colisao != null).length == 0;
+
+        const selecionadoNesseClique = selecionados.filter(objeto => objeto == this.angulo.mesh).length > 0;
+
+        this.estado.selecionado = (JaSelecionado && !clicouNoVazio) || selecionadoNesseClique;
+
+        return this.estado.selecionado;
     }
 
     addToScene(scene){

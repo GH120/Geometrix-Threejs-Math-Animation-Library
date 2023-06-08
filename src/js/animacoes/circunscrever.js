@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import Circle from '../objetos/circle';
-import { Animacao } from './animation';
+import Animacao from './animation';
 
 export default class Circunscrever extends Animacao {
 
@@ -13,6 +13,8 @@ export default class Circunscrever extends Animacao {
         this.valorInicial = anguloInicial;
         this.valorFinal = anguloFinal;
         this.frames = duration;
+
+        this.voltar = false;
         
         this.circulo = this.circunscrever(triangulo);
 

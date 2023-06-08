@@ -1,5 +1,5 @@
 import { Tracejado } from "../objetos/Tracejado";
-import { Animacao } from "./animation";
+import Animacao from "./animation";
 
 export default class MostrarTracejado extends Animacao{
 
@@ -11,6 +11,7 @@ export default class MostrarTracejado extends Animacao{
         this.valorInicial = tracejado.origem.clone();
         this.valorFinal   = tracejado.destino.clone();
         this.frames = 50;
+        this.voltar = false;
 
         this.setUpdateFunction(function(posicao){
 

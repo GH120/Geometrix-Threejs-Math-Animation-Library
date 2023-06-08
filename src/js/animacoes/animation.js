@@ -1,154 +1,4 @@
-export class Animacao {
-
-    constructor(objeto){
-        this.objeto = objeto;
-        this.frames = 0;
-        this.delay = 0;
-    }
-
-    setValorInicial(valorInicial){
-        this.valorInicial = valorInicial;
-        return this;
-    }
-    
-    setValorFinal(valorFinal){
-        this.valorFinal = valorFinal;
-        return this;
-    }
-
-    setDuration(frames){
-        this.frames = frames;
-        return this;
-    }
-
-    setDelay(delay){
-        this.delay = delay;
-        return this;
-    }
-
-    setInterpolacao(interpolacao){
-        this.interpolacao = interpolacao;
-        return this;
-    }
-
-    setUpdateFunction(update){
-        this.update = update;
-        return this;
-    }
-
-    setOnTermino(onTermino){
-        this.onTermino = onTermino;
-        return this;
-    }
-
-    manterExecucao(){
-        this.update(this.valorFinal);
-        return this;
-    }
-
-    terminarExecucao(){
-        this.update(this.valorInicial);
-        return this;
-    }
-
-    onTermino(){
-        return null;
-    }
-
-    *getFrames(){
-
-        for(let frame = 1; frame <= this.frames; frame++){
-
-            const atributo = this.nome;
-
-            const lerp = (peso) => this.interpolacao(this.valorInicial, this.valorFinal, peso);
-
-            const valor = lerp(frame/this.frames);
-
-            // this.update.bind(this.objeto);
-
-            this.update(valor);
-
-            yield frame;
-        }
-
-    }
-
-    static simultanea(...animacoes){
-
-        const animacaoJunta = new Animacao();
-        
-        animacaoJunta.getFrames = function* (){
-
-            const actions = animacoes.map(animacao => animacao.getFrames());
-
-            const duracao = animacoes.map(animacao => animacao.frames)
-                                    .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
-
-            for(let frame = 1; frame <= duracao; frame++){
-                yield actions.map(action => action.next());
-            }
-        }
-
-        animacaoJunta.setDuration = function(frames){
-            animacoes.map(animacao => animacao.setDuration(frames));
-            return this;
-        }
-
-        animacaoJunta.manterExecucao = function(){
-            animacoes.map(animacao => animacao.manterExecucao())
-            return this;
-        }
-
-        animacaoJunta.onTermino = function(){
-            animacoes.map(animacao => animacao.onTermino())
-            return this;
-        }
-
-        animacaoJunta.terminarExecucao = function(){
-            animacoes.map(animacao => animacao.terminarExecucao());
-            return this;
-        }
-
-        return animacaoJunta;
-    }
-
-    static sequencial(...animacoes){
-        
-        const animacaoSequencial = new Animacao();
-
-        animacaoSequencial.children = animacoes;
-        
-        animacaoSequencial.getFrames = function* (){
-
-            const actions = animacoes.map(animacao => animacao.getFrames());
-
-            for(const action of actions) yield* action;
-        }
-
-        animacaoSequencial.manterExecucao = function(){
-            animacoes.map(animacao => animacao.manterExecucao())
-        }
-
-        animacaoSequencial.onTermino = function(){
-            animacoes.map(animacao => animacao.onTermino())
-        }
-
-        animacaoSequencial.setDuration = function(frames){
-            animacoes.map(animacao => animacao.setDuration(frames));
-            return this;
-        }
-
-        animacaoSequencial.terminarExecucao = function(){
-            animacoes.map(animacao => animacao.terminarExecucao());
-            return this;
-        }
-
-        return animacaoSequencial;
-    }
-}
-
-class Refatorada {
+export default class Animacao {
 
     constructor(objeto){
         this.objeto = objeto;
@@ -198,9 +48,18 @@ class Refatorada {
         return this;
     }
 
+    setOnStart(onStart){
+        this.onStart = onStart;
+        return this;
+    }
+
     setOnTermino(onTermino){
         this.onTermino = onTermino;
         return this;
+    }
+
+    onStart(){
+        return null;
     }
 
     onTermino(){
@@ -209,20 +68,23 @@ class Refatorada {
 
     *getFrames(){
 
+        this.onStart();
+
         //Executa os frames da animação, interpolando os valores iniciais e finais
         for(let frame = 1; frame <= this.frames; frame++){
-
-            const atributo = this.nome;
 
             const lerp = (peso) => this.interpolacao(this.valorInicial, this.valorFinal, peso);
 
             const valor = lerp(frame/this.frames);
 
-            // this.update.bind(this.objeto);
-
             this.update(valor);
 
             yield frame;
+        }
+
+        //Parte do delay
+        for(let frame = this.frames; frame < this.frames + this.delay; frame++){
+            yield this.update(this.valorFinal);
         }
 
         //Enquanto estiver com a flag para manter a execução, continue retornando o ultimo frame
@@ -236,9 +98,17 @@ class Refatorada {
         //Se tiver uma função ao terminar, executa ela
         yield this.onTermino();
     }
+
+    static simultanea(...animacoes){
+        return new AnimacaoSimultanea(animacoes);
+    }
+
+    static sequencial(...animacoes){
+        return new AnimacaoSequencial(animacoes);
+    }
 }
 
-class AnimacaoSimultanea extends Refatorada{
+export class AnimacaoSimultanea extends Animacao{
 
     constructor(...animacoes){
         super();
@@ -254,21 +124,24 @@ class AnimacaoSimultanea extends Refatorada{
     //Opcional, ao invés do padrão, onde alguns podem manter e outros não, força todas as animações a um mesmo padrão
     manterExecucaoTodos(trueOrFalse){
         this.animacoes.map(animacao => animacao.manterExecucao(trueOrFalse));
-        this.animacoes.map(animacao => animacao.voltarAoInicio(false));
+        // this.animacoes.map(animacao => animacao.voltarAoInicio(false));
         return this;
     }
 
-    getFrames = function* (){
+    *getFrames(){
 
         const animacoes = this.animacoes;
 
+        this.frames =   animacoes.map(animacao => animacao.frames)
+                                 .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
+
+        this.delay  =   animacoes.map(animacao => animacao.delay)
+                                 .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
+
         const actions = animacoes.map(animacao => animacao.getFrames());
 
-        const duracao = animacoes.map(animacao => animacao.frames)
-                                .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
-
         //Avança os frames simultâneamente das animações
-        for(let frame = 1; frame <= duracao; frame++){
+        for(let frame = 1; frame <= this.frames + this.delay; frame++){
             yield actions.map(action => action.next());
         }
 
@@ -285,13 +158,19 @@ class AnimacaoSimultanea extends Refatorada{
         this.onTermino();
     }
 
-    setDuration = function(frames){
-        animacoes.map(animacao => animacao.setDuration(frames));
+    setDuration(frames){
+        this.frames = frames
+        this.animacoes.map(animacao => animacao.setDuration(frames));
+        return this;
+    }
+
+    setDelay(frames){
+        this.animacoes.map(animacao => animacao.delay = frames);
         return this;
     }
 }
 
-class AnimacaoSequencial extends Refatorada{
+export class AnimacaoSequencial extends Animacao{
 
     constructor(...animacoes){
         super();
@@ -299,21 +178,20 @@ class AnimacaoSequencial extends Refatorada{
         this.animacoes = animacoes;
         this.frames = animacoes.map(animacao => animacao.frames)
                                .reduce((acumulado, atual) => acumulado + atual, 0);
+
+        this.manterExecucaoTodos(true);
     }
 
     //Opcional, ao invés do padrão, onde alguns podem manter e outros não, força todas as animações a um mesmo padrão
     manterExecucaoTodos(trueOrFalse){
         this.animacoes.map(animacao => animacao.manterExecucao(trueOrFalse));
-        this.animacoes.map(animacao => animacao.voltarAoInicio(false));
+        // this.animacoes.map(animacao => animacao.voltarAoInicio(false));
         return this;
     }
 
-    getFrames = function* (){
+    *getFrames(){
 
         const animacoes = this.animacoes;
-
-        const duracao = animacoes.map(animacao => animacao.frames)
-                                 .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
         
         const completedActions = [];
 
@@ -322,7 +200,7 @@ class AnimacaoSequencial extends Refatorada{
             const action = animacao.getFrames();
 
             //Retorna um por um os frames da animação atual
-            for(let i = 0; i < animacao.frames; i++){
+            for(let i = 0; i < animacao.frames + animacao.delay; i++){
                 yield action.next();
             }
 
@@ -333,21 +211,25 @@ class AnimacaoSequencial extends Refatorada{
             completedActions.map(completed => completed.next());
         }
 
+        for(let frame = this.frames; frame < this.frames + this.delay; frame++){
+            yield completedActions.map(action => action.next());
+        }
+
         //Mantém a execução do frame final de todas as animações
         while(this.manter){
-            yield actions.map(actions => actions.next());
+            yield completedActions.map(actions => actions.next());
         }
 
         //Termina a execução
         animacoes.map(animacao => animacao.manter = false);
 
-        actions.map(action => action.next());
+        completedActions.map(action => action.next());
 
         this.onTermino();
     }
 
     setDuration = function(frames){
-        animacoes.map(animacao => animacao.setDuration(frames));
+        this.animacoes.map(animacao => animacao.setDuration(frames));
         return this;
     }
 }

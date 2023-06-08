@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {Animacao} from './animation';
+import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from './animation';
 import { Edge } from '../objetos/edge';
 
 export class Divisao extends Animacao{
@@ -14,32 +14,17 @@ export class Divisao extends Animacao{
 
     *getFrames(){
 
-        //Posiciona primeiro os lados no canto direito
-        const posicionar       = this.posicionar().setDuration(this.frames);
-        const posicionarFrames = posicionar.getFrames();
+        //Posiciona primeiro os lados no canto direito, não faz nada ao terminar
+        const posicionar  = this.posicionar().setDuration(this.frames/2).setDelay(this.delay/3);
+        // Depois executa o algoritmo da divisão
+        const dividir     = this.dividir();
 
-        yield* posicionarFrames;
+        // Quando dividido e o delay passar, termina a execução do posicionar
+        const animacao = new AnimacaoSequencial(posicionar, dividir)
 
+        animacao.setDelay(this.delay);
 
-        //Depois executa o algoritmo da divisão
-        const dividir       = this.dividir();
-        const dividirFrames = dividir.getFrames();
-
-        yield* dividirFrames;
-
-        //Mantém o resultado final da animação em estado de inércia
-        for(let i=0; i < this.delay; i++){
-            yield [
-              posicionar.manterExecucao(),
-              dividir.manterExecucao()
-            ]
-        }
-
-        //Remove os componentes da divisão da cena
-        dividir.onTermino();
-
-        //Volta os lados para sua posição e orientação originais
-        posicionar.terminarExecucao();
+        yield* animacao.getFrames();
     }
 
     posicionar(){
@@ -59,8 +44,13 @@ export class Divisao extends Animacao{
       
       const quaternionInicial2 = this.divisor.mesh.quaternion.clone();
       const girar2 = this.girar(this.divisor, quaternionInicial2, quaternionFinal)
-      
-      return Animacao.simultanea(mover,girar,mover2,girar2);
+
+
+      this.posicao1   = posicaoFinal;
+      this.posicao2   = posicaoFinal2;
+      this.quaternion = quaternionFinal;
+
+      return new AnimacaoSimultanea(mover,girar,mover2,girar2);
     }
 
     //Agora que os lados estão juntos, fazer a animação da divisão
@@ -72,8 +62,6 @@ export class Divisao extends Animacao{
 
         const divisor   = this.divisor.length;
         const dividendo = this.dividendo.length;
-
-        console.log(dividendo, divisor);
 
         const numero = dividendo/divisor;
 
@@ -88,33 +76,36 @@ export class Divisao extends Animacao{
           const copia = this.divisor.mesh.clone();
           const lado = {mesh:copia};
 
-          this.scene.add(copia);
-
           const altura = divisor*i-(dividendo-divisor)/2
 
-          const posicaoInicial = copia.position.clone();
+          const posicaoInicial = this.posicao2.clone();
 
-          const posicaoFinal = this.dividendo.mesh.position.clone()
+          const posicaoFinal = this.posicao1.clone()
                                .add(new THREE.Vector3(0,altura,0.005))
 
           const mover =  this.mover(lado, posicaoInicial, posicaoFinal)
                              .setDuration(this.frames)
-                             .setOnTermino(() => this.scene.remove(copia))
+                             .setOnStart(() => {this.scene.add(copia); copia.position.copy(posicaoInicial)})
+                             .setOnTermino(() => this.scene.remove(copia)) //Quando terminar execução, deletar copia
           
           const direcao = new THREE.Vector3().subVectors(posicaoFinal, posicaoInicial);
           const angulo  = new THREE.Vector3(-1,0,0).angleTo(direcao);
           const rotacao = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), angulo/10);
 
-          const quaternionInicial = copia.quaternion.clone(); 
-          const quaternionFinal   = quaternionInicial.clone().multiply(rotacao);
+          const quaternionInicial = this.quaternion.clone(); 
+          const quaternionFinal   = this.quaternion.clone().multiply(rotacao);
 
           const giro1 =  this.girar(lado, quaternionInicial, quaternionFinal).setDuration(this.frames/2);
           const giro2 =  this.girar(lado, quaternionFinal, quaternionInicial).setDuration(this.frames/2);
-          
-          dividir.push(Animacao.simultanea(mover,Animacao.sequencial(giro1,giro2)))
+
+          const girar =  new AnimacaoSequencial(giro1,giro2);
+
+          const divisao = new AnimacaoSimultanea(mover,girar);
+
+          dividir.push(divisao);
         }
 
-        return Animacao.sequencial(...dividir);
+        return new AnimacaoSequencial(...dividir);
     }
 
     //Animação para mover um lado

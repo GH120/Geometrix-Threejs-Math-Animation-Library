@@ -203,11 +203,14 @@ export class TrigOnHover {
 
     update(estadoNovo){
         //Atualiza o estado com a informação nova do controler
-        this.estado = {...estadoNovo, ...this.estado};
+        this.estado = {...this.estado, ...estadoNovo};
+
+        console.log(this.estado);
+
+        this.onHover(this.estado.dentro);
         
         this.dividendo.update();
         this.divisor.update();
-        this.onHover(this.estado.dentro);
     }
 }
 

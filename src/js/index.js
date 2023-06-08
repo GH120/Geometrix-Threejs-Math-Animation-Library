@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './handlers/trigonometry';
-import Animacao, { AnimacaoSimultanea } from './animacoes/animation';
+import Animacao, { AnimacaoSimultanea , AnimacaoSequencial} from './animacoes/animation';
 import {Divisao} from './animacoes/divisao';
 import { Draggable } from './controles/draggable';
 import MoverVertice from './handlers/moverVertice';
@@ -209,7 +209,8 @@ const linearizarCirculo = new Animacao(criarCirculo.circulo)
                             this.objeto.update();
 
                             scene.add(this.objeto.mesh);
-                          });
+                          })
+                          .voltarAoInicio(false);
 
 const gerarCicloTrigonometrico = new Animacao(circle)
                                  .setValorInicial(0)
@@ -263,7 +264,7 @@ const gerarCicloTrigonometrico = new Animacao(circle)
 
 // programa.adicionarCirculo(criarCirculo.circulo)
 //Adiciona as animações ao programa
-// programa.animar(Animacao.sequencial(criarCirculo, linearizarCirculo));
+// programa.animar(new AnimacaoSequencial(criarCirculo, linearizarCirculo));
 // programa.animar(mudarCor);
 circle.centro = new THREE.Vector3(-1.7,-1.7,0);
 criarCirculo.circulo.centro = circle.centro;

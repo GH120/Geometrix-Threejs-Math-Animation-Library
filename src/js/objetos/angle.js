@@ -125,8 +125,12 @@ export class Angle{
         
         const vetores  = [...left, ...top];
 
+        //Rotaciona o quadrado para orientação certa
+        const rotacao = new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,-1,0), this.vetor2));
+
         vetores.map(v => v.setY(v.y - 1));
         vetores.map(v => v.multiplyScalar(raio*0.7));
+        vetores.map(v => v.applyMatrix4(rotacao));
         
         //Concatena os vetores que representam os pontos em um só array de eixos
         const posicoes = [].concat(...vetores.map(vetor => vetor.toArray()));

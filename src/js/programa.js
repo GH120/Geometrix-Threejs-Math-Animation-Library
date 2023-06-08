@@ -10,6 +10,7 @@ import * as THREE from 'three'
 import Circunscrever from './animacoes/circunscrever';
 import { MostrarBissetriz } from './handlers/mostrarBissetriz';
 import { Clickable, MultipleClickable } from './controles/clickable';
+import FixarAoCirculo from './handlers/fixarAoCirculo';
 
 //Responsável por adiconar os controles de arrasto e hover
 //liga os handlers aos controlers
@@ -70,6 +71,7 @@ export class Programa {
         this.draggable.map((draggable,index) => draggable.addObserver(this.mostrarAngulo[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
         this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
+        this.draggable.map(draggable => draggable.addObserver(this.triangulo));
 
         this.handlers = [...this.moverVertice,
                          ...this.mostrarAngulo,
@@ -99,8 +101,6 @@ export class Programa {
     animar(animacao){
 
         animacao.animationFrames = animacao.getFrames();
-
-        console.log(animacao, "hies")
 
         this.frames.push(animacao.animationFrames);
 
@@ -161,6 +161,15 @@ export class Programa {
 
     circunscrever(){
         const criarCirculo = new Circunscrever(this.triangulo, this.scene);
+
+        const circulo = criarCirculo.circulo;
+
+        this.fixarAoCirculo = this.triangulo.vertices.map(vertice => new FixarAoCirculo(circulo,vertice));
+
+        criarCirculo.setOnTermino(() => {
+            this.draggable.map(draggable => draggable.removeObserver(observer => !this.moverVertice.filter(a => a == observer).length));
+            this.draggable.map((draggable,index) => draggable.addObserver(this.fixarAoCirculo[index]));
+        })
 
         this.circulo = criarCirculo.circulo;
 

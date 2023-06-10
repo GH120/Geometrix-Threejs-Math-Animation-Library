@@ -68,8 +68,11 @@ loader.load(
   function(objeto){
     objeto.scale.set(0.0007,0.0007,0.0007)
     scene.add(objeto);
+    objeto.hitbox = objeto;
+    new Draggable(objeto, camera).addObserver(new MoverVertice({update:() =>null}, objeto))
   }
 )
+
 directionalLight.lookAt(triangle.vertices[0]);
 
 ////////////////////////////Interfáce gráfica/////////////////////////////////////

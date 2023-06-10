@@ -71,11 +71,11 @@ export class MostrarBissetriz{
         const JaSelecionado = this.estado.selecionado;
 
         const selecionados  = this.estado.clicados.filter(colisao => colisao != null)
-                                                 .map(colisao => colisao.object);
+                                                  .map(colisao => colisao.object);
 
         const clicouNoVazio = this.estado.clicados.filter(colisao => colisao != null).length == 0;
 
-        const selecionadoNesseClique = selecionados.filter(objeto => objeto == this.angulo.mesh).length > 0;
+        const selecionadoNesseClique = selecionados.filter(objeto => objeto == this.angulo.hitbox).length > 0;
 
         this.estado.selecionado = (JaSelecionado && !clicouNoVazio) || selecionadoNesseClique;
 

@@ -104,7 +104,7 @@ export class MultipleClickable{
         this.raycaster.setFromCamera(mouse, this.camera);
     
         const hitbox = object.hitbox;
-        
+
         const intersects = this.raycaster.intersectObject(hitbox);
     
         if (intersects.length > 0) {

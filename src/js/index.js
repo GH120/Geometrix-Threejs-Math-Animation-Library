@@ -8,13 +8,12 @@ import { Draggable } from './controles/draggable';
 import MoverVertice from './handlers/moverVertice';
 import {Programa} from './programa';
 import Circle from './objetos/circle';
-
-
 import {Triangle} from './objetos/triangle';
 import grid from '../assets/grid.avif';
 import * as dat from 'dat.gui';
 import Circunscrever from './animacoes/circunscrever';
 import {Tracejado} from './objetos/Tracejado';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
@@ -29,6 +28,11 @@ const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.inner
 const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
 renderer.setSize( window.innerWidth, window.innerHeight );
 
+const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+scene.add( directionalLight );
+const light = new THREE.AmbientLight( 0x606060 ); // soft white light
+scene.add( light );
+
 camera.position.z = 5;
 
 scene.background = new THREE.TextureLoader().load(grid);
@@ -38,10 +42,6 @@ labelRenderer.setSize(window.innerWidth, window.innerHeight);
 labelRenderer.domElement.style.position = 'absolute';
 labelRenderer.domElement.style.top = '0px';
 document.body.appendChild(labelRenderer.domElement);
-
-// const tracejado = new Tracejado(new THREE.Vector3(0,0,0), new THREE.Vector3(3,1.5,0));
-// console.log(tracejado);
-// scene.add(tracejado.mesh)
 
 //Cria o triângulo e o programa
 const triangle = new Triangle()
@@ -56,44 +56,21 @@ circle.circunscrever(triangle);
 
 const programa = new Programa(triangle,scene,camera);
 
-// const w = 1; // Width of the square
+const loader = new OBJLoader();
 
-// const halfWidth = w / 2;
+//Lições aprendidas: o parcel precisa de uma configuração parcelrc
+//Essa configuração irá mudar os transformers para compilar o .obj
+//Pode-se obter o path para tal arquivo com um require
+const path =  require("../assets/compasso.obj");
 
-// const positions = [
-//   0,0,0,
-//   0,1,0,
-//   1,0,0,
-//   1,1,0,
-
-//   0,0,0,
-//   0,0.9,0,
-//   0.9,0,0,
-//   0.9,0.9,0
-// ];
-
-// const indices = [
-//   0, 1, 2,  // Triangle 1 (Bottom side)
-//   0, 2, 3,  // Triangle 2 (Bottom side)
-
-//   0, 4, 1,  // Triangle 3 (Left side)
-//   1, 4, 5,  // Triangle 4 (Left side)
-
-//   1, 5, 2,  // Triangle 5 (Right side)
-//   2, 5, 6,  // Triangle 6 (Right side)
-
-//   2, 6, 3,  // Triangle 7 (Top side)
-//   3, 6, 7,  // Triangle 8 (Top side)
-// ];
-
-// // Create the BufferGeometry
-// const geometry = new THREE.BufferGeometry();
-// geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-// geometry.setIndex(indices);
-
-// scene.add(new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:0x000ff0})));
-
-//programa.adicionarCirculo(circle);
+loader.load(
+  path,
+  function(objeto){
+    objeto.scale.set(0.0007,0.0007,0.0007)
+    scene.add(objeto);
+  }
+)
+directionalLight.lookAt(triangle.vertices[0]);
 
 ////////////////////////////Interfáce gráfica/////////////////////////////////////
 const gui = new dat.GUI();
@@ -266,9 +243,9 @@ const gerarCicloTrigonometrico = new Animacao(circle)
 //Adiciona as animações ao programa
 // programa.animar(new AnimacaoSequencial(criarCirculo, linearizarCirculo));
 // programa.animar(mudarCor);
-circle.centro = new THREE.Vector3(-1.7,-1.7,0);
-criarCirculo.circulo.centro = circle.centro;
-programa.animar(new AnimacaoSimultanea(gerarCicloTrigonometrico, criarCirculo))
+// circle.centro = new THREE.Vector3(-1.7,-1.7,0);
+// criarCirculo.circulo.centro = circle.centro;
+// programa.animar(new AnimacaoSimultanea(gerarCicloTrigonometrico, criarCirculo))
 // programa.animar(criarCirculo);
 
 console.log(programa)

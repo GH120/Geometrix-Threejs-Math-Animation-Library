@@ -160,10 +160,12 @@ export class Programa {
     }
 
     circunscrever(){
+
         const criarCirculo = new Circunscrever(this.triangulo, this.scene);
 
         const circulo = criarCirculo.circulo;
 
+        //Dá para usar isso como um puzzle, achar o centro do círculo
         this.fixarAoCirculo = this.triangulo.vertices.map(vertice => new FixarAoCirculo(circulo,vertice));
 
         criarCirculo.setOnTermino(() => {

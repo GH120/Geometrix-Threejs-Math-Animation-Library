@@ -14,6 +14,7 @@ import * as dat from 'dat.gui';
 import Circunscrever from './animacoes/circunscrever';
 import {Tracejado} from './objetos/Tracejado';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { MultipleClickable } from './controles/clickable';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
@@ -66,10 +67,27 @@ const path =  require("../assets/compasso.obj");
 loader.load(
   path,
   function(objeto){
-    objeto.scale.set(0.0007,0.0007,0.0007)
     scene.add(objeto);
     objeto.hitbox = objeto;
+    objeto.scale.set(0.0007,0.0007,0.0007)
+    //cilindro superior => 9
+    //Cabeçote => 13
+    //Ponta direita child 472
+    //Ponta esquerda child 499
+
+    //Perna direita
+
+    const cabecote = objeto.children.slice(0,440);
+    const pernaDireita = [objeto.children[19]].concat(objeto.children.slice(440, 482));
+    const pernaEsquerda = [objeto.children[18]].concat(objeto.children.slice(482));
+
+    //Eu sei que a ponta esquerda vai estar na posição do centro do círculo
+    const posicao = new THREE.Vector3(0.25,1.5,0);
+    const deslocamento = new THREE.Vector3(-1.5,-1.5,0).sub(posicao);
+    objeto.position.sub(deslocamento)
+
     new Draggable(objeto, camera).addObserver(new MoverVertice({update:() =>null}, objeto))
+    new MultipleClickable(objeto.children.map(child => ({hitbox:child})), camera).addObserver({update: estado => console.log(estado)});
   }
 )
 

@@ -5,7 +5,7 @@ export class TextoAparecendo extends Animacao{
     constructor(texto){
         super(texto);
         this.valorInicial    = -10;
-        this.valorFinal      = texto.children.length-1;
+        this.valorFinal      = texto.children.length*2;
         this.setDuration(200);
         this.voltar = false;
     }
@@ -21,8 +21,6 @@ export class TextoAparecendo extends Animacao{
 
     update(valor){
 
-        console.log(valor)
-        
         const letrasAmount = 5;
 
         const curva = (x) =>  x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
@@ -34,7 +32,7 @@ export class TextoAparecendo extends Animacao{
                 child.style.color = `rgba(0,0,0,1)`
             }
             else{
-                child.style.color = `rgba(0,0,0,${Math.max(0, (valor+letrasAmount-index)/letrasAmount)})`
+                child.style.color = `rgba(0,0,0,${curva(Math.max(0, (valor+letrasAmount-index)/letrasAmount))})`
             }
 
             index++;

@@ -16,6 +16,7 @@ import {Tracejado} from './objetos/Tracejado';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MultipleClickable } from './controles/clickable';
 import { Fase } from './fases/fase1';
+import { Fase2 } from './fases/fase2';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
@@ -52,7 +53,7 @@ const triangle = new Triangle()
                     .renderAngles()
                     .addToScene(scene);
 
-const programa = new Fase(triangle,scene,camera);
+const programa = new Fase2(triangle,scene,camera);
 
 const circle = new Circle(new THREE.Vector3(-1.5,-1.5,0), 2.17,0.05);
 

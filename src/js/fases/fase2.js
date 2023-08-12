@@ -13,7 +13,7 @@ import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
 import { AnimacaoSequencial } from '../animacoes/animation';
 
-export class Fase {
+export class Fase2 {
 
     constructor(triangle, scene, camera){
         this.triangulo = triangle;
@@ -130,14 +130,14 @@ export class Fase {
         this.bissetrizes = triangulo.angles.map(angle => new MostrarBissetriz(triangulo, angle));
 
         // //Liga esses observers ao hover/drag, quando acionados, eles avisam seus observers
-        this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
-        // this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
-        // this.clickable.map((clickable, index)=> clickable.addObserver(this.bissetrizes[index]));
-        // this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
+        // this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
+        this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
+        this.clickable.map((clickable, index)=> clickable.addObserver(this.bissetrizes[index]));
+        this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
-        this.draggable.map((draggable,index) => draggable.addObserver(this.mostrarAngulo[index]));
-        this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
-        // this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
+        // this.draggable.map((draggable,index) => draggable.addObserver(this.mostrarAngulo[index]));
+        // this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
+        this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
         this.draggable.map(draggable => draggable.addObserver(this.triangulo));
 
         this.handlers = [...this.moverVertice,

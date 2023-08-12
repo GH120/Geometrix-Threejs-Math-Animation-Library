@@ -42,8 +42,6 @@ export class MostrarAngulo{
 
             elemento.position.copy(newPosition)
 
-            console.log(elemento.element.getBoundingClientRect())
-            
             this.text.on = true;
         }
         else{

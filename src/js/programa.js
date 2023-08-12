@@ -12,14 +12,16 @@ import { MostrarBissetriz } from './handlers/mostrarBissetriz';
 import { Clickable, MultipleClickable } from './controles/clickable';
 import FixarAoCirculo from './handlers/fixarAoCirculo';
 
+import * as dat from 'dat.gui';
+
 //Responsável por adiconar os controles de arrasto e hover
 //liga os handlers aos controlers
 //handlers são objetos que fazem ações quando acionados pelos controles
 //Nesse caso, são os handlers que mostram o texto, criam animações, mudam cor...
 export class Programa {
 
-    constructor(triangle, scene, camera){
-        this.triangulo = triangle;
+    constructor(triangulo, scene, camera){
+        this.triangulo = triangulo;
         this.scene  = scene;
         this.camera = camera;
         this.frames = [];
@@ -30,6 +32,7 @@ export class Programa {
         this.createHandlers();
         this.setUpAnimar();
         this.addToScene(scene);
+        this.setupInterface();
         this.getEstados();
     }
 
@@ -189,5 +192,50 @@ export class Programa {
         new Draggable(circle.hitbox,this.camera).addObserver(new MoverVertice(circle, circle.hitbox));
 
         this.scene.add(circle.mesh);
+    }
+
+    setupInterface(){
+        const gui = new dat.GUI();
+
+        //Configurações
+        const options = {
+        "tamanho da esfera": 0.1,
+        "grossura": 0.05,
+        "raio do ângulo": 0.7,
+        "atualizar": false,
+        "duração da animação":90,
+
+        mudarFuncaoTrigonometrica: {
+            toggleFunction: function() { 
+                button.name(`Mostrando ${this.mudarFuncaoTrigonometrica().estado.nome}`);
+            }
+        }
+        };
+
+        //Atualizar configurações
+        this.atualizarOptions = () => {
+            this.triangulo.edges.map(edge => edge.grossura = options.grossura);
+            this.triangulo.sphereGeometry = new THREE.SphereGeometry(options["tamanho da esfera"]);
+            this.triangulo.angles.map(angle => angle.angleRadius = options["raio do ângulo"])
+        }
+
+        //Botões da interface
+        gui.add(options, 'grossura', 0.01, 0.2).onChange( () => this.triangulo.update());
+        gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => this.triangulo.update());
+        gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => this.triangulo.update());
+        gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
+        gui.add( {onClick: () => this.trigonometria.map(trig => trig.animando = !trig.animando)}, 'onClick').name('Mostrar animação de divisão');
+        gui.add( {onClick: () => this.circunscrever()},'onClick').name('Animação de circunscrever triângulo');
+        gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
+        let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('Mostrando nada');
+
+    }
+
+    update(){
+        this.atualizarOptions();
+
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+
+        // if(options.atualizar) triangle.update();
     }
 }

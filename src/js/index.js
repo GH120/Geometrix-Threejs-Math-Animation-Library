@@ -15,6 +15,7 @@ import Circunscrever from './animacoes/circunscrever';
 import {Tracejado} from './objetos/Tracejado';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MultipleClickable } from './controles/clickable';
+import { Fase } from './fases/fase1';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
@@ -93,40 +94,6 @@ const loader = new OBJLoader();
 
 directionalLight.lookAt(triangle.vertices[0]);
 
-////////////////////////////Interfáce gráfica/////////////////////////////////////
-const gui = new dat.GUI();
-
-//Configurações
-const options = {
-  "tamanho da esfera": 0.1,
-  "grossura": 0.05,
-  "raio do ângulo": 0.7,
-  "atualizar": false,
-  "duração da animação":90,
-
-  mudarFuncaoTrigonometrica: {
-      toggleFunction: function() { 
-        button.name(`Mostrando ${programa.mudarFuncaoTrigonometrica().estado.nome}`);
-      }
-  }
-};
-
-//Atualizar configurações
-function attOptions() {
-  triangle.edges.map(edge => edge.grossura = options.grossura);
-  triangle.sphereGeometry = new THREE.SphereGeometry(options["tamanho da esfera"]);
-  triangle.angles.map(angle => angle.angleRadius = options["raio do ângulo"])
-}
-
-//Botões da interface
-gui.add(options, 'grossura', 0.01, 0.2).onChange( () => triangle.update());
-gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => triangle.update());
-gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => triangle.update());
-gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
-gui.add( {onClick: () => programa.trigonometria.map(trig => trig.animando = !trig.animando)}, 'onClick').name('Mostrar animação de divisão');
-gui.add( {onClick: () => programa.circunscrever()},'onClick').name('Animação de circunscrever triângulo');
-gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
-let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('Mostrando nada');
 ////////////////////////////////////////////////////////////////////////////////////
 
 //Exemplos de animações, depois refatorar
@@ -274,11 +241,8 @@ console.log(programa)
 //Loop de animação
 function animate() {
     requestAnimationFrame( animate );
-    attOptions();
 
-    programa.frames.map(frame => frame.next()); //Roda as animações do programa
-
-    if(options.atualizar) triangle.update();
+    programa.update();
 
     renderer.render( scene, camera );
     labelRenderer.render( scene, camera );

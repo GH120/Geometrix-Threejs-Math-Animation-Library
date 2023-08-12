@@ -6,8 +6,14 @@ import { MostrarTipo } from '../handlers/mostrarTipo';
 import  MoverVertice  from '../handlers/moverVertice';
 import { MostrarBissetriz } from '../handlers/mostrarBissetriz';
 import { Clickable, MultipleClickable } from '../controles/clickable';
+import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
-export class Fase{
+import * as dat from 'dat.gui';
+import * as THREE from 'three';
+import { TextoAparecendo } from '../animacoes/textoAparecendo';
+
+export class Fase {
+
     constructor(triangle, scene, camera){
         this.triangulo = triangle;
         this.scene  = scene;
@@ -20,6 +26,42 @@ export class Fase{
         this.createHandlers();
         this.setUpAnimar();
         this.addToScene(scene);
+        this.setupInterface();
+        this.showText();
+    }
+
+    showText(){
+        // Create a parent element to hold the spans
+        const container = document.createElement('p');
+        container.style.fontFamily = "Courier New, monospace";
+        container.style.fontSize = "25px";
+        container.style.fontWeight ="italic";
+        container.style.display = 'inline-block';
+
+        // Text content to split into spans
+        const textContent = "Crie um triângulo equilátero";
+
+        // Split the text into individual characters
+        const characters = textContent.split('');
+
+        // Create spans for each character and apply the fading effect
+        characters.forEach((character,index) => {
+            const span = document.createElement('span');
+            span.textContent = character;
+            container.appendChild(span);
+        });
+
+        // Create the CSS2DObject using the container
+        const cPointLabel = new CSS2DObject(container);
+            
+
+        this.text = cPointLabel;
+
+        this.text.position.y = 3.5;
+
+        this.animar(new TextoAparecendo(container));
+
+        this.scene.add(this.text);
     }
 
     createControlers(){
@@ -96,5 +138,50 @@ export class Fase{
         this.animacoes.push(animacao);
 
         return this;
+    }
+
+    setupInterface(){
+        const gui = new dat.GUI();
+
+        //Configurações
+        const options = {
+        "tamanho da esfera": 0.1,
+        "grossura": 0.05,
+        "raio do ângulo": 0.7,
+        "atualizar": false,
+        "duração da animação":90,
+
+        mudarFuncaoTrigonometrica: {
+            toggleFunction: function() { 
+                button.name(`Mostrando ${this.mudarFuncaoTrigonometrica().estado.nome}`);
+            }
+        }
+        };
+
+        //Atualizar configurações
+        this.atualizarOptions = () => {
+            this.triangulo.edges.map(edge => edge.grossura = options.grossura);
+            this.triangulo.sphereGeometry = new THREE.SphereGeometry(options["tamanho da esfera"]);
+            this.triangulo.angles.map(angle => angle.angleRadius = options["raio do ângulo"])
+        }
+
+        //Botões da interface
+        gui.add(options, 'grossura', 0.01, 0.2).onChange( () => this.triangulo.update());
+        gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => this.triangulo.update());
+        gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => this.triangulo.update());
+        gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
+        // gui.add( {onClick: () => this.trigonometria.map(trig => trig.animando = !trig.animando)}, 'onClick').name('Mostrar animação de divisão');
+        // gui.add( {onClick: () => this.circunscrever()},'onClick').name('Animação de circunscrever triângulo');
+        gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
+        let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('Mostrando nada');
+
+    }
+
+    update(){
+        this.atualizarOptions();
+
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+
+        // if(options.atualizar) triangle.update();
     }
 }

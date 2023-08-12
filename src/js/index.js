@@ -52,13 +52,14 @@ const triangle = new Triangle()
                     .renderAngles()
                     .addToScene(scene);
 
+const programa = new Fase(triangle,scene,camera);
+
 const circle = new Circle(new THREE.Vector3(-1.5,-1.5,0), 2.17,0.05);
 
 circle.circunscrever(triangle);
 
-const programa = new Programa(triangle,scene,camera);
-
 const loader = new OBJLoader();
+
 
 //Lições aprendidas: o parcel precisa de uma configuração parcelrc
 //Essa configuração irá mudar os transformers para compilar o .obj
@@ -242,6 +243,7 @@ console.log(programa)
 function animate() {
     requestAnimationFrame( animate );
 
+    //Atualiza o programa
     programa.update();
 
     renderer.render( scene, camera );

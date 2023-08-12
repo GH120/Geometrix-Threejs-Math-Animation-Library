@@ -62,34 +62,34 @@ const loader = new OBJLoader();
 //Lições aprendidas: o parcel precisa de uma configuração parcelrc
 //Essa configuração irá mudar os transformers para compilar o .obj
 //Pode-se obter o path para tal arquivo com um require
-const path =  require("../assets/compasso.obj");
+// const path =  require("../assets/compasso.obj");
 
-loader.load(
-  path,
-  function(objeto){
-    scene.add(objeto);
-    objeto.hitbox = objeto;
-    objeto.scale.set(0.0007,0.0007,0.0007)
-    //cilindro superior => 9
-    //Cabeçote => 13
-    //Ponta direita child 472
-    //Ponta esquerda child 499
+// loader.load(
+//   path,
+//   function(objeto){
+//     scene.add(objeto);
+//     objeto.hitbox = objeto;
+//     objeto.scale.set(0.0007,0.0007,0.0007)
+//     //cilindro superior => 9
+//     //Cabeçote => 13
+//     //Ponta direita child 472
+//     //Ponta esquerda child 499
 
-    //Perna direita
+//     //Perna direita
 
-    const cabecote = objeto.children.slice(0,440);
-    const pernaDireita = [objeto.children[19]].concat(objeto.children.slice(440, 482));
-    const pernaEsquerda = [objeto.children[18]].concat(objeto.children.slice(482));
+//     const cabecote = objeto.children.slice(0,440);
+//     const pernaDireita = [objeto.children[19]].concat(objeto.children.slice(440, 482));
+//     const pernaEsquerda = [objeto.children[18]].concat(objeto.children.slice(482));
 
-    //Eu sei que a ponta esquerda vai estar na posição do centro do círculo
-    const posicao = new THREE.Vector3(0.25,1.5,0);
-    const deslocamento = new THREE.Vector3(-1.5,-1.5,0).sub(posicao);
-    objeto.position.sub(deslocamento)
+//     //Eu sei que a ponta esquerda vai estar na posição do centro do círculo
+//     const posicao = new THREE.Vector3(0.25,1.5,0);
+//     const deslocamento = new THREE.Vector3(-1.5,-1.5,0).sub(posicao);
+//     objeto.position.sub(deslocamento)
 
-    new Draggable(objeto, camera).addObserver(new MoverVertice({update:() =>null}, objeto))
-    new MultipleClickable(objeto.children.map(child => ({hitbox:child})), camera).addObserver({update: estado => console.log(estado)});
-  }
-)
+//     new Draggable(objeto, camera).addObserver(new MoverVertice({update:() =>null}, objeto))
+//     new MultipleClickable(objeto.children.map(child => ({hitbox:child})), camera).addObserver({update: estado => console.log(estado)});
+//   }
+// )
 
 directionalLight.lookAt(triangle.vertices[0]);
 

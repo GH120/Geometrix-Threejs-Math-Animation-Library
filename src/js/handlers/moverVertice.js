@@ -7,6 +7,8 @@ export default class MoverVertice{
     constructor(objeto, vertice){
         this.objeto = objeto;
         this.vertice = vertice;
+
+        console.log(this.vertice, this.objeto)
     }
 
     update(novoEstado){
@@ -20,8 +22,6 @@ export default class MoverVertice{
         this.getFocos();
 
         const speed = new THREE.Vector3().subVectors(point, this.vertice.position);
-
-        // console.log(point, this.vertice)
 
         this.vertice.position.copy(point);
 

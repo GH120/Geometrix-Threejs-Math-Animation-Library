@@ -27,10 +27,13 @@ export class Fase {
         this.setUpAnimar();
         this.addToScene(scene);
         this.setupInterface();
-        this.showText();
+        this.setupTextBox();
+
+        this.animar(new TextoAparecendo(this.text.element).setOnTermino(() => this.changeText("Crie um isoceles")));
     }
 
-    showText(){
+    //Cria a caixa de texto onde o texto vai aparecer
+    setupTextBox(){
         // Create a parent element to hold the spans
         const container = document.createElement('p');
         container.style.fontFamily = "Courier New, monospace";
@@ -38,30 +41,32 @@ export class Fase {
         container.style.fontWeight ="italic";
         container.style.display = 'inline-block';
 
-        // Text content to split into spans
-        const textContent = "Crie um triângulo equilátero";
-
-        // Split the text into individual characters
-        const characters = textContent.split('');
-
-        // Create spans for each character and apply the fading effect
-        characters.forEach((character,index) => {
-            const span = document.createElement('span');
-            span.textContent = character;
-            container.appendChild(span);
-        });
-
         // Create the CSS2DObject using the container
-        const cPointLabel = new CSS2DObject(container);
-            
+        const cPointLabel = new CSS2DObject(container);       
 
         this.text = cPointLabel;
 
         this.text.position.y = 3.5;
 
-        this.animar(new TextoAparecendo(container));
-
         this.scene.add(this.text);
+
+        this.changeText("Crie um triangulo equilatero");
+    }
+
+    //Muda o conteúdo da caixa de texto
+    changeText(texto){
+
+        this.text.element.textContent = '';
+
+        // Split the text into individual characters
+        const characters = texto.split('');
+
+        // Create spans for each character and apply the fading effect
+        characters.forEach((character,index) => {
+            const span = document.createElement('span');
+            span.textContent = character;
+            this.text.element.appendChild(span);
+        });
     }
 
     createControlers(){
@@ -140,6 +145,7 @@ export class Fase {
         return this;
     }
 
+    //Interface gráfica
     setupInterface(){
         const gui = new dat.GUI();
 

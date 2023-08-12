@@ -7,7 +7,7 @@ export class TextoAparecendo extends Animacao{
         this.valorInicial    = -10;
         this.valorFinal      = texto.children.length-1;
         this.setDuration(200);
-        this.manter = true;
+        this.voltar = false;
     }
 
     interpolacao(inicial, final, peso){

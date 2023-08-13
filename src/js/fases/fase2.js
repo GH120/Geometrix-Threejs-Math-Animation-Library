@@ -36,13 +36,9 @@ export class Fase2 {
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
     levelDesign(){
 
-        const dialogo = ["Um triângulo tem três lados e três angulos",
-                         "se ele tiver dois ângulos iguais então ele é simétrico, ou seja",
-                        "ele pode ser dividido em dois pelo meio", 
-                        "chamamos estes triângulos de isoceles",
-                        "se ele tiver três ângulos iguais, então ele é equilatero",
-                        "consegue descobrir o porque?",
-                        "como todos os lados são simétricos, então todos os lados são iguais"]
+        const dialogo = ["Na fase anterior você fez um triângulo, equilátero",
+                         "que nem a animação está fazendo abaixo",
+                         "O seu objetivo agora é..."]
 
         this.changeText(dialogo[0]);
 
@@ -50,10 +46,10 @@ export class Fase2 {
 
         const anim1 = animacoes[0];
         const anim2 = animacoes[1];
-        const anim3 = animacoes[2];
-        const anim4 = animacoes[3];
-        const anim5 = animacoes[4];
-        const anim6 = animacoes[5];
+        // const anim3 = animacoes[2];
+        // const anim4 = animacoes[3];
+        // const anim5 = animacoes[4];
+        // const anim6 = animacoes[5];
         const anim7 = new TextoAparecendo(this.text.element);
         //Bug estupido do javascript: array não funciona, por algum motivo descarta objeto passado nele
 
@@ -80,7 +76,7 @@ export class Fase2 {
             new Animacao(vertice)
                 .setValorInicial(vertice.position.clone())
                 .setValorFinal(posfinal)
-                .setDuration(50)
+                .setDuration(100)
                 .setInterpolacao(function(inicial,final,peso){
                     return new THREE.Vector3().lerpVectors(inicial,final,peso);
                 })
@@ -112,7 +108,7 @@ export class Fase2 {
         this.animar(novaAnimacao)
         // FIM DA ANIMAÇAO
 
-        const sequencia = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7);
+        const sequencia = new AnimacaoSequencial(anim1,anim2,anim7);
 
 
 

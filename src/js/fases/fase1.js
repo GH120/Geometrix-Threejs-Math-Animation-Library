@@ -13,6 +13,9 @@ import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
 import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from '../animacoes/animation';
 import { colorirAngulo } from '../animacoes/colorirAngulo';
+import { Tracejado } from '../objetos/Tracejado';
+import MostrarTracejado from '../animacoes/mostrarTracejado';
+import { Divisao } from '../animacoes/divisao';
 
 export class Fase {
 
@@ -52,7 +55,7 @@ export class Fase {
 
         const anim1 = this.firstDialogue(animacoes[0]);
         const anim2 = this.secondDialogue(animacoes[1]);
-        const anim3 = animacoes[2];
+        const anim3 = this.thirdDialogue(animacoes[2]);
         // const anim4 = animacoes[3];
         // const anim5 = animacoes[4];
         // const anim6 = animacoes[5];
@@ -103,6 +106,18 @@ export class Fase {
         return new AnimacaoSimultanea(colorirAngulo1, colorirAngulo2, dialogue)
                    .setOnStart(() => this.mostrarAngulo.map(mostrar => mostrar.update({dentro:true})))
                    .setOnTermino(() => this.colorirIsoceles.update())
+    }
+
+    thirdDialogue(dialogue){
+
+        const tracejado = new Tracejado(new THREE.Vector3(3,0,0), new THREE.Vector3(1.5,1.5,0));
+
+        const mostrarTracejado = new MostrarTracejado(tracejado, this.scene);
+
+        const divisao = new Divisao(this.triangulo.edges[0],this.triangulo.edges[1]);
+
+        return new AnimacaoSimultanea(dialogue,divisao, mostrarTracejado)
+                   .setOnStart(() => this.mostrarAngulo.map(anguloMostrado => anguloMostrado.update({dentro:false})));
     }
 
     //Cria a caixa de texto onde o texto vai aparecer

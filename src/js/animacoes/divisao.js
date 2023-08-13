@@ -8,19 +8,21 @@ export class Divisao extends Animacao{
         super();
         this.dividendo = lado1;
         this.divisor = lado2;
-        this.frames = 90;
-        this.delay = 45;
+        //Gambiarra, ajeitar depois
+        this.frames = 250;
+        this.frameCount = 90;
+        this.delay = 90;
     }
 
     *getFrames(){
 
         //Posiciona primeiro os lados no canto direito, não faz nada ao terminar
-        const posicionar  = this.posicionar().setDuration(this.frames/2).setDelay(this.delay/3);
+        const posicionar  = this.posicionar().setDuration(this.frameCount/2).setDelay(this.delay/3);
         // Depois executa o algoritmo da divisão
         const dividir     = this.dividir();
 
         // Quando dividido e o delay passar, termina a execução do posicionar
-        const animacao = new AnimacaoSequencial(posicionar, dividir)
+        const animacao = new AnimacaoSequencial(posicionar, dividir);
 
         animacao.setDelay(this.delay);
 
@@ -84,7 +86,7 @@ export class Divisao extends Animacao{
                                .add(new THREE.Vector3(0,altura,0.005))
 
           const mover =  this.mover(lado, posicaoInicial, posicaoFinal)
-                             .setDuration(this.frames)
+                             .setDuration(this.frameCount)
                              .setOnStart(() => {this.scene.add(copia); copia.position.copy(posicaoInicial)})
                              .setOnTermino(() => this.scene.remove(copia)) //Quando terminar execução, deletar copia
           
@@ -95,8 +97,8 @@ export class Divisao extends Animacao{
           const quaternionInicial = this.quaternion.clone(); 
           const quaternionFinal   = this.quaternion.clone().multiply(rotacao);
 
-          const giro1 =  this.girar(lado, quaternionInicial, quaternionFinal).setDuration(this.frames/2);
-          const giro2 =  this.girar(lado, quaternionFinal, quaternionInicial).setDuration(this.frames/2);
+          const giro1 =  this.girar(lado, quaternionInicial, quaternionFinal).setDuration(this.frameCount/2);
+          const giro2 =  this.girar(lado, quaternionFinal, quaternionInicial).setDuration(this.frameCount/2);
 
           const girar =  new AnimacaoSequencial(giro1,giro2);
 

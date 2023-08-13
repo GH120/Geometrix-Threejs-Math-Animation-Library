@@ -31,7 +31,7 @@ export class ColorirIsoceles {
 
 
         for(const angulo of iguais){
-            angulo.sectorMaterial = new THREE.MeshBasicMaterial({color:color});
+            angulo.material = new THREE.MeshBasicMaterial({color:color});
             angulo.update();
         }
 
@@ -41,7 +41,7 @@ export class ColorirIsoceles {
     descolorir(){
 
         for(const angulo of this.triangulo.angles){
-            angulo.sectorMaterial = new THREE.MeshBasicMaterial({color:0xff0000});
+            angulo.material = new THREE.MeshBasicMaterial({color:0xff0000});
             angulo.update();
         }
     }

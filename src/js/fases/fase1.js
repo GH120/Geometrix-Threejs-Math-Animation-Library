@@ -15,6 +15,7 @@ import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from '../animacoes/a
 import { colorirAngulo } from '../animacoes/colorirAngulo';
 import { Tracejado } from '../objetos/Tracejado';
 import MostrarTracejado from '../animacoes/mostrarTracejado';
+import { Divisao } from '../animacoes/divisao';
 
 export class Fase {
 
@@ -48,22 +49,22 @@ export class Fase {
 
         this.changeText(dialogo[0]);
 
+        const tracejado = new Tracejado(new THREE.Vector3(3,0,0), new THREE.Vector3(1.5,1.5,0));
+    
         const animacoes = dialogo.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)));
 
         const anim1 = this.firstDialogue(animacoes[0]);
         const anim2 = this.secondDialogue(animacoes[1]);
-
-        const tracejado = new Tracejado(new THREE.Vector3(3,0,0), new THREE.Vector3(1.5,1.5,0));
-
         const anim3 = this.thirdDialogue(animacoes[2], tracejado);
         const anim4 = this.fourthDialogue(animacoes[3], tracejado);
         const anim5 = animacoes[4];
         const anim6 = animacoes[5];
 
         console.log(Object.keys(anim1))
-        // const anim7 = new TextoAparecendo(this.text.element);
+
         //Bug estupido do javascript: array não funciona, por algum motivo descarta objeto passado nele
-        const sequencia = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6);
+        // const sequencia = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6);
+        const sequencia = anim4
 
         this.animar(sequencia);
     }
@@ -112,15 +113,31 @@ export class Fase {
 
         const mostrarTracejado = new MostrarTracejado(tracejado, this.scene);
 
-        // TODO: fazer divisao 
-        // const divisao = new Divisao(this.triangulo.edges[0],this.triangulo.edges[1]);
-
         return new AnimacaoSimultanea(dialogue, mostrarTracejado)
                    .setOnStart(() => this.mostrarAngulo.map(anguloMostrado => anguloMostrado.update({dentro:false})));
     }
 
     fourthDialogue(dialogue, tracejado) {
-        return new AnimacaoSimultanea(dialogue).setOnTermino(() => this.scene.remove(tracejado.mesh));
+
+         // TODO: fazer divisao 
+        const divisao = new Divisao(this.triangulo.edges[0],this.triangulo.edges[1]).addToScene(this.scene);
+
+        const colorirAresta1 = colorirAngulo(this.triangulo.edges[0])
+                               .setValorInicial(0xe525252)
+                               .setValorFinal(0xaa0000)
+                               .setDuration(50)
+                               .voltarAoInicio(false);
+
+        const colorirAresta2 = colorirAngulo(this.triangulo.edges[1])
+                               .setValorInicial(0xe525252)
+                               .setValorFinal(0x0000aa)
+                               .setDuration(50)
+                               .voltarAoInicio(false);
+        
+        const divisaoColorida = new AnimacaoSequencial(colorirAresta1, colorirAresta2, divisao);
+
+        return new AnimacaoSimultanea(dialogue,divisaoColorida)
+                   .setOnTermino(() => this.scene.remove(tracejado.mesh));
     }
 
     fifthDialogue(dialogue, tracejado) {

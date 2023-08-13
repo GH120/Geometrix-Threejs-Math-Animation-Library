@@ -8,7 +8,7 @@ export class Angle{
         this.index = index;
         this.angleRadius = 0.7;
         this.grossura = 0.065;
-        this.sectorMaterial = new THREE.MeshBasicMaterial({color:0xff0000})
+        this.material = new THREE.MeshBasicMaterial({color:0xff0000})
 
     }
 
@@ -91,7 +91,7 @@ export class Angle{
 
         sectorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(sectorVertices, 3));
 
-        const MalhaAngulo  = new THREE.Mesh(sectorGeometry, this.sectorMaterial)
+        const MalhaAngulo  = new THREE.Mesh(sectorGeometry, this.material)
         const MalhaReto    = this.anguloReto;
         const noventaGraus = Math.round(this.angulo*180/Math.PI) == 90;
 
@@ -138,7 +138,7 @@ export class Angle{
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(posicoes, 3));
 
-        const mesh = new THREE.Mesh(geometry, this.sectorMaterial);
+        const mesh = new THREE.Mesh(geometry, this.material);
 
         const vetor = this.vetor1.clone().lerp(this.vetor2, 0.5).multiplyScalar(raio*Math.sqrt(2));
 

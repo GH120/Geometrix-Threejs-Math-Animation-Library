@@ -143,7 +143,7 @@ export class AnimacaoSimultanea extends Animacao{
         const actions = animacoes.map(animacao => animacao.getFrames());
 
         //Avança os frames simultâneamente das animações
-        for(let frame = 1; frame <= this.frames + this.delay; frame++){
+        for(let frame = 0; frame <= this.frames + this.delay; frame++){
             yield actions.map(action => action.next());
         }
 
@@ -177,7 +177,7 @@ export class AnimacaoSequencial extends Animacao{
     constructor(...animacoes){
         super();
 
-        console.log(animacoes.map(animacao => Object.keys(animacao)));
+        // console.log(animacoes.map(animacao => Object.keys(animacao)));
 
         this.animacoes = animacoes;
         this.frames = animacoes.map(animacao => animacao.frames)

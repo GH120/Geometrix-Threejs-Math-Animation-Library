@@ -23,6 +23,6 @@ export const colorirAngulo = (angulo) =>    new Animacao(angulo)
                                                     return (r << 16) | (g << 8) | b;
                                                 })
                                                 .setUpdateFunction(function(valor){
-                                                    this.objeto.sectorMaterial = new THREE.MeshBasicMaterial({color:valor});
+                                                    this.objeto.material = new THREE.MeshBasicMaterial({color:valor});
                                                     this.objeto.update();
                                                 });

@@ -183,7 +183,7 @@ export class AnimacaoSequencial extends Animacao{
         this.frames = animacoes.map(animacao => animacao.frames)
                                .reduce((acumulado, atual) => acumulado + atual, 0);
 
-        this.manterExecucaoTodos(true);
+        // this.manterExecucaoTodos(false);
     }
 
     //Opcional, ao invés do padrão, onde alguns podem manter e outros não, força todas as animações a um mesmo padrão
@@ -211,8 +211,6 @@ export class AnimacaoSequencial extends Animacao{
             for(let i = 0; i < animacao.frames + animacao.delay; i++){
                 yield action.next();
             }
-
-            animacao.onTermino()
 
             //Quando terminada, adicionar as completadas
             completedActions.push(action);

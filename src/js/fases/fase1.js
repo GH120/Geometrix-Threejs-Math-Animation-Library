@@ -43,11 +43,9 @@ export class Fase {
         const dialogo = ["Um triângulo tem três lados e três angulos",
                          "se ele tiver dois ângulos iguais então ele é simétrico",
                          "você sabe o que isso significa?",
-                        "ele pode ser dividido em dois pelo meio", 
+                        " Como pode ver, temos dois lados iguais", 
                         "chamamos estes triângulos de isoceles",
-                        "se ele tiver três ângulos iguais, então ele é equilatero",
-                        "consegue descobrir o porque?",
-                        "como todos os lados são simétricos, então todos os lados são iguais"]
+                        "Você consegue fazer um triângulo com três lados iguais?"]
 
         this.changeText(dialogo[0]);
 
@@ -56,14 +54,14 @@ export class Fase {
         const anim1 = this.firstDialogue(animacoes[0]);
         const anim2 = this.secondDialogue(animacoes[1]);
         const anim3 = this.thirdDialogue(animacoes[2]);
-        // const anim4 = animacoes[3];
-        // const anim5 = animacoes[4];
-        // const anim6 = animacoes[5];
+        const anim4 = animacoes[3];
+        const anim5 = animacoes[4];
+        const anim6 = animacoes[5];
 
         console.log(Object.keys(anim1))
         // const anim7 = new TextoAparecendo(this.text.element);
         //Bug estupido do javascript: array não funciona, por algum motivo descarta objeto passado nele
-        const sequencia = new AnimacaoSequencial(anim1,anim2,anim3);
+        const sequencia = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6);
 
         this.animar(sequencia);
     }

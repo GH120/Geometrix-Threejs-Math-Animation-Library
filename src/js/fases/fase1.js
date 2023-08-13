@@ -114,9 +114,9 @@ export class Fase {
 
         const mostrarTracejado = new MostrarTracejado(tracejado, this.scene);
 
-        const divisao = new Divisao(this.triangulo.edges[0],this.triangulo.edges[1]);
+        // const divisao = new Divisao(this.triangulo.edges[0],this.triangulo.edges[1]);
 
-        return new AnimacaoSimultanea(dialogue,divisao, mostrarTracejado)
+        return new AnimacaoSimultanea(dialogue, mostrarTracejado)
                    .setOnStart(() => this.mostrarAngulo.map(anguloMostrado => anguloMostrado.update({dentro:false})));
     }
 

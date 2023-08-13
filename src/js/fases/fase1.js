@@ -11,7 +11,7 @@ import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
-import { AnimacaoSequencial } from '../animacoes/animation';
+import Animacao, { AnimacaoSequencial } from '../animacoes/animation';
 
 export class Fase {
 
@@ -58,6 +58,23 @@ export class Fase {
         //Bug estupido do javascript: array não funciona, por algum motivo descarta objeto passado nele
         const sequencia = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7);
 
+        const vertice = this.triangulo.vertices[0];
+
+        const triangulo = this.triangulo;
+
+        const novaAnimacao = new Animacao(vertice)
+                                .setValorInicial(new THREE.Vector3(2,0,0))
+                                .setValorFinal(new THREE.Vector3(-2,-2,0))
+                                .setDuration(300)
+                                .setInterpolacao(function(inicial,final,peso){
+                                    return new THREE.Vector3().lerpVectors(inicial,final,peso);
+                                })
+                                .setUpdateFunction(function(valor){
+                                    vertice.position.copy(valor);
+                                    triangulo.update();
+                                })
+        
+        this.animar(novaAnimacao)
         this.animar(sequencia);
     }
 

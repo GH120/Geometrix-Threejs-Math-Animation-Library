@@ -7,6 +7,7 @@ export class ColorirIsoceles {
     }
 
     update(){
+        console.log("funcionou")
 
         const isoceles = this.triangulo.isoceles();
 

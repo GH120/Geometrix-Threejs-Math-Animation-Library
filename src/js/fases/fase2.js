@@ -80,7 +80,7 @@ export class Fase2 {
             new Animacao(vertice)
                 .setValorInicial(vertice.position.clone())
                 .setValorFinal(posfinal)
-                .setDuration(300)
+                .setDuration(50)
                 .setInterpolacao(function(inicial,final,peso){
                     return new THREE.Vector3().lerpVectors(inicial,final,peso);
                 })
@@ -104,7 +104,7 @@ export class Fase2 {
 
         const pontosEq = retornaEq(1.5, 0, 1.5*Math.sqrt(3));
 
-        const novaAnimacao = retornaAnim(vertice, pontosEq[0]);
+        const novaAnimacao = retornaAnim(vertice, pontosEq[0]).setOnTermino(() => this.colorirIsoceles.update());
         novaAnimacao.manter = true;
         // const novaAnimacao2 = retornaAnim(vertice, pontosEq[0]);
         // const novaAnimacao3 = retornaAnim(vertice, pontosEq[0]);
@@ -194,7 +194,7 @@ export class Fase2 {
         this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
         // this.draggable.map((draggable,index) => draggable.addObserver(this.mostrarAngulo[index]));
-        // this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
+        this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
         this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
         this.draggable.map(draggable => draggable.addObserver(this.triangulo));
 

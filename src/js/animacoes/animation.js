@@ -87,6 +87,9 @@ export default class Animacao {
             yield this.update(this.valorFinal);
         }
 
+        //Se tiver uma função ao terminar, executa ela
+        yield this.onTermino();
+
         //Enquanto estiver com a flag para manter a execução, continue retornando o ultimo frame
         while(this.manter) {
             yield this.update(this.valorFinal);
@@ -94,9 +97,6 @@ export default class Animacao {
 
         //Se tiver a flag para a volta, retorna ao estado inicial
         if(this.voltar) this.update(this.valorInicial);
-
-        //Se tiver uma função ao terminar, executa ela
-        yield this.onTermino();
     }
 
     static simultanea(...animacoes){

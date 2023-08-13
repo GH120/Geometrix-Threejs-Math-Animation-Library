@@ -52,8 +52,11 @@ export class Fase {
 
         const anim1 = this.firstDialogue(animacoes[0]);
         const anim2 = this.secondDialogue(animacoes[1]);
-        const anim3 = this.thirdDialogue(animacoes[2]);
-        const anim4 = animacoes[3];
+
+        const tracejado = new Tracejado(new THREE.Vector3(3,0,0), new THREE.Vector3(1.5,1.5,0));
+
+        const anim3 = this.thirdDialogue(animacoes[2], tracejado);
+        const anim4 = this.fourthDialogue(animacoes[3], tracejado);
         const anim5 = animacoes[4];
         const anim6 = animacoes[5];
 
@@ -105,9 +108,7 @@ export class Fase {
                    .setOnTermino(() => this.colorirIsoceles.update())
     }
 
-    thirdDialogue(dialogue){
-
-        const tracejado = new Tracejado(new THREE.Vector3(3,0,0), new THREE.Vector3(1.5,1.5,0));
+    thirdDialogue(dialogue, tracejado){
 
         const mostrarTracejado = new MostrarTracejado(tracejado, this.scene);
 
@@ -116,6 +117,17 @@ export class Fase {
 
         return new AnimacaoSimultanea(dialogue, mostrarTracejado)
                    .setOnStart(() => this.mostrarAngulo.map(anguloMostrado => anguloMostrado.update({dentro:false})));
+    }
+
+    fourthDialogue(dialogue, tracejado) {
+        return new AnimacaoSimultanea(dialogue).setOnTermino(() => this.scene.remove(tracejado.mesh));
+    }
+
+    fifthDialogue(dialogue, tracejado) {
+
+        this.scene.remove(tracejado);
+
+        return dialogue
     }
 
     //Cria a caixa de texto onde o texto vai aparecer

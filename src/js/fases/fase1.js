@@ -15,7 +15,6 @@ import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from '../animacoes/a
 import { colorirAngulo } from '../animacoes/colorirAngulo';
 import { Tracejado } from '../objetos/Tracejado';
 import MostrarTracejado from '../animacoes/mostrarTracejado';
-import { Divisao } from '../animacoes/divisao';
 
 export class Fase {
 
@@ -112,6 +111,7 @@ export class Fase {
 
         const mostrarTracejado = new MostrarTracejado(tracejado, this.scene);
 
+        // TODO: fazer divisao 
         // const divisao = new Divisao(this.triangulo.edges[0],this.triangulo.edges[1]);
 
         return new AnimacaoSimultanea(dialogue, mostrarTracejado)

@@ -11,7 +11,7 @@ import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
-import { AnimacaoSequencial } from '../animacoes/animation';
+import Animacao, { AnimacaoSequencial } from '../animacoes/animation';
 
 export class Fase2 {
 
@@ -56,7 +56,65 @@ export class Fase2 {
         const anim6 = animacoes[5];
         const anim7 = new TextoAparecendo(this.text.element);
         //Bug estupido do javascript: array não funciona, por algum motivo descarta objeto passado nele
+
+
+        // ANIMAÇAO DE PONTO
+        const vertice = this.triangulo.vertices[0];
+
+        const triangulo = this.triangulo;
+
+        // x  , y = pontoX do PDFdasideias
+        // 1.5, 0                1.5*raiz(3)
+        const retornaEq = (x, y, h) => {
+
+            // const l = (2*h)/Math.sqrt(3); 
+
+            const pontoA = new THREE.Vector3(x, y + h, 0);
+            const pontoB = new THREE.Vector3(x + h/Math.sqrt(3), y, 0);
+            const pontoC = new THREE.Vector3(x - h/Math.sqrt(3), y, 0);
+
+            return [pontoA, pontoB, pontoC];
+        }
+
+        const retornaAnim = (vertice, posfinal) => 
+            new Animacao(vertice)
+                .setValorInicial(vertice.position.clone())
+                .setValorFinal(posfinal)
+                .setDuration(300)
+                .setInterpolacao(function(inicial,final,peso){
+                    return new THREE.Vector3().lerpVectors(inicial,final,peso);
+                })
+                .setUpdateFunction(function(valor){
+                    vertice.position.copy(valor);
+                    triangulo.update();
+                })
+        
+
+        // const novaAnimacao = new Animacao(vertice)
+        //                         .setValorInicial(new THREE.Vector3(2,0,0))
+        //                         .setValorFinal(new THREE.Vector3(-2,-2,0))
+        //                         .setDuration(300)
+        //                         .setInterpolacao(function(inicial,final,peso){
+        //                             return new THREE.Vector3().lerpVectors(inicial,final,peso);
+        //                         })
+        //                         .setUpdateFunction(function(valor){
+        //                             vertice.position.copy(valor);
+        //                             triangulo.update();
+        //                         })
+
+        const pontosEq = retornaEq(1.5, 0, 1.5*Math.sqrt(3));
+
+        const novaAnimacao = retornaAnim(vertice, pontosEq[0]);
+        novaAnimacao.manter = true;
+        // const novaAnimacao2 = retornaAnim(vertice, pontosEq[0]);
+        // const novaAnimacao3 = retornaAnim(vertice, pontosEq[0]);
+        
+        this.animar(novaAnimacao)
+        // FIM DA ANIMAÇAO
+
         const sequencia = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7);
+
+
 
         this.animar(sequencia);
     }

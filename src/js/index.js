@@ -53,7 +53,7 @@ const triangle = new Triangle()
                     .renderAngles()
                     .addToScene(scene);
 
-const programa = new Fase(triangle,scene,camera);
+const programa = new Fase2(triangle,scene,camera);
 
 const circle = new Circle(new THREE.Vector3(-1.5,-1.5,0), 2.17,0.05);
 

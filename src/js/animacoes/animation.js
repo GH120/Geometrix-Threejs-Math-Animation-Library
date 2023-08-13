@@ -130,6 +130,8 @@ export class AnimacaoSimultanea extends Animacao{
 
     *getFrames(){
 
+        this.onStart();
+
         const animacoes = this.animacoes;
 
         this.frames =   animacoes.map(animacao => animacao.frames)
@@ -194,6 +196,8 @@ export class AnimacaoSequencial extends Animacao{
     }
 
     *getFrames(){
+
+        this.onStart();
 
         const animacoes = this.animacoes;
         

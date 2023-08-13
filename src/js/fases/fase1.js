@@ -11,7 +11,8 @@ import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
-import Animacao, { AnimacaoSequencial } from '../animacoes/animation';
+import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from '../animacoes/animation';
+import { colorirAngulo } from '../animacoes/colorirAngulo';
 
 export class Fase {
 
@@ -46,40 +47,61 @@ export class Fase {
 
         this.changeText(dialogo[0]);
 
-        const animacoes = dialogo.slice(1).map(texto => new TextoAparecendo(this.text.element).setOnTermino(() => this.changeText(texto)));
+        const animacoes = dialogo.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)));
 
-        const anim1 = animacoes[0];
-        const anim2 = animacoes[1];
-        const anim3 = animacoes[2];
-        const anim4 = animacoes[3];
-        const anim5 = animacoes[4];
-        const anim6 = animacoes[5];
-        const anim7 = new TextoAparecendo(this.text.element);
+        const anim1 = this.firstDialogue(animacoes[0]);
+        const anim2 = this.secondDialogue(animacoes[1]);
+        // const anim3 = animacoes[2];
+        // const anim4 = animacoes[3];
+        // const anim5 = animacoes[4];
+        // const anim6 = animacoes[5];
+
+        console.log(Object.keys(anim1))
+        // const anim7 = new TextoAparecendo(this.text.element);
         //Bug estupido do javascript: array não funciona, por algum motivo descarta objeto passado nele
-        const sequencia = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7);
-
-
-        // ANIMAÇAO DE PONTO
-        // const vertice = this.triangulo.vertices[0];
-
-        // const triangulo = this.triangulo;
-
-        // const novaAnimacao = new Animacao(vertice)
-        //                         .setValorInicial(new THREE.Vector3(2,0,0))
-        //                         .setValorFinal(new THREE.Vector3(-2,-2,0))
-        //                         .setDuration(300)
-        //                         .setInterpolacao(function(inicial,final,peso){
-        //                             return new THREE.Vector3().lerpVectors(inicial,final,peso);
-        //                         })
-        //                         .setUpdateFunction(function(valor){
-        //                             vertice.position.copy(valor);
-        //                             triangulo.update();
-        //                         })
-        
-        // this.animar(novaAnimacao)
-        // FIM DA ANIMAÇAO
+        const sequencia = new AnimacaoSequencial(anim1,anim2);
 
         this.animar(sequencia);
+    }
+
+    firstDialogue(dialogue){
+
+        const fadeInAndOut = (angulo) =>  new AnimacaoSequencial(colorirAngulo(angulo)
+                                                                .setValorInicial(0xff0000)
+                                                                .setValorFinal(0xffff00)
+                                                                .setDuration(100), 
+                                                                colorirAngulo(angulo)
+                                                                .setValorInicial(0xffff00)
+                                                                .setValorFinal(0xff0000)
+                                                                .setDuration(50)
+                                                                .voltarAoInicio(false))
+
+        const colorirAngulos = this.triangulo.angles.map(angle => fadeInAndOut(angle));
+
+        return new AnimacaoSimultanea(new AnimacaoSequencial(...colorirAngulos),dialogue);
+    }
+
+    secondDialogue(dialogue){
+
+        dialogue.setDelay(150);
+
+        const colorirAngulo1 = colorirAngulo(this.triangulo.angles[0])
+                              .setValorInicial(0xff0000)
+                              .setValorFinal(0x0000ff)
+                              .setDuration(100)
+                              .voltarAoInicio(false);
+
+        const colorirAngulo2 = colorirAngulo(this.triangulo.angles[2])
+                              .setValorInicial(0xff0000)
+                              .setValorFinal(0x0000ff)
+                              .setDuration(100)
+                              .voltarAoInicio(false);
+
+        //Atualiza os mostrarAngulos para eles serem selecionados
+        //Atualiza o colorir isoceles depois de ter efetuado as animações
+        return new AnimacaoSimultanea(colorirAngulo1, colorirAngulo2, dialogue)
+                   .setOnStart(() => this.mostrarAngulo.map(mostrar => mostrar.update({dentro:true})))
+                   .setOnTermino(() => this.colorirIsoceles.update())
     }
 
     //Cria a caixa de texto onde o texto vai aparecer

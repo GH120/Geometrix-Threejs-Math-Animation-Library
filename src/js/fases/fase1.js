@@ -38,7 +38,8 @@ export class Fase {
     levelDesign(){
 
         const dialogo = ["Um triângulo tem três lados e três angulos",
-                         "se ele tiver dois ângulos iguais então ele é simétrico, ou seja",
+                         "se ele tiver dois ângulos iguais então ele é simétrico",
+                         "você sabe o que isso significa?",
                         "ele pode ser dividido em dois pelo meio", 
                         "chamamos estes triângulos de isoceles",
                         "se ele tiver três ângulos iguais, então ele é equilatero",
@@ -51,7 +52,7 @@ export class Fase {
 
         const anim1 = this.firstDialogue(animacoes[0]);
         const anim2 = this.secondDialogue(animacoes[1]);
-        // const anim3 = animacoes[2];
+        const anim3 = animacoes[2];
         // const anim4 = animacoes[3];
         // const anim5 = animacoes[4];
         // const anim6 = animacoes[5];
@@ -59,7 +60,7 @@ export class Fase {
         console.log(Object.keys(anim1))
         // const anim7 = new TextoAparecendo(this.text.element);
         //Bug estupido do javascript: array não funciona, por algum motivo descarta objeto passado nele
-        const sequencia = new AnimacaoSequencial(anim1,anim2);
+        const sequencia = new AnimacaoSequencial(anim1,anim2,anim3);
 
         this.animar(sequencia);
     }

@@ -24,6 +24,8 @@ export class Divisao extends Animacao{
         // Quando dividido e o delay passar, termina a execução do posicionar
         const animacao = new AnimacaoSequencial(posicionar, dividir);
 
+        animacao.chosen = true;
+
         animacao.setDelay(this.delay);
 
         yield* animacao.getFrames();
@@ -89,6 +91,10 @@ export class Divisao extends Animacao{
                              .setDuration(this.frameCount)
                              .setOnStart(() => {this.scene.add(copia); copia.position.copy(posicaoInicial)})
                              .setOnTermino(() => this.scene.remove(copia)) //Quando terminar execução, deletar copia
+
+          mover.chosen = true;
+
+          console.log(mover)
           
           const direcao = new THREE.Vector3().subVectors(posicaoFinal, posicaoInicial);
           const angulo  = new THREE.Vector3(-1,0,0).angleTo(direcao);
@@ -106,8 +112,11 @@ export class Divisao extends Animacao{
 
           dividir.push(divisao);
         }
+        const anim = new AnimacaoSequencial(...dividir);
 
-        return new AnimacaoSequencial(...dividir);
+        anim.chosen = true;
+
+        return anim;
     }
 
     //Animação para mover um lado

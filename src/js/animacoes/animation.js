@@ -73,6 +73,8 @@ export default class Animacao {
         //Executa os frames da animação, interpolando os valores iniciais e finais
         for(let frame = 1; frame <= this.frames; frame++){
 
+            if(this.chosen) console.log(frame)
+
             const lerp = (peso) => this.interpolacao(this.valorInicial, this.valorFinal, peso);
 
             const valor = lerp(frame/this.frames);
@@ -87,16 +89,27 @@ export default class Animacao {
             yield this.update(this.valorFinal);
         }
 
-        //Se tiver uma função ao terminar, executa ela
-        yield this.onTermino();
-
         //Enquanto estiver com a flag para manter a execução, continue retornando o ultimo frame
         while(this.manter) {
             yield this.update(this.valorFinal);
         }
 
+        //Se tiver uma função ao terminar, executa ela
+        yield this.onTermino();
+
         //Se tiver a flag para a volta, retorna ao estado inicial
         if(this.voltar) this.update(this.valorInicial);
+    }
+
+    setProgresso(progresso){
+
+        const lerp = (peso) => this.interpolacao(this.valorInicial, this.valorFinal, peso);
+
+        const valor = lerp(progresso);
+
+        this.update(valor);
+
+        return this;
     }
 
     static simultanea(...animacoes){
@@ -134,16 +147,15 @@ export class AnimacaoSimultanea extends Animacao{
 
         const animacoes = this.animacoes;
 
-        this.frames =   animacoes.map(animacao => animacao.frames)
+        this.frames =   animacoes.map(animacao => animacao.frames + animacao.delay)
                                  .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
 
-        this.delay  =   animacoes.map(animacao => animacao.delay)
-                                 .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
+        console.log(this.frames,this.delay)
 
         const actions = animacoes.map(animacao => animacao.getFrames());
 
         //Avança os frames simultâneamente das animações
-        for(let frame = 0; frame <= this.frames + this.delay; frame++){
+        for(let frame = 0; frame <= this.frames; frame++){
             yield actions.map(action => action.next());
         }
 
@@ -155,7 +167,7 @@ export class AnimacaoSimultanea extends Animacao{
         //Termina a execução
         animacoes.map(animacao => animacao.manter = false);
 
-        actions.map(action => action.next());
+        actions.map(action => action.next())
 
         this.onTermino();
     }
@@ -167,7 +179,14 @@ export class AnimacaoSimultanea extends Animacao{
     }
 
     setDelay(frames){
+        this.delay = frames;
         this.animacoes.map(animacao => animacao.delay = frames);
+        return this;
+    }
+
+    setProgresso(progresso){
+        this.animacoes.map(animacao => animacao.setProgresso(progresso));
+
         return this;
     }
 }
@@ -180,7 +199,8 @@ export class AnimacaoSequencial extends Animacao{
         // console.log(animacoes.map(animacao => Object.keys(animacao)));
 
         this.animacoes = animacoes;
-        this.frames = animacoes.map(animacao => animacao.frames)
+
+        this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
                                .reduce((acumulado, atual) => acumulado + atual, 0);
 
         // this.manterExecucaoTodos(false);
@@ -208,7 +228,8 @@ export class AnimacaoSequencial extends Animacao{
             const action = animacao.getFrames();
 
             //Retorna um por um os frames da animação atual
-            for(let i = 0; i < animacao.frames + animacao.delay; i++){
+            for(let i = 0; i <= animacao.frames + animacao.delay; i++){
+                if(this.chosen) console.log(this.delay)
                 yield action.next();
             }
 
@@ -217,11 +238,6 @@ export class AnimacaoSequencial extends Animacao{
 
             //Mantém a execução opcionalmente das animações completas
             completedActions.map(completed => completed.next());
-        }
-        
-        //Delay final ao terminar execução
-        for(let frame = this.frames; frame < this.frames + this.delay; frame++){
-            yield completedActions.map(action => action.next());
         }
 
         //Mantém a execução do frame final de todas as animações
@@ -239,6 +255,21 @@ export class AnimacaoSequencial extends Animacao{
 
     setDuration = function(frames){
         this.animacoes.map(animacao => animacao.setDuration(frames));
+        return this;
+    }
+
+    setProgresso(progresso){
+        this.animacoes.map(animacao => animacao.setProgresso(progresso));
+
+        return this;
+    }
+
+    setDelay(delay){
+
+        this.delay = delay;
+
+        this.animacoes[this.animacoes.length-1].setDelay(delay);
+
         return this;
     }
 }

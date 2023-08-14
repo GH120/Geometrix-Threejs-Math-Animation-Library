@@ -50,7 +50,9 @@ export class Fase {
         this.changeText(dialogo[0]);
 
         const tracejado = new Tracejado(new THREE.Vector3(3,0,0), new THREE.Vector3(1.5,1.5,0));
-    
+        
+        //On termino usado corretamente, apenas quando o delay e execução terminarem ele muda
+        //On delay entretando já executa quando estiver no delay
         const animacoes = dialogo.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)));
 
         const anim1 = this.firstDialogue(animacoes[0]);
@@ -62,7 +64,7 @@ export class Fase {
 
         console.log(Object.keys(anim1))
 
-        //Bug estupido do javascript: array não funciona, por algum motivo descarta objeto passado nele
+        //Bug do javascript: array não funciona, por algum motivo descarta objeto passado nele
         const sequencia = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6);
         // const sequencia = anim4
 
@@ -74,11 +76,11 @@ export class Fase {
         const fadeInAndOut = (angulo) =>  new AnimacaoSequencial(colorirAngulo(angulo)
                                                                 .setValorInicial(0xff0000)
                                                                 .setValorFinal(0xffff00)
-                                                                .setDuration(100), 
+                                                                .setDuration(80), 
                                                                 colorirAngulo(angulo)
                                                                 .setValorInicial(0xffff00)
                                                                 .setValorFinal(0xff0000)
-                                                                .setDuration(50)
+                                                                .setDuration(40)
                                                                 .voltarAoInicio(false))
 
         const colorirAngulos = this.triangulo.angles.map(angle => fadeInAndOut(angle));
@@ -137,7 +139,11 @@ export class Fase {
         const divisaoColorida = new AnimacaoSequencial(colorirAresta1, colorirAresta2, divisao);
 
         return new AnimacaoSimultanea(dialogue,divisaoColorida)
-                   .setOnTermino(() => this.scene.remove(tracejado.mesh));
+                   .setOnTermino(() => {
+                         this.scene.remove(tracejado.mesh)
+                         colorirAresta1.setProgresso(0);
+                         colorirAresta2.setProgresso(0);
+                    });
     }
 
     fifthDialogue(dialogue, tracejado) {

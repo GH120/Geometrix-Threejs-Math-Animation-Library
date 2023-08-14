@@ -56,13 +56,11 @@ export class Triangle{
 
     removeFromScene(){
 
-        this.scene = scene;
+        const scene = this.scene;
 
-        this.vertices.map(vertex => scene.add(vertex));
+        this.vertices.map(vertex => scene.remove(vertex));
         this.edges.map(   edge   => scene.remove(edge.mesh));
         this.angles.map(  angle  => scene.remove(angle.mesh));
-
-        this.update();
 
         return this;
     }

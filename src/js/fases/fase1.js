@@ -95,13 +95,13 @@ export class Fase {
 
         const colorirAngulo1 = colorirAngulo(this.triangulo.angles[0])
                               .setValorInicial(0xff0000)
-                              .setValorFinal(0x0000ff)
+                              .setValorFinal(0x0000aa)
                               .setDuration(100)
                               .voltarAoInicio(false);
 
         const colorirAngulo2 = colorirAngulo(this.triangulo.angles[2])
                               .setValorInicial(0xff0000)
-                              .setValorFinal(0x0000ff)
+                              .setValorFinal(0x0000aa)
                               .setDuration(100)
                               .voltarAoInicio(false);
 
@@ -109,12 +109,11 @@ export class Fase {
         //Atualiza o colorir isoceles depois de ter efetuado as animações
         return new AnimacaoSimultanea(colorirAngulo1, colorirAngulo2, dialogue)
                    .setOnStart(() => this.mostrarAngulo.map(mostrar => mostrar.update({dentro:true})))
-                   .setOnTermino(() => this.colorirIsoceles.update())
     }
 
     thirdDialogue(dialogue, tracejado){
 
-        const mostrarTracejado = new MostrarTracejado(tracejado, this.scene);
+        const mostrarTracejado = new MostrarTracejado(tracejado, this.scene).setDelay(100);
 
         const triangle2 = new Triangle([[3,3,0],[1.5,1.5,0],[3,0,0]])
                         .renderVertices()
@@ -132,7 +131,7 @@ export class Fase {
                        this.mostrarAngulo.map(anguloMostrado => anguloMostrado.update({dentro:false}))
                     })
                     .setOnTermino(() => {
-
+                        
                         triangle2.removeFromScene();
                         triangle3.removeFromScene();
                     })

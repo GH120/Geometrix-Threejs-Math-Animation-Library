@@ -16,6 +16,7 @@ import { colorirAngulo } from '../animacoes/colorirAngulo';
 import { Tracejado } from '../objetos/Tracejado';
 import MostrarTracejado from '../animacoes/mostrarTracejado';
 import { Divisao } from '../animacoes/divisao';
+import { Triangle } from '../objetos/triangle';
 
 export class Fase {
 
@@ -42,8 +43,8 @@ export class Fase {
 
         const dialogo = ["Um triângulo tem três lados e três angulos",
                          "se ele tiver dois ângulos iguais então ele é simétrico",
-                         "você sabe o que isso significa?",
-                        " Como pode ver, temos dois lados iguais", 
+                         "então podemos dividir ele em dois triângulos iguais",
+                        " Como eles são iguais, os lados em evidência tem o mesmo tamanho", 
                         "chamamos estes triângulos de isoceles",
                         "Você consegue fazer um triângulo com três lados iguais?"]
 
@@ -115,8 +116,26 @@ export class Fase {
 
         const mostrarTracejado = new MostrarTracejado(tracejado, this.scene);
 
+        const triangle2 = new Triangle([[3,3,0],[1.5,1.5,0],[3,0,0]])
+                        .renderVertices()
+                        .renderAngles()
+
+        const triangle3 = new Triangle([[3,0,0],[1.5,1.5,0],[0,0,0]])
+                        .renderVertices()
+                        .renderAngles()
+
         return new AnimacaoSimultanea(dialogue, mostrarTracejado)
-                   .setOnStart(() => this.mostrarAngulo.map(anguloMostrado => anguloMostrado.update({dentro:false})));
+                   .setOnStart(() => {
+                    //    Criar uma animação, usar aquela do circulo trigonométrico?
+                       triangle3.addToScene(this.scene);
+                       triangle2.addToScene(this.scene);
+                       this.mostrarAngulo.map(anguloMostrado => anguloMostrado.update({dentro:false}))
+                    })
+                    .setOnTermino(() => {
+
+                        triangle2.removeFromScene();
+                        triangle3.removeFromScene();
+                    })
     }
 
     fourthDialogue(dialogue, tracejado) {
@@ -138,7 +157,7 @@ export class Fase {
         
         const divisaoColorida = new AnimacaoSequencial(colorirAresta1, colorirAresta2, divisao);
 
-        return new AnimacaoSimultanea(dialogue,divisaoColorida)
+        return new AnimacaoSimultanea(dialogue, divisaoColorida)
                    .setOnTermino(() => {
                          this.scene.remove(tracejado.mesh)
                          colorirAresta1.setProgresso(0);

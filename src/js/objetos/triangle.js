@@ -5,22 +5,16 @@ import {Edge} from './edge.js';
 
 export class Triangle{
 
-    constructor(){
+    constructor(positions =  [[0,0,0],[3,0,0],[3,3,0],]){
 
         this.grossura = 0.05
         this.sphereGeometry =   new THREE.SphereGeometry(0.1);
         this.sphereMaterial =   new THREE.MeshBasicMaterial({ color: 0x8c8c8c });
         this.cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xe525252 });
 
-        this.positions = [
-            [0,0,0],
-            [0,-1,0],
-            [-1,-1,0],
-        ]
-
-        this.positions = this.positions.map(vetor => vetor.map(n => n*3))
-
-        this.positions = this.positions.map(vetor => [vetor[0]+3, vetor[1]+3, vetor[2]]);
+        this.positions = positions;
+        this.edges = [];
+        this.angles = [];
     }
 
     renderVertices(){
@@ -54,6 +48,19 @@ export class Triangle{
         this.vertices.map(vertex => scene.add(vertex));
         this.edges.map(   edge   => edge.addToScene(scene));
         this.angles.map(  angle  => angle.addToScene(scene));
+
+        this.update();
+
+        return this;
+    }
+
+    removeFromScene(){
+
+        this.scene = scene;
+
+        this.vertices.map(vertex => scene.add(vertex));
+        this.edges.map(   edge   => scene.remove(edge.mesh));
+        this.angles.map(  angle  => scene.remove(angle.mesh));
 
         this.update();
 

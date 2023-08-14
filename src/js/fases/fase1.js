@@ -63,8 +63,8 @@ export class Fase {
         console.log(Object.keys(anim1))
 
         //Bug estupido do javascript: array não funciona, por algum motivo descarta objeto passado nele
-        // const sequencia = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6);
-        const sequencia = anim4
+        const sequencia = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6);
+        // const sequencia = anim4
 
         this.animar(sequencia);
     }

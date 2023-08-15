@@ -53,12 +53,21 @@ export default class Animacao {
         return this;
     }
 
+    setOnDelay(onDelay){
+        this.onDelay = onDelay;
+        return this;
+    }
+
     setOnTermino(onTermino){
         this.onTermino = onTermino;
         return this;
     }
 
     onStart(){
+        return null;
+    }
+
+    onDelay(){
         return null;
     }
 
@@ -83,6 +92,8 @@ export default class Animacao {
 
             yield frame;
         }
+
+        this.onDelay();
 
         //Parte do delay
         for(let frame = this.frames; frame < this.frames + this.delay; frame++){

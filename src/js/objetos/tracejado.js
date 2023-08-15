@@ -2,13 +2,13 @@ import * as THREE from 'three';
 
 export class Tracejado{
 
-    constructor(origem, destino, largura=0.01, altura=0.1, spacingRatio=1){
+    constructor(origem, destino, largura=0.01, altura=0.1, spacingRatio=1, cor=0xf00f00){
         this.origem  = origem;
         this.destino = destino;
         this.largura = largura;
         this.altura  = altura;
         this.spacing = spacingRatio;
-        this.material = new THREE.MeshBasicMaterial({color:0xf00f00});
+        this.material = new THREE.MeshBasicMaterial({color:cor});
 
         this.renderMalha();
     }

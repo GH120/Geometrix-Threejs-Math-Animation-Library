@@ -46,11 +46,11 @@ export class Fase {
                          "então podemos dividir ele em dois triângulos iguais",
                         " Como eles são iguais, os lados em evidência tem o mesmo tamanho", 
                         "chamamos estes triângulos de isoceles",
-                        "Você consegue fazer um triângulo com três lados iguais?"]
+                        "Consegue fazer um triângulo com três lados iguais?"]
 
         this.changeText(dialogo[0]);
 
-        const tracejado = new Tracejado(new THREE.Vector3(3,0,0), new THREE.Vector3(1.5,1.5,0));
+        const tracejado = new Tracejado(new THREE.Vector3(3,0,0), new THREE.Vector3(1.5,1.5,0),0.01, 0.1, 1, 0xe525252);
         
         //On termino usado corretamente, apenas quando o delay e execução terminarem ele muda
         //On delay entretando já executa quando estiver no delay
@@ -63,11 +63,8 @@ export class Fase {
         const anim5 = animacoes[4];
         const anim6 = animacoes[5];
 
-        console.log(Object.keys(anim1))
-
         //Bug do javascript: array não funciona, por algum motivo descarta objeto passado nele
         const sequencia = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6);
-        // const sequencia = anim4
 
         this.animar(sequencia);
     }
@@ -113,7 +110,12 @@ export class Fase {
 
     thirdDialogue(dialogue, tracejado){
 
-        const mostrarTracejado = new MostrarTracejado(tracejado, this.scene).setDelay(100);
+        const mostrarTracejado = new MostrarTracejado(tracejado, this.scene)
+                                    .setDelay(100)
+                                    .setOnDelay(() => {
+                                        triangle2.renderEdges();
+                                        triangle2.edges.map(edge => edge.addToScene(this.scene))
+                                    })
 
         const triangle2 = new Triangle([[3,3,0],[1.5,1.5,0],[3,0,0]])
                         .renderVertices()
@@ -131,7 +133,6 @@ export class Fase {
                        this.mostrarAngulo.map(anguloMostrado => anguloMostrado.update({dentro:false}))
                     })
                     .setOnTermino(() => {
-                        
                         triangle2.removeFromScene();
                         triangle3.removeFromScene();
                     })
@@ -162,13 +163,6 @@ export class Fase {
                          colorirAresta1.setProgresso(0);
                          colorirAresta2.setProgresso(0);
                     });
-    }
-
-    fifthDialogue(dialogue, tracejado) {
-
-        this.scene.remove(tracejado);
-
-        return dialogue
     }
 
     //Cria a caixa de texto onde o texto vai aparecer

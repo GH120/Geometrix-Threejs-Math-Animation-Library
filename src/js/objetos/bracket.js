@@ -2,77 +2,74 @@ import * as THREE from 'three';
 
 export default class Bracket{
 
-    constructor(largura, altura){
-        this.largura = largura;
-        this.altura  = altura;
+  constructor(largura, altura){
+      this.largura = largura;
+      this.altura  = altura;
 
-        this.renderMalha();
-    }
+      this.renderMalha()
+  }
 
-    setDimensions(){
-        
-    }
+  setDimensions(){
+      
+  }
 
-    renderMalha(){
+  renderMalha(){
 
-        const bracket = new THREE.Group();
+      const bracket = new THREE.Group();
 
-        bracket.add(
-            this.criarCurva([
-                new THREE.Vector3(0,0,0),
-                new THREE.Vector3(0,this.altura,0),
-                new THREE.Vector3(-this.largura,0,0), 
-                new THREE.Vector3(-this.largura,this.altura,0)
-            ])
-        );
 
-        bracket.add(
-            criarCurva([
-                new THREE.Vector3(0,0,0), 
-                new THREE.Vector3(0,this.altura,0), 
-                new THREE.Vector3(this.largura,0,0), 
-                new THREE.Vector3(this.largura,this.altura,0)
-            ])
-        );
-        
-        this.mesh = bracket;
+      this.criarCurva([
+        new THREE.Vector3(0,0,0),
+        new THREE.Vector3(0,this.altura,0),
+        new THREE.Vector3(-this.largura,0,0), 
+        new THREE.Vector3(-this.largura,this.altura,0)
+      ])
 
-    }
+     
 
-    createCurve(points){
+    //   bracket.add(
+    //       this.criarCurva([
+    //           new THREE.Vector3(0,0,0), 
+    //           new THREE.Vector3(0,this.altura,0), 
+    //           new THREE.Vector3(this.largura,0,0), 
+    //           new THREE.Vector3(this.largura,this.altura,0)
+    //       ])
+    //   );
+      
+      this.mesh = bracket;
 
-        const curve = new THREE.CubicBezierCurve3(points[0], points[1], points[2], points[3]);
+  }
 
-        // Create the curve geometry
-        const numSegments = 100; // Number of segments to approximate the curve
-        const curvePoints = curve.getPoints(numSegments);
-        const curveGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+  createCurve(points){
 
-        // Create a material for the curve
-        const curveMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+      const curve = new THREE.CubicBezierCurve3(points);
 
-        // Create the curve object
-        const curveObject = new THREE.Line(curveGeometry, curveMaterial);
+      // Create the curve geometry
+      const numSegments = 100; // Number of segments to approximate the curve
+      const curvePoints = curve.getPoints(numSegments);
+      const curveGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
 
-        return curveObject;
-    }
+      // Create a material for the curve
+      const curveMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
 
-    get length(){
-        return this.largura.clone().sub(this.altura).length();
-    }
+      // Create the curve object
+      const curveObject = new THREE.Line(curveGeometry, curveMaterial);
 
-    addToScene(scene){
-        this.scene = scene;
-        scene.add(this.mesh);
-        return this;
-    }
+      return curveObject;
+  }
 
-    update(){
-        
-        this.scene.remove(this.mesh);
+  addToScene(scene){
+      this.scene = scene;
+      scene.add(this.mesh);
+      return this;
+  }
 
-        this.renderMalha();
+  update(){
+      
+      this.scene.remove(this.mesh);
 
-        this.scene.add(this.mesh);
-    }
+      this.renderMalha();
+
+      this.scene.add(this.mesh);
+  }
 }

@@ -46,6 +46,28 @@ labelRenderer.domElement.style.position = 'absolute';
 labelRenderer.domElement.style.top = '0px';
 document.body.appendChild(labelRenderer.domElement);
 
+const criarCurva = (points) => {
+  // Create a cubic Bézier curve
+  const curve = new THREE.CubicBezierCurve3(points[0], points[1], points[2], points[3]);
+
+  // Create the curve geometry
+  const numSegments = 100; // Number of segments to approximate the curve
+  const curvePoints = curve.getPoints(numSegments);
+  const curveGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+
+  // Create a material for the curve
+  const curveMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+
+  // Create the curve object
+  const curveObject = new THREE.Line(curveGeometry, curveMaterial);
+
+  // Add the curve object to the scene
+  scene.add(curveObject);
+}
+
+criarCurva([new THREE.Vector3(0,0,0), new THREE.Vector3(0,0.2,0), new THREE.Vector3(-1,0,0), new THREE.Vector3(-1,0.2,0)])
+criarCurva([new THREE.Vector3(0,0,0), new THREE.Vector3(0,0.2,0), new THREE.Vector3(1,0,0), new THREE.Vector3(1,0.2,0)])
+
 //Cria o triângulo e o programa
 const triangle = new Triangle()
                     .renderVertices()

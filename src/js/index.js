@@ -12,7 +12,7 @@ import {Triangle} from './objetos/triangle';
 import grid from '../assets/grid.avif';
 import * as dat from 'dat.gui';
 import Circunscrever from './animacoes/circunscrever';
-import {Tracejado} from './objetos/Tracejado';
+import {Tracejado} from './objetos/tracejado';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MultipleClickable } from './controles/clickable';
 import { Fase } from './fases/fase1';

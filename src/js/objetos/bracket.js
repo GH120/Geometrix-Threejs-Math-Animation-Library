@@ -18,31 +18,35 @@ export default class Bracket{
       const bracket = new THREE.Group();
 
 
-      this.criarCurva([
-        new THREE.Vector3(0,0,0),
-        new THREE.Vector3(0,this.altura,0),
-        new THREE.Vector3(-this.largura,0,0), 
-        new THREE.Vector3(-this.largura,this.altura,0)
-      ])
+      bracket.add(
+        this.criarCurva([
+          new THREE.Vector3(0,0,0),
+          new THREE.Vector3(0,this.altura,0),
+          new THREE.Vector3(-this.largura,0,0), 
+          new THREE.Vector3(-this.largura,this.altura,0)
+        ])
+      );
 
      
 
-    //   bracket.add(
-    //       this.criarCurva([
-    //           new THREE.Vector3(0,0,0), 
-    //           new THREE.Vector3(0,this.altura,0), 
-    //           new THREE.Vector3(this.largura,0,0), 
-    //           new THREE.Vector3(this.largura,this.altura,0)
-    //       ])
-    //   );
+      bracket.add(
+          this.criarCurva([
+              new THREE.Vector3(0,0,0), 
+              new THREE.Vector3(0,this.altura,0), 
+              new THREE.Vector3(this.largura,0,0), 
+              new THREE.Vector3(this.largura,this.altura,0)
+          ])
+      );
+
+      console.log(bracket)
       
       this.mesh = bracket;
 
   }
 
-  createCurve(points){
+  criarCurva(points){
 
-      const curve = new THREE.CubicBezierCurve3(points);
+      const curve = new THREE.CubicBezierCurve3(...points);
 
       // Create the curve geometry
       const numSegments = 100; // Number of segments to approximate the curve

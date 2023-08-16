@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import DesenharMalha from '../animacoes/desenharMalha';
+import { AnimacaoSequencial } from '../animacoes/animation';
 
 export default class Bracket{
 
@@ -60,6 +62,13 @@ export default class Bracket{
       const curveObject = new THREE.Line(curveGeometry, curveMaterial);
 
       return curveObject;
+  }
+
+  animacao(){
+    return new AnimacaoSequencial(
+                    new DesenharMalha(this.mesh.children[0],this.scene).reverse(),
+                    new DesenharMalha(this.mesh.children[1],this.scene)
+            )
   }
 
   addToScene(scene){

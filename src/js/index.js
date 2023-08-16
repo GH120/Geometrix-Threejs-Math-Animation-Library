@@ -40,11 +40,13 @@ const triangle = new Triangle()
                     .renderVertices()
                     .renderEdges()
                     .renderAngles()
-                    .addToScene(scene);
+                    // .addToScene(scene);
 
 const programa = new Fase(triangle,scene,camera);
 
-programa.animar(new DesenharMalha(triangle.angles[0].mesh, scene));
+const bracket = new Bracket(1,0.2).addToScene(scene);
+
+programa.animar(bracket.animacao());
 
 //Loop de animação
 function animate() {

@@ -11,16 +11,22 @@ export default class DesenharMalha extends Animacao{
 
         this.valorInicial = 0;
         this.valorFinal   = malha.geometry.attributes.position.count;
-        this.frames = 200;
+        this.frames = 30;
         this.voltar = false;
+
+        this.malha = malha.clone();
+
+        malha.visible = false;
 
         this.setUpdateFunction(function(posicao){
 
             const scene = this.scene;
-            
-            const posicoes = this.objeto.geometry.attributes.position.array.slice(0,posicao*3);
 
-            const material = this.objeto.material;
+            const length = this.objeto.geometry.attributes.position.count;
+
+            const intervalo = (this.reverso)? [-posicao*3] : [0, posicao*3]
+            
+            const posicoes = this.objeto.geometry.attributes.position.array.slice(...intervalo);
 
             const geometry = new THREE.BufferGeometry();
 
@@ -28,22 +34,23 @@ export default class DesenharMalha extends Animacao{
 
             scene.remove(this.malha)
 
-            this.malha = new this.objeto.constructor(geometry, material);
+            this.malha = new this.objeto.constructor(geometry, this.objeto.material);
 
             scene.add(this.malha);
         })
     }
 
-    onTermino(){
-        console.log("terminou", this.scene)
+    reverse(){
+        this.reverso = true;
+        return this;
     }
 
     interpolacao(inicial, final, peso){
 
-        const curva = (x) =>  x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+        const curva = (x) => (x < 0.05)? Math.sin((x * Math.PI)) : Math.sin((x * Math.PI) / 2);
 
         peso = curva(peso);
 
-        return Math.floor(inicial*(1-peso) + final*peso);
+        return Math.round(inicial*(1-peso) + final*peso);
     }
 }

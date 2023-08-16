@@ -1,23 +1,11 @@
 import * as THREE from 'three';
-import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
-import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './handlers/trigonometry';
-import Animacao, { AnimacaoSimultanea , AnimacaoSequencial} from './animacoes/animation';
-import {Divisao} from './animacoes/divisao';
-import { Draggable } from './controles/draggable';
-import MoverVertice from './handlers/moverVertice';
-import {Programa} from './programa';
-import Circle from './objetos/circle';
 import {Triangle} from './objetos/triangle';
 import grid from '../assets/grid.avif';
-import * as dat from 'dat.gui';
-import Circunscrever from './animacoes/circunscrever';
-import {Tracejado} from './objetos/tracejado';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import { MultipleClickable } from './controles/clickable';
 import { Fase } from './fases/fase1';
 import { Fase2 } from './fases/fase2';
 import Bracket from './objetos/bracket'
+import DesenharMalha from './animacoes/desenharMalha';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
@@ -47,7 +35,6 @@ labelRenderer.domElement.style.position = 'absolute';
 labelRenderer.domElement.style.top = '0px';
 document.body.appendChild(labelRenderer.domElement);
 
-new Bracket(1,0.3).addToScene(scene);
 //Cria o triângulo e o programa
 const triangle = new Triangle()
                     .renderVertices()
@@ -56,6 +43,8 @@ const triangle = new Triangle()
                     .addToScene(scene);
 
 const programa = new Fase(triangle,scene,camera);
+
+programa.animar(new DesenharMalha(triangle.angles[0].mesh, scene));
 
 //Loop de animação
 function animate() {

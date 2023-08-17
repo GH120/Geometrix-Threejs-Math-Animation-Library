@@ -4,15 +4,15 @@ import { AnimacaoSequencial } from '../animacoes/animation';
 
 export default class Bracket{
 
-  constructor(largura, altura){
-      this.largura = largura;
+  constructor(largura, altura, ponto1=new THREE.Vector3(3,0,0), ponto2=new THREE.Vector3(3,3,0)){
+
+      this.largura = ponto1.clone().sub(ponto2).length()*0.5;
+
       this.altura  = altura;
 
-      this.renderMalha()
-  }
+      this.calculateMatrix(ponto1,ponto2);
 
-  setDimensions(){
-      
+      this.renderMalha()
   }
 
   renderMalha(){
@@ -40,13 +40,13 @@ export default class Bracket{
           ])
       );
 
-      console.log(bracket)
-      
       this.mesh = bracket;
 
   }
 
   criarCurva(points){
+
+      points = points.map(p => p.applyMatrix4(this.matrix))
 
       const curve = new THREE.CubicBezierCurve3(...points);
 
@@ -62,6 +62,34 @@ export default class Bracket{
       const curveObject = new THREE.Line(curveGeometry, curveMaterial);
 
       return curveObject;
+  }
+
+  calculateMatrix(ponto1,ponto2){
+
+    //Translação
+    const meio = ponto1.clone().add(ponto2).multiplyScalar(0.5);
+
+    const translation = new THREE.Matrix4().makeTranslation(meio.x+this.altura+0.2,meio.y,meio.z);
+
+    console.log(translation)
+
+    //Rotação
+    const angulacao = ponto2.clone().sub(ponto1).normalize();
+
+    const horizontal = new THREE.Vector3(1, 0, 0);
+
+    // Calculate the axis of rotation (cross product of initial and target vectors)
+    const axis = new THREE.Vector3().crossVectors(horizontal, angulacao).normalize();
+
+    // Calculate the angle between the initial and target vectors
+    const angle = Math.acos(horizontal.dot(angulacao));
+
+    // Create a rotation matrix
+    const rotationMatrix = new THREE.Matrix4();
+
+    rotationMatrix.makeRotationAxis(axis, angle);
+
+    this.matrix = translation.multiply(rotationMatrix)
   }
 
   animacao(){

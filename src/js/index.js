@@ -40,7 +40,7 @@ const triangle = new Triangle()
                     .renderVertices()
                     .renderEdges()
                     .renderAngles()
-                    // .addToScene(scene);
+                    .addToScene(scene);
 
 const programa = new Fase(triangle,scene,camera);
 

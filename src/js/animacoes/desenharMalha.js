@@ -11,18 +11,12 @@ export default class DesenharMalha extends Animacao{
 
         this.valorInicial = 0;
         this.valorFinal   = malha.geometry.attributes.position.count;
-        this.frames = 30;
+        this.frames = 44;
         this.voltar = false;
-
-        this.malha = malha.clone();
 
         malha.visible = false;
 
         this.setUpdateFunction(function(posicao){
-
-            const scene = this.scene;
-
-            const length = this.objeto.geometry.attributes.position.count;
 
             const intervalo = (this.reverso)? [-posicao*3] : [0, posicao*3]
             
@@ -36,6 +30,8 @@ export default class DesenharMalha extends Animacao{
 
             this.malha = new this.objeto.constructor(geometry, this.objeto.material);
 
+            // this.malha.quaternion.copy(this.objeto.quaternion)
+            
             scene.add(this.malha);
         })
     }
@@ -47,7 +43,7 @@ export default class DesenharMalha extends Animacao{
 
     interpolacao(inicial, final, peso){
 
-        const curva = (x) => (x < 0.05)? Math.sin((x * Math.PI)) : Math.sin((x * Math.PI) / 2);
+        const curva = (x) => Math.sin((x * Math.PI) / 2);
 
         peso = curva(peso);
 

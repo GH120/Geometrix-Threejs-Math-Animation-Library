@@ -1,3 +1,18 @@
+class Pythagoras {
+
+    constructor(){
+
+        this.equation = "a² + b² = c²";
+
+        this.variables = {
+            'a': ['a', handleLetterClick],
+            'b': ['b', handleLetterClick],
+            'c': ['c', handleLetterClick]
+        }
+
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     const openButton = document.getElementById("openEquationWindow");
     const closeButton = document.getElementById("closeEquationWindow");
@@ -11,15 +26,11 @@ document.addEventListener("DOMContentLoaded", function() {
         equationWindow.classList.add("hidden");
     });
 
-    const variaveis = {'a': ['a', handleLetterClick],
-                       'b': ['b', handleLetterClick],
-                       'c': ['c', handleLetterClick]}
-
-    updateEquationContent("a² + b² = c²", variaveis)
+    updateEquationContent(new Pythagoras())
 });
 
 
-function updateEquationContent(texto, letters) {
+function updateEquationContent(Formula) {
 
   const equationContent = document.createElement("div");
   equationContent.id = "equationContent";
@@ -28,17 +39,19 @@ function updateEquationContent(texto, letters) {
 
   equationWindow.insertBefore(equationContent, equationWindow.firstChild);
 
-  texto.split(/([abc])/)
-       .map(element => {
-            if(letters[element]) return addButtonToEquation(...letters[element])
+  Formula.equation.split(/([abc])/)
+            .map(letters => {
 
-            const span = document.createElement("span");
+                    if(Formula.variables[letters]) 
+                        return addButtonToEquation(...Formula.variables[letters])
 
-            span.textContent = element;
+                    const span = document.createElement("span");
 
-            return span;
-        })
-       .map(element => equationContent.append(element))
+                    span.textContent = letters;
+
+                    return span;
+                })
+            .map(element => equationContent.append(element))
 
 }
 

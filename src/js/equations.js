@@ -11,6 +11,42 @@ class Pythagoras {
         }
 
     }
+
+    updateEquationContent() {
+
+        const equationContent = document.createElement("div");
+        equationContent.id = "equationContent";
+      
+        const equationWindow = document.getElementById("equationWindow");
+      
+        equationWindow.insertBefore(equationContent, equationWindow.firstChild);
+      
+        this.equation.split(/([abc])/)
+                  .map(letters => {
+      
+                          if(this.variables[letters]) 
+                              return this.addButtonToEquation(...this.variables[letters])
+      
+                          const span = document.createElement("span");
+      
+                          span.textContent = letters;
+      
+                          return span;
+                      })
+                  .map(element => equationContent.append(element))
+      
+      }
+      
+      addButtonToEquation(letter, clickFunction) {
+        const button = document.createElement("button");
+        button.className = "equation-letter";
+        button.textContent = letter;
+        button.addEventListener("click", function() {
+            clickFunction(letter);
+        });
+      
+        return button
+      }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -26,45 +62,8 @@ document.addEventListener("DOMContentLoaded", function() {
         equationWindow.classList.add("hidden");
     });
 
-    updateEquationContent(new Pythagoras())
+    new Pythagoras().updateEquationContent()
 });
-
-
-function updateEquationContent(Formula) {
-
-  const equationContent = document.createElement("div");
-  equationContent.id = "equationContent";
-
-  const equationWindow = document.getElementById("equationWindow");
-
-  equationWindow.insertBefore(equationContent, equationWindow.firstChild);
-
-  Formula.equation.split(/([abc])/)
-            .map(letters => {
-
-                    if(Formula.variables[letters]) 
-                        return addButtonToEquation(...Formula.variables[letters])
-
-                    const span = document.createElement("span");
-
-                    span.textContent = letters;
-
-                    return span;
-                })
-            .map(element => equationContent.append(element))
-
-}
-
-function addButtonToEquation(letter, clickFunction) {
-  const button = document.createElement("button");
-  button.className = "equation-letter";
-  button.textContent = letter;
-  button.addEventListener("click", function() {
-      clickFunction(letter);
-  });
-
-  return button
-}
 
 function handleLetterClick(letter) {
   alert(`Letter ${letter} clicked!`);

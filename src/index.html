@@ -101,13 +101,50 @@ table {
             padding: 0 0 1em 0;
             list-style-type: none;
         }
+
+        #openEquationWindow{
+            position: absolute;
+            top: 100%;
+            z-index: 1000;
+        }
+        
+        #equationWindow {
+            position: fixed;
+            top: 90%;
+            left: 5%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .equation-letter {
+            padding: 5px;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: bold;
+            background: none;
+            border: none;
+        }
+
+        .hidden {
+            display: none;
+        }
         
     </style>
 </head>
 <body>
     <script src="./js/index.js" type="module"></script>
     <script src="./js/fasesbotoes.js" type="module"></script>
+    <script src="./js/equations.js"  type="module"></script>
     <canvas id="triangulo"></canvas>
+    <button id="openEquationWindow">Open Equation Window</button>
+    <div id="equationWindow" class="hidden">
+        
+        <button id="closeEquationWindow">Close</button>
+    </div>
 
     <!-- <div class="fases">
         <div class="divfase" id="iniciante">

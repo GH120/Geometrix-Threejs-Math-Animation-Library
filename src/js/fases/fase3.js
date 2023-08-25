@@ -18,6 +18,131 @@ import MostrarTracejado from '../animacoes/mostrarTracejado';
 import { Divisao } from '../animacoes/divisao';
 import { Triangle } from '../objetos/triangle';
 
+export class Equation{
+
+    updateEquationContent() {
+
+        const equationContent = document.createElement("div");
+        equationContent.id = "equationContent";
+
+        equationContent.style.fontFamily = "Courier New, monospace";
+        equationContent.style.fontSize = "25px";
+        equationContent.style.fontWeight ="italic";
+      
+        const equationWindow = document.getElementById("equationWindow");
+      
+        equationWindow.insertBefore(equationContent, equationWindow.firstChild);
+      
+        this.equation.split(/([abc])/)
+                  .map(letters => {
+      
+                          if(this.variables[letters]) 
+                              return this.addButtonToEquation(...this.variables[letters])
+      
+                          const span = document.createElement("span");
+      
+                          span.textContent = letters;
+      
+                          return span;
+                      })
+                  .map(element => equationContent.append(element))
+      
+      }
+      
+      addButtonToEquation(letter, clickFunction) {
+        const button = document.createElement("button");
+        button.className = "equation-letter";
+        button.textContent = letter;
+        button.addEventListener("click", function() {
+            clickFunction(letter);
+        });
+      
+        return button
+      }
+}
+
+export class Pythagoras extends Equation{
+
+    constructor(programa){
+
+        super();
+
+        this.programa = programa;
+
+        this.equation = "a² + b² = c²";
+
+        this.variables = {
+            'a': ['a', this.cateto.bind(this)],
+            'b': ['b', handleLetterClick],
+            'c': ['c', handleLetterClick]
+        }
+        this.updateEquationContent()
+        this.updateEquationContent()
+        this.updateEquationContent()
+        this.updateEquationContent()
+        this.updateEquationContent()
+
+    }
+
+    cateto(){
+
+        const triangulo = this.programa.triangulo;
+
+        if(!triangulo.retangulo()) return this.falhou();
+        
+        let index = 0;
+        for(const lado of triangulo.edges){
+
+            const angulo = triangulo.angles[(index++ +2) % 3];
+
+            //Controle de click, aciona quando o lado é clicado
+            const clickable = new Clickable(lado, this.programa.camera)
+            
+            const anguloReto = Math.round(angulo.degrees) == 90;
+
+            //Se o lado for oposto ao ângulo reto, então ele falha, pois só aceita catetos
+            if(anguloReto){
+
+                const atualizar = (estado) => (estado.clicado)? this.falhou() : null;
+
+                clickable.addObserver({update: atualizar})
+            }
+            else{
+
+                //Se for um cateto, seleciona ele apenas se ele não foi selecionado ainda
+                const atualizar = (estado) => {
+
+                    if(estado.clicado){
+
+                        if(lado.selecionado) return this.falhou();
+
+                        return this.selecionar(lado);
+                    }
+
+                    return null;
+                }
+
+                clickable.addObserver({update:atualizar})
+            }
+
+            
+        }
+    }
+
+    falhou(){
+        alert("falhou");
+    }
+
+    selecionar(lado){
+        alert("sucesso");
+    }
+}
+
+function handleLetterClick(letter) {
+    alert(`Letter ${letter} clicked!`);
+  }
+  
+
 export class Fase3 {
 
     constructor(triangle, scene, camera){
@@ -50,7 +175,7 @@ export class Fase3 {
 
         this.changeText(dialogo[0]);
 
-        
+        new Pythagoras(this);
     }
 
     firstDialogue(dialogue){

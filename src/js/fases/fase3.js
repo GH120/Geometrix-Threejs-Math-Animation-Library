@@ -71,11 +71,15 @@ export class Pythagoras extends Equation{
 
         this.equation = "a² + b² = c²";
 
+        const cateto     = this.lado(false);
+        const hipotenusa = this.lado(true);
+
         this.variables = {
-            'a': ['a', this.cateto.bind(this)],
-            'b': ['b', handleLetterClick],
-            'c': ['c', handleLetterClick]
+            'a': ['a', cateto],
+            'b': ['b', cateto],
+            'c': ['c', hipotenusa]
         }
+
         this.updateEquationContent()
         this.updateEquationContent()
         this.updateEquationContent()
@@ -84,48 +88,59 @@ export class Pythagoras extends Equation{
 
     }
 
-    cateto(){
+    //Retorna uma função se diz se o lado é ou não hipotenusa/cateto
+    lado(isHipotenusa){
 
         const triangulo = this.programa.triangulo;
 
         if(!triangulo.retangulo()) return this.falhou();
+
+        return function(){
         
-        let index = 0;
-        for(const lado of triangulo.edges){
+            let index = 0;
+            for(const lado of triangulo.edges){
 
-            const angulo = triangulo.angles[(index++ +2) % 3];
+                const anguloOposto = triangulo.angles[(index++ +2) % 3];
 
-            //Controle de click, aciona quando o lado é clicado
-            const clickable = new Clickable(lado, this.programa.camera)
-            
-            const anguloReto = Math.round(angulo.degrees) == 90;
+                this.criarControles(lado, anguloOposto, isHipotenusa)
 
-            //Se o lado for oposto ao ângulo reto, então ele falha, pois só aceita catetos
-            if(anguloReto){
-
-                const atualizar = (estado) => (estado.clicado)? this.falhou() : null;
-
-                clickable.addObserver({update: atualizar})
+                
             }
-            else{
+        }.bind(this);
+    }
 
-                //Se for um cateto, seleciona ele apenas se ele não foi selecionado ainda
-                const atualizar = (estado) => {
+    //Cria os controles de um lado
+    criarControles(lado, angulo, isHipotenusa){
 
-                    if(estado.clicado){
+        //Controle de click, aciona quando o lado é clicado
+        const clickable = new Clickable(lado, this.programa.camera)
+        
+        const anguloReto = Math.round(angulo.degrees) == 90;
 
-                        if(lado.selecionado) return this.falhou();
+        const falhou = anguloReto && !isHipotenusa || !anguloReto && isHipotenusa;
 
-                        return this.selecionar(lado);
-                    }
+        if(falhou){
 
-                    return null;
+            const atualizar = (estado) => (estado.clicado)? this.falhou() : null;
+
+            clickable.addObserver({update: atualizar})
+        }
+        else{
+
+            //Se for um cateto, seleciona ele apenas se ele não foi selecionado ainda
+            const atualizar = (estado) => {
+
+                if(estado.clicado){
+
+                    if(lado.selecionado) return this.falhou();
+
+                    return this.selecionar(lado);
                 }
 
-                clickable.addObserver({update:atualizar})
+                return null;
             }
 
-            
+            clickable.addObserver({update:atualizar})
         }
     }
 

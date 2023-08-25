@@ -17,6 +17,7 @@ import { Tracejado } from '../objetos/tracejado';
 import MostrarTracejado from '../animacoes/mostrarTracejado';
 import { Divisao } from '../animacoes/divisao';
 import { Triangle } from '../objetos/triangle';
+import Bracket from '../objetos/bracket';
 
 export class Equation{
 
@@ -181,112 +182,31 @@ export class Fase3 {
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
     levelDesign(){
 
-        const dialogo = ["Um triângulo tem três lados e três angulos",
-                         "se ele tiver dois ângulos iguais então ele é simétrico",
-                         "então podemos dividir ele em dois triângulos iguais",
-                        " Como eles são iguais, os lados em evidência tem o mesmo tamanho", 
-                        "chamamos estes triângulos de isoceles",
-                        "Consegue fazer um triângulo com três lados iguais?"]
+        const dialogo = ["Encontre o valor de x"]
 
         this.changeText(dialogo[0]);
 
-        new Pythagoras(this);
-    }
+        const lado1 = this.createEquationBox("(x - 1)",[3.9,1.5,0])
+        const lado2 = this.createEquationBox("(x - 2)",[1.5,-0.5,0])
+        const lado3 = this.createEquationBox("x",[1.1,2,0])
 
-    firstDialogue(dialogue){
+        const bracket = new Bracket(1,0.2).addToScene(this.scene);
+        const bracket2 = new Bracket(1,0.2, new THREE.Vector3(-0.4,-0.35,0), new THREE.Vector3(2.6,-0.35,0)).addToScene(this.scene)
+        const bracket3 = new Bracket(1,-0.2, new THREE.Vector3(-0.3,0.3,0), new THREE.Vector3(2.7,3.3,0)).addToScene(this.scene)
 
-        const fadeInAndOut = (angulo) =>  new AnimacaoSequencial(colorirAngulo(angulo)
-                                                                .setValorInicial(0xff0000)
-                                                                .setValorFinal(0xffff00)
-                                                                .setDuration(80), 
-                                                                colorirAngulo(angulo)
-                                                                .setValorInicial(0xffff00)
-                                                                .setValorFinal(0xff0000)
-                                                                .setDuration(40)
-                                                                .voltarAoInicio(false))
-
-        const colorirAngulos = this.triangulo.angles.map(angle => fadeInAndOut(angle));
-
-        return new AnimacaoSimultanea(new AnimacaoSequencial(...colorirAngulos),dialogue);
-    }
-
-    secondDialogue(dialogue){
-
-        dialogue.setDelay(150);
-
-        const colorirAngulo1 = colorirAngulo(this.triangulo.angles[0])
-                              .setValorInicial(0xff0000)
-                              .setValorFinal(0x0000aa)
-                              .setDuration(100)
-                              .voltarAoInicio(false);
-
-        const colorirAngulo2 = colorirAngulo(this.triangulo.angles[2])
-                              .setValorInicial(0xff0000)
-                              .setValorFinal(0x0000aa)
-                              .setDuration(100)
-                              .voltarAoInicio(false);
-
-        //Atualiza os mostrarAngulos para eles serem selecionados
-        //Atualiza o colorir isoceles depois de ter efetuado as animações
-        return new AnimacaoSimultanea(colorirAngulo1, colorirAngulo2, dialogue)
-                   .setOnStart(() => this.mostrarAngulo.map(mostrar => mostrar.update({dentro:true})))
-    }
-
-    thirdDialogue(dialogue, tracejado){
-
-        const mostrarTracejado = new MostrarTracejado(tracejado, this.scene)
-                                    .setDelay(100)
-                                    .setOnDelay(() => {
-                                        triangle2.renderEdges();
-                                        triangle2.edges.map(edge => edge.addToScene(this.scene))
-                                    })
-
-        const triangle2 = new Triangle([[3,3,0],[1.5,1.5,0],[3,0,0]])
-                        .renderVertices()
-                        .renderAngles()
-
-        const triangle3 = new Triangle([[3,0,0],[1.5,1.5,0],[0,0,0]])
-                        .renderVertices()
-                        .renderAngles()
-
-        return new AnimacaoSimultanea(dialogue, mostrarTracejado)
-                   .setOnStart(() => {
-                    //    Criar uma animação, usar aquela do circulo trigonométrico?
-                       triangle3.addToScene(this.scene);
-                       triangle2.addToScene(this.scene);
-                       this.mostrarAngulo.map(anguloMostrado => anguloMostrado.update({dentro:false}))
-                    })
-                    .setOnTermino(() => {
-                        triangle2.removeFromScene();
-                        triangle3.removeFromScene();
-                    })
-    }
-
-    fourthDialogue(dialogue, tracejado) {
-
-         // TODO: fazer divisao 
-        const divisao = new Divisao(this.triangulo.edges[0],this.triangulo.edges[1]).addToScene(this.scene);
-
-        const colorirAresta1 = colorirAngulo(this.triangulo.edges[0])
-                               .setValorInicial(0xe525252)
-                               .setValorFinal(0xaa0000)
-                               .setDuration(50)
-                               .voltarAoInicio(false);
-
-        const colorirAresta2 = colorirAngulo(this.triangulo.edges[1])
-                               .setValorInicial(0xe525252)
-                               .setValorFinal(0x0000aa)
-                               .setDuration(50)
-                               .voltarAoInicio(false);
+        const anim1 = new AnimacaoSimultanea(bracket.animacao(), new TextoAparecendo(lado1.element).setProgresso(0))
+        const anim2 = new AnimacaoSimultanea(bracket2.animacao(), new TextoAparecendo(lado2.element).setProgresso(0))
+        const anim3 = new AnimacaoSimultanea(bracket3.animacao(), new TextoAparecendo(lado3.element).setProgresso(0))
+        const anim4 = new TextoAparecendo(this.text.element).setProgresso(0);
         
-        const divisaoColorida = new AnimacaoSequencial(colorirAresta1, colorirAresta2, divisao);
+        const removeAll = () => {this.scene.remove(bracket.mesh);    
+                                 this.scene.remove(bracket2.mesh); 
+                                 this.scene.remove(bracket3.mesh);
+        }
 
-        return new AnimacaoSimultanea(dialogue, divisaoColorida)
-                   .setOnTermino(() => {
-                         this.scene.remove(tracejado.mesh)
-                         colorirAresta1.setProgresso(0);
-                         colorirAresta2.setProgresso(0);
-                    });
+        this.animar(new AnimacaoSequencial(anim1,anim2,anim3.setOnTermino(removeAll),anim4))
+
+        new Pythagoras(this);
     }
 
     //Cria a caixa de texto onde o texto vai aparecer
@@ -326,6 +246,37 @@ export class Fase3 {
             span.textContent = character;
             this.text.element.appendChild(span);
         });
+    }
+
+    createEquationBox(equation, position){
+
+        const container = document.createElement('p');
+        container.style.fontSize = "25px";
+        container.style.fontWeight ="italic";
+        container.style.display = 'inline-block';
+
+        // Split the text into individual characters
+        const characters = equation.split('');
+
+        // Create spans for each character and apply the fading effect
+        characters.forEach((character,index) => {
+            const span = document.createElement('span');
+            span.textContent = character;
+            container.appendChild(span);
+        });
+
+        // Create the CSS2DObject using the container
+        const cPointLabel = new CSS2DObject(container);       
+
+        cPointLabel = cPointLabel;
+
+        cPointLabel.position.x = position[0];
+        cPointLabel.position.y = position[1];
+        cPointLabel.position.z = position[2];
+
+        this.scene.add(cPointLabel);
+
+        return cPointLabel;
     }
 
     createControlers(){

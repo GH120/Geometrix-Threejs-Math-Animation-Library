@@ -41,6 +41,11 @@ export default class DesenharMalha extends Animacao{
         return this;
     }
 
+    onTermino(){
+        this.scene.remove(this.malha);
+        this.objeto.visible = true;
+    }
+
     interpolacao(inicial, final, peso){
 
         const curva = (x) => Math.sin((x * Math.PI) / 2);

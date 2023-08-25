@@ -45,10 +45,6 @@ const triangle = new Triangle()
 
 const programa = new Fase3(triangle,scene,camera);
 
-const bracket = new Bracket(1,0.2).addToScene(scene);
-
-programa.animar(bracket.animacao());
-
 //Loop de animação
 function animate() {
     requestAnimationFrame( animate );

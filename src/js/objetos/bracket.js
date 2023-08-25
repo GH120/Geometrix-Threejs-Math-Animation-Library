@@ -106,7 +106,7 @@ export default class Bracket{
   }
 
   update(){
-      
+    
       this.scene.remove(this.mesh);
 
       this.renderMalha();

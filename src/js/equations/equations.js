@@ -28,3 +28,46 @@ document.addEventListener("DOMContentLoaded", function() {
         equationWindow.classList.add("hidden");
     });
 });
+
+export default class Equation{
+
+    updateEquationContent() {
+
+        const equationContent = document.createElement("div");
+        equationContent.id = "equationContent";
+
+        equationContent.style.fontFamily = "Courier New, monospace";
+        equationContent.style.fontSize = "25px";
+        equationContent.style.fontWeight ="italic";
+      
+        const equationWindow = document.getElementById("equationWindow");
+      
+        equationWindow.insertBefore(equationContent, equationWindow.firstChild);
+      
+        this.equation.split(/([abc])/)
+                  .map(letters => {
+      
+                          if(this.variables[letters]) 
+                              return this.addButtonToEquation(...this.variables[letters])
+      
+                          const span = document.createElement("span");
+      
+                          span.textContent = letters;
+      
+                          return span;
+                      })
+                  .map(element => equationContent.append(element))
+      
+      }
+      
+      addButtonToEquation(letter, clickFunction) {
+        const button = document.createElement("button");
+        button.className = "equation-letter";
+        button.textContent = letter;
+        button.addEventListener("click", function() {
+            clickFunction(letter);
+        });
+      
+        return button
+      }
+}

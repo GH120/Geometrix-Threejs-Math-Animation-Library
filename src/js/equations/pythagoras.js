@@ -11,31 +11,26 @@ export default class Pythagoras extends Equation{
 
         this.equation = "a² + b² = c²";
 
-        const cateto     = this.lado(false);
-        const hipotenusa = this.lado(true);
-
         this.variables = {
-            'a': ['a', cateto],
-            'b': ['b', cateto],
-            'c': ['c', hipotenusa]
+            'a': ['a', this.lado(false, 'a')],
+            'b': ['b', this.lado(false, 'b')],
+            'c': ['c', this.lado(true,  'c')]
         }
 
-        this.updateEquationContent()
-        this.updateEquationContent()
-        this.updateEquationContent()
-        this.updateEquationContent()
         this.updateEquationContent()
 
     }
 
     //Retorna uma função se diz se o lado é ou não hipotenusa/cateto
-    lado(isHipotenusa){
+    lado(isHipotenusa, name){
 
         const triangulo = this.programa.triangulo;
 
         if(!triangulo.retangulo()) return this.falhou();
 
         return function(){
+
+            if(!this.instancia) this.criarInstancia(name);
         
             let index = 0;
             for(const lado of triangulo.edges){
@@ -88,7 +83,42 @@ export default class Pythagoras extends Equation{
         alert("falhou");
     }
 
+    //Valores necessários => nome da instancia, botão da instância
     selecionar(lado){
         alert("sucesso");
+        
+        //Pegar valor do lado e substituir na instancia
+        this.instancia.adicionar(lado);
+    }
+
+    criarInstancia(name){
+        const equationContent = document.createElement("div");
+        equationContent.id = "equationContent";
+
+        equationContent.style.fontFamily = "Courier New, monospace";
+        equationContent.style.fontSize = "25px";
+        equationContent.style.fontWeight ="italic";
+      
+        const equationWindow = document.getElementById("equationWindow");
+      
+        equationWindow.insertBefore(equationContent, equationWindow.firstChild);
+      
+        this.equation.split(/([abc])/)
+                  .map(letters => {
+
+                          if(this.variables[letters]){
+                            const button = this.addButtonToEquation("(  )", () => console.log("yes"))
+
+                            if(name == letters) button.style.color = "red";
+
+                            return button;
+                          }
+                          const span = document.createElement("span");
+      
+                          span.textContent = letters;
+      
+                          return span;
+                      })
+                  .map(element => equationContent.append(element))
     }
 }

@@ -38,6 +38,10 @@ export class Fase3 {
         this.setupInterface();
         this.setupTextBox();
 
+        triangle.edges[0].valor = "(x-2)";
+        triangle.edges[1].valor = "(x-1)";
+        triangle.edges[2].valor = "x";
+
         this.levelDesign();
     }
 

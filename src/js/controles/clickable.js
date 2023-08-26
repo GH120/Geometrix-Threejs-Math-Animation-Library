@@ -60,7 +60,7 @@ export class Clickable {
     return this;
   }
 
-  removeObserver(criteria){
+  removeObserver(criteria = () => false){
     this.observers = this.observers.filter(criteria);
     return this;
   }

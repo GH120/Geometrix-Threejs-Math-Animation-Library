@@ -9,6 +9,8 @@ export default class Pythagoras extends Equation{
 
         this.programa = programa;
 
+        this.clickables = [];
+
         this.equation = "a² + b² = c²";
 
         this.variables = {
@@ -22,7 +24,7 @@ export default class Pythagoras extends Equation{
     }
 
     //Retorna uma função se diz se o lado é ou não hipotenusa/cateto
-    lado(isHipotenusa, name){
+    lado(isHipotenusa, variavel){
 
         const triangulo = this.programa.triangulo;
 
@@ -30,22 +32,23 @@ export default class Pythagoras extends Equation{
 
         return function(){
 
-            if(!this.instancia) this.criarInstancia(name);
-        
+            if(!this.instancia) this.criarInstancia(variavel);
+
+            //this.instancia.elements.filter(e => e.identity == variavel).map(e => e.style.color == "red");
+
             let index = 0;
             for(const lado of triangulo.edges){
 
                 const anguloOposto = triangulo.angles[(index++ +2) % 3];
 
-                this.criarControles(lado, anguloOposto, isHipotenusa)
-
+                this.criarControles(lado, anguloOposto, isHipotenusa, variavel)
                 
             }
         }.bind(this);
     }
 
     //Cria os controles de um lado
-    criarControles(lado, angulo, isHipotenusa){
+    criarControles(lado, angulo, isHipotenusa, variavel){
 
         //Controle de click, aciona quando o lado é clicado
         const clickable = new Clickable(lado, this.programa.camera)
@@ -69,7 +72,7 @@ export default class Pythagoras extends Equation{
 
                     if(lado.selecionado) return this.falhou();
 
-                    return this.selecionar(lado);
+                    return this.selecionar(lado, variavel);
                 }
 
                 return null;
@@ -77,6 +80,8 @@ export default class Pythagoras extends Equation{
 
             clickable.addObserver({update:atualizar})
         }
+
+        this.clickables.push(clickable);
     }
 
     falhou(){
@@ -84,41 +89,49 @@ export default class Pythagoras extends Equation{
     }
 
     //Valores necessários => nome da instancia, botão da instância
-    selecionar(lado){
+    selecionar(lado, variavel){
         alert("sucesso");
-        
-        //Pegar valor do lado e substituir na instancia
-        this.instancia.adicionar(lado);
+
+        const ladoAntigo = this.variables[variavel][2];
+
+        if(ladoAntigo && ladoAntigo != lado) ladoAntigo.selecionado = false;
+
+        this.variables[variavel][2] = lado;
+
+
+
+        if(lado.selecionado) return;
+
+        const ocorrenciasDaVariavel = this.instancia.elements.filter(e => e.identity == variavel);
+
+        ocorrenciasDaVariavel.map(x => x.textContent = lado.valor);
+
+        ocorrenciasDaVariavel.map(x => x.style.color = "gray")
+
+        lado.selecionado = true;
+
+        this.clickables.map(clickable => clickable.removeObserver())
+
+        console.log(this.clickables)
+
     }
 
-    criarInstancia(name){
-        const equationContent = document.createElement("div");
-        equationContent.id = "equationContent";
+    criarInstancia(variavel){
 
-        equationContent.style.fontFamily = "Courier New, monospace";
-        equationContent.style.fontSize = "25px";
-        equationContent.style.fontWeight ="italic";
-      
-        const equationWindow = document.getElementById("equationWindow");
-      
-        equationWindow.insertBefore(equationContent, equationWindow.firstChild);
-      
-        this.equation.split(/([abc])/)
-                  .map(letters => {
+        if(this.instancia) return;
 
-                          if(this.variables[letters]){
-                            const button = this.addButtonToEquation("(  )", () => console.log("yes"))
+        const instancia = new Pythagoras(this.programa);
 
-                            if(name == letters) button.style.color = "red";
+        //Colore a letra selecionada
+        instancia.elements.map(element => element.style.color = (element.textContent == variavel)? "red" : "black")
 
-                            return button;
-                          }
-                          const span = document.createElement("span");
-      
-                          span.textContent = letters;
-      
-                          return span;
-                      })
-                  .map(element => equationContent.append(element))
+        const isVariavel = (e) => this.variables[e.textContent];
+
+        //Transforma todas as letras em espaços em branco
+        instancia.elements.map(element => (isVariavel(element))? element.textContent = "( )" : null)
+
+        instancia.instancia = instancia;
+
+        this.instancia = instancia;
     }
 }

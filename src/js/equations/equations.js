@@ -44,19 +44,19 @@ export default class Equation{
       
         equationWindow.insertBefore(equationContent, equationWindow.firstChild);
       
-        this.equation.split(/([abc])/)
-                  .map(letters => {
-      
-                          if(this.variables[letters]) 
-                              return this.addButtonToEquation(...this.variables[letters])
-      
-                          const span = document.createElement("span");
-      
-                          span.textContent = letters;
-      
-                          return span;
-                      })
-                  .map(element => equationContent.append(element))
+        this.elements = this.equation.split(/([abc])/)
+                                     .map(letters => {
+                                            if(this.variables[letters]) 
+                                                return this.addButtonToEquation(...this.variables[letters])
+                        
+                                            const span = document.createElement("span");
+                        
+                                            span.textContent = letters;
+                        
+                                            return span;
+                                        });
+        
+        this.elements.map(element => equationContent.append(element))
       
       }
       
@@ -64,6 +64,7 @@ export default class Equation{
         const button = document.createElement("button");
         button.className = "equation-letter";
         button.textContent = letter;
+        button.identity = letter;
         button.addEventListener("click", function() {
             clickFunction(letter);
         });

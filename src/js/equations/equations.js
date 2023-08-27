@@ -57,6 +57,8 @@ export default class Equation{
                                         });
         
         this.elements.map(element => equationContent.append(element))
+
+        this.equationContent = equationContent;
       
       }
       

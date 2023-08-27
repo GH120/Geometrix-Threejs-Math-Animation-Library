@@ -1,5 +1,7 @@
 import Equation from "./equations";
+import {TextoAparecendo} from '../animacoes/textoAparecendo'
 import { Clickable } from "../controles/clickable";
+import { colorirAngulo } from "../animacoes/colorirAngulo";
 
 export default class Pythagoras extends Equation{
 
@@ -70,8 +72,6 @@ export default class Pythagoras extends Equation{
 
                 if(estado.clicado){
 
-                    if(lado.selecionado) return this.falhou();
-
                     return this.selecionar(lado, variavel);
                 }
 
@@ -86,12 +86,13 @@ export default class Pythagoras extends Equation{
 
     falhou(){
         alert("falhou");
+
     }
 
     //Valores necessários => nome da instancia, botão da instância
     selecionar(lado, variavel){
-        alert("sucesso");
 
+        //Muda o lado se a variável já tiver um lado
         const ladoAntigo = this.variables[variavel][2];
 
         if(ladoAntigo && ladoAntigo != lado) ladoAntigo.selecionado = false;
@@ -99,8 +100,13 @@ export default class Pythagoras extends Equation{
         this.variables[variavel][2] = lado;
 
 
+        //Se esse lado for selecionado, então recusa execução
+        if(lado.selecionado) return this.falhou();
 
-        if(lado.selecionado) return;
+        //Em caso de sucesso, muda todas as ocorrências da variavel para o valor do lado
+        //Por exemplo, todo "a" vira "x-1"
+        //Remove os controles de selecionar lado e seta o lado para selecionado
+        alert("lado escolhido com sucesso");
 
         const ocorrenciasDaVariavel = this.instancia.elements.filter(e => e.identity == variavel);
 
@@ -108,11 +114,14 @@ export default class Pythagoras extends Equation{
 
         ocorrenciasDaVariavel.map(x => x.style.color = "gray")
 
+        ocorrenciasDaVariavel.map(x => x.valor = lado.valor);
+
         lado.selecionado = true;
 
         this.clickables.map(clickable => clickable.removeObserver())
 
-        console.log(this.clickables)
+        //Se a instância estiver completa, executa animação
+        this.instancia.isComplete();
 
     }
 
@@ -133,5 +142,27 @@ export default class Pythagoras extends Equation{
         instancia.instancia = instancia;
 
         this.instancia = instancia;
+    }
+
+    isComplete(){
+
+        const verdadeiro = this.elements.filter(x => x.identity)
+                                        .map(x => !!x.valor)
+                                        .reduce((a,b) => a && b, true)
+
+        const colorirTexto = (texto) => colorirAngulo(texto)
+                                        .setValorInicial(0x808080)
+                                        .setValorFinal(0x000000)
+                                        .voltarAoInicio(false)
+                                        .setUpdateFunction(function(valor){
+                                            
+                                            for(const child of this.objeto.children){
+                                                child.style.color = `#${valor.toString(16)}`
+                                            }
+                                        })
+
+        if(verdadeiro){
+            this.programa.animar(colorirTexto(this.equationContent));
+        }
     }
 }

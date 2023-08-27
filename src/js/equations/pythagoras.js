@@ -3,6 +3,7 @@ import {TextoAparecendo} from '../animacoes/textoAparecendo'
 import { Clickable } from "../controles/clickable";
 import { colorirAngulo } from "../animacoes/colorirAngulo";
 import { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/animation";
+import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
 
 export default class Pythagoras extends Equation{
 
@@ -127,7 +128,7 @@ export default class Pythagoras extends Equation{
 
     }
 
-    criarInstancia(variavel){
+    criarInstancia(){
 
         if(this.instancia) return;
 
@@ -162,14 +163,32 @@ export default class Pythagoras extends Equation{
                                         
         
         const mudarDialogo = new TextoAparecendo(this.programa.text.element)
-                               .setDuration(600)
+                               .setDuration(300)
                                .setOnStart(() => this.programa.changeText("resolva a equação para encontrar x"))
         
         const animacao = new AnimacaoSimultanea(colorirTexto(this.equationContent), mudarDialogo);
 
-
         if(verdadeiro){
             this.programa.animar(animacao);
+
+            const instancia = this.instancia;
+            
+            instancia.elements.map((element, index) => {
+
+                if(element.identity){
+
+                    console.log(instancia.variables[element.identity])
+    
+                    element.onclick = () =>{
+    
+                        const multiplicar = new ExpoenteParaMult(this.equationContent, element, instancia.elements[index+1]);
+    
+                        this.programa.animar(multiplicar)
+    
+                    }
+    
+                }
+            })
         }
     }
 }

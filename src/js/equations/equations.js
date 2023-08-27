@@ -44,7 +44,7 @@ export default class Equation{
       
         equationWindow.insertBefore(equationContent, equationWindow.firstChild);
       
-        this.elements = this.equation.split(/([abc])/)
+        this.elements = this.equation.split(/([abc ])/)
                                      .map(letters => {
                                             if(this.variables[letters]) 
                                                 return this.addButtonToEquation(...this.variables[letters])
@@ -67,9 +67,8 @@ export default class Equation{
         button.className = "equation-letter";
         button.textContent = letter;
         button.identity = letter;
-        button.addEventListener("click", function() {
-            clickFunction(letter);
-        });
+        button.onclick = () => clickFunction(letter)
+
       
         return button
       }

@@ -2,6 +2,7 @@ import Equation from "./equations";
 import {TextoAparecendo} from '../animacoes/textoAparecendo'
 import { Clickable } from "../controles/clickable";
 import { colorirAngulo } from "../animacoes/colorirAngulo";
+import { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/animation";
 
 export default class Pythagoras extends Equation{
 
@@ -36,7 +37,8 @@ export default class Pythagoras extends Equation{
 
             if(!this.instancia) this.criarInstancia(variavel);
 
-            //this.instancia.elements.filter(e => e.identity == variavel).map(e => e.style.color == "red");
+             //Colore a letra selecionada
+            this.instancia.elements.map(element => (element.identity == variavel)? element.style.color = "red" : null)
 
             let index = 0;
             for(const lado of triangulo.edges){
@@ -131,9 +133,6 @@ export default class Pythagoras extends Equation{
 
         const instancia = new Pythagoras(this.programa);
 
-        //Colore a letra selecionada
-        instancia.elements.map(element => element.style.color = (element.textContent == variavel)? "red" : "black")
-
         const isVariavel = (e) => this.variables[e.textContent];
 
         //Transforma todas as letras em espaços em branco
@@ -157,12 +156,20 @@ export default class Pythagoras extends Equation{
                                         .setUpdateFunction(function(valor){
                                             
                                             for(const child of this.objeto.children){
-                                                child.style.color = `#${valor.toString(16)}`
+                                                if(child.identity) child.style.color = `#${valor.toString(16)}`
                                             }
                                         })
+                                        
+        
+        const mudarDialogo = new TextoAparecendo(this.programa.text.element)
+                               .setDuration(600)
+                               .setOnStart(() => this.programa.changeText("resolva a equação para encontrar x"))
+        
+        const animacao = new AnimacaoSimultanea(colorirTexto(this.equationContent), mudarDialogo);
+
 
         if(verdadeiro){
-            this.programa.animar(colorirTexto(this.equationContent));
+            this.programa.animar(animacao);
         }
     }
 }

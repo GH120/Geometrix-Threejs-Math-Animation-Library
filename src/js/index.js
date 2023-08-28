@@ -59,6 +59,28 @@ window.addEventListener('resize', function() {
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+function pixelToCoordinates(x,y){
+
+  const raycaster = new THREE.Raycaster();
+
+  raycaster.setFromCamera(normalizar(x,y), camera);
+    
+  const intersects = raycaster.intersectObject(programa.draggable[0].plane);
+
+  if (intersects.length > 0) {
+    // Update the object's position to the intersection point
+    return intersects[0].point;
+  }
+}
+
+function normalizar(x, y) {
+  const rect = canvas.getBoundingClientRect();
+  const normalizedX = (x - rect.left) / canvas.width * 2 - 1;
+  const normalizedY = -(y - rect.top) / canvas.height * 2 + 1;
+  return new THREE.Vector2(normalizedX,normalizedY);
+}
+
+
 document.addEventListener("DOMContentLoaded", function() {
     const openButton = document.getElementById("openEquationWindow");
     const closeButton = document.getElementById("closeButton");
@@ -74,8 +96,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // Create a mesh using the geometry and material
     const whitePlane = new THREE.Mesh(planeGeometry, whiteMaterial);
 
-    whitePlane.position.x = -4.4
+    whitePlane.position.x = -4.5
     whitePlane.position.y = -2.7
+    whitePlane.position.z = -0.1
 
     scene.add(whitePlane);
 
@@ -85,6 +108,15 @@ document.addEventListener("DOMContentLoaded", function() {
         openButton.classList.add("hidden");
         equationWindow.classList.remove("hidden");
         whitePlane.visible = true;
+
+        const retangulo = equationWindow.children[1].getBoundingClientRect();
+        const ponto1 = pixelToCoordinates(retangulo.left, retangulo.bottom);
+        const ponto2 = pixelToCoordinates(retangulo.right, retangulo.bottom);
+        console.log(retangulo);
+        console.log(pixelToCoordinates(retangulo.left, retangulo.bottom))
+        console.log(pixelToCoordinates(retangulo.right, retangulo.bottom))
+
+        new Bracket(0.2, [ponto1.x - 0.4,ponto1.y - 0.2,0],[ponto2.x-0.4,ponto2.y-0.2,0]).addToScene(scene)
     });
 
     closeButton.addEventListener("click", function() {

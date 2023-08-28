@@ -70,7 +70,7 @@ export class Fase3 {
                                  this.scene.remove(bracket3.mesh);
         }
 
-        this.animar(new AnimacaoSequencial(anim1,anim2,anim3.setOnTermino(removeAll),anim4))
+        this.animar(new AnimacaoSequencial(anim1,anim2,anim3.setOnTermino(removeAll),anim4).manterExecucaoTodos(true))
 
         new Pythagoras(this);
     }

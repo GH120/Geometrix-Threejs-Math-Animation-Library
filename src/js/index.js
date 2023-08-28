@@ -80,6 +80,18 @@ function normalizar(x, y) {
   return new THREE.Vector2(normalizedX,normalizedY);
 }
 
+function createBracket(element){
+
+  const retangulo = element.getBoundingClientRect();
+  const ponto1 = pixelToCoordinates(retangulo.left, retangulo.bottom);
+  const ponto2 = pixelToCoordinates(retangulo.right, retangulo.bottom);
+  console.log(retangulo);
+  console.log(pixelToCoordinates(retangulo.left, retangulo.bottom))
+  console.log(pixelToCoordinates(retangulo.right, retangulo.bottom))
+
+  new Bracket(0.2, [ponto1.x - 0.4,ponto1.y - 0.2,0],[ponto2.x-0.4,ponto2.y-0.2,0]).addToScene(scene)
+}
+
 
 document.addEventListener("DOMContentLoaded", function() {
     const openButton = document.getElementById("openEquationWindow");
@@ -109,14 +121,9 @@ document.addEventListener("DOMContentLoaded", function() {
         equationWindow.classList.remove("hidden");
         whitePlane.visible = true;
 
-        const retangulo = equationWindow.children[1].getBoundingClientRect();
-        const ponto1 = pixelToCoordinates(retangulo.left, retangulo.bottom);
-        const ponto2 = pixelToCoordinates(retangulo.right, retangulo.bottom);
-        console.log(retangulo);
-        console.log(pixelToCoordinates(retangulo.left, retangulo.bottom))
-        console.log(pixelToCoordinates(retangulo.right, retangulo.bottom))
-
-        new Bracket(0.2, [ponto1.x - 0.4,ponto1.y - 0.2,0],[ponto2.x-0.4,ponto2.y-0.2,0]).addToScene(scene)
+        for(const child of equationWindow.children[2].children){
+          if(child.identity) createBracket(child)
+        }
     });
 
     closeButton.addEventListener("click", function() {

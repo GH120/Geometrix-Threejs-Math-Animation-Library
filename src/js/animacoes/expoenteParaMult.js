@@ -38,8 +38,9 @@ export class ExpoenteParaMult extends Animacao{
         //Gambiarra pra enganar o css, aumenta o tamanho do container da base
         const filler = document.createElement("span");
 
-        filler.textContent = "*" + this.base.textContent;
-
+        filler.style.display = "inline-block";
+        filler.style.width = "1px";
+        filler.style.height = "1px";
         filler.style.color = "white"
 
         //Copia o valor da base 
@@ -66,7 +67,7 @@ export class ExpoenteParaMult extends Animacao{
                             .setOnStart(() => {
                                 this.base.appendChild(mult)
                             })
-
+        
         const posicionarCopia = new Animacao(copia)
                                 .setValorInicial(4*length)
                                 .setValorFinal(15 + 9.5*length)
@@ -76,8 +77,10 @@ export class ExpoenteParaMult extends Animacao{
                                 })
                                 .setUpdateFunction(function(valor){
                                     copia.style.left = `${valor}px`
+
+                                    filler.style.width = `${Math.round(valor)}px`
                                 })
-                                .setOnStart(() => {this.base.appendChild(copia);this.base.appendChild(filler)})
+                                .setOnStart(() => {this.base.appendChild(copia); this.base.appendChild(filler)})
                                 .voltarAoInicio(false)
 
         return new AnimacaoSimultanea(mostrarMult, posicionarCopia);
@@ -89,8 +92,6 @@ export class ExpoenteParaMult extends Animacao{
                                         .setValorInicial(4)
                                         .setValorFinal(-20);
 
-        yield* desaparecerExpoente.getFrames();
-
-        yield* this.moverBase().getFrames();
+        yield* new AnimacaoSequencial(desaparecerExpoente, this.moverBase()).getFrames()
     }
 }

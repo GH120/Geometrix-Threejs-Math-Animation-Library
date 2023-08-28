@@ -52,7 +52,7 @@ export class Fase3 {
 
         this.changeText(dialogo[0]);
 
-        const lado1 = this.createEquationBox("(x - 1)",[3.9,1.5,0])
+        const lado1 = this.createEquationBox("(x - 1)",[4.1,1.5,0])
         const lado2 = this.createEquationBox("(x - 2)",[1.5,-0.5,0])
         const lado3 = this.createEquationBox("x",[1.1,2,0])
 
@@ -118,7 +118,8 @@ export class Fase3 {
 
         const container = document.createElement('p');
         container.style.fontSize = "25px";
-        container.style.fontWeight ="italic";
+        container.style.fontFamily = "Courier New, monospace";
+        container.style.fontWeight = 540;
         container.style.display = 'inline-block';
 
         // Split the text into individual characters

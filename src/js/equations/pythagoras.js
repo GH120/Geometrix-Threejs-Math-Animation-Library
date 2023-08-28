@@ -64,7 +64,7 @@ export default class Pythagoras extends Equation{
 
         if(falhou){
 
-            const atualizar = (estado) => (estado.clicado)? this.falhou() : null;
+            const atualizar = (estado) => (estado.clicado)? alert((!isHipotenusa)? "precisa ser cateto, escolheu hipotenusa" : "precisa ser hipotenusa, escolheu cateto") : null;
 
             clickable.addObserver({update: atualizar})
         }
@@ -104,7 +104,7 @@ export default class Pythagoras extends Equation{
 
 
         //Se esse lado for selecionado, então recusa execução
-        if(lado.selecionado) return this.falhou();
+        if(lado.selecionado) return this.falhou()
 
         //Em caso de sucesso, muda todas as ocorrências da variavel para o valor do lado
         //Por exemplo, todo "a" vira "x-1"

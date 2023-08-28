@@ -56,9 +56,9 @@ export class Fase3 {
         const lado2 = this.createEquationBox("(x - 2)",[1.5,-0.5,0])
         const lado3 = this.createEquationBox("x",[1.1,2,0])
 
-        const bracket = new Bracket(1,0.2).addToScene(this.scene);
-        const bracket2 = new Bracket(1,0.2, new THREE.Vector3(-0.4,-0.35,0), new THREE.Vector3(2.6,-0.35,0)).addToScene(this.scene)
-        const bracket3 = new Bracket(1,-0.2, new THREE.Vector3(-0.3,0.3,0), new THREE.Vector3(2.7,3.3,0)).addToScene(this.scene)
+        const bracket = new Bracket(0.2).addToScene(this.scene);
+        const bracket2 = new Bracket(0.2, [-0.4,-0.35,0], [2.6,-0.35,0]).addToScene(this.scene)
+        const bracket3 = new Bracket(-0.2, [-0.3,0.3,0], [2.7,3.3,0]).addToScene(this.scene)
 
         const anim1 = new AnimacaoSimultanea(bracket.animacao(), new TextoAparecendo(lado1.element).setProgresso(0))
         const anim2 = new AnimacaoSimultanea(bracket2.animacao(), new TextoAparecendo(lado2.element).setProgresso(0))
@@ -134,8 +134,6 @@ export class Fase3 {
 
         // Create the CSS2DObject using the container
         const cPointLabel = new CSS2DObject(container);       
-
-        cPointLabel = cPointLabel;
 
         cPointLabel.position.x = position[0];
         cPointLabel.position.y = position[1];

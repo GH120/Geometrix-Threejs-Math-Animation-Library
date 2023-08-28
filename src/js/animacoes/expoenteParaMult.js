@@ -70,7 +70,7 @@ export class ExpoenteParaMult extends Animacao{
         
         const posicionarCopia = new Animacao(copia)
                                 .setValorInicial(4)
-                                .setValorFinal(15 + 9.5*length)
+                                .setValorFinal(15 + 11*length)
                                 .setDuration(120)
                                 .setInterpolacao(function(inicial,final,peso){
                                     return inicial*(1-peso) + final*peso;

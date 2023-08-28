@@ -21,11 +21,6 @@ const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.inner
 const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
 renderer.setSize( window.innerWidth, window.innerHeight );
 
-const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
-scene.add( directionalLight );
-const light = new THREE.AmbientLight( 0x606060 ); // soft white light
-scene.add( light );
-
 camera.position.z = 5;
 
 scene.background = new THREE.TextureLoader().load(grid);
@@ -62,4 +57,39 @@ window.addEventListener('resize', function() {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const openButton = document.getElementById("openEquationWindow");
+    const closeButton = document.getElementById("closeButton");
+    const equationWindow = document.getElementById("equationWindow");
+
+
+    //Gambiarra para os objetos estarem em cima do html, mas ter um fundo branco ao invés do background do threejs
+    const planeGeometry = new THREE.PlaneGeometry(6, 4); // Width, height
+
+    // Create a white material
+    const whiteMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // White color
+
+    // Create a mesh using the geometry and material
+    const whitePlane = new THREE.Mesh(planeGeometry, whiteMaterial);
+
+    whitePlane.position.x = -4.4
+    whitePlane.position.y = -2.7
+
+    scene.add(whitePlane);
+
+    whitePlane.visible = false;
+
+    openButton.addEventListener("click", function() {
+        openButton.classList.add("hidden");
+        equationWindow.classList.remove("hidden");
+        whitePlane.visible = true;
+    });
+
+    closeButton.addEventListener("click", function() {
+        openButton.classList.remove("hidden");
+        equationWindow.classList.add("hidden");
+        whitePlane.visible = false;
+    });
 });

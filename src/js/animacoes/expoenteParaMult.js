@@ -69,7 +69,7 @@ export class ExpoenteParaMult extends Animacao{
                             })
         
         const posicionarCopia = new Animacao(copia)
-                                .setValorInicial(4*length)
+                                .setValorInicial(4)
                                 .setValorFinal(15 + 9.5*length)
                                 .setDuration(120)
                                 .setInterpolacao(function(inicial,final,peso){
@@ -92,6 +92,11 @@ export class ExpoenteParaMult extends Animacao{
                                         .setValorInicial(4)
                                         .setValorFinal(-20);
 
-        yield* new AnimacaoSequencial(desaparecerExpoente, this.moverBase()).getFrames()
+        //Gambiarra pra ter delay antes da execução
+        const fillerFrames = new TextoAparecendo(this.expoente)
+                                .setUpdateFunction(() => null)
+                                .setDuration(40);
+
+        yield* new AnimacaoSimultanea(desaparecerExpoente, new AnimacaoSequencial(fillerFrames, this.moverBase())).getFrames()
     }
 }

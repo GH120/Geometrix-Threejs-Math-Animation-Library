@@ -42,7 +42,7 @@ export default class Equation{
       
         const equationWindow = document.getElementById("equationWindow");
       
-        equationWindow.insertBefore(equationContent, equationWindow.firstChild);
+        equationWindow.insertBefore(equationContent, equationWindow.lastChild);
       
         this.elements = this.equation.split(/([abc ])/)
                                      .map(letters => {

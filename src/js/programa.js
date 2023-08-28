@@ -197,6 +197,8 @@ export class Programa {
     setupInterface(){
         const gui = new dat.GUI();
 
+        const programa = this;
+
         //Configurações
         const options = {
         "tamanho da esfera": 0.1,
@@ -207,7 +209,7 @@ export class Programa {
 
         mudarFuncaoTrigonometrica: {
             toggleFunction: function() { 
-                button.name(`Mostrando ${this.mudarFuncaoTrigonometrica().estado.nome}`);
+                button.name(`Mostrando ${programa.mudarFuncaoTrigonometrica().estado.nome}`);
             }
         }
         };

@@ -4,7 +4,10 @@ import { AnimacaoSequencial } from '../animacoes/animation';
 
 export default class Bracket{
 
-  constructor(largura, altura, ponto1=new THREE.Vector3(3,0,0), ponto2=new THREE.Vector3(3,3,0)){
+  constructor(altura=0.2, ponto1=[3,0,0], ponto2=[3,3,0]){
+
+      ponto1 = new THREE.Vector3(...ponto1);
+      ponto2 = new THREE.Vector3(...ponto2);
 
       this.largura = ponto1.clone().sub(ponto2).length()*0.5;
 
@@ -46,7 +49,7 @@ export default class Bracket{
 
   criarCurva(points){
 
-      points = points.map(p => p.applyMatrix4(this.matrix))
+      points = points.map(ponto => ponto.applyMatrix4(this.matrix))
 
       const curve = new THREE.CubicBezierCurve3(...points);
 
@@ -71,8 +74,6 @@ export default class Bracket{
 
     const translation = new THREE.Matrix4().makeTranslation(meio.x+this.altura+0.2,meio.y,meio.z);
 
-    console.log(translation)
-
     //Rotação
     const angulacao = ponto2.clone().sub(ponto1).normalize();
 
@@ -96,7 +97,24 @@ export default class Bracket{
     return new AnimacaoSequencial(
                     new DesenharMalha(this.mesh.children[0],this.scene).reverse(),
                     new DesenharMalha(this.mesh.children[1],this.scene)
-            )
+              )
+              .setOnTermino(() => this.scene.remove(this.mesh))
+
+  }
+
+  setOrigemDestino(origem,destino){
+
+      origem  = new THREE.Vector3(...origem);
+
+      destino = new THREE.Vector3(...destino);
+
+      this.largura = destino.clone().sub(origem).length()*0.5;
+
+      this.calculateMatrix(origem,destino);
+
+      this.renderMalha();
+
+      return this;
   }
 
   addToScene(scene){

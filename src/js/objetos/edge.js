@@ -63,4 +63,8 @@ export class Edge {
     get quaternion(){
         return this.mesh.quaternion;
     }
+
+    get hitbox(){
+        return this.mesh;
+    }
 }

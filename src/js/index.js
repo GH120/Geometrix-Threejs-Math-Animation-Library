@@ -6,6 +6,7 @@ import { Fase } from './fases/fase1';
 import { Fase2 } from './fases/fase2';
 import Bracket from './objetos/bracket'
 import DesenharMalha from './animacoes/desenharMalha';
+import { Fase3 } from './fases/fase3';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
@@ -42,11 +43,7 @@ const triangle = new Triangle()
                     .renderAngles()
                     .addToScene(scene);
 
-const programa = new Fase(triangle,scene,camera);
-
-const bracket = new Bracket(1,0.2).addToScene(scene);
-
-programa.animar(bracket.animacao());
+const programa = new Fase3(triangle,scene,camera);
 
 //Loop de animação
 function animate() {
@@ -66,4 +63,3 @@ window.addEventListener('resize', function() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
 });
-  

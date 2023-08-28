@@ -101,6 +101,105 @@ table {
             padding: 0 0 1em 0;
             list-style-type: none;
         }
+
+        #openEquationWindow{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        #equationWindow {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 40%;
+            width: 40%;
+            justify-content: center;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-top-right-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            border-top: 1px solid black;
+    border-right: 1px solid black;
+    pointer-events: none;
+        }
+
+        .equation-letter {
+            padding: 5px;
+            font-size:25px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family:"Courier New, monospace";
+            font-weight:"italic";
+            pointer-events:all;
+            display:inline-block
+        }
+
+        
+        .equation-letter:hover {
+            color: rgba(100, 100, 100, 0.9); /* Change background color on hover */
+        }
+
+        
+        .equation-letter:hover::before {
+            opacity: 1; /* Show the shine on hover */
+        }
+
+        #closeButton{
+            position: absolute;
+            margin-top:10px;
+            left: 68%;
+            top: 90%;
+            transform: translate(0%, -50%);
+            background-color: rgba(0, 0, 255, 0.8);
+            color: white;
+            width:30%;
+            height:20px;
+            pointer-events:all;
+        }
+        /* CSS */
+        .button-9 {
+        appearance: button;
+        backface-visibility: hidden;
+        background-color: #405cf5;
+        border-radius: 6px;
+        height:30px;
+        border-width: 0;
+        box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset,rgba(50, 50, 93, .1) 0 2px 5px 0,rgba(0, 0, 0, .07) 0 1px 1px 0;
+        box-sizing: border-box;
+        color: #fff;
+        cursor: pointer;
+        font-family: -apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif;
+        line-height: 1.15;
+        outline: none;
+        overflow: hidden;
+        position: relative;
+        text-align: center;
+        text-transform: none;
+        transform: translateZ(0);
+        transition: all .2s,box-shadow .08s ease-in;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        }
+
+        .button-9:disabled {
+        cursor: default;
+        }
+
+        .button-9:focus {
+        box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .2) 0 6px 15px 0, rgba(0, 0, 0, .1) 0 2px 2px 0, rgba(50, 151, 211, .3) 0 0 0 4px;
+        }
+
+        .hidden {
+            display: none;
+        }
         
     </style>
 </head>
@@ -108,6 +207,10 @@ table {
     <script src="./js/index.js" type="module"></script>
     <script src="./js/fasesbotoes.js" type="module"></script>
     <canvas id="triangulo"></canvas>
+    <button id="openEquationWindow" class="button-9">Menu de Equações</button>
+    <div id="equationWindow" class="hidden">
+        <button id="closeButton" class="button-9">Fechar</button>
+    </div>
 
     <!-- <div class="fases">
         <div class="divfase" id="iniciante">

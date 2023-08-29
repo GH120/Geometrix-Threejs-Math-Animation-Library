@@ -175,10 +175,26 @@ document.addEventListener("DOMContentLoaded", function() {
         openButton.classList.add("hidden");
         equationWindow.classList.remove("hidden");
         whitePlane.visible = true;
+        
+        // const a = equationWindow.children[2].children[1];
+        // const b = equationWindow.children[2].children[7];
 
-        distributividade.comutatividade(equationWindow.children[1].children[1], equationWindow.children[1].children[7])
+        // const spanParaCadaLetra = (element) => {
+        //   const text = element.textContent;
+        //   element.innerHtml = "";
+        //   element.textContent = "";
+        //   for(const letter of text.split("")){
+        //     const span = document.createElement("span");
+        //     span.textContent = letter;
+        //     element.appendChild(span);
+        //   }
+        // }
 
-        comutatividade(equationWindow.children[2].children[1], equationWindow.children[2].children[7])
+        // spanParaCadaLetra(a)
+
+        // console.log(a)
+        
+        distributividade.update(equationWindow)
 
         for(const child of equationWindow.children[2].children){
           if(child.identity) createBracket(child)

@@ -43,6 +43,17 @@ export class Distributividade extends Animacao{
         ]);
       }
 
+      update(elemento){
+
+        const a = elemento.children[2];
+
+        this.spanParaCadaLetra(a)
+
+        this.comutatividade(a.children[1],a.children[7]);
+
+
+      }
+
       comutatividade(elemento1, elemento2){
 
         const retangulo1 =  elemento1.getBoundingClientRect()
@@ -72,6 +83,18 @@ export class Distributividade extends Animacao{
         if (intersects.length > 0) {
           // Update the object's position to the intersection point
           return intersects[0].point;
+        }
+      }
+
+      spanParaCadaLetra(element){
+        const text = element.textContent;
+        element.innerHtml = "";
+        element.textContent = "";
+        for(const letter of text.split("")){
+          const span = document.createElement("span");
+          span.textContent = letter;
+          span.classList.add("equation-letter")
+          element.appendChild(span);
         }
       }
 

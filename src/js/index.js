@@ -113,16 +113,15 @@ function curva(points){
   return curveObject;
 }
 
-function desenharSeta(origem, destino){
+function desenharSeta(origem, destino, altura=0.2){
 
-  const vetor = destino.sub(origem);
+  const vetor = new THREE.Vector3().subVectors(destino, origem);
 
-  const ortogonal = new THREE.Vector3().crossVectors(vetor, new THREE.Vector3(0,0,-1)).multiplyScalar(1/4)
+  const ortogonal = new THREE.Vector3().crossVectors(vetor, new THREE.Vector3(0,0,-1)).normalize().multiplyScalar(altura)
 
 
   const p1 = new THREE.Vector3().add(vetor).multiplyScalar(1/3).add(origem).add(ortogonal);
   const p2 = new THREE.Vector3().add(vetor).multiplyScalar(2/3).add(origem).add(ortogonal);
-
 
   scene.add(curva([
     origem,
@@ -134,15 +133,21 @@ function desenharSeta(origem, destino){
 
 function comutatividade(elemento1, elemento2){
 
+  console.log(elemento1,elemento2, "elementos")
+
   const retangulo1 =  elemento1.getBoundingClientRect()
 
   const retangulo2 =  elemento2.getBoundingClientRect()
 
-  const ponto1 = pixelToCoordinates(retangulo1.left, retangulo1.bottom);
+  console.log(retangulo1,retangulo2, "bounding")
 
-  const ponto2 = pixelToCoordinates(retangulo2.right, retangulo2.bottom);
+  const middle = (rect) => (rect.left + rect.right)/2 
 
-  scene.add(curva(ponto1,ponto2));
+  const ponto1 = pixelToCoordinates(middle(retangulo1), retangulo1.top + 10);
+
+  const ponto2 = pixelToCoordinates(middle(retangulo2), retangulo2.top + 10);
+
+  scene.add(desenharSeta(ponto1,ponto2));
 }
 
 
@@ -174,9 +179,7 @@ document.addEventListener("DOMContentLoaded", function() {
         equationWindow.classList.remove("hidden");
         whitePlane.visible = true;
 
-        console.log(equationWindow.children[1])
-        
-        comutatividade(equationWindow.children[1].children[1], equationWindow.children[1].children[7])
+        comutatividade(equationWindow.children[2].children[1], equationWindow.children[2].children[7])
 
         for(const child of equationWindow.children[2].children){
           if(child.identity) createBracket(child)

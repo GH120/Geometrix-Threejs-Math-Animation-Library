@@ -65,7 +65,10 @@ function pixelToCoordinates(x,y){
 
   raycaster.setFromCamera(normalizar(x,y), camera);
     
-  const intersects = raycaster.intersectObject(programa.draggable[0].plane);
+  const intersects = raycaster.intersectObject(new THREE.Mesh(
+    new THREE.PlaneGeometry(100,100),
+    new THREE.MeshBasicMaterial({color:0xffffff})
+  ));
 
   if (intersects.length > 0) {
     // Update the object's position to the intersection point
@@ -90,6 +93,56 @@ function createBracket(element){
   console.log(pixelToCoordinates(retangulo.right, retangulo.bottom))
 
   new Bracket(0.2, [ponto1.x - 0.4,ponto1.y - 0.2,0],[ponto2.x-0.4,ponto2.y-0.2,0]).addToScene(scene)
+}
+
+function curva(points){
+
+  const curve = new THREE.CubicBezierCurve3(...points);
+
+  // Create the curve geometry
+  const numSegments = 100; // Number of segments to approximate the curve
+  const curvePoints = curve.getPoints(numSegments);
+  const curveGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+
+  // Create a material for the curve
+  const curveMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+
+  // Create the curve object
+  const curveObject = new THREE.Line(curveGeometry, curveMaterial);
+
+  return curveObject;
+}
+
+function desenharSeta(origem, destino){
+
+  const vetor = destino.sub(origem);
+
+  const ortogonal = new THREE.Vector3().crossVectors(vetor, new THREE.Vector3(0,0,-1)).multiplyScalar(1/4)
+
+
+  const p1 = new THREE.Vector3().add(vetor).multiplyScalar(1/3).add(origem).add(ortogonal);
+  const p2 = new THREE.Vector3().add(vetor).multiplyScalar(2/3).add(origem).add(ortogonal);
+
+
+  scene.add(curva([
+    origem,
+    p1,
+    p2,
+    destino
+  ]))
+}
+
+function comutatividade(elemento1, elemento2){
+
+  const retangulo1 =  elemento1.getBoundingClientRect()
+
+  const retangulo2 =  elemento2.getBoundingClientRect()
+
+  const ponto1 = pixelToCoordinates(retangulo1.left, retangulo1.bottom);
+
+  const ponto2 = pixelToCoordinates(retangulo2.right, retangulo2.bottom);
+
+  scene.add(curva(ponto1,ponto2));
 }
 
 
@@ -120,6 +173,10 @@ document.addEventListener("DOMContentLoaded", function() {
         openButton.classList.add("hidden");
         equationWindow.classList.remove("hidden");
         whitePlane.visible = true;
+
+        console.log(equationWindow.children[1])
+        
+        comutatividade(equationWindow.children[1].children[1], equationWindow.children[1].children[7])
 
         for(const child of equationWindow.children[2].children){
           if(child.identity) createBracket(child)

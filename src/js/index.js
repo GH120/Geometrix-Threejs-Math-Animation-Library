@@ -7,6 +7,7 @@ import { Fase2 } from './fases/fase2';
 import Bracket from './objetos/bracket'
 import DesenharMalha from './animacoes/desenharMalha';
 import { Fase3 } from './fases/fase3';
+import { Distributividade } from './animacoes/distributividade';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
@@ -88,9 +89,6 @@ function createBracket(element){
   const retangulo = element.getBoundingClientRect();
   const ponto1 = pixelToCoordinates(retangulo.left, retangulo.bottom);
   const ponto2 = pixelToCoordinates(retangulo.right, retangulo.bottom);
-  console.log(retangulo);
-  console.log(pixelToCoordinates(retangulo.left, retangulo.bottom))
-  console.log(pixelToCoordinates(retangulo.right, retangulo.bottom))
 
   new Bracket(0.2, [ponto1.x - 0.4,ponto1.y - 0.2,0],[ponto2.x-0.4,ponto2.y-0.2,0]).addToScene(scene)
 }
@@ -133,13 +131,9 @@ function desenharSeta(origem, destino, altura=0.2){
 
 function comutatividade(elemento1, elemento2){
 
-  console.log(elemento1,elemento2, "elementos")
-
   const retangulo1 =  elemento1.getBoundingClientRect()
 
   const retangulo2 =  elemento2.getBoundingClientRect()
-
-  console.log(retangulo1,retangulo2, "bounding")
 
   const middle = (rect) => (rect.left + rect.right)/2 
 
@@ -174,10 +168,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     whitePlane.visible = false;
 
+    const distributividade = new Distributividade(null)
+                            .addSettings(scene,camera,canvas)
+
     openButton.addEventListener("click", function() {
         openButton.classList.add("hidden");
         equationWindow.classList.remove("hidden");
         whitePlane.visible = true;
+
+        distributividade.comutatividade(equationWindow.children[1].children[1], equationWindow.children[1].children[7])
 
         comutatividade(equationWindow.children[2].children[1], equationWindow.children[2].children[7])
 

@@ -185,34 +185,24 @@ document.addEventListener("DOMContentLoaded", function() {
     openButton.addEventListener("click", function() {
         openButton.classList.add("hidden");
         equationWindow.classList.remove("hidden");
-
+        
+        //Adiciona plano de fundo branco a tela de equações
+        //Ele é um objeto do threejs, que tem as proporções da tela html, que é transparente
         whiteboard = addWhiteBoard(equationWindow);
 
         scene.add(whiteboard);
+
+        //Anima a equação de distributividade
+        const equation = equationWindow.children[0];
         
-        // const a = equationWindow.children[2].children[1];
-        // const b = equationWindow.children[2].children[7];
+        equation.onclick = () => {
 
-        // const spanParaCadaLetra = (element) => {
-        //   const text = element.textContent;
-        //   element.innerHtml = "";
-        //   element.textContent = "";
-        //   for(const letter of text.split("")){
-        //     const span = document.createElement("span");
-        //     span.textContent = letter;
-        //     element.appendChild(span);
-        //   }
-        // }
+          distributividade.update(equation);
 
-        // spanParaCadaLetra(a)
-
-        // console.log(a)
-        
-        distributividade.update(equationWindow)
-
-        for(const child of equationWindow.children[2].children){
-          if(child.identity) createBracket(child)
+          programa.animar(distributividade);
         }
+        
+        createBracket(equation)
     });
 
     closeButton.addEventListener("click", function() {

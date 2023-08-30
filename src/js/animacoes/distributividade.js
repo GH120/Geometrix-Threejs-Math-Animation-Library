@@ -1,10 +1,18 @@
 import Animacao from "./animation";
 import * as THREE from 'three';
+import DesenharMalha from "./desenharMalha";
 
 export class Distributividade extends Animacao{
 
     constructor(objeto){
         super(objeto);
+    }
+
+    *getFrames(){
+
+      for(const animacao of this.animacoes){
+        yield* animacao.getFrames();
+      }
     }
 
     curva(points){
@@ -43,15 +51,21 @@ export class Distributividade extends Animacao{
         ]);
       }
 
-      update(elemento){
+      update(equation){
 
-        const a = elemento.children[2];
+        const ac = this.comutatividade(equation.children[1],equation.children[7]);
 
-        this.spanParaCadaLetra(a)
+        const ad = this.comutatividade(equation.children[1],equation.children[9]);
 
-        this.comutatividade(a.children[1],a.children[7]);
+        const bc = this.comutatividade(equation.children[3],equation.children[7]);
 
+        const bd = this.comutatividade(equation.children[3],equation.children[9]);
 
+        const multiplicacoes = [ac,ad,bc,bd];
+
+        this.animacoes = multiplicacoes.map(resultado => new DesenharMalha(resultado, this.scene));
+
+        this.animacoes.map(animacao => animacao.setDuration(200))
       }
 
       comutatividade(elemento1, elemento2){
@@ -62,11 +76,11 @@ export class Distributividade extends Animacao{
       
         const middle = (rect) => (rect.left + rect.right)/2 
       
-        const ponto1 = this.pixelToCoordinates(middle(retangulo1), retangulo1.top + 10);
+        const ponto1 = this.pixelToCoordinates(middle(retangulo1), retangulo1.top + 6);
       
-        const ponto2 = this.pixelToCoordinates(middle(retangulo2), retangulo2.top + 10);
+        const ponto2 = this.pixelToCoordinates(middle(retangulo2), retangulo2.top + 6);
 
-        this.scene.add(this.desenharSeta(ponto1,ponto2));
+        return this.desenharSeta(ponto1,ponto2);
       }
 
       pixelToCoordinates(x,y){

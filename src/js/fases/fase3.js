@@ -72,7 +72,7 @@ export class Fase3 {
 
         this.animar(new AnimacaoSequencial(anim1,anim2,anim3.setOnTermino(removeAll),anim4).manterExecucaoTodos(true))
 
-        new Pythagoras(this);
+        //new Pythagoras(this);
     }
 
     //Cria a caixa de texto onde o texto vai aparecer

@@ -75,6 +75,7 @@ function pixelToCoordinates(x,y){
     // Update the object's position to the intersection point
     return intersects[0].point;
   }
+
 }
 
 function normalizar(x, y) {
@@ -144,15 +145,20 @@ function comutatividade(elemento1, elemento2){
   scene.add(desenharSeta(ponto1,ponto2));
 }
 
+function addWhiteBoard(equationWindow){
 
-document.addEventListener("DOMContentLoaded", function() {
-    const openButton = document.getElementById("openEquationWindow");
-    const closeButton = document.getElementById("closeButton");
-    const equationWindow = document.getElementById("equationWindow");
+    const rect = equationWindow.getBoundingClientRect();
 
+    const bottomleft = pixelToCoordinates(rect.left, rect.bottom);
+
+    const topright   = pixelToCoordinates(rect.right, rect.top) 
+
+    const width = topright.x - bottomleft.x;
+
+    const height = topright.y - bottomleft.y;
 
     //Gambiarra para os objetos estarem em cima do html, mas ter um fundo branco ao invés do background do threejs
-    const planeGeometry = new THREE.PlaneGeometry(6, 4); // Width, height
+    const planeGeometry = new THREE.PlaneGeometry(width,height); // Width, height
 
     // Create a white material
     const whiteMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // White color
@@ -160,13 +166,18 @@ document.addEventListener("DOMContentLoaded", function() {
     // Create a mesh using the geometry and material
     const whitePlane = new THREE.Mesh(planeGeometry, whiteMaterial);
 
-    whitePlane.position.x = -4.5
-    whitePlane.position.y = -2.7
-    whitePlane.position.z = -0.1
+    whitePlane.position.x = bottomleft.x + width/2;
+    whitePlane.position.y = bottomleft.y + height/2;
 
-    scene.add(whitePlane);
+    return whitePlane;
+}
 
-    whitePlane.visible = false;
+document.addEventListener("DOMContentLoaded", function() {
+    const openButton = document.getElementById("openEquationWindow");
+    const closeButton = document.getElementById("closeButton");
+    const equationWindow = document.getElementById("equationWindow");
+
+    let whiteboard;
 
     const distributividade = new Distributividade(null)
                             .addSettings(scene,camera,canvas)
@@ -174,7 +185,10 @@ document.addEventListener("DOMContentLoaded", function() {
     openButton.addEventListener("click", function() {
         openButton.classList.add("hidden");
         equationWindow.classList.remove("hidden");
-        whitePlane.visible = true;
+
+        whiteboard = addWhiteBoard(equationWindow);
+
+        scene.add(whiteboard);
         
         // const a = equationWindow.children[2].children[1];
         // const b = equationWindow.children[2].children[7];
@@ -204,6 +218,7 @@ document.addEventListener("DOMContentLoaded", function() {
     closeButton.addEventListener("click", function() {
         openButton.classList.remove("hidden");
         equationWindow.classList.add("hidden");
-        whitePlane.visible = false;
+
+        scene.remove(whiteboard)
     });
 });

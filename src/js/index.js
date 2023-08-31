@@ -197,12 +197,14 @@ document.addEventListener("DOMContentLoaded", function() {
         
         equation.onclick = () => {
 
-          distributividade.update(equation);
+          distributividade.update(equation, equationWindow);
 
           programa.animar(distributividade);
+
+          createBracket(equation)
+
         }
         
-        createBracket(equation)
     });
 
     closeButton.addEventListener("click", function() {

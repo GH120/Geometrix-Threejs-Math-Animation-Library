@@ -1,6 +1,7 @@
-import Animacao from "./animation";
+import Animacao, { AnimacaoSequencial } from "./animation";
 import * as THREE from 'three';
 import DesenharMalha from "./desenharMalha";
+import { TextoAparecendo } from "./textoAparecendo";
 
 export class Distributividade extends Animacao{
 
@@ -51,24 +52,31 @@ export class Distributividade extends Animacao{
         ]);
       }
 
-      update(equation){
+      update(equation, window){
 
-        const ac = this.comutatividade(equation.children[1],equation.children[7]);
+        const ac = this.comutatividade(equation.children[1],equation.children[6]);
 
-        const ad = this.comutatividade(equation.children[1],equation.children[9]);
+        const ad = this.comutatividade(equation.children[1],equation.children[7],true);
 
-        const bc = this.comutatividade(equation.children[3],equation.children[7]);
+        const bc = this.comutatividade(equation.children[2],equation.children[6],true);
 
-        const bd = this.comutatividade(equation.children[3],equation.children[9]);
+        const bd = this.comutatividade(equation.children[2],equation.children[7],true);
 
         const multiplicacoes = [ac,ad,bc,bd];
 
-        this.animacoes = multiplicacoes.map(resultado => new DesenharMalha(resultado, this.scene));
+        const equacao = document.createElement("div");
 
-        this.animacoes.map(animacao => animacao.setDuration(200))
+        window.insertBefore(equacao, window.lastChild)
+
+        this.animacoes = multiplicacoes.map(resultado => 
+                          new AnimacaoSequencial(
+                              new DesenharMalha(resultado.seta, this.scene).setDuration(100),
+                              new TextoAparecendo(resultado.html).setOnStart(() => equacao.appendChild(resultado.html)).setDuration(100)
+                          ));
+
       }
 
-      comutatividade(elemento1, elemento2){
+      comutatividade(elemento1, elemento2,hasPlus){
 
         const retangulo1 =  elemento1.getBoundingClientRect()
       
@@ -80,7 +88,28 @@ export class Distributividade extends Animacao{
       
         const ponto2 = this.pixelToCoordinates(middle(retangulo2), retangulo2.top + 6);
 
-        return this.desenharSeta(ponto1,ponto2);
+        return {
+                seta: this.desenharSeta(ponto1,ponto2), 
+                html: this.createEquationBox(elemento1, elemento2,hasPlus)
+              }
+      }
+
+      createEquationBox(a,b, hasPlus){
+        
+        const equation = document.createElement("span");
+
+        const text =  ((hasPlus)? " + ": "") + `(${a.textContent} ⋅ ${b.textContent})`;
+
+        for(const letter of text.split('')){
+
+          const child = document.createElement("span");
+          child.textContent = letter;
+          equation.appendChild(child);
+        }
+
+        equation.classList.add("equation-letter")
+
+        return equation;
       }
 
       pixelToCoordinates(x,y){

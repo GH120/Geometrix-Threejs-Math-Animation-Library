@@ -72,7 +72,7 @@ export class Fase3 {
 
         this.animar(new AnimacaoSequencial(anim1,anim2,anim3.setOnTermino(removeAll),anim4).manterExecucaoTodos(true))
 
-        //new Pythagoras(this);
+        new Pythagoras(this);
     }
 
     //Cria a caixa de texto onde o texto vai aparecer
@@ -119,7 +119,7 @@ export class Fase3 {
         const container = document.createElement('p');
         container.style.fontSize = "25px";
         container.style.fontFamily = "Courier New, monospace";
-        container.style.fontWeight = 540;
+        container.style.fontWeight = 500;
         container.style.display = 'inline-block';
 
         // Split the text into individual characters

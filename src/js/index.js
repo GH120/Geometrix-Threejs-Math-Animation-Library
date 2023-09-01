@@ -41,6 +41,8 @@ const triangle = new Triangle()
 
 const programa = new Fase3(triangle,scene,camera);
 
+programa.canvas = canvas;
+
 //Loop de animação
 function animate() {
     requestAnimationFrame( animate );
@@ -182,6 +184,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const distributividade = new Distributividade(null)
                             .addSettings(scene,camera,canvas)
 
+    const result = document.createElement("div");
+
+    // equationWindow.insertBefore(result, equationWindow.lastChild)
+
     openButton.addEventListener("click", function() {
         openButton.classList.add("hidden");
         equationWindow.classList.remove("hidden");
@@ -193,11 +199,13 @@ document.addEventListener("DOMContentLoaded", function() {
         scene.add(whiteboard);
 
         //Anima a equação de distributividade
-        const equation = equationWindow.children[0];
+        const equation = equationWindow.children[2];
+
+        console.log(equation)
         
         equation.onclick = () => {
 
-          distributividade.update(equation, equationWindow);
+          // distributividade.update(equation, result);
 
           programa.animar(distributividade);
 

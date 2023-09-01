@@ -52,21 +52,19 @@ export class Distributividade extends Animacao{
         ]);
       }
 
-      update(equation, window){
+      update(equation, equacao){
 
-        const ac = this.comutatividade(equation.children[1],equation.children[6]);
+        console.log(equation,equacao, equation.children[1],  equation.children[5].children[1]);
 
-        const ad = this.comutatividade(equation.children[1],equation.children[7],true);
+        const ac = this.comutatividade(equation.children[1],equation.children[5].children[1]);
 
-        const bc = this.comutatividade(equation.children[2],equation.children[6],true);
+        const ad = this.comutatividade(equation.children[1],equation.children[5].children[2],true);
 
-        const bd = this.comutatividade(equation.children[2],equation.children[7],true);
+        const bc = this.comutatividade(equation.children[2],equation.children[5].children[1],true);
+
+        const bd = this.comutatividade(equation.children[2],equation.children[5].children[2],true);
 
         const multiplicacoes = [ac,ad,bc,bd];
-
-        const equacao = document.createElement("div");
-
-        window.insertBefore(equacao, window.lastChild)
 
         this.animacoes = multiplicacoes.map(resultado => 
                           new AnimacaoSequencial(

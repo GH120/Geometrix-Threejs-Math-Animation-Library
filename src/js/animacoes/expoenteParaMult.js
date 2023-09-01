@@ -24,12 +24,12 @@ export class ExpoenteParaMult extends Animacao{
 
         element.textContent = '';
 
-        letters.map(letter => {
+        letters.map((letter,index) => {
             const span = document.createElement("span");
 
-            span.textContent = letter;
+            span.textContent = (letters[index-1] == "-")? "-".concat(letter) : letter;
 
-            element.appendChild(span)
+            if(letter != "-") element.appendChild(span)
         })
     }
 
@@ -60,7 +60,9 @@ export class ExpoenteParaMult extends Animacao{
 
         mult.style.position = "absolute"
 
-        this.quebrar(mult)
+        this.quebrar(mult);
+
+        this.quebrar(copia);
 
         const mostrarMult = new TextoAparecendo(mult)
                             .setValorInicial(-10)

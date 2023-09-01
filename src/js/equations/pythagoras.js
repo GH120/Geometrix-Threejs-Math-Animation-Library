@@ -4,6 +4,7 @@ import { Clickable } from "../controles/clickable";
 import { colorirAngulo } from "../animacoes/colorirAngulo";
 import { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/animation";
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
+import { Distributividade } from "../animacoes/distributividade";
 
 export default class Pythagoras extends Equation{
 
@@ -183,7 +184,23 @@ export default class Pythagoras extends Equation{
     
                         const multiplicar = new ExpoenteParaMult(this.equationContent, element, instancia.elements[index+1]);
     
-                        this.programa.animar(multiplicar)
+                        this.programa.animar(multiplicar);
+
+                        //Gambiarra, muda o proximo click para animar a distributividade
+                        element.onclick = () => {
+
+                            const equacaoResultante = document.createElement("div");
+
+                            const equationWindow = document.getElementById("equationWindow")
+
+                            equationWindow.insertBefore(equacaoResultante, equationWindow.lastChild)
+
+                            this.programa.animar(
+                                                    new Distributividade(null)
+                                                    .addSettings(this.programa.scene,this.programa.camera,this.programa.canvas)
+                                                    .update(element, equacaoResultante)
+                            )
+                        }
     
                     }
     

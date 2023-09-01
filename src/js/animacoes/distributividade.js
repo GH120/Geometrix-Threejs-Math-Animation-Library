@@ -2,6 +2,7 @@ import Animacao, { AnimacaoSequencial } from "./animation";
 import * as THREE from 'three';
 import DesenharMalha from "./desenharMalha";
 import { TextoAparecendo } from "./textoAparecendo";
+import Bracket from "../objetos/bracket";
 
 export class Distributividade extends Animacao{
 
@@ -55,6 +56,8 @@ export class Distributividade extends Animacao{
       update(equation, equacao){
 
         console.log(equation,equacao, equation.children[1],  equation.children[5].children[1]);
+
+        this.createBracket(equation)
 
         const ac = this.comutatividade(equation.children[1],equation.children[5].children[1]);
 
@@ -138,6 +141,16 @@ export class Distributividade extends Animacao{
           span.classList.add("equation-letter")
           element.appendChild(span);
         }
+      }
+
+      createBracket(element){
+
+        const retangulo = element.getBoundingClientRect();
+        const ponto1 = this.pixelToCoordinates(retangulo.left, retangulo.bottom);
+        const ponto2 = this.pixelToCoordinates(retangulo.right, retangulo.bottom);
+      
+        this.bracket = new Bracket(0.1, [ponto1.x - 0.3,ponto1.y - 0.1,0],[ponto2.x-0.3,ponto2.y-0.1,0])
+                           .addToScene(this.scene);
       }
 
       normalizar(x, y) {

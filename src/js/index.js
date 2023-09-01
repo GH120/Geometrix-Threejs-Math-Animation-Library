@@ -62,6 +62,61 @@ window.addEventListener('resize', function() {
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+document.addEventListener("DOMContentLoaded", function() {
+    const openButton = document.getElementById("openEquationWindow");
+    const closeButton = document.getElementById("closeButton");
+    const equationWindow = document.getElementById("equationWindow");
+
+    let whiteboard;
+
+    openButton.addEventListener("click", function() {
+        openButton.classList.add("hidden");
+        equationWindow.classList.remove("hidden");
+        
+        //Adiciona plano de fundo branco a tela de equações
+        //Ele é um objeto do threejs, que tem as proporções da tela html, que é transparente
+        whiteboard = addWhiteBoard(equationWindow);
+
+        scene.add(whiteboard);
+        
+    });
+
+    closeButton.addEventListener("click", function() {
+        openButton.classList.remove("hidden");
+        equationWindow.classList.add("hidden");
+
+        scene.remove(whiteboard)
+    });
+});
+
+
+function addWhiteBoard(equationWindow){
+
+  const rect = equationWindow.getBoundingClientRect();
+
+  const bottomleft = pixelToCoordinates(rect.left, rect.bottom);
+
+  const topright   = pixelToCoordinates(rect.right, rect.top) 
+
+  const width = topright.x - bottomleft.x;
+
+  const height = topright.y - bottomleft.y;
+
+  //Gambiarra para os objetos estarem em cima do html, mas ter um fundo branco ao invés do background do threejs
+  const planeGeometry = new THREE.PlaneGeometry(width,height); // Width, height
+
+  // Create a white material
+  const whiteMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // White color
+
+  // Create a mesh using the geometry and material
+  const whitePlane = new THREE.Mesh(planeGeometry, whiteMaterial);
+
+  whitePlane.position.x = bottomleft.x + width/2;
+  whitePlane.position.y = bottomleft.y + height/2;
+
+  return whitePlane;
+}
+
 function pixelToCoordinates(x,y){
 
   const raycaster = new THREE.Raycaster();
@@ -86,139 +141,3 @@ function normalizar(x, y) {
   const normalizedY = -(y - rect.top) / canvas.height * 2 + 1;
   return new THREE.Vector2(normalizedX,normalizedY);
 }
-
-function createBracket(element){
-
-  const retangulo = element.getBoundingClientRect();
-  const ponto1 = pixelToCoordinates(retangulo.left, retangulo.bottom);
-  const ponto2 = pixelToCoordinates(retangulo.right, retangulo.bottom);
-
-  new Bracket(0.2, [ponto1.x - 0.4,ponto1.y - 0.2,0],[ponto2.x-0.4,ponto2.y-0.2,0]).addToScene(scene)
-}
-
-function curva(points){
-
-  const curve = new THREE.CubicBezierCurve3(...points);
-
-  // Create the curve geometry
-  const numSegments = 100; // Number of segments to approximate the curve
-  const curvePoints = curve.getPoints(numSegments);
-  const curveGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-
-  // Create a material for the curve
-  const curveMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
-
-  // Create the curve object
-  const curveObject = new THREE.Line(curveGeometry, curveMaterial);
-
-  return curveObject;
-}
-
-function desenharSeta(origem, destino, altura=0.2){
-
-  const vetor = new THREE.Vector3().subVectors(destino, origem);
-
-  const ortogonal = new THREE.Vector3().crossVectors(vetor, new THREE.Vector3(0,0,-1)).normalize().multiplyScalar(altura)
-
-
-  const p1 = new THREE.Vector3().add(vetor).multiplyScalar(1/3).add(origem).add(ortogonal);
-  const p2 = new THREE.Vector3().add(vetor).multiplyScalar(2/3).add(origem).add(ortogonal);
-
-  scene.add(curva([
-    origem,
-    p1,
-    p2,
-    destino
-  ]))
-}
-
-function comutatividade(elemento1, elemento2){
-
-  const retangulo1 =  elemento1.getBoundingClientRect()
-
-  const retangulo2 =  elemento2.getBoundingClientRect()
-
-  const middle = (rect) => (rect.left + rect.right)/2 
-
-  const ponto1 = pixelToCoordinates(middle(retangulo1), retangulo1.top + 10);
-
-  const ponto2 = pixelToCoordinates(middle(retangulo2), retangulo2.top + 10);
-
-  scene.add(desenharSeta(ponto1,ponto2));
-}
-
-function addWhiteBoard(equationWindow){
-
-    const rect = equationWindow.getBoundingClientRect();
-
-    const bottomleft = pixelToCoordinates(rect.left, rect.bottom);
-
-    const topright   = pixelToCoordinates(rect.right, rect.top) 
-
-    const width = topright.x - bottomleft.x;
-
-    const height = topright.y - bottomleft.y;
-
-    //Gambiarra para os objetos estarem em cima do html, mas ter um fundo branco ao invés do background do threejs
-    const planeGeometry = new THREE.PlaneGeometry(width,height); // Width, height
-
-    // Create a white material
-    const whiteMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // White color
-
-    // Create a mesh using the geometry and material
-    const whitePlane = new THREE.Mesh(planeGeometry, whiteMaterial);
-
-    whitePlane.position.x = bottomleft.x + width/2;
-    whitePlane.position.y = bottomleft.y + height/2;
-
-    return whitePlane;
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-    const openButton = document.getElementById("openEquationWindow");
-    const closeButton = document.getElementById("closeButton");
-    const equationWindow = document.getElementById("equationWindow");
-
-    let whiteboard;
-
-    const distributividade = new Distributividade(null)
-                            .addSettings(scene,camera,canvas)
-
-    const result = document.createElement("div");
-
-    // equationWindow.insertBefore(result, equationWindow.lastChild)
-
-    openButton.addEventListener("click", function() {
-        openButton.classList.add("hidden");
-        equationWindow.classList.remove("hidden");
-        
-        //Adiciona plano de fundo branco a tela de equações
-        //Ele é um objeto do threejs, que tem as proporções da tela html, que é transparente
-        whiteboard = addWhiteBoard(equationWindow);
-
-        scene.add(whiteboard);
-
-        //Anima a equação de distributividade
-        const equation = equationWindow.children[2];
-
-        console.log(equation)
-        
-        equation.onclick = () => {
-
-          // distributividade.update(equation, result);
-
-          programa.animar(distributividade);
-
-          createBracket(equation)
-
-        }
-        
-    });
-
-    closeButton.addEventListener("click", function() {
-        openButton.classList.remove("hidden");
-        equationWindow.classList.add("hidden");
-
-        scene.remove(whiteboard)
-    });
-});

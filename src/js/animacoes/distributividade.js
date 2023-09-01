@@ -71,7 +71,8 @@ export class Distributividade extends Animacao{
                               new DesenharMalha(resultado.seta, this.scene).setDuration(100),
                               new TextoAparecendo(resultado.html).setOnStart(() => equacao.appendChild(resultado.html)).setDuration(100)
                           ));
-
+        
+        return this;
       }
 
       comutatividade(elemento1, elemento2,hasPlus){

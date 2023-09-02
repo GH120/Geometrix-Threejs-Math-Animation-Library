@@ -190,3 +190,36 @@ export class Square{
         return span;
     }
 }
+
+export class Equality{
+
+    constructor(leftSide, rightSide){
+
+        this.left = leftSide;
+        this.right = rightSide;
+
+    }
+
+    get html(){
+
+        if(this.element) return this.element;
+
+        const span = document.createElement("span");
+
+        span.class = "equation-letter";
+
+        span.appendChild(this.left.html);
+
+        const equals = document.createElement("span");
+
+        equals.textContent = " = ";
+
+        span.appendChild(equals);
+
+        span.appendChild(this.right.html)
+
+        this.element = span;
+
+        return span;
+    }
+}

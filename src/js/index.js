@@ -8,7 +8,7 @@ import Bracket from './objetos/bracket'
 import DesenharMalha from './animacoes/desenharMalha';
 import { Fase3 } from './fases/fase3';
 import { Distributividade } from './animacoes/distributividade';
-import { Addition, Multiplication, Square, Value, Variable } from './equations/expressions';
+import { Addition, Equality, Multiplication, Square, Value, Variable } from './equations/expressions';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
@@ -70,7 +70,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let whiteboard;
 
-    const elemento = new Multiplication(new Addition(new Variable("x"), new Value(1)), new Square(new Addition(new Variable("y"), new Value(-1))))
+    const elemento = new Equality(
+      new Multiplication(
+        new Addition(
+          new Variable("x"), 
+          new Value(1)
+        ), 
+        new Square(
+          new Addition(
+            new Variable("y"), 
+            new Value(-1)
+          )
+        )
+      ),
+      new Value(3)
+    )
 
     openButton.addEventListener("click", function() {
         openButton.classList.add("hidden");

@@ -1,12 +1,31 @@
-export class Variable{
+class Expression{
+
+    //Muda a variável com o nome escolhido para seu novo valor, que também pode ser uma expressão
+    changeVariable(value, name){
+
+        if(this.right && this.right.changeVariable(value, name)){
+            this.right = value;
+        }
+
+        if(this.left && this.left.changeVariable(value, name)){
+            this.left = value;
+        }
+
+        return false;
+    }
+}
+
+export class Variable extends Expression{
 
     constructor(name){
+
+        super();
+
         this.type = "variable";
         this.name = name;
     }
 
     get html() {
-        if(this.element) return this.element;
 
         const span = document.createElement("span");
 
@@ -18,11 +37,17 @@ export class Variable{
 
         return span;
     }
+
+    changeVariable(value, name){
+        return this.name == name;
+    }
 }
 
-export class Value{
+export class Value extends Expression{
     
     constructor(value){
+
+        super();
 
         this.type = "value"
 
@@ -33,7 +58,6 @@ export class Value{
 
     get html(){
 
-        if(this.element) return this.element;
 
         const span = document.createElement("span");
 
@@ -47,9 +71,10 @@ export class Value{
     }
 }
 
-export class Addition{
+export class Addition extends Expression{
 
     constructor(leftOperand, rightOperand){
+        super();
         this.left  = leftOperand;
         this.right = rightOperand;
         this.type  = "addition";
@@ -57,7 +82,6 @@ export class Addition{
 
     get html(){
 
-        if(this.element) return this.element;
 
         const span = document.createElement("span");
 
@@ -79,16 +103,18 @@ export class Addition{
     }
 }
 
-export class Parenthesis{
+export class Parenthesis extends Expression{
 
     constructor(expression){
-        this.expression = expression;
+
+        super();
+
+        this.left = expression;
         this.type = "parenthesis";
     }
 
     get html(){
 
-        if(this.element) return this.element;
 
         const span = document.createElement("span");
 
@@ -98,7 +124,7 @@ export class Parenthesis{
 
         span.appendChild(createElement("("));
 
-        span.appendChild(this.expression.html);
+        span.appendChild(this.left.html);
 
         span.appendChild(createElement(")"));
 
@@ -108,9 +134,10 @@ export class Parenthesis{
     }
 }
 
-export class Multiplication{
+export class Multiplication extends Expression{
 
     constructor(leftOperand, rightOperand){
+        super();
         this.left  = leftOperand;
         this.right = rightOperand;
         this.type  = "multiplication";
@@ -131,7 +158,6 @@ export class Multiplication{
 
     get html(){
 
-        if(this.element) return this.element;
 
         const span = document.createElement("span");
 
@@ -153,9 +179,11 @@ export class Multiplication{
     }
 }
 
-export class Square{
+export class Square extends Expression{
 
     constructor(leftOperand, rightOperand){
+
+        super();
         this.left  = leftOperand;
         this.type  = "square";
         
@@ -171,7 +199,6 @@ export class Square{
 
     get html(){
 
-        if(this.element) return this.element;
 
         const span = document.createElement("span");
 
@@ -191,9 +218,11 @@ export class Square{
     }
 }
 
-export class Equality{
+export class Equality extends Expression{
 
     constructor(leftSide, rightSide){
+
+        super();
 
         this.left = leftSide;
         this.right = rightSide;
@@ -202,7 +231,8 @@ export class Equality{
 
     get html(){
 
-        if(this.element) return this.element;
+        console.log(this.left,this.right)
+
 
         const span = document.createElement("span");
 

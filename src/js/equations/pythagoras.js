@@ -41,12 +41,6 @@ export default class Pythagoras extends Equation{
 
         document.getElementById("equationWindow").appendChild(equation)
 
-        // this.variables = {
-        //     'a': ['a', this.lado(false, 'a')],
-        //     'b': ['b', this.lado(false, 'b')],
-        //     'c': ['c', this.lado(true,  'c')]
-        // }
-
     }
 
     // //Retorna uma função se diz se o lado é ou não hipotenusa/cateto

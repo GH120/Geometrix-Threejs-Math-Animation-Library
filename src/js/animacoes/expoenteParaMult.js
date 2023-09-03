@@ -11,6 +11,8 @@ export class ExpoenteParaMult extends Animacao{
         this.base     = base;
         this.expoente = expoente;
 
+        console.log(element,base, expoente)
+
         this.quebrar(expoente);
         this.quebrar(base);
 
@@ -50,8 +52,7 @@ export class ExpoenteParaMult extends Animacao{
         
         copia.style.position = "absolute";
         
-        const length = copia.textContent.length;
-
+        const length = this.base.getBoundingClientRect().width + 5;
 
         //caractere de multiplicação *
         const mult = document.createElement("span")
@@ -68,11 +69,12 @@ export class ExpoenteParaMult extends Animacao{
                             .setValorInicial(-10)
                             .setOnStart(() => {
                                 this.base.appendChild(mult)
+                                
                             })
         
         const posicionarCopia = new Animacao(copia)
-                                .setValorInicial(4)
-                                .setValorFinal(15 + 11*length)
+                                .setValorInicial(0)
+                                .setValorFinal(length)
                                 .setDuration(120)
                                 .setInterpolacao(function(inicial,final,peso){
                                     return inicial*(1-peso) + final*peso;
@@ -80,7 +82,7 @@ export class ExpoenteParaMult extends Animacao{
                                 .setUpdateFunction(function(valor){
                                     copia.style.left = `${valor}px`
 
-                                    filler.style.width = `${Math.round(valor)}px`
+                                    filler.style.width = `${valor}px`
                                 })
                                 .setOnStart(() => {this.base.appendChild(copia); this.base.appendChild(filler)})
                                 .voltarAoInicio(false)

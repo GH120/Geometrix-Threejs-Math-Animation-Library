@@ -89,6 +89,8 @@ document.addEventListener("DOMContentLoaded", function() {
     openButton.addEventListener("click", function() {
         openButton.classList.add("hidden");
         equationWindow.classList.remove("hidden");
+
+        getOptions()
         
         //Adiciona plano de fundo branco a tela de equações
         //Ele é um objeto do threejs, que tem as proporções da tela html, que é transparente
@@ -159,4 +161,44 @@ function normalizar(x, y) {
   const normalizedX = (x - rect.left) / canvas.width * 2 - 1;
   const normalizedY = -(y - rect.top) / canvas.height * 2 + 1;
   return new THREE.Vector2(normalizedX,normalizedY);
+}
+
+//Criar uma classe para isso, ao selecionar uma opção cria os botões para uma certa equação
+function getOptions(){
+
+  const options = document.createElement("select");
+
+  options.id = "openEquationWindow"
+
+  options.class = "button-9";
+
+  options.textContent = "opções";
+
+  let texto = document.createElement("option");
+
+  texto.textContent = "expoente para multiplicação"
+
+  options.append(texto);
+  texto = document.createElement("option");
+
+  texto.textContent = "opção 2"
+
+  options.append(texto);
+  texto = document.createElement("option");
+
+  texto.textContent = "opção 3"
+
+  options.append(texto);
+
+  options.addEventListener("change", function() {
+    const selectedValue = selectElement.value;
+    
+    // Perform your desired action based on the selected option
+    console.log("Selected option:", selectedValue);
+    // Call your function here
+    // functionName(selectedValue);
+  });
+
+
+  document.body.append(options);
 }

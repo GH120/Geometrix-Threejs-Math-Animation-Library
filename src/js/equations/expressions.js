@@ -280,7 +280,7 @@ export class Square extends Expression{
         return [
             {
                 "name": "transformar em multiplicação", 
-                "function": () => new ExpoenteParaMult(this.element, this.left.html, this.right)
+                "function": () => new ExpoenteParaMult(this.element, this.left.element, this.right)
             }
         ]
     }

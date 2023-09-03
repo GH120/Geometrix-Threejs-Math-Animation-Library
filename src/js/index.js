@@ -105,6 +105,7 @@ document.addEventListener("DOMContentLoaded", function() {
     openButton.addEventListener("click", function() {
         openButton.classList.add("hidden");
         equationWindow.classList.remove("hidden");
+        options.classList.remove("hidden");
         
         //Adiciona plano de fundo branco a tela de equações
         //Ele é um objeto do threejs, que tem as proporções da tela html, que é transparente
@@ -117,6 +118,7 @@ document.addEventListener("DOMContentLoaded", function() {
     closeButton.addEventListener("click", function() {
         openButton.classList.remove("hidden");
         equationWindow.classList.add("hidden");
+        options.classList.add("hidden");
 
         scene.remove(whiteboard)
     });

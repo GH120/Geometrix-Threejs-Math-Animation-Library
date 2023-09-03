@@ -12,9 +12,13 @@ export class Distributividade extends Animacao{
 
     *getFrames(){
 
+      yield* this.bracket.animacao().setOnTermino(() => null).getFrames();
+
       for(const animacao of this.animacoes){
         yield* animacao.getFrames();
       }
+
+      this.scene.remove(this.bracket.mesh);
 
       this.onTermino();
     }
@@ -57,7 +61,13 @@ export class Distributividade extends Animacao{
 
       update(expression, equacao){
 
-        // this.createBracket(expression.element)
+        this.createBracket(expression.element)
+
+        equacao.style.position = "absolute";
+
+        equacao.style.left = `${expression.element.getBoundingClientRect().left - 5}px`
+
+        equacao.style.bottom =  `${expression.element.getBoundingClientRect().bottom - 320}px`
 
         const a = expression.left.left.left;
         const b = expression.left.left.right;
@@ -115,6 +125,9 @@ export class Distributividade extends Animacao{
         }
 
         equation.classList.add("equation-letter")
+
+        equation.style.fontFamily = "Courier New, monospace";
+        equation.style.fontSize = "18px";
 
         return equation;
       }

@@ -290,6 +290,9 @@ export class Equality extends Expression{
 
         span.class = "equation-letter"
 
+        span.style.fontFamily = "Courier New, monospace";
+        span.style.fontSize = "18px";
+
         span.appendChild(this.left.html);
 
         const equals = document.createElement("span");

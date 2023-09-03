@@ -15,8 +15,8 @@ export class Operations{
         const options = document.createElement("select");
       
         options.id = "openEquationWindow"
-      
-        options.class = "button-9";
+
+        options.classList.add('button-9', 'hidden');
       
         options.textContent = "opções";
 

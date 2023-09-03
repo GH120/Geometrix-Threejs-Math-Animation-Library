@@ -11,8 +11,6 @@ export class ExpoenteParaMult extends Animacao{
         this.base     = base;
         this.expoente = expoente;
 
-        console.log(element,base, expoente)
-
         this.quebrar(expoente);
         this.quebrar(base);
 

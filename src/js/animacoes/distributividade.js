@@ -55,8 +55,6 @@ export class Distributividade extends Animacao{
 
       update(equation, equacao){
 
-        console.log(equation,equacao, equation.children[1],  equation.children[5].children[1]);
-
         this.createBracket(equation)
 
         const ac = this.comutatividade(equation.children[1],equation.children[5].children[1]);

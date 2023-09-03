@@ -56,6 +56,17 @@ class Expression{
 
         return this;
     }
+
+    get nodes(){
+
+        const nodes = [this]
+
+        if(this.left)  nodes.push(...this.left.nodes);
+
+        if(this.right) nodes.push(...this.right.nodes);
+
+        return nodes;
+    }
 }
 
 export class Variable extends Expression{
@@ -74,7 +85,8 @@ export class Variable extends Expression{
 
         span.textContent = this.name;
 
-        this.element = span;
+        this.element    = span;
+        span.expression = this;
 
         return span;
     }
@@ -82,6 +94,7 @@ export class Variable extends Expression{
     changeVariable(value, name){
         return this.name == name;
     }
+
 }
 
 export class Value extends Expression{
@@ -106,7 +119,8 @@ export class Value extends Expression{
 
         span.textContent = (this.negative)? "- " + (-this.value) : this.value;
 
-        this.element = span;
+        this.element    = span;
+        span.expression = this;
 
         return span;
     }
@@ -138,7 +152,8 @@ export class Addition extends Expression{
 
         span.appendChild(this.right.html)
 
-        this.element = span;
+        this.element    = span;
+        span.expression = this;
 
         return span;
     }
@@ -169,7 +184,8 @@ export class Parenthesis extends Expression{
 
         span.appendChild(createElement(")"));
 
-        this.element = span;
+        this.element    = span;
+        span.expression = this;
         
         return span;
     }
@@ -214,7 +230,8 @@ export class Multiplication extends Expression{
 
         span.appendChild(this.right.html)
 
-        this.element = span;
+        this.element    = span;
+        span.expression = this;
 
         return span;
     }
@@ -243,7 +260,7 @@ export class Square extends Expression{
         if(this.element) return this.element
 
 
-        const span = document.createElement("button");
+        const span = document.createElement("span");
 
         span.class = "equation-letter"
 
@@ -255,23 +272,11 @@ export class Square extends Expression{
 
         span.appendChild(square);
 
-        span.onclick = () => this.animar(this.options[0].function());
+        this.element    = span;
+        span.expression = this;
 
-        span.style = `background: none;
-        border: none;
-        padding: 0;
-        margin: 0;
-        font: inherit;
-        cursor: pointer;
-        outline: inherit;
-        color: inherit;
-        `
-
-        span.style.pointerEvents = "all";
-
-        this.element = span;
-
-        this.right = square;
+        this.right = {element:square};
+        this.right.nodes = [this.right];
 
         return span;
     }
@@ -318,7 +323,8 @@ export class Equality extends Expression{
 
         span.appendChild(this.right.html)
 
-        this.element = span;
+        this.element    = span;
+        span.expression = this;
 
         return span;
     }

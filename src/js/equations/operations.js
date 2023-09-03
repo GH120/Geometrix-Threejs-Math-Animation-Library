@@ -110,7 +110,7 @@ export class Operations{
                 },
 
                 result:     (expression) => {
-                    return new Multiplication(expression.left, expression.left);
+                    return new Multiplication(expression.left, expression.left.copy);
                 }
 
             },

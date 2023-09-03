@@ -61,7 +61,7 @@ export class Distributividade extends Animacao{
 
       update(expression, equacao){
 
-        this.createBracket(expression.element)
+        this.createBracket(expression.element);
 
         equacao.style.position = "absolute";
 

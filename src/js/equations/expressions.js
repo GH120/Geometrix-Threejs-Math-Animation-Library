@@ -28,10 +28,15 @@ class Expression{
     }
 
     substitute(expression){
-        if(this.father.right == this) 
-            return this.father.right = expression;
-        if(this.father.left  == this)
-            return this.father.left  = expression;
+
+        if(this.father.right == this){
+            this.father.right = expression;
+            expression.father = this.father;
+        }
+        else if(this.father.left == this){
+            this.father.left = expression;
+            expression.father = this.father;
+        }
     }
 
     update(){
@@ -41,6 +46,15 @@ class Expression{
         window.removeChild(this.element);
 
         window.appendChild(this.html);
+    }
+
+    get copy(){
+        const nodes = [];
+
+        if(this.left) nodes.push(this.left.copy);
+        if(this.right) nodes.push(this.right.copy);
+
+        return new this.constructor(...nodes);
     }
 }
 
@@ -70,6 +84,9 @@ export class Variable extends Expression{
         return this.name == name;
     }
 
+    get copy(){
+        return new this.constructor(this.name);
+    }
 }
 
 export class Value extends Expression{
@@ -98,6 +115,10 @@ export class Value extends Expression{
         span.expression = this;
 
         return span;
+    }
+
+    get copy(){
+        return new this.constructor(this.value);
     }
 }
 

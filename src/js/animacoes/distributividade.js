@@ -55,15 +55,20 @@ export class Distributividade extends Animacao{
 
       update(equation, equacao){
 
-        this.createBracket(equation)
+        this.createBracket(equation.element)
 
-        const ac = this.comutatividade(equation.children[1],equation.children[5].children[1]);
+        const a = equation.left.left.left;
+        const b = equation.left.left.right;
+        const c = equation.right.left.left;
+        const d = equation.right.left.right;
 
-        const ad = this.comutatividade(equation.children[1],equation.children[5].children[2],true);
+        const ac = this.comutatividade(a.element,c.element);
 
-        const bc = this.comutatividade(equation.children[2],equation.children[5].children[1],true);
+        const ad = this.comutatividade(a.element,d.element,true);
 
-        const bd = this.comutatividade(equation.children[2],equation.children[5].children[2],true);
+        const bc = this.comutatividade(b.element,c.element,true);
+
+        const bd = this.comutatividade(b.element,d.element,true);
 
         const multiplicacoes = [ac,ad,bc,bd];
 
@@ -146,7 +151,7 @@ export class Distributividade extends Animacao{
         const retangulo = element.getBoundingClientRect();
         const ponto1 = this.pixelToCoordinates(retangulo.left, retangulo.bottom);
         const ponto2 = this.pixelToCoordinates(retangulo.right, retangulo.bottom);
-      
+
         this.bracket = new Bracket(0.1, [ponto1.x - 0.3,ponto1.y - 0.1,0],[ponto2.x-0.3,ponto2.y-0.1,0])
                            .addToScene(this.scene);
       }

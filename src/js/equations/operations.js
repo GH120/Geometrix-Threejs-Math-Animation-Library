@@ -109,8 +109,8 @@ export class Operations{
                 action:      (expression) => {
 
                     const distributividade = new Distributividade(null)
-                                            .addSettings(this.programa.scnee,this.programa.camera, this.programa.canvas)
-                                            .update(expression, expression);
+                                            .addSettings(this.programa.scene,this.programa.camera, this.programa.canvas)
+                                            .update(expression, document.body);
 
                     this.programa.animar(distributividade);
                 }

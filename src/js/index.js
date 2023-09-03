@@ -94,19 +94,21 @@ document.addEventListener("DOMContentLoaded", function() {
           new Value(-1)
         )
       )
-    ).setPrograma(programa)
+    )
+
+    equationWindow.append(elemento.html);
+
+    const options = new Operations(elemento,programa).getOptions();
+
+    document.body.appendChild(options);
 
     openButton.addEventListener("click", function() {
         openButton.classList.add("hidden");
         equationWindow.classList.remove("hidden");
-
-        new Operations(elemento,programa).getOptions();
         
         //Adiciona plano de fundo branco a tela de equações
         //Ele é um objeto do threejs, que tem as proporções da tela html, que é transparente
         whiteboard = addWhiteBoard(equationWindow);
-
-        equationWindow.append(elemento.html);
 
         scene.add(whiteboard);
         

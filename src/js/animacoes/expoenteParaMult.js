@@ -88,6 +88,8 @@ export class ExpoenteParaMult extends Animacao{
         return new AnimacaoSimultanea(mostrarMult, posicionarCopia);
     }
 
+    //Talvez transformar essa classe em uma AnimacaoSimultânea?
+    //Mesmo começando com as animações vazias, preencher a mão no construtor depois
     *getFrames(){
 
         const desaparecerExpoente = new TextoAparecendo(this.expoente)
@@ -100,5 +102,7 @@ export class ExpoenteParaMult extends Animacao{
                                 .setDuration(40);
 
         yield* new AnimacaoSimultanea(desaparecerExpoente, new AnimacaoSequencial(fillerFrames, this.moverBase())).getFrames()
+
+        this.onTermino();
     }
 }

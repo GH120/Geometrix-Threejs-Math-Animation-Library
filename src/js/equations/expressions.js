@@ -16,47 +16,6 @@ class Expression{
         return false;
     }
 
-    getOptions(){
-        const options = document.createElement("select");
-
-        options.id = "openEquationWindow"
-
-        options.class = "button-9";
-
-        options.textContent = "opções";
-
-        let texto = document.createElement("option");
-
-        texto.textContent = "opção 1"
-
-        options.append(texto);
-        texto = document.createElement("option");
-
-        texto.textContent = "opção 2"
-
-        options.append(texto);
-        texto = document.createElement("option");
-
-        texto.textContent = "opção 3"
-
-        options.append(texto);
-
-
-        document.body.append(options);
-    }
-
-    animar(animacao){
-        this.programa.animar(animacao);
-    }
-
-    setPrograma(programa){
-        this.programa = programa;
-        if(this.right) this.right.setPrograma(programa);
-        if(this.left) this.left.setPrograma(programa);
-
-        return this;
-    }
-
     get nodes(){
 
         const nodes = [this]
@@ -66,6 +25,22 @@ class Expression{
         if(this.right) nodes.push(...this.right.nodes);
 
         return nodes;
+    }
+
+    substitute(expression){
+        if(this.father.right == this) 
+            return this.father.right = expression;
+        if(this.father.left  == this)
+            return this.father.left  = expression;
+    }
+
+    update(){
+
+        const window = document.getElementById("equationWindow");
+
+        window.removeChild(this.element);
+
+        window.appendChild(this.html);
     }
 }
 
@@ -133,6 +108,9 @@ export class Addition extends Expression{
         this.left  = leftOperand;
         this.right = rightOperand;
         this.type  = "addition";
+
+        this.left.father  = this;
+        this.right.father = this;
     }
 
     get html(){
@@ -167,6 +145,7 @@ export class Parenthesis extends Expression{
 
         this.left = expression;
         this.type = "parenthesis";
+        this.left.father  = this;
     }
 
     get html(){
@@ -198,6 +177,10 @@ export class Multiplication extends Expression{
         this.left  = leftOperand;
         this.right = rightOperand;
         this.type  = "multiplication";
+
+        
+        this.left.father  = this;
+        this.right.father = this;
         
         this.checkForAddition();
     }
@@ -244,6 +227,9 @@ export class Square extends Expression{
         super();
         this.left  = leftOperand;
         this.type  = "square";
+
+        
+        this.left.father  = this;
         
         this.checkForAddition();
     }
@@ -281,15 +267,6 @@ export class Square extends Expression{
         return span;
     }
 
-    get options(){
-        return [
-            {
-                "name": "transformar em multiplicação", 
-                "function": () => new ExpoenteParaMult(this.element, this.left.element, this.right)
-            }
-        ]
-    }
-
 
 }
 
@@ -301,13 +278,13 @@ export class Equality extends Expression{
 
         this.left = leftSide;
         this.right = rightSide;
+        
+        this.left.father  = this;
+        this.right.father = this;
 
     }
 
     get html(){
-
-        console.log(this.left,this.right)
-
 
         const span = document.createElement("span");
 

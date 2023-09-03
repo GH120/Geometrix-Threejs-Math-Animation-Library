@@ -1,5 +1,6 @@
 import { Distributividade } from "../animacoes/distributividade";
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
+import { Addition, Multiplication, Parenthesis } from "./expressions";
 
 export class Operations{
 
@@ -53,6 +54,8 @@ export class Operations{
 
             const temOperacao = operacaoEscolhida.requirement(expression);
 
+            console.log(expression, temOperacao)
+
             if(temOperacao) {
 
                 const html = expression.element;
@@ -69,7 +72,16 @@ export class Operations{
                                 `;
 
                 html.onclick = () => {
-                    operacaoEscolhida.action(expression);
+                    const action = operacaoEscolhida.action(expression);
+
+                    const result = operacaoEscolhida.result(expression);
+
+                    expression.substitute(result);
+
+                    this.programa.animar(action);
+
+                    action.setOnTermino(() => this.expression.update());
+
                     html.style = ""
                 }
 
@@ -78,8 +90,7 @@ export class Operations{
           }
         });
       
-      
-        document.body.append(options);
+        return options;
     }
 
     get operations(){
@@ -95,7 +106,11 @@ export class Operations{
                     const base      = expression.left.element;
                     const exponent  = expression.right.element;
 
-                    this.programa.animar(new ExpoenteParaMult(expression,base,exponent))
+                    return new ExpoenteParaMult(expression,base,exponent);
+                },
+
+                result:     (expression) => {
+                    return new Multiplication(expression.left, expression.left);
                 }
 
             },
@@ -108,12 +123,55 @@ export class Operations{
 
                 action:      (expression) => {
 
+                    //Cria uma equação auxiliar para mostrar os valores da distributividade
+                    const equationWindow = document.getElementById("equationWindow");
+                    const auxiliary      = document.createElement("div");
+                    equationWindow.append(auxiliary);
+
                     const distributividade = new Distributividade(null)
                                             .addSettings(this.programa.scene,this.programa.camera, this.programa.canvas)
-                                            .update(expression, document.body);
+                                            .update(expression, auxiliary)
+                                            .setOnTermino(() => equationWindow.removeChild(auxiliary));
 
-                    this.programa.animar(distributividade);
-                }
+                    //Quando a última animação terminar, deleta a equação auxiliar
+                    const lastAnimation = distributividade.animacoes.slice(-1)[0];
+                    lastAnimation.setOnTermino(() => equationWindow.removeChild(auxiliary))
+
+                    return distributividade;
+                },
+
+                result:       (expression) => 
+                    new Addition(
+                        new Addition(
+                            new Parenthesis(
+                                new Multiplication(
+                                    expression.left.left.left,
+                                    expression.right.left.left
+                                )
+                            ),
+                            new Parenthesis(
+                                new Multiplication(
+                                    expression.left.left.left,
+                                    expression.right.left.right
+                                )
+                            )
+                           
+                        ),
+                        new Addition(
+                            new Parenthesis(
+                                new Multiplication(
+                                    expression.left.left.right,
+                                    expression.right.left.left,
+                                )
+                            ),
+                            new Parenthesis(
+                                new Multiplication(
+                                    expression.left.left.right,
+                                    expression.right.left.right,
+                                )
+                            )
+                        )
+                    )
 
             }
         }

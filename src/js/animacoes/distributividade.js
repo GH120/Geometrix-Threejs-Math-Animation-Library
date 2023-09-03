@@ -15,6 +15,8 @@ export class Distributividade extends Animacao{
       for(const animacao of this.animacoes){
         yield* animacao.getFrames();
       }
+
+      this.onTermino();
     }
 
     curva(points){
@@ -53,14 +55,14 @@ export class Distributividade extends Animacao{
         ]);
       }
 
-      update(equation, equacao){
+      update(expression, equacao){
 
-        this.createBracket(equation.element)
+        // this.createBracket(expression.element)
 
-        const a = equation.left.left.left;
-        const b = equation.left.left.right;
-        const c = equation.right.left.left;
-        const d = equation.right.left.right;
+        const a = expression.left.left.left;
+        const b = expression.left.left.right;
+        const c = expression.right.left.left;
+        const d = expression.right.left.right;
 
         const ac = this.comutatividade(a.element,c.element);
 

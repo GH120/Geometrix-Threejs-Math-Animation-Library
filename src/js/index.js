@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
         )
       ),
       new Value(3)
-    )
+    ).setPrograma(programa)
 
     openButton.addEventListener("click", function() {
         openButton.classList.add("hidden");

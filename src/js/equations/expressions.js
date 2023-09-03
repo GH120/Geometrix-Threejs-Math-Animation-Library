@@ -1,3 +1,5 @@
+import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
+
 class Expression{
 
     //Muda a variável com o nome escolhido para seu novo valor, que também pode ser uma expressão
@@ -12,6 +14,47 @@ class Expression{
         }
 
         return false;
+    }
+
+    getOptions(){
+        const options = document.createElement("select");
+
+        options.id = "openEquationWindow"
+
+        options.class = "button-9";
+
+        options.textContent = "opções";
+
+        let texto = document.createElement("option");
+
+        texto.textContent = "opção 1"
+
+        options.append(texto);
+        texto = document.createElement("option");
+
+        texto.textContent = "opção 2"
+
+        options.append(texto);
+        texto = document.createElement("option");
+
+        texto.textContent = "opção 3"
+
+        options.append(texto);
+
+
+        document.body.append(options);
+    }
+
+    animar(animacao){
+        this.programa.animar(animacao);
+    }
+
+    setPrograma(programa){
+        this.programa = programa;
+        if(this.right) this.right.setPrograma(programa);
+        if(this.left) this.left.setPrograma(programa);
+
+        return this;
     }
 }
 
@@ -28,8 +71,6 @@ export class Variable extends Expression{
     get html() {
 
         const span = document.createElement("span");
-
-        span.class = "equation-letter";
 
         span.textContent = this.name;
 
@@ -61,7 +102,7 @@ export class Value extends Expression{
 
         const span = document.createElement("span");
 
-        span.class = "equation-letter";
+        span.class = "equation-letter"
 
         span.textContent = (this.negative)? "- " + (-this.value) : this.value;
 
@@ -85,7 +126,7 @@ export class Addition extends Expression{
 
         const span = document.createElement("span");
 
-        span.class = "equation-letter";
+        span.class = "equation-letter"
 
         span.appendChild(this.left.html);
 
@@ -118,7 +159,7 @@ export class Parenthesis extends Expression{
 
         const span = document.createElement("span");
 
-        span.class = "equation-letter";
+        span.class = "equation-letter"
 
         const createElement = (name) => {const e = document.createElement("span"); e.textContent = name; return e}
 
@@ -161,7 +202,7 @@ export class Multiplication extends Expression{
 
         const span = document.createElement("span");
 
-        span.class = "equation-letter";
+        span.class = "equation-letter"
 
         span.appendChild(this.left.html);
 
@@ -199,10 +240,12 @@ export class Square extends Expression{
 
     get html(){
 
+        if(this.element) return this.element
 
-        const span = document.createElement("span");
 
-        span.class = "equation-letter";
+        const span = document.createElement("button");
+
+        span.class = "equation-letter"
 
         span.appendChild(this.left.html);
 
@@ -212,10 +255,37 @@ export class Square extends Expression{
 
         span.appendChild(square);
 
+        span.onclick = () => this.animar(this.options[0].function());
+
+        span.style = `background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        font: inherit;
+        cursor: pointer;
+        outline: inherit;
+        color: inherit;
+        `
+
+        span.style.pointerEvents = "all";
+
         this.element = span;
+
+        this.right = square;
 
         return span;
     }
+
+    get options(){
+        return [
+            {
+                "name": "transformar em multiplicação", 
+                "function": () => new ExpoenteParaMult(this.element, this.left.html, this.right)
+            }
+        ]
+    }
+
+
 }
 
 export class Equality extends Expression{
@@ -236,7 +306,7 @@ export class Equality extends Expression{
 
         const span = document.createElement("span");
 
-        span.class = "equation-letter";
+        span.class = "equation-letter"
 
         span.appendChild(this.left.html);
 

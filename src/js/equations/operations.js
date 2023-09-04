@@ -1,6 +1,7 @@
 import { Distributividade } from "../animacoes/distributividade";
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
-import { Addition, Multiplication, Parenthesis } from "./expressions";
+import { TextoAparecendo } from "../animacoes/textoAparecendo";
+import { Addition, Multiplication, Parenthesis, Value } from "./expressions";
 
 export class Operations{
 
@@ -40,6 +41,7 @@ export class Operations{
         createOption("expoente para multiplicação", "square");
         createOption("distributividade", "distributive");
         createOption("mudar de lado", "subtraction");
+        createOption("simplificar", "simplify")
         
       
         options.addEventListener("change", () => {
@@ -113,6 +115,22 @@ export class Operations{
                     return new Multiplication(expression.left, expression.left.copy);
                 }
 
+            },
+
+            simplify: {
+
+                requirement: (expression) => //expression.type in ["parenthesis", "addition", "multiplication"] &&
+                                            //( 
+                                              //  expression.type == "parenthesis" && expression.left.type != "addition" || //Parentesis desnecessário
+                                                
+                                                (
+                                                    expression.type == "multiplication" && 
+                                                    expression.left.type == "value" && expression.right.type == "value" //Multiplicação e adição de valores
+                                                ),
+                                            //),
+                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorInicial(0),
+                
+                result:     (expression) => new Value(expression.right.value * expression.left.value)
             },
 
             distributive: {

@@ -17,15 +17,19 @@ export default class Pythagoras extends Equation{
 
         this.clickables = [];
 
+        const variables = {"a": new Square(new Variable("a")), 
+                          "b": new Square(new Variable("b")),
+                          "c": new Square(new Variable("c"))}
+
         this.equation = new Equality(
                             new Addition(
-                                new Square(new Variable("a")),
-                                new Square(new Variable("b"))
+                                variables.a,
+                                variables.b
                             ),
-                            new Square(new Variable("c"))
+                            variables.c
                         );
 
-        this.equation.changeVariable(new Value(3), "a")
+        this.instancia = this.equation.copy;
 
         const equation = document.createElement("div");
 
@@ -37,128 +41,146 @@ export default class Pythagoras extends Equation{
 
         equation.appendChild(this.equation.html);
 
+        this.lado(true, variables.c);
+        this.lado(false, variables.b);
+        this.lado(false, variables.a);
+
         
 
         document.getElementById("equationWindow").appendChild(equation)
 
     }
 
-    // //Retorna uma função se diz se o lado é ou não hipotenusa/cateto
-    // lado(isHipotenusa, variavel){
+    //Retorna uma função se diz se o lado é ou não hipotenusa/cateto
+    lado(isHipotenusa, variavel){
 
-    //     const triangulo = this.programa.triangulo;
+        const triangulo = this.programa.triangulo;
 
-    //     if(!triangulo.retangulo()) return this.falhou();
+        if(!triangulo.retangulo()) return this.falhou();
 
-    //     return function(){
+        console.log(variavel)
 
-    //         if(!this.instancia) this.criarInstancia(variavel);
+        variavel.element.style = `background: none;
+                                    border: none;
+                                    padding: 0;
+                                    margin: 0;
+                                    font: inherit;
+                                    cursor: pointer;
+                                    outline: inherit;
+                                    color: inherit;
+                                    pointer-events:all;
+                                    `;
 
-    //          //Colore a letra selecionada
-    //         this.instancia.elements.map(element => (element.identity == variavel)? element.style.color = "red" : null)
+        variavel.element.onclick = function(){
 
-    //         let index = 0;
-    //         for(const lado of triangulo.edges){
+            if(!this.instancia.element) this.criarInstancia(variavel);
 
-    //             const anguloOposto = triangulo.angles[(index++ +2) % 3];
+            const variavelInstanciada = new Variable("a");
 
-    //             this.criarControles(lado, anguloOposto, isHipotenusa, variavel)
+            variavelInstanciada.html.style.color = "red";
+
+            variavelInstanciada.element.textContent = "( )"
+
+            this.instancia.changeVariable(variavelInstanciada, variavel.name)
+
+            // let index = 0;
+            // for(const lado of triangulo.edges){
+
+            //     const anguloOposto = triangulo.angles[(index++ +2) % 3];
+
+            //     this.criarControles(lado, anguloOposto, isHipotenusa, variavel)
                 
-    //         }
-    //     }.bind(this);
-    // }
+            // }
+        }.bind(this);
+    }
 
-    // //Cria os controles de um lado
-    // criarControles(lado, angulo, isHipotenusa, variavel){
+    //Cria os controles de um lado
+    criarControles(lado, angulo, isHipotenusa, variavel){
 
-    //     //Controle de click, aciona quando o lado é clicado
-    //     const clickable = new Clickable(lado, this.programa.camera)
+        //Controle de click, aciona quando o lado é clicado
+        const clickable = new Clickable(lado, this.programa.camera)
         
-    //     const anguloReto = Math.round(angulo.degrees) == 90;
+        const anguloReto = Math.round(angulo.degrees) == 90;
 
-    //     const falhou = anguloReto && !isHipotenusa || !anguloReto && isHipotenusa;
+        const falhou = anguloReto && !isHipotenusa || !anguloReto && isHipotenusa;
 
-    //     if(falhou){
+        if(falhou){
 
-    //         const atualizar = (estado) => (estado.clicado)? alert((!isHipotenusa)? "precisa ser cateto, escolheu hipotenusa" : "precisa ser hipotenusa, escolheu cateto") : null;
+            const atualizar = (estado) => (estado.clicado)? alert((!isHipotenusa)? "precisa ser cateto, escolheu hipotenusa" : "precisa ser hipotenusa, escolheu cateto") : null;
 
-    //         clickable.addObserver({update: atualizar})
-    //     }
-    //     else{
+            clickable.addObserver({update: atualizar})
+        }
+        else{
 
-    //         //Se for um cateto, seleciona ele apenas se ele não foi selecionado ainda
-    //         const atualizar = (estado) => {
+            //Se for um cateto, seleciona ele apenas se ele não foi selecionado ainda
+            const atualizar = (estado) => {
 
-    //             if(estado.clicado){
+                if(estado.clicado){
 
-    //                 return this.selecionar(lado, variavel);
-    //             }
+                    return this.selecionar(lado, variavel);
+                }
 
-    //             return null;
-    //         }
+                return null;
+            }
 
-    //         clickable.addObserver({update:atualizar})
-    //     }
+            clickable.addObserver({update:atualizar})
+        }
 
-    //     this.clickables.push(clickable);
-    // }
+        this.clickables.push(clickable);
+    }
 
-    // falhou(){
-    //     alert("falhou");
+    falhou(){
+        alert("falhou");
 
-    // }
+    }
 
-    // //Valores necessários => nome da instancia, botão da instância
-    // selecionar(lado, variavel){
+    //Valores necessários => nome da instancia, botão da instância
+    selecionar(lado, variavel){
 
-    //     //Muda o lado se a variável já tiver um lado
-    //     const ladoAntigo = this.variables[variavel][2];
+        // //Muda o lado se a variável já tiver um lado
+        // const ladoAntigo = this.variables[variavel][2];
 
-    //     if(ladoAntigo && ladoAntigo != lado) ladoAntigo.selecionado = false;
+        // if(ladoAntigo && ladoAntigo != lado) ladoAntigo.selecionado = false;
 
-    //     this.variables[variavel][2] = lado;
+        // this.variables[variavel][2] = lado;
 
 
-    //     //Se esse lado for selecionado, então recusa execução
-    //     if(lado.selecionado) return this.falhou()
+        // //Se esse lado for selecionado, então recusa execução
+        // if(lado.selecionado) return this.falhou()
 
-    //     //Em caso de sucesso, muda todas as ocorrências da variavel para o valor do lado
-    //     //Por exemplo, todo "a" vira "x-1"
-    //     //Remove os controles de selecionar lado e seta o lado para selecionado
-    //     alert("lado escolhido com sucesso");
+        //Em caso de sucesso, muda todas as ocorrências da variavel para o valor do lado
+        //Por exemplo, todo "a" vira "x-1"
+        //Remove os controles de selecionar lado e seta o lado para selecionado
+        alert("lado escolhido com sucesso");
 
-    //     const ocorrenciasDaVariavel = this.instancia.elements.filter(e => e.identity == variavel);
+        this.instancia.changeVariable(lado.valor, variavel.name);
 
-    //     ocorrenciasDaVariavel.map(x => x.textContent = lado.valor);
+        lado.selecionado = true;
 
-    //     ocorrenciasDaVariavel.map(x => x.style.color = "gray")
+        this.clickables.map(clickable => clickable.removeObserver())
 
-    //     ocorrenciasDaVariavel.map(x => x.valor = lado.valor);
+        //Se a instância estiver completa, executa animação
+        // this.instancia.isComplete();
 
-    //     lado.selecionado = true;
+    }
 
-    //     this.clickables.map(clickable => clickable.removeObserver())
+    criarInstancia(){
 
-    //     //Se a instância estiver completa, executa animação
-    //     this.instancia.isComplete();
+        const instance = document.createElement("div");
 
-    // }
+        instance.id = "equationContent";
 
-    // criarInstancia(){
+        instance.style.fontFamily = "Courier New, monospace";
+        instance.style.fontSize = "25px";
+        instance.style.fontWeight ="italic";
 
-    //     if(this.instancia) return;
+        instance.appendChild(this.instancia.html);
 
-    //     const instancia = new Pythagoras(this.programa);
+        document.getElementById("equationWindow").append(instance)
 
-    //     const isVariavel = (e) => this.variables[e.textContent];
+        instancia.instancia = instancia;
 
-    //     //Transforma todas as letras em espaços em branco
-    //     instancia.elements.map(element => (isVariavel(element))? element.textContent = "( )" : null)
-
-    //     instancia.instancia = instancia;
-
-    //     this.instancia = instancia;
-    // }
+    }
 
     // isComplete(){
 
@@ -201,21 +223,21 @@ export default class Pythagoras extends Equation{
     
     //                     this.programa.animar(multiplicar);
 
-    //                     //Gambiarra, muda o proximo click para animar a distributividade
-    //                     element.onclick = () => {
+    //                     // //Gambiarra, muda o proximo click para animar a distributividade
+    //                     // element.onclick = () => {
 
-    //                         const equacaoResultante = document.createElement("div");
+    //                     //     const equacaoResultante = document.createElement("div");
 
-    //                         const equationWindow = document.getElementById("equationWindow")
+    //                     //     const equationWindow = document.getElementById("equationWindow")
 
-    //                         equationWindow.insertBefore(equacaoResultante, equationWindow.lastChild)
+    //                     //     equationWindow.insertBefore(equacaoResultante, equationWindow.lastChild)
 
-    //                         this.programa.animar(
-    //                                                 new Distributividade(null)
-    //                                                 .addSettings(this.programa.scene,this.programa.camera,this.programa.canvas)
-    //                                                 .update(element, equacaoResultante)
-    //                         )
-    //                     }
+    //                     //     this.programa.animar(
+    //                     //                             new Distributividade(null)
+    //                     //                             .addSettings(this.programa.scene,this.programa.camera,this.programa.canvas)
+    //                     //                             .update(element, equacaoResultante)
+    //                     //     )
+    //                     // }
     
     //                 }
     

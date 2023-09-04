@@ -31,6 +31,7 @@ export default class Pythagoras extends Equation{
                         );
 
         this.instancia = this.equation.copy;
+        this.variables = variables;
 
         const equation = document.createElement("div");
 
@@ -39,10 +40,11 @@ export default class Pythagoras extends Equation{
         equation.style.fontFamily = "Courier New, monospace";
         equation.style.fontSize = "25px";
         equation.style.fontWeight ="italic";
+        equation.style.marginBottom = "30px"
 
         equation.appendChild(this.equation.html);
 
-        this.lado(true, variables.c);
+        this.lado(true,  variables.c);
         this.lado(false, variables.b);
         this.lado(false, variables.a);
 
@@ -74,18 +76,20 @@ export default class Pythagoras extends Equation{
 
             if(!this.instancia.element) this.criarInstancia(variavel);
 
-            const variavelInstanciada = variavel.copy;
-
-            this.instancia.changeVariable(variavelInstanciada, variavel.name)
-            
-            //Gambiarra pra adicionar com div ao invez de span
-            document.getElementById("equationWindow").removeChild(this.instancia.element);
-            this.criarInstancia();
-            document.getElementById("equationWindow").appendChild(this.instancia.element)
+            const variavelInstanciada = this.instancia.variables.filter(variable => variable.name == variavel.name)[0];
 
             variavelInstanciada.element.style.color = "red";
 
             variavelInstanciada.element.textContent = "( )";
+
+            this.instancia.variables
+                          .filter(v => this.variables[v.name])
+                          .map(v => {
+                            v.element.textContent = "( )";
+                            v.content = "( )"
+                            v.element.classList.add("selectable");
+                            v.onclick = this.variables[v.name].element.onclick
+                          });
 
             let index = 0;
             for(const lado of triangulo.edges){
@@ -162,7 +166,7 @@ export default class Pythagoras extends Equation{
          //Gambiarra pra adicionar com div ao invez de span
          document.getElementById("equationWindow").removeChild(this.instancia.element);
          this.criarInstancia();
-         document.getElementById("equationWindow").appendChild(this.instancia.element)
+         document.getElementById("equationWindow").appendChild(this.instancia.element);
 
 
         lado.selecionado = true;
@@ -179,10 +183,6 @@ export default class Pythagoras extends Equation{
         const instance = document.createElement("div");
 
         instance.id = "equationContent";
-
-        instance.style.fontFamily = "Courier New, monospace";
-        instance.style.fontSize = "25px";
-        instance.style.fontWeight ="italic";
 
         instance.appendChild(this.instancia.html);
 

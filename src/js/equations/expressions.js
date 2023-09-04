@@ -62,6 +62,10 @@ class Expression{
 
         return new this.constructor(...nodes);
     }
+
+    get variables(){
+        return this.nodes.filter(node => node.type == "variable");
+    }
 }
 
 export class Variable extends Expression{
@@ -72,13 +76,14 @@ export class Variable extends Expression{
 
         this.type = "variable";
         this.name = name;
+        this.content = name;
     }
 
     get html() {
 
         const span = document.createElement("span");
 
-        span.textContent = this.name;
+        span.textContent = this.content;
 
         this.element    = span;
         span.expression = this;
@@ -152,6 +157,42 @@ export class Addition extends Expression{
         const plus = document.createElement("span");
 
         plus.textContent = (this.right.negative)? " " : " + ";
+
+        span.appendChild(plus);
+
+        span.appendChild(this.right.html)
+
+        this.element    = span;
+        span.expression = this;
+
+        return span;
+    }
+}
+
+export class Minus extends Expression{
+
+    constructor(leftOperand, rightOperand){
+        super();
+        this.left  = leftOperand;
+        this.right = rightOperand;
+        this.type  = "addition";
+
+        this.left.father  = this;
+        this.right.father = this;
+    }
+
+    get html(){
+
+
+        const span = document.createElement("span");
+
+        span.class = "equation-letter"
+
+        span.appendChild(this.left.html);
+
+        const plus = document.createElement("span");
+
+        plus.textContent = " - ";
 
         span.appendChild(plus);
 
@@ -306,6 +347,8 @@ export class Equality extends Expression{
         
         this.left.father  = this;
         this.right.father = this;
+
+        this.type = "equality"
 
     }
 

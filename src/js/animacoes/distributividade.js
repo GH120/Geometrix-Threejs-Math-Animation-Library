@@ -67,7 +67,7 @@ export class Distributividade extends Animacao{
 
         equacao.style.left = `${expression.element.getBoundingClientRect().left - 5}px`
 
-        equacao.style.bottom =  `${expression.element.getBoundingClientRect().bottom - 390}px`
+        equacao.style.bottom =  `${expression.element.getBoundingClientRect().bottom - 445}px`
 
         const a = expression.left.left.left;
         const b = expression.left.left.right;

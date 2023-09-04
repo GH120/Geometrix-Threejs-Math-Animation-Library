@@ -1,7 +1,7 @@
 import { Distributividade } from "../animacoes/distributividade";
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
-import { Addition, Multiplication, Parenthesis, Value } from "./expressions";
+import { Addition, Minus, Multiplication, Parenthesis, Value } from "./expressions";
 
 export class Operations{
 
@@ -44,15 +44,20 @@ export class Operations{
         createOption("simplificar", "simplify")
         
       
-        options.addEventListener("change", () => {
+        options.addEventListener("change", () => this.chooseOption(options));
+      
+        return options;
+    }
 
-          const nome = options.value;
+    chooseOption(options){
+
+        const nome = options.value;
           
-          // Operação escolhida das opções
-          const operacaoEscolhida = this.operations[nome];
-        
-          //Para cada subexpressão da expressão, vê se ela se encaixa com os requerimentos da operação escolhida
-          for(const expression of this.expression.nodes){
+        // Operação escolhida das opções
+        const operacaoEscolhida = this.operations[nome];
+    
+        //Para cada subexpressão da expressão, vê se ela se encaixa com os requerimentos da operação escolhida
+        for(const expression of this.expression.nodes){
 
             const temOperacao = operacaoEscolhida.requirement(expression);
 
@@ -62,16 +67,7 @@ export class Operations{
 
                 const html = expression.element;
 
-                html.style =   `background: none;
-                                border: none;
-                                padding: 0;
-                                margin: 0;
-                                font: inherit;
-                                cursor: pointer;
-                                outline: inherit;
-                                color: inherit;
-                                pointer-events:all;
-                                `;
+                html.classList.add("selectable")
 
                 html.onclick = () => {
                     const action = operacaoEscolhida.action(expression);
@@ -82,17 +78,23 @@ export class Operations{
 
                     this.programa.animar(action);
 
-                    action.setOnTermino(() => this.expression.update());
+                    action.onStart(() => this.animando = true)
 
-                    html.style = ""
+                    action.setOnTermino(() => {
+                        if(!this.animando){
+                            this.expression.update();
+                            this.chooseOption(options);
+                        }
+                        return this.animando = false;
+                    });
+
+                    html.classList.remove("selectable");
+
                 }
 
             }
-              
-          }
-        });
-      
-        return options;
+            
+        }
     }
 
     get operations(){
@@ -117,6 +119,22 @@ export class Operations{
 
             },
 
+            subtraction: {
+
+                requirement: function isFree(expression){
+                    if(!expression.father) return false;
+                    if(expression.father.type == "addition") return isFree(expression.father);
+                    if(expression.father.type == "equality") return true;
+                } ,
+
+                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
+
+                result: (expression) => {
+                    this.expression.left = new Minus(this.expression.left, expression.copy);
+                    return new Value(0)
+                }
+            },
+
             simplify: {
 
                 requirement: (expression) => //expression.type in ["parenthesis", "addition", "multiplication"] &&
@@ -128,7 +146,7 @@ export class Operations{
                                                     expression.left.type == "value" && expression.right.type == "value" //Multiplicação e adição de valores
                                                 ),
                                             //),
-                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorInicial(0),
+                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
                 
                 result:     (expression) => new Value(expression.right.value * expression.left.value)
             },

@@ -40,7 +40,7 @@ export class Fase3 {
         this.setupTextBox();
 
         triangle.edges[0].valor = new Addition(new Variable("x"), new Value(-1));
-        triangle.edges[1].valor = new Addition(new Variable("x"), new Value(-1));
+        triangle.edges[1].valor = new Addition(new Variable("x"), new Value(-2));
         triangle.edges[2].valor = new Variable("x");
 
         this.levelDesign();

@@ -10,6 +10,7 @@ export class Operations{
         this.expression = expression;
         this.programa   = programa;
 
+        this.basicOperations = ["simplify"]
     }
 
     createSelector(){
@@ -41,18 +42,17 @@ export class Operations{
         createOption("expoente para multiplicação", "square");
         createOption("distributividade", "distributive");
         createOption("mudar de lado", "subtraction");
-        createOption("simplificar", "simplify")
-        
-      
-        options.addEventListener("change", () => this.chooseOption(options));
+        createOption("simplificar", "basic")
+
+        options.addEventListener("change", () => this.chooseOption(options.value));
       
         return options;
     }
 
-    chooseOption(options){
+    chooseOption(nome){
 
-        const nome = options.value;
-          
+        if(nome == "basic") this.basicOperations.map(operation => this.chooseOption(operation))
+
         // Operação escolhida das opções
         const operacaoEscolhida = this.operations[nome];
     
@@ -83,7 +83,7 @@ export class Operations{
                     action.setOnTermino(() => {
                         if(!this.animando){
                             this.expression.update();
-                            this.chooseOption(options);
+                            this.chooseOption(nome);
                         }
                         return this.animando = false;
                     });
@@ -133,22 +133,6 @@ export class Operations{
                     this.expression.left = new Minus(this.expression.left, expression.copy);
                     return new Value(0)
                 }
-            },
-
-            simplify: {
-
-                requirement: (expression) => //expression.type in ["parenthesis", "addition", "multiplication"] &&
-                                            //( 
-                                              //  expression.type == "parenthesis" && expression.left.type != "addition" || //Parentesis desnecessário
-                                                
-                                                (
-                                                    expression.type == "multiplication" && 
-                                                    expression.left.type == "value" && expression.right.type == "value" //Multiplicação e adição de valores
-                                                ),
-                                            //),
-                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
-                
-                result:     (expression) => new Value(expression.right.value * expression.left.value)
             },
 
             distributive: {
@@ -209,7 +193,33 @@ export class Operations{
                         )
                     )
 
-            }
+            },
+
+            simplify: {
+
+                requirement: (expression) => //expression.type in ["parenthesis", "addition", "multiplication"] &&
+                                            //( 
+                                              //  expression.type == "parenthesis" && expression.left.type != "addition" || //Parentesis desnecessário
+                                                
+                                                (
+                                                    expression.type == "multiplication" && 
+                                                    expression.left.type == "value" && expression.right.type == "value" //Multiplicação e adição de valores
+                                                ),
+                                            //),
+                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
+                
+                result:     (expression) => new Value(expression.right.value * expression.left.value)
+            },
+
+            // parenthesis: {
+
+            //     requirement: (expression) => expression.type == "parenthesis" &&
+            //                                   expression.left.type in ["variable", "value"],
+                                            
+            //     action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
+                
+            //     result: (expression) => expression
+            // },
         }
     }
 }

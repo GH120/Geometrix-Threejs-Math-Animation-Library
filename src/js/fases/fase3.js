@@ -19,6 +19,7 @@ import { Divisao } from '../animacoes/divisao';
 import { Triangle } from '../objetos/triangle';
 import Bracket from '../objetos/bracket';
 import Pythagoras from '../equations/pythagoras';
+import { Addition, Value, Variable } from '../equations/expressions';
   
 
 export class Fase3 {
@@ -38,9 +39,9 @@ export class Fase3 {
         this.setupInterface();
         this.setupTextBox();
 
-        triangle.edges[0].valor = "(x-2)";
-        triangle.edges[1].valor = "(x-1)";
-        triangle.edges[2].valor = "x";
+        triangle.edges[0].valor = new Addition(new Variable("x"), new Value(-1));
+        triangle.edges[1].valor = new Addition(new Variable("x"), new Value(-1));
+        triangle.edges[2].valor = new Variable("x");
 
         this.levelDesign();
     }

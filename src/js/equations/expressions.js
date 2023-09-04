@@ -4,16 +4,20 @@ class Expression{
 
     //Muda a variável com o nome escolhido para seu novo valor, que também pode ser uma expressão
     changeVariable(value, name){
-
+        
         if(this.right && this.right.changeVariable(value, name)){
-            this.right = value;
+            this.right.substitute(value)
         }
 
         if(this.left && this.left.changeVariable(value, name)){
-            this.left = value;
+            this.left.substitute(value)
         }
 
         return false;
+    }
+
+    checkForAddition(){
+
     }
 
     get nodes(){
@@ -32,10 +36,12 @@ class Expression{
         if(this.father.right == this){
             this.father.right = expression;
             expression.father = this.father;
+            this.father.checkForAddition();
         }
         else if(this.father.left == this){
             this.father.left = expression;
             expression.father = this.father;
+            this.father.checkForAddition();
         }
     }
 
@@ -264,8 +270,6 @@ export class Square extends Expression{
 
     get html(){
 
-        if(this.element) return this.element
-
 
         const span = document.createElement("span");
 
@@ -282,7 +286,7 @@ export class Square extends Expression{
         this.element    = span;
         span.expression = this;
 
-        this.right = {element:square};
+        this.right = {element:square, changeVariable: () => false};
         this.right.nodes = [this.right];
 
         return span;

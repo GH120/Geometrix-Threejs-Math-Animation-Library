@@ -6,6 +6,7 @@ import { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/animation";
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
 import { Distributividade } from "../animacoes/distributividade";
 import { Addition, Equality, Square, Value, Variable } from "./expressions";
+import { Operations } from "./operations";
 
 export default class Pythagoras extends Equation{
 
@@ -17,16 +18,16 @@ export default class Pythagoras extends Equation{
 
         this.clickables = [];
 
-        const variables = {"a": new Square(new Variable("a")), 
-                          "b": new Square(new Variable("b")),
-                          "c": new Square(new Variable("c"))}
+        const variables = {"a": new Variable("a"), 
+                          "b": new Variable("b"),
+                          "c": new Variable("c")}
 
         this.equation = new Equality(
                             new Addition(
-                                variables.a,
-                                variables.b
+                                new Square(variables.a),
+                                new Square(variables.b)
                             ),
-                            variables.c
+                            new Square(variables.c)
                         );
 
         this.instancia = this.equation.copy;
@@ -45,9 +46,9 @@ export default class Pythagoras extends Equation{
         this.lado(false, variables.b);
         this.lado(false, variables.a);
 
-        
+        document.getElementById("equationWindow").appendChild(equation);
 
-        document.getElementById("equationWindow").appendChild(equation)
+        document.body.appendChild(new Operations(this.instancia, this.programa).getOptions());
 
     }
 
@@ -57,8 +58,6 @@ export default class Pythagoras extends Equation{
         const triangulo = this.programa.triangulo;
 
         if(!triangulo.retangulo()) return this.falhou();
-
-        console.log(variavel)
 
         variavel.element.style = `background: none;
                                     border: none;
@@ -71,27 +70,32 @@ export default class Pythagoras extends Equation{
                                     pointer-events:all;
                                     `;
 
-        variavel.element.onclick = function(){
+        variavel.element.onclick = () => {
 
             if(!this.instancia.element) this.criarInstancia(variavel);
 
-            const variavelInstanciada = new Variable("a");
-
-            variavelInstanciada.html.style.color = "red";
-
-            variavelInstanciada.element.textContent = "( )"
+            const variavelInstanciada = variavel.copy;
 
             this.instancia.changeVariable(variavelInstanciada, variavel.name)
+            
+            //Gambiarra pra adicionar com div ao invez de span
+            document.getElementById("equationWindow").removeChild(this.instancia.element);
+            this.criarInstancia();
+            document.getElementById("equationWindow").appendChild(this.instancia.element)
 
-            // let index = 0;
-            // for(const lado of triangulo.edges){
+            variavelInstanciada.element.style.color = "red";
 
-            //     const anguloOposto = triangulo.angles[(index++ +2) % 3];
+            variavelInstanciada.element.textContent = "( )";
 
-            //     this.criarControles(lado, anguloOposto, isHipotenusa, variavel)
+            let index = 0;
+            for(const lado of triangulo.edges){
+
+                const anguloOposto = triangulo.angles[(index++ +2) % 3];
+
+                this.criarControles(lado, anguloOposto, isHipotenusa, variavel)
                 
-            // }
-        }.bind(this);
+            }
+        };
     }
 
     //Cria os controles de um lado
@@ -147,13 +151,19 @@ export default class Pythagoras extends Equation{
 
         // //Se esse lado for selecionado, então recusa execução
         // if(lado.selecionado) return this.falhou()
-
+        "x";
         //Em caso de sucesso, muda todas as ocorrências da variavel para o valor do lado
         //Por exemplo, todo "a" vira "x-1"
         //Remove os controles de selecionar lado e seta o lado para selecionado
         alert("lado escolhido com sucesso");
 
         this.instancia.changeVariable(lado.valor, variavel.name);
+
+         //Gambiarra pra adicionar com div ao invez de span
+         document.getElementById("equationWindow").removeChild(this.instancia.element);
+         this.criarInstancia();
+         document.getElementById("equationWindow").appendChild(this.instancia.element)
+
 
         lado.selecionado = true;
 
@@ -176,9 +186,9 @@ export default class Pythagoras extends Equation{
 
         instance.appendChild(this.instancia.html);
 
-        document.getElementById("equationWindow").append(instance)
+        this.instancia.element = instance;
 
-        instancia.instancia = instancia;
+        document.getElementById("equationWindow").append(instance)
 
     }
 

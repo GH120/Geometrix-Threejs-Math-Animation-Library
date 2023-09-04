@@ -15,7 +15,7 @@ export class Operations{
     createSelector(){
         const options = document.createElement("select");
       
-        options.id = "openEquationWindow"
+        options.id = "options"
 
         options.classList.add('button-9', 'hidden');
       
@@ -27,7 +27,7 @@ export class Operations{
     getOptions(){
 
         const options = this.createSelector();
-      
+
         const createOption = (content, tag) => {
             let texto = document.createElement("option");
           
@@ -56,7 +56,7 @@ export class Operations{
 
             const temOperacao = operacaoEscolhida.requirement(expression);
 
-            console.log(expression, temOperacao)
+            // console.log(expression, temOperacao)
 
             if(temOperacao) {
 

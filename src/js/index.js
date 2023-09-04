@@ -68,39 +68,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const openButton = document.getElementById("openEquationWindow");
     const closeButton = document.getElementById("closeButton");
     const equationWindow = document.getElementById("equationWindow");
+    const options = document.getElementById("options");
 
     let whiteboard;
 
-    const elemento = new Equality(
-      new Multiplication(
-        new Addition(
-          new Variable("x"), 
-          new Value(1)
-        ), 
-        new Square(
-          new Addition(
-            new Variable("y"), 
-            new Value(-1)
-          )
-        )
-      ),
-      new Multiplication(
-        new Addition(
-          new Variable("x"), 
-          new Value(1)
-        ), 
-        new Addition(
-          new Variable("y"), 
-          new Value(-1)
-        )
-      )
-    )
+    // const options = new Operations(elemento,programa).getOptions();
 
-    equationWindow.append(elemento.html);
-
-    const options = new Operations(elemento,programa).getOptions();
-
-    document.body.appendChild(options);
+    // document.body.appendChild(options);
 
     openButton.addEventListener("click", function() {
         openButton.classList.add("hidden");

@@ -68,7 +68,12 @@ class Expression{
     }
 
     get sibling(){
-        return (this.father)? (this.father.left == this)? this.father.right : this.father.left : {type:null};
+        return (this.father)? 
+               (this.father.left == this)? 
+               (this.father.right)?        this.father.right : 
+                                           {type:null}       :
+                                           this.father.left  : 
+                                           {type:null}       ;
     }
 }
 

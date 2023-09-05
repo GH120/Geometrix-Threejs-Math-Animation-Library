@@ -61,7 +61,7 @@ export class Operations{
 
             const temOperacao = operacaoEscolhida.requirement(expression);
 
-            // console.log(expression, temOperacao)
+            console.log(expression, temOperacao)
 
             if(temOperacao) {
 
@@ -121,23 +121,28 @@ export class Operations{
 
             subtraction: {
 
-                requirement: function isFree(expression){
+                requirement: function isFree(expression, index = 0){
                     if(!expression.father) return false;
-                    console.log(expression)
-                    if(expression.sibling.type == "addition") return false;
-                    if(expression.father.type == "addition") return isFree(expression.father);
+                    if(expression.father.type == "addition") return isFree(expression.father, index+1);
+                    if(expression.type == "addition" && index == 0) return false;
                     if(expression.father.type == "equality") return true;
                 } ,
 
                 action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
 
                 result: (expression) => {
-                    if (expression.father.right == expression) 
-                        this.expression.left.substitute(new Minus(this.expression.left.copy, expression.copy));
-                    if (expression.father.left  == expression) 
-                        this.expression.right.substitute(new Minus(this.expression.right.copy, expression.copy));
 
-                    console.log(this.expression)
+                    function ladoOposto(expression){
+                        if(expression.father.type == "equality"){
+                            return expression.sibling;
+                        }
+                        return ladoOposto(expression.father);
+                    }
+
+                    const oposto = ladoOposto(expression);
+                    
+                    oposto.substitute(new Minus(oposto.copy, expression.copy));
+
                     return new Value(0)
                 }
             },

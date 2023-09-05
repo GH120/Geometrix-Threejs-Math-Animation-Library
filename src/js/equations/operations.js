@@ -123,6 +123,8 @@ export class Operations{
 
                 requirement: function isFree(expression){
                     if(!expression.father) return false;
+                    console.log(expression)
+                    if(expression.sibling.type == "addition") return false;
                     if(expression.father.type == "addition") return isFree(expression.father);
                     if(expression.father.type == "equality") return true;
                 } ,
@@ -130,7 +132,12 @@ export class Operations{
                 action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
 
                 result: (expression) => {
-                    this.expression.left = new Minus(this.expression.left, expression.copy);
+                    if (expression.father.right == expression) 
+                        this.expression.left.substitute(new Minus(this.expression.left.copy, expression.copy));
+                    if (expression.father.left  == expression) 
+                        this.expression.right.substitute(new Minus(this.expression.right.copy, expression.copy));
+
+                    console.log(this.expression)
                     return new Value(0)
                 }
             },

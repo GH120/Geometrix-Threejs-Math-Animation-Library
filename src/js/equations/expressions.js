@@ -66,6 +66,10 @@ class Expression{
     get variables(){
         return this.nodes.filter(node => node.type == "variable");
     }
+
+    get sibling(){
+        return (this.father)? (this.father.left == this)? this.father.right : this.father.left : {type:null};
+    }
 }
 
 export class Variable extends Expression{
@@ -327,7 +331,7 @@ export class Square extends Expression{
         this.element    = span;
         span.expression = this;
 
-        this.right = {element:square, changeVariable: () => false};
+        this.right = {element:square, changeVariable: () => false, sibling: this.left};
         this.right.nodes = [this.right];
 
         return span;

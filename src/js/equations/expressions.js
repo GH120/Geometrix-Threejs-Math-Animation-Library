@@ -275,10 +275,27 @@ export class Multiplication extends Expression{
 
     get html(){
 
-
         const span = document.createElement("span");
 
-        span.class = "equation-letter"
+        span.class = "equation-letter";
+        
+        this.element    = span;
+        span.expression = this;
+
+        // if((this.left.type == "variable" || this.right.type == "variable")){
+
+        //     const variavel = (this.left.name)? this.left : this.right;
+
+        //     const valor = variavel.sibling;
+
+        //     if(valor && valor.type == "value"){
+        //         span.appendChild(valor.html)
+        //         span.appendChild(variavel.html);
+
+        //         return span;
+        //     }
+        // }
+
 
         span.appendChild(this.left.html);
 
@@ -289,9 +306,6 @@ export class Multiplication extends Expression{
         span.appendChild(mult);
 
         span.appendChild(this.right.html)
-
-        this.element    = span;
-        span.expression = this;
 
         return span;
     }

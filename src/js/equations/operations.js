@@ -1,7 +1,7 @@
 import { Distributividade } from "../animacoes/distributividade";
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
-import { Addition, Minus, Multiplication, Parenthesis, Value } from "./expressions";
+import { Addition, Minus, Multiplication, Parenthesis, Square, Value } from "./expressions";
 
 export class Operations{
 
@@ -10,7 +10,7 @@ export class Operations{
         this.expression = expression;
         this.programa   = programa;
 
-        this.basicOperations = ["simplify"]
+        this.basicOperations = ["toSquare", "parenthesis", "simplify"]
     }
 
     createSelector(){
@@ -42,16 +42,18 @@ export class Operations{
         createOption("expoente para multiplicação", "square");
         createOption("distributividade", "distributive");
         createOption("mudar de lado", "subtraction");
-        createOption("simplificar", "basic")
+        createOption("simplificar", "toSquare")
 
         options.addEventListener("change", () => this.chooseOption(options.value));
       
         return options;
     }
 
-    chooseOption(nome){
+    chooseOption(nome, recursion=true){
 
-        if(nome == "basic") this.basicOperations.map(operation => this.chooseOption(operation))
+        const isBasicOperation = this.basicOperations.filter(name => name == nome).length;
+
+        if(isBasicOperation && recursion) this.basicOperations.map(operation => this.chooseOption(operation, false));
 
         // Operação escolhida das opções
         const operacaoEscolhida = this.operations[nome];
@@ -60,8 +62,6 @@ export class Operations{
         for(const expression of this.expression.nodes){
 
             const temOperacao = operacaoEscolhida.requirement(expression);
-
-            console.log(expression, temOperacao)
 
             if(temOperacao) {
 
@@ -177,14 +177,14 @@ export class Operations{
                         new Addition(
                             new Parenthesis(
                                 new Multiplication(
-                                    expression.left.left.left,
-                                    expression.right.left.left
+                                    expression.left.left.left.copy,
+                                    expression.right.left.left.copy
                                 )
                             ),
                             new Parenthesis(
                                 new Multiplication(
-                                    expression.left.left.left,
-                                    expression.right.left.right
+                                    expression.left.left.left.copy,
+                                    expression.right.left.right.copy
                                 )
                             )
                            
@@ -192,14 +192,14 @@ export class Operations{
                         new Addition(
                             new Parenthesis(
                                 new Multiplication(
-                                    expression.left.left.right,
-                                    expression.right.left.left,
+                                    expression.left.left.right.copy,
+                                    expression.right.left.left.copy,
                                 )
                             ),
                             new Parenthesis(
                                 new Multiplication(
-                                    expression.left.left.right,
-                                    expression.right.left.right,
+                                    expression.left.left.right.copy,
+                                    expression.right.left.right.copy,
                                 )
                             )
                         )
@@ -223,15 +223,27 @@ export class Operations{
                 result:     (expression) => new Value(expression.right.value * expression.left.value)
             },
 
-            // parenthesis: {
-
-            //     requirement: (expression) => expression.type == "parenthesis" &&
-            //                                   expression.left.type in ["variable", "value"],
+            parenthesis: {
+                //Corrigir requirement, father pode ser addition ou equality, mas não multiplicação e exponenciação
+                requirement: (expression) => expression.type == "parenthesis",
                                             
-            //     action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
+                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
                 
-            //     result: (expression) => expression
-            // },
+                result: (expression) => expression.left
+            },
+
+            toSquare: {
+
+                requirement: (expression) => expression.type         == "multiplication" && 
+                                             expression.left.type    == "variable"       &&
+                                             expression.left.name    == expression.right.name,
+
+                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
+
+                result:     (expression) => {
+                    return new Square(expression.left);
+                }
+            }
         }
     }
 }

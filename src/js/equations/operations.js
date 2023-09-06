@@ -83,6 +83,7 @@ export class Operations{
                     action.setOnTermino(() => {
                         if(!this.animando){
                             this.expression.update();
+                            this.eliminarZero(result);
                             this.chooseOption(nome);
                         }
                         return this.animando = false;
@@ -94,6 +95,22 @@ export class Operations{
 
             }
             
+        }
+    }
+
+    //Consertar a eliminação da opção escolhida
+    eliminarZero(result, nome) {
+
+        if(result.type == "value" && result.value == 0 && result.father != "equation"){
+
+            result.father.substitute(result.sibling)
+
+            const fadeOut = new TextoAparecendo(result.father.element)
+                                .setValorInicial(10)
+                                .setValorFinal(-2)
+                                .setOnTermino(() => this.expression.update());
+
+            this.programa.animar(fadeOut);
         }
     }
 
@@ -263,5 +280,51 @@ export class Operations{
             //Nesse caso, vamos verificar se também é multiplicação com coeficientes iguais => confuso pra somas complexas
             //No futuro, criar soma complexa, onde transforma b*a + c*a em (b+c)*a
         }
+    }
+}
+
+class Somar {
+
+    constructor(equation, expression){
+        
+        this.expression = expression;
+        this.escopo = obterEscopo(expression);
+    }
+
+    static requirement(expression){
+        return expression.father && expression.father.type != "equality"
+    }
+
+    somaValida(outraExpression){
+
+        const foraDoEscopo = !this.estaNoEscopo(outraExpression);
+
+        if(foraDoEscopo) return false;
+
+        const igual = outraExpression.igual(expression);
+
+        
+    }
+
+    //A fazer...
+    multiplicadoPorConstante(termo1, termo2){
+        if(termo1.type != "multiplication") return false;
+        if(termo1.left.igual(termo2)) return 
+    }
+
+    obterEscopo(expression){
+        
+        if(expression.father.type == "multiplication") return expression.father;
+        if(expression.father.type == "square") return expression.father;
+        if(expression.father.type == "addition"){
+            if(expression.father.father) // se a adição não for filha da igualdade, seu escopo é maior
+                return this.obterEscopo(expression.father)
+            else
+                return expression.father;
+        }
+    }
+
+    estaNoEscopo(expression){
+        return this.escopo.nodes.filter(node => node == expression).length;
     }
 }

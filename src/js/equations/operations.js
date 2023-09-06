@@ -1,7 +1,7 @@
 import { Distributividade } from "../animacoes/distributividade";
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
-import { Addition, Minus, Multiplication, Parenthesis, Square, Value } from "./expressions";
+import { Addition, Minus, Multiplication, Parenthesis, Square, Value, VariableMultiplication } from "./expressions";
 
 export class Operations{
 
@@ -10,7 +10,7 @@ export class Operations{
         this.expression = expression;
         this.programa   = programa;
 
-        this.basicOperations = ["toSquare", "parenthesis", "simplify"]
+        this.basicOperations = ["toSquare", "parenthesis", "simplify", "variableMultiplication"]
     }
 
     createSelector(){
@@ -243,7 +243,25 @@ export class Operations{
                 result:     (expression) => {
                     return new Square(expression.left);
                 }
+            },
+
+            variableMultiplication:{
+
+                requirement: (expression) => expression.type == "multiplication" &&
+                                             ((expression.left.type == "variable" && expression.right && expression.right.type == "value") ||
+                                              (expression.left.type == "value" && expression.right && expression.right.type == "variable")),
+
+                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
+
+                result: (expression) => new VariableMultiplication(expression.left, expression.right)
             }
+
+            //TODO: Somar, ou seja, ao selecionar um elemento, ele tem de estar em uma soma
+            //Mas essa soma tem de ser válida, ou seja, livre e com elemento de mesma qualidade
+            //Somas válidas são aquelas entre expressões do mesmo tipo 
+            //Diferenciar de soma de elementos com multiplicação? => inicialmente não, depois detalhar
+            //Nesse caso, vamos verificar se também é multiplicação com coeficientes iguais => confuso pra somas complexas
+            //No futuro, criar soma complexa, onde transforma b*a + c*a em (b+c)*a
         }
     }
 }

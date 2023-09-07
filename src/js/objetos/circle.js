@@ -101,6 +101,7 @@ export default class Circle{
         scene.remove(this.mesh);
         this.construirMesh();
         scene.add(this.mesh);
+        this.mesh.position.copy(this.centro);
     }
 
     get centro(){

@@ -50,7 +50,8 @@ export class Fase4 {
         this.triangulo.removeFromScene();
 
         const dialogo = ["O círculo é uma das figuras geométricas mais básicas",
-                         "Ele tem um centro"]
+                         "Ele tem um centro",
+                         "e um raio"]
 
         const circulo = new Circle(new THREE.Vector3(0,0,0), 3);
 
@@ -64,33 +65,71 @@ export class Fase4 {
 
         centro.material = new THREE.MeshBasicMaterial({color:0x960000})
 
-        const circuloCrescendo = new Animacao(centro)
-                                 .setValorInicial(0.001)
-                                 .setValorFinal(0.1)
-                                 .setDuration(100)
-                                 .setInterpolacao((inicial,final,peso) => inicial*(1 - peso) + final*peso)
-                                 .setCurva((x) => {
-                                    const c5 = (2 * Math.PI) / 4.5;
-                                    
-                                    return x === 0
-                                      ? 0
-                                      : x === 1
-                                      ? 1
-                                      : x < 0.5
-                                      ? -(Math.pow(2, 20 * x - 10) * Math.sin((20 * x - 11.125) * c5)) / 2
-                                      : (Math.pow(2, -20 * x + 10) * Math.sin((20 * x - 11.125) * c5)) / 2 + 1;
-                                    })
-                                 .setUpdateFunction((valor) => {
-                                    centro.raio = valor;
-                                    centro.updateMesh(this.scene);
-                                 })
+        const circuloCrescendo = this.circuloCrescendoAnimacao(centro);
 
         const anim1 = new AnimacaoSimultanea(animacoes[0], desenharCirculo);
         const anim2 = new AnimacaoSimultanea(animacoes[1], circuloCrescendo);
+        const anim3 = this.thirdDialogue(animacoes[2], centro, circulo);
 
         
 
-        this.animar(new AnimacaoSequencial(anim1,anim2));
+        this.animar(new AnimacaoSequencial(anim1,anim2,anim3));
+    }
+
+    thirdDialogue(dialogue, center, circulo){
+
+        const pontoDoCirculo = new Circle(new THREE.Vector3(0,3,0), 0.1, 0.2);
+
+        pontoDoCirculo.material = new THREE.MeshBasicMaterial({color:0x960000});
+
+        const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
+
+        const tracejado = new Tracejado(circulo.mesh.position.clone(), pontoDoCirculo.mesh.position.clone());
+        
+
+        const moverPonto = (posicaoFinal) => new Animacao(pontoDoCirculo)
+                                        .setValorInicial(pontoDoCirculo.mesh.position.clone())
+                                        .setValorFinal(posicaoFinal)
+                                        .setInterpolacao((inicial, final, peso) => new THREE.Vector3().lerpVectors(inicial,final,peso).normalize().multiplyScalar(3))
+                                        .setDuration(200)
+                                        .setUpdateFunction((value) => {
+                                            console.log(value)
+                                            pontoDoCirculo.centro = value;
+                                            tracejado.destino = value;
+                                            pontoDoCirculo.updateMesh(this.scene); //Refatorar circulo, updateMesh deve ser apenas update
+                                            tracejado.update();
+                                        })
+        
+        const demonstrarRaio = new AnimacaoSequencial(
+                                    new AnimacaoSimultanea(criarPonto, new MostrarTracejado(tracejado, this.scene)),
+                                    moverPonto(new THREE.Vector3(3,0,0)).setOnStart(() => tracejado.addToScene(this.scene))
+                                )
+
+        return new AnimacaoSimultanea(dialogue, demonstrarRaio)
+    }
+
+    circuloCrescendoAnimacao(circulo){
+
+        return new Animacao(circulo)
+                .setValorInicial(0.001)
+                .setValorFinal(0.1)
+                .setDuration(140)
+                .setInterpolacao((inicial,final,peso) => inicial*(1 - peso) + final*peso)
+                .setCurva((x) => {
+                    const c5 = (2 * Math.PI) / 4.5;
+                    
+                    return x === 0
+                        ? 0
+                        : x === 1
+                        ? 1
+                        : x < 0.5
+                        ? -(Math.pow(2, 20 * x - 10) * Math.sin((20 * x - 11.125) * c5)) / 2
+                        : (Math.pow(2, -20 * x + 10) * Math.sin((20 * x - 11.125) * c5)) / 2 + 1;
+                    })
+                .setUpdateFunction((valor) => {
+                    circulo.raio = valor;
+                    circulo.updateMesh(this.scene);
+                })
     }
 
     //Cria a caixa de texto onde o texto vai aparecer

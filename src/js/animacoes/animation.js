@@ -63,6 +63,11 @@ export default class Animacao {
         return this;
     }
 
+    setCurva(curva){
+        this.curva = curva;
+        return this;
+    }
+
     onStart(){
         return null;
     }
@@ -75,6 +80,10 @@ export default class Animacao {
         return null;
     }
 
+    curva(peso){
+        return peso;
+    }
+
     *getFrames(){
 
         this.onStart();
@@ -84,7 +93,7 @@ export default class Animacao {
 
             if(this.chosen) console.log(frame)
 
-            const lerp = (peso) => this.interpolacao(this.valorInicial, this.valorFinal, peso);
+            const lerp = (peso) => this.interpolacao(this.valorInicial, this.valorFinal, this.curva(peso));
 
             const valor = lerp(frame/this.frames);
 

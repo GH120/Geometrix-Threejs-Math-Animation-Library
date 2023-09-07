@@ -10,6 +10,7 @@ import { Fase3 } from './fases/fase3';
 import { Distributividade } from './animacoes/distributividade';
 import { Addition, Equality, Multiplication, Square, Value, Variable } from './equations/expressions';
 import { Operations } from './equations/operations';
+import { Fase4 } from './fases/fase4';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
@@ -41,7 +42,7 @@ const triangle = new Triangle()
                     .renderAngles()
                     .addToScene(scene);
 
-const programa = new Fase3(triangle,scene,camera);
+const programa = new Fase4(triangle,scene,camera);
 
 programa.canvas = canvas;
 

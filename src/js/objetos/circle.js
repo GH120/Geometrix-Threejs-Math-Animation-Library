@@ -7,6 +7,7 @@ export default class Circle{
         this.hitbox = new THREE.Mesh(new THREE.SphereGeometry(0.5));
 
         this.hitbox.visible = false;
+        this.material =new THREE.MeshBasicMaterial({color:0xff0000});
 
         this.centro = centro;
         this.raio = raio;
@@ -53,7 +54,7 @@ export default class Circle{
 
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(posicoes, 3));
 
-        this.mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:0xff0000}));
+        this.mesh = new THREE.Mesh(geometry, this.material);
     }
 
     circunscrever(triangulo){
@@ -94,6 +95,12 @@ export default class Circle{
 
     update(){
         this.mesh.position.copy(this.centro);
+    }
+
+    updateMesh(scene){
+        scene.remove(this.mesh);
+        this.construirMesh();
+        scene.add(this.mesh);
     }
 
     get centro(){

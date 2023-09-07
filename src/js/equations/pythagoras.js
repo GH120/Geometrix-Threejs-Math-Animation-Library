@@ -61,16 +61,7 @@ export default class Pythagoras extends Equation{
 
         if(!triangulo.retangulo()) return this.falhou();
 
-        variavel.element.style = `background: none;
-                                    border: none;
-                                    padding: 0;
-                                    margin: 0;
-                                    font: inherit;
-                                    cursor: pointer;
-                                    outline: inherit;
-                                    color: inherit;
-                                    pointer-events:all;
-                                    `;
+        variavel.element.classList.add("selectable")
 
         variavel.element.onclick = () => {
 

@@ -75,6 +75,17 @@ class Expression{
                                            this.father.left  : 
                                            {type:null}       ;
     }
+
+    igual(termo2){
+        
+        if(this.left && !termo2.left) return false;
+        if(this.right && !termo2.right) return false;
+
+        if(this.left.igual(termo2.right) && this.right && this.right.igual(termo2.left)) return true;
+        if(this.left.igual(termo2.left) && this.right && this.right.igual(termo2.right)) return true;
+
+        return false;
+    }
 }
 
 export class Variable extends Expression{
@@ -106,6 +117,10 @@ export class Variable extends Expression{
 
     get copy(){
         return new this.constructor(this.name);
+    }
+
+    igual(termo2){
+        return this.name == termo2.name;
     }
 }
 
@@ -139,6 +154,10 @@ export class Value extends Expression{
 
     get copy(){
         return new this.constructor(this.value);
+    }
+
+    igual(termo2){
+        return this.value == termo2.value;
     }
 }
 

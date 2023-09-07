@@ -3,6 +3,76 @@ import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
 import { Addition, Minus, Multiplication, Parenthesis, Square, Value, VariableMultiplication } from "./expressions";
 
+
+class Somar {
+
+    constructor(equation, expression){
+        
+        this.expression = expression;
+        this.escopo = this.obterEscopo(expression);
+
+        console.log(this.escopo);
+    }
+    //Check if scope is not empty, like -1x
+    static requirement(expression){                                         //Alterar esse daqui, eliminar apenas variable multiplication ou escopos vazios
+        return expression.father && expression.father.type != "equality" && expression.father.type != "multiplication" && expression.type != "addition";
+    }
+
+    somaValida(termo2){
+
+        const foraDoEscopo = !this.estaNoEscopo(termo2);
+
+        if(foraDoEscopo) return false;
+
+        const termo1 = this.expression;
+
+        if(termo1.igual(termo2)) return [termo1, new Value(1), new Value(1)];
+
+        if(termo1.type == "multiplication"){
+            
+            if(termo2.igual(termo1.left)) return [termo1.left, new Value(1), termo1.left.sibling];
+
+            if(termo2.igual(termo1.right)) return [termo1.right, new Value(1), termo1.right.sibling];
+        }
+
+        if(termo2.type == "multiplication"){
+            
+            if(termo1.igual(termo2.left)) return [termo2.left, new Value(1), termo2.left.sibling];
+
+            if(termo1.igual(termo2.right)) return [termo2.right, new Value(1), termo2.right.sibling];
+        }
+
+        if(termo1.type == termo2.type && termo2.type == "multiplication"){
+
+            if(termo2.left.igual(termo1.left)) return [termo1.left, termo2.left.sibling, termo1.left.sibling];
+
+            if(termo2.left.igual(termo1.right)) return [termo1.left, termo2.right.sibling, termo1.left.sibling];
+
+            if(termo2.right.igual(termo1.left)) return [termo1.right, termo2.left.sibling, termo1.left.sibling];
+
+            if(termo2.right.igual(termo1.left)) return [termo1.right, termo2.right.sibling, termo1.left.sibling];
+        }
+
+        //Resultado => new Multiplication(first, new Addition(second, third)) 
+    }
+
+    obterEscopo(expression){
+
+        if(expression.father.type == "multiplication") return expression.father;
+        if(expression.father.type == "square") return expression.father;
+        if(expression.father.type == "addition"){
+            if(expression.father.father.type != "equality") // se a adição não for filha da igualdade, seu escopo é maior
+                return this.obterEscopo(expression.father)
+            else
+                return expression.father;
+        }
+
+    }
+
+    estaNoEscopo(expression){
+        return this.escopo.nodes.filter(node => node == expression).length;
+    }
+}
 export class Operations{
 
     constructor(expression, programa){
@@ -43,6 +113,7 @@ export class Operations{
         createOption("distributividade", "distributive");
         createOption("mudar de lado", "subtraction");
         createOption("simplificar", "toSquare")
+        createOption("somar", "somar")
 
         options.addEventListener("change", () => this.chooseOption(options.value));
       
@@ -69,6 +140,8 @@ export class Operations{
 
                 html.classList.add("selectable")
 
+                //Create on click as a method of the operations that takes in values and returns an on click function
+                //Works for addition and other more complex click operations with states
                 html.onclick = () => {
                     const action = operacaoEscolhida.action(expression);
 
@@ -271,6 +344,20 @@ export class Operations{
                 action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
 
                 result: (expression) => new VariableMultiplication(expression.left, expression.right)
+            },
+            somar: {
+                requirement: (expression) => { console.log(expression, Somar.requirement(expression));return Somar.requirement(expression)},
+
+                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(1).setValorFinal(0),
+
+                result: expression => {
+
+                    const soma = new Somar(this.expression, expression);
+
+                    this.expression.nodes.map(node => console.log(soma.somaValida(node), node));
+
+                    return expression;
+                }
             }
 
             //TODO: Somar, ou seja, ao selecionar um elemento, ele tem de estar em uma soma
@@ -283,48 +370,3 @@ export class Operations{
     }
 }
 
-class Somar {
-
-    constructor(equation, expression){
-        
-        this.expression = expression;
-        this.escopo = obterEscopo(expression);
-    }
-
-    static requirement(expression){
-        return expression.father && expression.father.type != "equality"
-    }
-
-    somaValida(outraExpression){
-
-        const foraDoEscopo = !this.estaNoEscopo(outraExpression);
-
-        if(foraDoEscopo) return false;
-
-        const igual = outraExpression.igual(expression);
-
-        
-    }
-
-    //A fazer...
-    multiplicadoPorConstante(termo1, termo2){
-        if(termo1.type != "multiplication") return false;
-        if(termo1.left.igual(termo2)) return 
-    }
-
-    obterEscopo(expression){
-        
-        if(expression.father.type == "multiplication") return expression.father;
-        if(expression.father.type == "square") return expression.father;
-        if(expression.father.type == "addition"){
-            if(expression.father.father) // se a adição não for filha da igualdade, seu escopo é maior
-                return this.obterEscopo(expression.father)
-            else
-                return expression.father;
-        }
-    }
-
-    estaNoEscopo(expression){
-        return this.escopo.nodes.filter(node => node == expression).length;
-    }
-}

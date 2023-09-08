@@ -34,11 +34,11 @@ export class Fase4 {
         this.animacoes = [];
         this.trigonometria = [];
 
-        this.createControlers();
-        this.createHandlers();
-        this.setUpAnimar();
-        this.addToScene(scene);
-        this.setupInterface();
+        // this.createControlers();
+        // this.createHandlers();
+        // this.setUpAnimar();
+        // this.addToScene(scene);
+        // this.setupInterface();
         this.setupTextBox();
 
         this.levelDesign();
@@ -47,33 +47,38 @@ export class Fase4 {
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
     levelDesign(){
 
+        //Tira o triângulo padrão da cena
         this.triangulo.removeFromScene();
 
         const dialogo = ["O círculo é uma das figuras geométricas mais básicas",
                          "Ele tem um centro",
-                         "e um raio"]
+                         "e um raio",
+                         "Como pode ver, todos os pontos no círculo estão na mesma distância do raio",
+                         "Então a única diferença entre dois pontos é o giro entre eles"]
 
-        const circulo = new Circle(new THREE.Vector3(0,0,0), 3);
-
-        const animacoes = dialogo.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)));
-
+        //Desenha o círculo
+        const circulo         = new Circle(new THREE.Vector3(0,0,0), 3);
         const desenharCirculo = new DesenharMalha(circulo.mesh, this.scene)
                                     .setDuration(300)
                                     .setOnTermino(() => null);
 
-        const centro = new Circle(new THREE.Vector3(0,0,0), 0.1, 0.2);
-
-        centro.material = new THREE.MeshBasicMaterial({color:0x960000})
-
+        //Efeito de popIn do centro
+        const centro           = new Circle(new THREE.Vector3(0,0,0), 0.1, 0.2);
+              centro.material  = new THREE.MeshBasicMaterial({color:0x960000});
         const circuloCrescendo = this.circuloCrescendoAnimacao(centro);
+
+        //Animações de mostrarTexto de cada diálogo
+        const animacoes = dialogo.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)));
 
         const anim1 = new AnimacaoSimultanea(animacoes[0], desenharCirculo);
         const anim2 = new AnimacaoSimultanea(animacoes[1], circuloCrescendo);
         const anim3 = this.thirdDialogue(animacoes[2], centro, circulo);
+        const anim4 = animacoes[3].setValorFinal(100);
+        const anim5 = this.fifthDialogue( animacoes[4], circulo)
 
         
 
-        this.animar(new AnimacaoSequencial(anim1,anim2,anim3));
+        this.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5));
     }
 
     thirdDialogue(dialogue, center, circulo){
@@ -82,20 +87,58 @@ export class Fase4 {
 
         pontoDoCirculo.material = new THREE.MeshBasicMaterial({color:0x960000});
 
+        this.ponto1 = pontoDoCirculo;
+
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
 
         const tracejado = new Tracejado(circulo.mesh.position.clone(), pontoDoCirculo.mesh.position.clone());
         
 
         const moverPonto = (posicaoFinal) => new Animacao(pontoDoCirculo)
-                                        .setValorInicial(pontoDoCirculo.mesh.position.clone())
-                                        .setValorFinal(posicaoFinal)
-                                        .setInterpolacao((inicial, final, peso) => new THREE.Vector3().lerpVectors(inicial,final,peso).normalize().multiplyScalar(3))
+                                        .setValorInicial(0)
+                                        .setValorFinal(2*Math.PI)
+                                        .setInterpolacao((inicial, final, peso) => inicial*(1-peso) + final*peso)
                                         .setDuration(200)
-                                        .setUpdateFunction((value) => {
-                                            console.log(value)
-                                            pontoDoCirculo.centro = value;
-                                            tracejado.destino = value;
+                                        .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
+                                        .setUpdateFunction((angulo) => {
+                                            const posicao = new THREE.Vector3(3*Math.sin(angulo), 3*Math.cos(angulo), 0)
+                                            pontoDoCirculo.centro = posicao;
+                                            tracejado.destino = posicao.clone().multiplyScalar(0.95);
+                                            pontoDoCirculo.updateMesh(this.scene); //Refatorar circulo, updateMesh deve ser apenas update
+                                            tracejado.update();
+                                        })
+        
+        const demonstrarRaio = new AnimacaoSequencial(
+                                    new AnimacaoSimultanea(criarPonto, new MostrarTracejado(tracejado, this.scene)),
+                                    moverPonto(new THREE.Vector3(3,0,0)).setOnStart(() => tracejado.addToScene(this.scene))
+                                )
+
+        return new AnimacaoSimultanea(dialogue, demonstrarRaio)
+    }
+
+    fifthDialogue(dialogue, circulo){
+
+        const pontoDoCirculo = new Circle(new THREE.Vector3(3,0,0), 0.1, 0.2);
+
+        pontoDoCirculo.material = new THREE.MeshBasicMaterial({color:0x960000});
+
+        this.ponto2 = pontoDoCirculo;
+
+        const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
+
+        const tracejado = new Tracejado(circulo.mesh.position.clone(), pontoDoCirculo.mesh.position.clone());
+        
+
+        const moverPonto = (posicaoFinal) => new Animacao(pontoDoCirculo)
+                                        .setValorInicial(Math.PI/2)
+                                        .setValorFinal(Math.PI*2/3)
+                                        .setInterpolacao((inicial, final, peso) => inicial*(1-peso) + final*peso)
+                                        .setDuration(200)
+                                        .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
+                                        .setUpdateFunction((angulo) => {
+                                            const posicao = new THREE.Vector3(3*Math.sin(angulo), 3*Math.cos(angulo), 0)
+                                            pontoDoCirculo.centro = posicao;
+                                            tracejado.destino = posicao.clone().multiplyScalar(0.95);
                                             pontoDoCirculo.updateMesh(this.scene); //Refatorar circulo, updateMesh deve ser apenas update
                                             tracejado.update();
                                         })
@@ -316,7 +359,7 @@ export class Fase4 {
     }
 
     update(){
-        this.atualizarOptions();
+        // this.atualizarOptions();
 
         this.frames.map(frame => frame.next()); //Roda as animações do programa
 

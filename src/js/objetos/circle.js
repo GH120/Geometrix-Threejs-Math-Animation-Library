@@ -115,4 +115,8 @@ export default class Circle{
     get length(){
         return 2*Math.PI*this.raio;
     }
+
+    get position(){
+        return this.mesh.position;
+    }
 }

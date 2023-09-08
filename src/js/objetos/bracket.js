@@ -117,6 +117,18 @@ export default class Bracket{
       return this;
   }
 
+  mostrarLinha(edge){
+
+    this.ponto1 = edge.origem;
+    this.ponto2 = edge.destino;
+
+    this.largura = ponto1.clone().sub(ponto2).length()*0.5;
+
+    this.calculateMatrix(ponto1,ponto2);
+
+    this.renderMalha()
+  }
+
   addToScene(scene){
       this.scene = scene;
       scene.add(this.mesh);

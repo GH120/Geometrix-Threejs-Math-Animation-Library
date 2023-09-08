@@ -55,7 +55,10 @@ export class Fase4 {
                          "Ele tem um centro",
                          "e um raio",
                          "Como pode ver, todos os pontos no círculo estão na mesma distância do raio",
-                         "Então a única diferença entre dois pontos é o giro entre eles"]
+                         "Então a única diferença entre dois pontos é o giro entre eles",
+                         "Esse giro é o chamado ângulo,",
+                         "Por padrão, dividimos o círculo em 360 partes, em graus",
+                         "e o ângulo é medido neles."]
 
         //Desenha o círculo
         const circulo         = new Circle(new THREE.Vector3(0,0,0), 3);
@@ -75,11 +78,14 @@ export class Fase4 {
         const anim2 = new AnimacaoSimultanea(animacoes[1], circuloCrescendo);
         const anim3 = this.thirdDialogue(animacoes[2], centro, circulo);
         const anim4 = animacoes[3].setValorFinal(100);
-        const anim5 = this.fifthDialogue( animacoes[4], circulo)
+        const anim5 = this.fifthDialogue( animacoes[4], circulo);
+        const anim6 = animacoes[5];
+        const anim7 = this.seventhDialogue(animacoes[6]);
+        const anim8 = animacoes[7].setValorFinal(120).setDuration(200);
 
         
 
-        this.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5));
+        this.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7,anim8));
     }
 
     thirdDialogue(dialogue, center, circulo){
@@ -175,6 +181,30 @@ export class Fase4 {
                                 )
 
         return new AnimacaoSimultanea(dialogue, demonstrarRaio)
+    }
+
+    seventhDialogue(dialogue){
+
+        const getPoint = angulo => new THREE.Vector3(3.1*Math.sin(angulo), 3.1*Math.cos(angulo), 0);
+
+        const mostrarTracejados = new Array(360)
+                                    .fill(0)
+                                    .map((e,index) => index*Math.PI/180)
+                                    .map(angulo => new Tracejado(getPoint(angulo).multiplyScalar(0.95), getPoint(angulo),0.01))
+                                    .map(tracejado => new MostrarTracejado(tracejado,this.scene));
+
+        const sequencial = new AnimacaoSequencial();
+
+        sequencial.animacoes = mostrarTracejados;
+
+        sequencial.setDuration(1);
+
+        //Transformar isso em apenas uma animação, usar um array de tracejados que dá pop
+        //Deletar os angulos maiores que 120
+        //Juntar os tracejados em um contador que vira depois 120 graus
+        sequencial.frames = 720;
+
+        return new AnimacaoSimultanea(dialogue, sequencial);
     }
 
     circuloCrescendoAnimacao(circulo){

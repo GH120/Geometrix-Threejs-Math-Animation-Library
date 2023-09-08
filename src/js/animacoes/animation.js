@@ -147,7 +147,7 @@ export class AnimacaoSimultanea extends Animacao{
         super();
 
         this.animacoes = animacoes;
-        this.frames = animacoes.map(animacao => animacao.frames).reduce((maior, atual) => (maior > atual)? maior : atual);
+        this.frames = animacoes.map(animacao => animacao.frames).reduce((maior, atual) => (maior > atual)? maior : atual,0);
 
         //Todas as animações vão manter sua execução até o termino dessa
         //Revisar isso depois

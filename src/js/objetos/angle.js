@@ -23,7 +23,7 @@ export class Angle{
 
         const index     = this.index;
         const positions = this.vertices.map(vertex => [vertex.position.x, vertex.position.y, vertex.position.z]);
-
+        
         this.position = positions[index];
         this.seguinte = positions[(index+1)%positions.length];
         this.anterior = positions[(index+2)%positions.length];

@@ -34,7 +34,7 @@ export class MostrarAngulo{
 
             elemento.element.textContent = `${(angulo.degrees).toFixed()}°`;
 
-            const vetor = new THREE.Vector3(0,0,0).lerpVectors(angulo.vetor2,angulo.vetor1,0.5).normalize().multiplyScalar(1.3*angulo.angleRadius);
+            const vetor = new THREE.Vector3(0,0,0).lerpVectors(angulo.vetor2,angulo.vetor1,0.5).normalize().multiplyScalar(1.5*angulo.angleRadius);
 
             const position = this.vertice.position.clone();
 

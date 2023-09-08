@@ -22,6 +22,7 @@ import Pythagoras from '../equations/pythagoras';
 import { Addition, Value, Variable } from '../equations/expressions';
 import Circle from '../objetos/circle';
 import DesenharMalha from '../animacoes/desenharMalha';
+import { Angle } from '../objetos/angle';
   
 
 export class Fase4 {
@@ -118,33 +119,58 @@ export class Fase4 {
 
     fifthDialogue(dialogue, circulo){
 
-        const pontoDoCirculo = new Circle(new THREE.Vector3(3,0,0), 0.1, 0.2);
+        const pontoDoCirculo = new Circle(new THREE.Vector3(3*Math.sin(Math.PI*0.3),3*Math.cos(Math.PI*0.3),0), 0.1, 0.2);
 
         pontoDoCirculo.material = new THREE.MeshBasicMaterial({color:0x960000});
 
         this.ponto2 = pontoDoCirculo;
 
+        const angle = new Angle([circulo,this.ponto2, this.ponto1], 0)
+                        .addToScene(this.scene)
+                        .render();
+
+        const mostrarAngulo = new MostrarAngulo({vertices:[circulo,this.ponto2, this.ponto1], angles:[angle]}, 0).addToScene(this.scene);
+
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
 
         const tracejado = new Tracejado(circulo.mesh.position.clone(), pontoDoCirculo.mesh.position.clone());
         
+        const desenharAngulo = new DesenharMalha(angle.mesh, this.scene)
+                                   .setOnStart(() => angle.addToScene(this.scene));
 
         const moverPonto = (posicaoFinal) => new Animacao(pontoDoCirculo)
-                                        .setValorInicial(Math.PI/2)
+                                        .setValorInicial(Math.PI*0.3)
                                         .setValorFinal(Math.PI*2/3)
                                         .setInterpolacao((inicial, final, peso) => inicial*(1-peso) + final*peso)
                                         .setDuration(200)
-                                        .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
+                                        .setCurva(x => {
+                                            const n1 = 7.5625;
+                                            const d1 = 2.75;
+                                            
+                                            if (x < 1 / d1) {
+                                                return n1 * x * x;
+                                            } else if (x < 2 / d1) {
+                                                return n1 * (x -= 1.5 / d1) * x + 0.75;
+                                            } else if (x < 2.5 / d1) {
+                                                return n1 * (x -= 2.25 / d1) * x + 0.9375;
+                                            } else {
+                                                return n1 * (x -= 2.625 / d1) * x + 0.984375;
+                                            }
+                                            }
+                                        )
                                         .setUpdateFunction((angulo) => {
                                             const posicao = new THREE.Vector3(3*Math.sin(angulo), 3*Math.cos(angulo), 0)
                                             pontoDoCirculo.centro = posicao;
                                             tracejado.destino = posicao.clone().multiplyScalar(0.95);
                                             pontoDoCirculo.updateMesh(this.scene); //Refatorar circulo, updateMesh deve ser apenas update
                                             tracejado.update();
+                                            angle.update()
+                                            mostrarAngulo.update({dentro:true})
                                         })
         
         const demonstrarRaio = new AnimacaoSequencial(
                                     new AnimacaoSimultanea(criarPonto, new MostrarTracejado(tracejado, this.scene)),
+                                    desenharAngulo,
                                     moverPonto(new THREE.Vector3(3,0,0)).setOnStart(() => tracejado.addToScene(this.scene))
                                 )
 

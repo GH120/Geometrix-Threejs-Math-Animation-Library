@@ -81,7 +81,7 @@ export class Fase4 {
         const anim5 = this.fifthDialogue( animacoes[4], circulo);
         const anim6 = animacoes[5];
         const anim7 = this.seventhDialogue(animacoes[6]);
-        const anim8 = animacoes[7].setValorFinal(120).setDuration(200);
+        const anim8 = this.eigthDialogue(animacoes[7].setValorFinal(120).setDuration(200));
 
         
 
@@ -187,11 +187,14 @@ export class Fase4 {
 
         const getPoint = angulo => new THREE.Vector3(3.1*Math.sin(angulo), 3.1*Math.cos(angulo), 0);
 
-        const mostrarTracejados = new Array(360)
+        const tracejados = new Array(360)
                                     .fill(0)
                                     .map((e,index) => index*Math.PI/180)
                                     .map(angulo => new Tracejado(getPoint(angulo).multiplyScalar(0.95), getPoint(angulo),0.01))
-                                    .map(tracejado => new MostrarTracejado(tracejado,this.scene));
+        
+        tracejados.map(tracejado => tracejado.material = new THREE.MeshBasicMaterial({color:0x000000}))
+
+        const mostrarTracejados = tracejados.map(tracejado => new MostrarTracejado(tracejado,this.scene));
 
         const sequencial = new AnimacaoSequencial();
 
@@ -204,8 +207,58 @@ export class Fase4 {
         //Juntar os tracejados em um contador que vira depois 120 graus
         sequencial.frames = 720;
 
-        return new AnimacaoSimultanea(dialogue, sequencial);
+        const descolorir = tracejados.slice(121,360).map(tracejado => colorirAngulo(tracejado)
+                                                                    .setValorInicial(0x000000)
+                                                                    .setValorFinal(0xffffff)
+                                                                    .setOnStart(() => tracejado.scene = this.scene)
+                                                                    .setCurva(x => 1 - Math.sqrt(1 - Math.pow(x, 2)))
+                                                                    .setOnTermino(() => this.scene.remove(tracejado.mesh))
+        );
+
+        const simultanea = new AnimacaoSimultanea();
+
+        simultanea.animacoes = descolorir;
+
+        simultanea.setDuration(50)
+
+        this.tracejados = tracejados.slice(0,120);
+
+        return new AnimacaoSimultanea(dialogue, new AnimacaoSequencial(sequencial,simultanea));
     }
+
+    eigthDialogue(dialogue){
+        
+        const contarGraus = new Animacao(this.tracejados)
+                            .setValorFinal(0)
+                            .setValorInicial(120)
+                            .setInterpolacao((inicial,final,peso) => inicial*(1-peso) + final*peso)
+                            .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
+                            .setUpdateFunction((index) => {
+
+                                let tamanho = this.tracejados.length;
+                                while(index < tamanho){
+                                    const tracejado = this.tracejados.pop()
+
+                                    this.scene.remove(tracejado.mesh)
+
+                                    tamanho--;
+                                }
+                            })
+
+        return new AnimacaoSimultanea(dialogue, contarGraus);
+    }
+
+    // moverTracejado(tracejado){
+
+    //     return new Animacao(tracejado.mesh.children[0])
+    //            .setValorInicial(tracejado.mesh.children[0].position.clone())
+    //            .setValorFinal(new THREE.Vector3(1.5,0.5,0))
+    //            .setInterpolacao((inicial,final,peso) => new THREE.Vector3().lerpVectors(inicial,final,peso))
+    //            .setUpdateFunction(function(posicao){
+    //                 console.log(this.objeto)
+    //                 this.objeto.position.copy(posicao);
+    //            })
+    // }
 
     circuloCrescendoAnimacao(circulo){
 

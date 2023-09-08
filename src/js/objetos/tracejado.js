@@ -56,6 +56,10 @@ export class Tracejado{
 
     }
 
+    get position(){
+        return this.mesh.position;
+    }
+
     get length(){
         return this.origem.clone().sub(this.destino).length();
     }

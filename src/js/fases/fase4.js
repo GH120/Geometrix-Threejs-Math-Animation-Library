@@ -180,6 +180,8 @@ export class Fase4 {
                                     moverPonto(new THREE.Vector3(3,0,0)).setOnStart(() => tracejado.addToScene(this.scene))
                                 )
 
+        this.mostrarAngulo = mostrarAngulo;
+
         return new AnimacaoSimultanea(dialogue, demonstrarRaio)
     }
 
@@ -221,29 +223,34 @@ export class Fase4 {
 
         simultanea.setDuration(50)
 
-        this.tracejados = tracejados.slice(0,120);
+        this.tracejados = tracejados.slice(0,121);
 
         return new AnimacaoSimultanea(dialogue, new AnimacaoSequencial(sequencial,simultanea));
     }
 
     eigthDialogue(dialogue){
+
+        const textHtml = this.mostrarAngulo.text.elemento.element;
+
+        this.mostrarAngulo.increment = (() => {let a = 0; return () => {textHtml.textContent = `120° = ${a++} segmentos de arco`}})()
         
         const contarGraus = new Animacao(this.tracejados)
                             .setValorFinal(0)
                             .setValorInicial(120)
+                            .setDuration(120)
                             .setInterpolacao((inicial,final,peso) => inicial*(1-peso) + final*peso)
                             .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
                             .setUpdateFunction((index) => {
 
                                 let tamanho = this.tracejados.length;
-                                while(index < tamanho){
-                                    const tracejado = this.tracejados.pop()
-
+                                if(index < tamanho) {
+                                   const tracejado = this.tracejados.pop()
                                     this.scene.remove(tracejado.mesh)
-
-                                    tamanho--;
+                                    this.mostrarAngulo.increment()
                                 }
+
                             })
+                            .setOnStart(() => this.mostrarAngulo.text.elemento.position.x += 1.5)
 
         return new AnimacaoSimultanea(dialogue, contarGraus);
     }

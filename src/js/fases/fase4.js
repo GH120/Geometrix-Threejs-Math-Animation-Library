@@ -230,42 +230,51 @@ export class Fase4 {
 
     eigthDialogue(dialogue){
 
-        const textHtml = this.mostrarAngulo.text.elemento.element;
+        const mostrarAngulo = this.mostrarAngulo;
 
-        this.mostrarAngulo.increment = (() => {let a = 0; return () => {textHtml.textContent = `120° = ${a++} segmentos de arco`}})()
-        
-        const contarGraus = new Animacao(this.tracejados)
-                            .setValorFinal(0)
-                            .setValorInicial(120)
-                            .setDuration(120)
-                            .setInterpolacao((inicial,final,peso) => inicial*(1-peso) + final*peso)
-                            .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
-                            .setUpdateFunction((index) => {
+        const textHtml = mostrarAngulo.text.elemento.element;
 
-                                let tamanho = this.tracejados.length;
-                                if(index < tamanho) {
-                                   const tracejado = this.tracejados.pop()
-                                    this.scene.remove(tracejado.mesh)
-                                    this.mostrarAngulo.increment()
-                                }
+        mostrarAngulo.increment = (() => {let a = 0; return () => {textHtml.textContent = `120° = ${a++} segmentos`}})()
+    
+        const animacoes = this.tracejados.map((tracejado, index) => this.moverTracejado(tracejado,index));
 
-                            })
-                            .setOnStart(() => this.mostrarAngulo.text.elemento.position.x += 1.5)
+        animacoes.map(tracejado => tracejado.setOnTermino(function(){
+                                        mostrarAngulo.increment();
+                                        mostrarAngulo.text.elemento.position.x = 1.8
+                                    })
+                     )
 
-        return new AnimacaoSimultanea(dialogue, contarGraus);
+        const simultanea = new AnimacaoSimultanea();
+
+        simultanea.animacoes = animacoes;
+
+        simultanea.frames = 240;
+
+        return new AnimacaoSimultanea(dialogue, simultanea);
     }
 
-    // moverTracejado(tracejado){
+    moverTracejado(tracejado, filler){
 
-    //     return new Animacao(tracejado.mesh.children[0])
-    //            .setValorInicial(tracejado.mesh.children[0].position.clone())
-    //            .setValorFinal(new THREE.Vector3(1.5,0.5,0))
-    //            .setInterpolacao((inicial,final,peso) => new THREE.Vector3().lerpVectors(inicial,final,peso))
-    //            .setUpdateFunction(function(posicao){
-    //                 console.log(this.objeto)
-    //                 this.objeto.position.copy(posicao);
-    //            })
-    // }
+
+        const translation = new THREE.Vector3();
+
+        tracejado.mesh.children[0].getWorldPosition(translation);
+
+        const posicaoFinal = new THREE.Vector3(1.5,0.5,0).add(translation.negate())
+
+        return new Animacao(tracejado.mesh)
+               .setValorInicial(new THREE.Vector3(0,0,0))
+               .setValorFinal(posicaoFinal)
+               .setDuration(100)
+               .setInterpolacao((inicial,final,peso) => new THREE.Vector3().lerpVectors(inicial,final,peso))
+               .setUpdateFunction(function(posicao){
+
+                    tracejado.mesh.position.copy(posicao);
+               })
+               .voltarAoInicio(false)
+               .setOnTermino(() => this.scene.remove(tracejado.mesh))
+               .filler(filler)
+    }
 
     circuloCrescendoAnimacao(circulo){
 

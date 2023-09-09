@@ -139,6 +139,17 @@ export default class Animacao {
     static sequencial(...animacoes){
         return new AnimacaoSequencial(animacoes);
     }
+
+    filler(delay){
+        return new AnimacaoSequencial(
+                                      new Animacao(null)
+                                      .setInterpolacao( ()=> null)
+                                      .setUpdateFunction(() => null)
+                                      .setDuration(delay), 
+
+                                      this
+                                     );
+    }
 }
 
 export class AnimacaoSimultanea extends Animacao{

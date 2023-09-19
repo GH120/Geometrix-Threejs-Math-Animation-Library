@@ -7,6 +7,13 @@ import  MoverVertice  from '../handlers/moverVertice';
 import { MostrarBissetriz } from '../handlers/mostrarBissetriz';
 import { Clickable, MultipleClickable } from '../controles/clickable';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
+import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
+import {TGALoader} from 'three/examples/jsm/loaders/TGALoader';
+import {MTLLoader} from 'three/examples/jsm/loaders/MTLLoader';
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader'
+import FixarAoCirculo from '../handlers/fixarAoCirculo';
+
+
 
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
@@ -22,6 +29,7 @@ import Pythagoras from '../equations/pythagoras';
 import { Addition, Value, Variable } from '../equations/expressions';
 import Circle from '../objetos/circle';
 import DesenharMalha from '../animacoes/desenharMalha';
+import RelogioGLB from '../../assets/Relogio.glb'
 import { Angle } from '../objetos/angle';
   
 
@@ -58,13 +66,16 @@ export class Fase4 {
                          "Então a única diferença entre dois pontos é o giro entre eles",
                          "Esse giro é o chamado ângulo,",
                          "Por padrão, dividimos o círculo em 360 partes, em graus",
-                         "e o ângulo é medido neles."]
+                         "e o ângulo é medido neles.",
+                         "Quantos graus tem uma hora no relógio?"]
 
         //Desenha o círculo
         const circulo         = new Circle(new THREE.Vector3(0,0,0), 3);
         const desenharCirculo = new DesenharMalha(circulo.mesh, this.scene)
                                     .setDuration(300)
                                     .setOnTermino(() => null);
+
+        this.circulo = circulo;
 
         //Efeito de popIn do centro
         const centro           = new Circle(new THREE.Vector3(0,0,0), 0.1, 0.2);
@@ -81,11 +92,12 @@ export class Fase4 {
         const anim5 = this.fifthDialogue( animacoes[4], circulo);
         const anim6 = animacoes[5];
         const anim7 = this.seventhDialogue(animacoes[6]);
-        const anim8 = this.eigthDialogue(animacoes[7].setValorFinal(120).setDuration(200));
+        const anim8 = this.eigthDialogue(animacoes[7].setValorFinal(120).setDuration(200)).setDelay(50);
+        const anim9 = this.ninthDialogue(animacoes[8]);
 
         
 
-        this.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7,anim8));
+        this.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7,anim8,anim9));
     }
 
     thirdDialogue(dialogue, center, circulo){
@@ -251,6 +263,38 @@ export class Fase4 {
         simultanea.frames = 240;
 
         return new AnimacaoSimultanea(dialogue, simultanea);
+    }
+
+    ninthDialogue(dialogue){
+
+
+        const light = new THREE.AmbientLight(0xffffff,1);
+
+        this.scene.add(light);
+
+        this.draggable = new Draggable(this.ponto2.hitbox, this.camera);
+
+        this.draggable.addObserver(new FixarAoCirculo(this.circulo, this.ponto2.mesh))
+
+        dialogue.setOnTermino(() =>{
+
+            this.mostrarAngulo.update({dentro:true})
+
+            var loader = new GLTFLoader();
+            loader.load(
+                RelogioGLB,
+                ( gltf ) =>  {
+                    console.log(gltf.scene.children[0])
+                    console.log(gltf);
+                    const relogio = gltf.scene.children[0];
+                    relogio.scale.set(7,7,1)
+                    relogio.position.z = -0.5
+                    this.scene.add(gltf.scene);
+                },
+          );
+        })
+
+        return dialogue;
     }
 
     moverTracejado(tracejado, filler){

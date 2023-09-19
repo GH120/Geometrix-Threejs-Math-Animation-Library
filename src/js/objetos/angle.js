@@ -1,8 +1,11 @@
 import * as THREE from 'three';
+import { Objeto } from './Objeto';
 
-export class Angle{
+export class Angle extends Objeto{
 
     constructor(vertices, index){
+
+        super();
 
         this.vertices = vertices;
         this.index = index;
@@ -162,11 +165,6 @@ export class Angle{
         this.render();
 
         scene.add(this.mesh);
-    }
-
-    addToScene(scene){
-        this.scene = scene;
-        return this;
     }
 
     get degrees(){

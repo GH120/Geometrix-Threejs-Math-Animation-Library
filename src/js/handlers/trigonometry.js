@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import {Divisao} from '../animacoes/divisao';
+import { Handler } from './handler';
 
 
 //Como a lógica geral é só pegar dois lados, seno, cosseno e tangente só mudam o get
@@ -8,9 +9,10 @@ import {Divisao} from '../animacoes/divisao';
 
 //get função é sintaxe do javascript para rodar toda vez que for pegar um valor
 //get hipotenusa siginifica que this.hipotenusa é o mesmo de chamar getHipotenusa();
-export class TrigOnHover {
+export class TrigOnHover extends Handler{
 
     setTriangulo(triangulo, index){
+        super()
         this.triangulo = triangulo;
         this.index = (index+1)%3;
         this.animando = false;

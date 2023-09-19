@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import {Angle} from './angle';
 import {Edge} from './edge.js';
+import { Objeto } from './Objeto';
 
 
-export class Triangle{
+export class Triangle extends Objeto{
 
     constructor(positions =  [[0,0,0],[3,0,0],[3,3,0],]){
+
+        super();
 
         this.grossura = 0.05
         this.sphereGeometry =   new THREE.SphereGeometry(0.1);
@@ -15,6 +18,13 @@ export class Triangle{
         this.positions = positions;
         this.edges = [];
         this.angles = [];
+    }
+
+    render(){
+        this.renderVertices();
+        this.renderEdges();
+        this.renderVertices();
+        return this;
     }
 
     renderVertices(){

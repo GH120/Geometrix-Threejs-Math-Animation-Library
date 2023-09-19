@@ -1,8 +1,10 @@
+import { Handler } from './handler';
 import * as THREE from 'three';
 
-export class ColorirIsoceles {
+export class ColorirIsoceles extends Handler{
 
     constructor(triangulo){
+        super();
         this.triangulo = triangulo;
     }
 

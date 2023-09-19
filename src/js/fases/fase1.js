@@ -213,7 +213,7 @@ export class Fase {
         
         this.clickable = triangulo.angles.map(   angle  => selecionar);
         this.hoverable = triangulo.angles.map(   angle  => new Hoverable(angle , camera));
-        this.draggable = triangulo.vertices.map( vertex => new Draggable(vertex, camera));
+        this.draggable = triangulo.vertices.map( vertex => new Draggable({hitbox: vertex}, camera)); //Consertar vertice
 
         return this;
     }

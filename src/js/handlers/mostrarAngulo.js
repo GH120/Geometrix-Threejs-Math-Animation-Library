@@ -1,9 +1,11 @@
 import * as THREE from 'three'
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
+import { Handler } from './handler';
 
-export class MostrarAngulo{
+export class MostrarAngulo extends Handler{
 
     constructor(triangulo, index){
+        super();
 
         this.triangulo = triangulo;
         this.vertice = triangulo.vertices[index];

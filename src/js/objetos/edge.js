@@ -1,17 +1,21 @@
 import * as THREE from 'three';
+import { Objeto } from './Objeto';
 
-export class Edge {
+export class Edge extends Objeto{
 
     constructor(triangle, index){
+
+        super();
+
         this.triangle = triangle;
         this.index    = index;
         this.material = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.grossura = 0.05;
 
-        this.renderMalha();
+        this.render();
     }
 
-    renderMalha(){
+    render(){
 
         const vertices       = this.triangle.vertices;
         
@@ -39,19 +43,13 @@ export class Edge {
         return this;
     }
 
-    addToScene(scene){
-        this.scene = scene;
-        this.scene.add(this.mesh)
-        return this;
-    }
-
     update(){
         
         this.mesh.geometry.dispose();
         this.mesh.material.dispose();
         this.scene.remove(this.mesh);
 
-        this.renderMalha();
+        this.render();
 
         this.scene.add(this.mesh);
     }

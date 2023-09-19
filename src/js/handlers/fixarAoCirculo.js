@@ -1,6 +1,9 @@
-export default class FixarAoCirculo{
+import { Handler } from './handler';
+
+export default class FixarAoCirculo extends Handler{
 
     constructor(circulo, vertice){
+        super();
         this.circulo = circulo;
         this.vertice = vertice;
     }

@@ -1,8 +1,12 @@
 import * as THREE from 'three';
+import { Objeto } from './Objeto';
 
-export class Tracejado{
+export class Tracejado extends Objeto{
 
     constructor(origem, destino, largura=0.01, altura=0.1, spacingRatio=1, cor=0xf00f00){
+
+        super();
+
         this.origem  = origem;
         this.destino = destino;
         this.largura = largura;
@@ -10,10 +14,10 @@ export class Tracejado{
         this.spacing = spacingRatio;
         this.material = new THREE.MeshBasicMaterial({color:cor});
 
-        this.renderMalha();
+        this.render();
     }
 
-    renderMalha(){
+    render(){
 
         const tracejado = new THREE.Group();
 
@@ -74,7 +78,7 @@ export class Tracejado{
         
         this.scene.remove(this.mesh);
 
-        this.renderMalha();
+        this.render();
 
         this.scene.add(this.mesh);
     }

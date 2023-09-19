@@ -1,13 +1,11 @@
 import * as THREE from 'three';
+import { Controler } from './Controler';
 
-export class Hoverable {
+export class Hoverable extends Controler {
 
   constructor(object, camera) {
 
-    this.object = object;
-    this.camera = camera;
-    this.raycaster = new THREE.Raycaster();
-    this.observers = [];
+    super(object,camera);
 
     this.onMouseMove = this.onMouseMove.bind(this);
 
@@ -16,7 +14,7 @@ export class Hoverable {
 
   onMouseMove(event) {
 
-    const isInside = !!this.intersectouObjeto(event);
+    const isInside = !!this.intersectouObjeto(event,this.object);
 
     //Ignora se continua no mesmo estado
     if(this.isInside == isInside) return;
@@ -27,29 +25,6 @@ export class Hoverable {
     this.isInside = isInside;
   }
 
-  intersectouObjeto(event){
-
-    // Calculate the mouse position in normalized device coordinates (-1 to +1)
-    const mouse = new THREE.Vector2(
-      (event.clientX / window.innerWidth) * 2 - 1,
-      -(event.clientY / window.innerHeight) * 2 + 1
-    );
-    
-
-    // Raycast to determine the intersection point between the mouse and the object's plane
-    this.raycaster.setFromCamera(mouse, this.camera);
-
-    const hitbox = this.object.hitbox;
-    
-    const intersects = this.raycaster.intersectObject(hitbox);
-
-    if (intersects.length > 0) {
-      // Update the object's position to the intersection point
-      return intersects[0].point;
-    }
-
-    return null;
-  }
 
   notify(estado){
     for(const observer of this.observers) {

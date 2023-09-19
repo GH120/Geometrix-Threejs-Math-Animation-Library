@@ -1,8 +1,10 @@
 import * as THREE from 'three'
+import { Objeto } from './Objeto';
 
-export default class Circle{
+export default class Circle extends Objeto{
 
     constructor(centro, raio, grossura = 0.01){
+        super()
 
         this.hitbox = new THREE.Mesh(new THREE.SphereGeometry(0.5));
 
@@ -13,7 +15,7 @@ export default class Circle{
         this.raio = raio;
         this.grossura = grossura;
 
-        this.construirMesh();
+        this.render();
         this.update();
     }
 
@@ -40,7 +42,7 @@ export default class Circle{
         return pontos;
     }
 
-    construirMesh(resolucao=360){
+    render(resolucao=360){
 
         const geometry = new THREE.BufferGeometry();
 
@@ -99,7 +101,7 @@ export default class Circle{
 
     updateMesh(scene){
         scene.remove(this.mesh);
-        this.construirMesh();
+        this.render();
         scene.add(this.mesh);
         this.mesh.position.copy(this.centro);
     }

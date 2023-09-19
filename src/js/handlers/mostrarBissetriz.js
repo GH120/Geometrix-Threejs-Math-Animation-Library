@@ -1,10 +1,12 @@
 import MostrarTracejado from "../animacoes/mostrarTracejado";
-import { Tracejado } from "../objetos/tracejado";
+import { Handler } from './handler';
+import { Tracejado } from "../objetos/Tracejado";
 
 //No ato de criar uma bissetriz, criar um novo triangulo?
-export class MostrarBissetriz{
+export class MostrarBissetriz extends Handler{
 
     constructor(triangulo, angulo, scene){
+        super();
         
         this.triangulo = triangulo;
         this.angulo = angulo;
@@ -30,7 +32,7 @@ export class MostrarBissetriz{
 
             this.tracejado.origem  = this.vertice.position.clone();
             this.tracejado.destino = this.ladoOposto.mesh.position.clone();
-            this.tracejado.renderMalha();
+            this.tracejado.render();
 
             this.scene.add(this.tracejado.mesh);
 

@@ -1,10 +1,13 @@
 import * as THREE from 'three';
 import DesenharMalha from '../animacoes/desenharMalha';
 import { AnimacaoSequencial } from '../animacoes/animation';
+import { Objeto } from './Objeto';
 
-export default class Bracket{
+export default class Bracket extends Objeto{
 
   constructor(altura=0.2, ponto1=[3,0,0], ponto2=[3,3,0]){
+
+      super();
 
       ponto1 = new THREE.Vector3(...ponto1);
       ponto2 = new THREE.Vector3(...ponto2);
@@ -15,10 +18,10 @@ export default class Bracket{
 
       this.calculateMatrix(ponto1,ponto2);
 
-      this.renderMalha()
+      this.render()
   }
 
-  renderMalha(){
+  render(){
 
       const bracket = new THREE.Group();
 

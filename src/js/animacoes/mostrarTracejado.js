@@ -22,7 +22,7 @@ export default class MostrarTracejado extends Animacao{
 
             tracejado.destino = posicao;
 
-            tracejado.renderMalha();
+            tracejado.render();
 
             scene.add(tracejado.mesh);
         })

@@ -1,4 +1,4 @@
-import { Tracejado } from "../objetos/tracejado";
+import { Tracejado } from "../objetos/Tracejado";
 import Animacao from "./animation";
 
 export default class MostrarTracejado extends Animacao{

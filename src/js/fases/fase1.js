@@ -13,7 +13,7 @@ import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
 import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from '../animacoes/animation';
 import { colorirAngulo } from '../animacoes/colorirAngulo';
-import { Tracejado } from '../objetos/tracejado';
+import { Tracejado } from '../objetos/Tracejado';
 import MostrarTracejado from '../animacoes/mostrarTracejado';
 import { Divisao } from '../animacoes/divisao';
 import { Triangle } from '../objetos/triangle';

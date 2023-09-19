@@ -18,9 +18,11 @@ export default class FixarAoCirculo extends Handler{
 
         const posicaoNoCirculo = this.posicaoNoCirculo(point);
 
+        console.log(this.vertice,point)
+
         this.vertice.position.copy(posicaoNoCirculo);
 
-        this.objeto.update();
+        this.circulo.update();
     }
 
     //Pega o sentido do ponto e mapeia para a borda do círculo

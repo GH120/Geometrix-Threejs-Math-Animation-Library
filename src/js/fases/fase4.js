@@ -272,7 +272,7 @@ export class Fase4 {
 
         this.scene.add(light);
 
-        this.draggable = new Draggable(this.ponto2.hitbox, this.camera);
+        this.draggable = new Draggable(this.ponto2, this.camera);
 
         this.draggable.addObserver(new FixarAoCirculo(this.circulo, this.ponto2.mesh))
 

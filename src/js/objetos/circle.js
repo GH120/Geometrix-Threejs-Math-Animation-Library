@@ -6,10 +6,12 @@ export default class Circle extends Objeto{
     constructor(centro, raio, grossura = 0.01){
         super()
 
-        this.hitbox = new THREE.Mesh(new THREE.SphereGeometry(0.5));
-
+        this.hitbox = new THREE.Mesh(new THREE.SphereGeometry(raio));
         this.hitbox.visible = false;
+
         this.material =new THREE.MeshBasicMaterial({color:0xff0000});
+
+        console.log(this.hitbox.position)
 
         this.centro = centro;
         this.raio = raio;
@@ -99,6 +101,11 @@ export default class Circle extends Objeto{
         this.render();
         this.scene.add(this.mesh);
         this.mesh.position.copy(this.centro);
+    }
+
+    moveTo(position){
+        this.mesh.position.copy(position);
+        this.hitbox.position.copy(position);
     }
 
     get centro(){

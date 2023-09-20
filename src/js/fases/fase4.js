@@ -273,7 +273,7 @@ export class Fase4 {
 
         this.draggable = new Draggable(this.ponto2, this.camera);
 
-        this.draggable.addObserver(new FixarAoCirculo(this.circulo, this.ponto2.mesh))
+        this.draggable.addObserver(new FixarAoCirculo(this.circulo, this.ponto2))
 
         dialogue.setOnTermino(() =>{
 

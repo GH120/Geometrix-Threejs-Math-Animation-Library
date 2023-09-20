@@ -100,7 +100,7 @@ export class Angle extends Objeto{
 
         this.mesh   = (noventaGraus)? MalhaReto : MalhaAngulo;
         this.hitbox =  MalhaAngulo;
-
+        
         return this;
     }
 

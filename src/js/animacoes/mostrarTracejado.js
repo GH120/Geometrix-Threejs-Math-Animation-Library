@@ -10,22 +10,21 @@ export default class MostrarTracejado extends Animacao{
 
         this.valorInicial = tracejado.origem.clone();
         this.valorFinal   = tracejado.destino.clone();
+
+        console.log(tracejado.origem, tracejado.destino);
         this.frames = 50;
         this.voltar = false;
 
         this.setUpdateFunction(function(posicao){
 
-            const scene     = this.scene;
             const tracejado = this.objeto;
-
-            scene.remove(tracejado.mesh);
 
             tracejado.destino = posicao;
 
-            tracejado.render();
-
-            scene.add(tracejado.mesh);
+            tracejado.update();
         })
+
+        this.onStart = () => tracejado.addToScene(scene);
     }
 
     interpolacao(inicial, final, peso){

@@ -16,7 +16,6 @@ export default class Circle extends Objeto{
         this.grossura = grossura;
 
         this.render();
-        this.update();
     }
 
     getPontos(resolucao){
@@ -92,17 +91,13 @@ export default class Circle extends Objeto{
         }
 
         this.centro = chute;
-        this.update();
-    }
-
-    update(){
         this.mesh.position.copy(this.centro);
     }
 
-    updateMesh(scene){
-        scene.remove(this.mesh);
+    update(){
+        this.scene.remove(this.mesh);
         this.render();
-        scene.add(this.mesh);
+        this.scene.add(this.mesh);
         this.mesh.position.copy(this.centro);
     }
 

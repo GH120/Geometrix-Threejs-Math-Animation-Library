@@ -70,8 +70,8 @@ export class Fase4 {
                          "Quantos graus tem uma hora no relógio?"]
 
         //Desenha o círculo
-        const circulo         = new Circle(new THREE.Vector3(0,0,0), 3);
-        const desenharCirculo = new DesenharMalha(circulo.mesh, this.scene)
+        const circulo         = new Circle(new THREE.Vector3(0,0,0), 3).addToScene(this.scene);
+        const desenharCirculo = new DesenharMalha(circulo, this.scene)
                                     .setDuration(300)
                                     .setOnTermino(() => null);
 
@@ -110,7 +110,7 @@ export class Fase4 {
 
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
 
-        const tracejado = new Tracejado(circulo.mesh.position.clone(), pontoDoCirculo.mesh.position.clone());
+        const tracejado = new Tracejado(circulo.centro, pontoDoCirculo.centro);
         
 
         const moverPonto = (posicaoFinal) => new Animacao(pontoDoCirculo)
@@ -123,7 +123,7 @@ export class Fase4 {
                                             const posicao = new THREE.Vector3(3*Math.sin(angulo), 3*Math.cos(angulo), 0)
                                             pontoDoCirculo.centro = posicao;
                                             tracejado.destino = posicao.clone().multiplyScalar(0.95);
-                                            pontoDoCirculo.updateMesh(this.scene); //Refatorar circulo, updateMesh deve ser apenas update
+                                            pontoDoCirculo.update(); //Refatorar circulo, update deve ser apenas update
                                             tracejado.update();
                                         })
         
@@ -143,18 +143,17 @@ export class Fase4 {
 
         this.ponto2 = pontoDoCirculo;
 
-        const angle = new Angle([circulo,this.ponto2, this.ponto1], 0)
-                        .addToScene(this.scene)
-                        .render();
+        const angle = new Angle([circulo, this.ponto2, this.ponto1], 0).render()
 
         const mostrarAngulo = new MostrarAngulo({vertices:[circulo,this.ponto2, this.ponto1], angles:[angle]}, 0).addToScene(this.scene);
 
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
 
-        const tracejado = new Tracejado(circulo.mesh.position.clone(), pontoDoCirculo.mesh.position.clone());
+        const tracejado = new Tracejado(circulo.centro, pontoDoCirculo.centro);
         
-        const desenharAngulo = new DesenharMalha(angle.mesh, this.scene)
-                                   .setOnStart(() => angle.addToScene(this.scene));
+
+        
+        const desenharAngulo = new DesenharMalha(angle, this.scene)
 
         const moverPonto = (posicaoFinal) => new Animacao(pontoDoCirculo)
                                         .setValorInicial(Math.PI*0.3)
@@ -180,7 +179,7 @@ export class Fase4 {
                                             const posicao = new THREE.Vector3(3*Math.sin(angulo), 3*Math.cos(angulo), 0)
                                             pontoDoCirculo.centro = posicao;
                                             tracejado.destino = posicao.clone().multiplyScalar(0.95);
-                                            pontoDoCirculo.updateMesh(this.scene); //Refatorar circulo, updateMesh deve ser apenas update
+                                            pontoDoCirculo.update(); //Refatorar circulo, update deve ser apenas update
                                             tracejado.update();
                                             angle.update()
                                             mostrarAngulo.update({dentro:true})
@@ -340,8 +339,9 @@ export class Fase4 {
                     })
                 .setUpdateFunction((valor) => {
                     circulo.raio = valor;
-                    circulo.updateMesh(this.scene);
+                    circulo.update();
                 })
+                .setOnStart(() => circulo.addToScene(this.scene))
     }
 
     //Cria a caixa de texto onde o texto vai aparecer

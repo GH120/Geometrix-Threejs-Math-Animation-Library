@@ -4,23 +4,30 @@ import Animacao from "./animation";
 
 export default class DesenharMalha extends Animacao{
 
-    constructor(malha, scene){
-        super(malha);
+    constructor(objeto, scene){
+        super(objeto);
 
         this.scene = scene;
 
         this.valorInicial = 0;
-        this.valorFinal   = malha.geometry.attributes.position.count;
         this.frames = 44;
         this.voltar = false;
+        
+        this.onStart = () => {
+            
+            objeto.addToScene(scene);
+            objeto.update();
+            objeto.mesh.visible = false;
+            this.valorFinal   = objeto.mesh.geometry.attributes.position.count;
+            
+        }
 
-        malha.visible = false;
 
         this.setUpdateFunction(function(posicao){
 
             const intervalo = (this.reverso)? [-posicao*3] : [0, posicao*3]
             
-            const posicoes = this.objeto.geometry.attributes.position.array.slice(...intervalo);
+            const posicoes = this.objeto.mesh.geometry.attributes.position.array.slice(...intervalo);
 
             const geometry = new THREE.BufferGeometry();
 
@@ -28,7 +35,7 @@ export default class DesenharMalha extends Animacao{
 
             scene.remove(this.malha)
 
-            this.malha = new this.objeto.constructor(geometry, this.objeto.material);
+            this.malha = new this.objeto.mesh.constructor(geometry, this.objeto.material);
 
             // this.malha.quaternion.copy(this.objeto.quaternion)
             
@@ -43,7 +50,7 @@ export default class DesenharMalha extends Animacao{
 
     onTermino(){
         this.scene.remove(this.malha);
-        this.objeto.visible = true;
+        this.objeto.mesh.visible = true;
     }
 
     interpolacao(inicial, final, peso){

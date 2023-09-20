@@ -25,4 +25,12 @@ export class Objeto{
     // get position(){
     //     return this.mesh.position.clone();
     // }
+
+    // set position(value){
+    //     this.mesh.position.copy(value);
+    // }
+
+    moveTo(position){
+        this.mesh.position.copy(position);
+    }
 }

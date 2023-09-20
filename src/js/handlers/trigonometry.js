@@ -12,7 +12,6 @@ import { Handler } from './handler';
 export class TrigOnHover extends Handler{
 
     setTriangulo(triangulo, index){
-        super()
         this.triangulo = triangulo;
         this.index = (index+1)%3;
         this.animando = false;

@@ -34,6 +34,9 @@ export class Triangle extends Objeto{
             return esfera;
         });
 
+        //Gambiarra enquanto não transforma o vértice em um objeto
+        this.vertices.map(vertice => vertice.moveTo = (position) => vertice.position.copy(position));
+
         return this;
     }
 

@@ -28,7 +28,7 @@ export default class MoverVertice extends Handler{
 
         // const speed = new THREE.Vector3().subVectors(point, this.vertice.position);
 
-        this.vertice.position.copy(point);
+        this.vertice.moveTo(point);
 
         this.triangulo.update();
     }

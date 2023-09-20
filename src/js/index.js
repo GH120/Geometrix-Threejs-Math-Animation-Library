@@ -11,6 +11,7 @@ import { Distributividade } from './animacoes/distributividade';
 import { Addition, Equality, Multiplication, Square, Value, Variable } from './equations/expressions';
 import { Operations } from './equations/operations';
 import { Fase4 } from './fases/fase4';
+import { Programa } from './programa';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)

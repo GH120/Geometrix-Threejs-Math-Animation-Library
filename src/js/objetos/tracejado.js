@@ -68,12 +68,6 @@ export class Tracejado extends Objeto{
         return this.origem.clone().sub(this.destino).length();
     }
 
-    addToScene(scene){
-        this.scene = scene;
-        scene.add(this.mesh);
-        return this;
-    }
-
     update(){
         
         this.scene.remove(this.mesh);

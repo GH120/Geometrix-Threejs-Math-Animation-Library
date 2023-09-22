@@ -60,7 +60,7 @@ export class Fase4 {
         this.triangulo.removeFromScene();
 
         const dialogo = ["O círculo é uma das figuras geométricas mais básicas",
-                         "Ele tem um position",
+                         "Ele tem um centro",
                          "e um raio",
                          "Como pode ver, todos os pontos no círculo estão na mesma distância do raio",
                          "Então a única diferença entre dois pontos é o giro entre eles",
@@ -111,6 +111,8 @@ export class Fase4 {
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
 
         const tracejado = new Tracejado(circulo.position, pontoDoCirculo.position);
+
+        this.ponto1.tracejado = tracejado;
         
 
         const moverPonto = (posicaoFinal) => new Animacao(pontoDoCirculo)
@@ -151,7 +153,14 @@ export class Fase4 {
 
         const tracejado = new Tracejado(circulo.position, pontoDoCirculo.position);
         
-
+        //Função para dar update em todos os observadores dependetes do ponto
+        pontoDoCirculo.updateObservers = () => {
+            tracejado.destino = pontoDoCirculo.position.clone().multiplyScalar(0.95);
+            pontoDoCirculo.update(); //Refatorar circulo, update deve ser apenas update
+            tracejado.update();
+            angle.update()
+            mostrarAngulo.update({dentro:true})
+        }
         
         const desenharAngulo = new DesenharMalha(angle, this.scene)
 
@@ -178,11 +187,8 @@ export class Fase4 {
                                         .setUpdateFunction((angulo) => {
                                             const posicao = new THREE.Vector3(3*Math.sin(angulo), 3*Math.cos(angulo), 0)
                                             pontoDoCirculo.position = posicao;
-                                            tracejado.destino = posicao.clone().multiplyScalar(0.95);
                                             pontoDoCirculo.update(); //Refatorar circulo, update deve ser apenas update
-                                            tracejado.update();
-                                            angle.update()
-                                            mostrarAngulo.update({dentro:true})
+                                            pontoDoCirculo.updateObservers();
                                         })
         
         const demonstrarRaio = new AnimacaoSequencial(
@@ -273,7 +279,13 @@ export class Fase4 {
 
         this.draggable = new Draggable(this.ponto2, this.camera);
 
+        //Atualiza a posição do ponto no arraste para ficar restrita ao círculo
         this.draggable.addObserver(new FixarAoCirculo(this.circulo, this.ponto2))
+
+        //Atualiza todos os objetos dependentes da posição do ponto
+        this.draggable.addObserver({
+            update: this.ponto2.updateObservers
+        })
 
         dialogue.setOnTermino(() =>{
 

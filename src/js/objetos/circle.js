@@ -105,6 +105,7 @@ export default class Circle extends Objeto{
     moveTo(position){
         this.mesh.position.copy(position);
         this.hitbox.position.copy(position);
+        this.position = position;
     }
 
     addToScene(scene){

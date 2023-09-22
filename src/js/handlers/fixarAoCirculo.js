@@ -18,8 +18,6 @@ export default class FixarAoCirculo extends Handler{
 
         const posicaoNoCirculo = this.posicaoNoCirculo(point);
 
-        console.log(this.vertice,point)
-
         this.vertice.moveTo(posicaoNoCirculo);
 
         // this.circulo.update();

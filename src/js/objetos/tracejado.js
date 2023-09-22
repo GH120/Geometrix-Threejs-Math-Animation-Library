@@ -73,7 +73,7 @@ export class Tracejado extends Objeto{
     }
 
     update(){
-        
+
         this.scene.remove(this.mesh);
 
         this.render();

@@ -50,6 +50,7 @@ export class Fase4 {
         // this.setupInterface();
         this.setupTextBox();
 
+        this.progresso = 0;
         this.levelDesign();
     }
 
@@ -152,6 +153,8 @@ export class Fase4 {
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
 
         const tracejado = new Tracejado(circulo.position, pontoDoCirculo.position);
+
+        this.angle = angle;
         
         //Função para dar update em todos os observadores dependetes do ponto
         pontoDoCirculo.updateObservers = () => {
@@ -238,7 +241,7 @@ export class Fase4 {
 
         simultanea.animacoes = descolorir;
 
-        simultanea.setDuration(50)
+        simultanea.setDuration(50);
 
         this.tracejados = tracejados.slice(0,121);
 
@@ -286,6 +289,8 @@ export class Fase4 {
         this.draggable.addObserver({
             update: this.ponto2.updateObservers
         })
+
+        this.hoverable = new Hoverable(this.ponto2,this.camera);
 
         dialogue.setOnTermino(() =>{
 
@@ -546,9 +551,38 @@ export class Fase4 {
 
         // if(options.atualizar) triangle.update();
 
-        if (this.triangulo.equilatero()) {
-            this.changeText("VITORIA!!!");
-            // botar notif
+        const problema = this.problemas[this.progresso];
+
+        if(!problema) return console.log("Finalizado");
+
+        if(problema.satisfeito(this)){
+            problema.consequencia(this);
+            this.progresso++;
+        }
+    }
+
+    problemas = {
+
+        0: {
+            satisfeito(fase){
+
+                console.log(fase.angle.degrees)
+
+                return Math.round(30 - fase.angle.degrees) == 0;
+            },
+
+            consequencia(fase){
+
+                const dialogo1 = `Uma hora tem 30°, como acabou de demonstrar`
+
+                const animacao1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo1))
+
+                const dialogo2 = `Agora, consegue mostrar quanto vale 5 horas?`
+
+                const animacao2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo2))
+
+                fase.animar(new AnimacaoSequencial(animacao1,animacao2))
+            }
         }
     }
 }

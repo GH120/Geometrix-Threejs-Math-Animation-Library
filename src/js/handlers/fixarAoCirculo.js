@@ -28,11 +28,11 @@ export default class FixarAoCirculo extends Handler{
     //Pega o sentido do ponto e mapeia para a borda do círculo
     posicaoNoCirculo(point){
 
-        const direcao = point.clone().sub(this.circulo.centro).normalize();
+        const direcao = point.clone().sub(this.circulo.position).normalize();
 
         const deslocamento = direcao.multiplyScalar(this.circulo.raio*(1 - this.circulo.grossura));
 
-        const posicao = this.circulo.centro.clone().add(deslocamento);
+        const posicao = this.circulo.position.clone().add(deslocamento);
 
         return posicao;
     }

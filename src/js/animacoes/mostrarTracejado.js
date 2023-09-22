@@ -11,7 +11,6 @@ export default class MostrarTracejado extends Animacao{
         this.valorInicial = tracejado.origem.clone();
         this.valorFinal   = tracejado.destino.clone();
 
-        console.log(tracejado.origem, tracejado.destino);
         this.frames = 50;
         this.voltar = false;
 

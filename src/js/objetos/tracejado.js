@@ -64,6 +64,10 @@ export class Tracejado extends Objeto{
         return this.mesh.position;
     }
 
+    set position(posicao){
+        this.mesh.copy(posicao);
+    }
+
     get length(){
         return this.origem.clone().sub(this.destino).length();
     }

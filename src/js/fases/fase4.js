@@ -60,7 +60,7 @@ export class Fase4 {
         this.triangulo.removeFromScene();
 
         const dialogo = ["O círculo é uma das figuras geométricas mais básicas",
-                         "Ele tem um centro",
+                         "Ele tem um position",
                          "e um raio",
                          "Como pode ver, todos os pontos no círculo estão na mesma distância do raio",
                          "Então a única diferença entre dois pontos é o giro entre eles",
@@ -77,17 +77,17 @@ export class Fase4 {
 
         this.circulo = circulo;
 
-        //Efeito de popIn do centro
-        const centro           = new Circle(new THREE.Vector3(0,0,0), 0.1, 0.2);
-              centro.material  = new THREE.MeshBasicMaterial({color:0x960000});
-        const circuloCrescendo = this.circuloCrescendoAnimacao(centro);
+        //Efeito de popIn do position
+        const position           = new Circle(new THREE.Vector3(0,0,0), 0.1, 0.2);
+              position.material  = new THREE.MeshBasicMaterial({color:0x960000});
+        const circuloCrescendo = this.circuloCrescendoAnimacao(position);
 
         //Animações de mostrarTexto de cada diálogo
         const animacoes = dialogo.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)));
 
         const anim1 = new AnimacaoSimultanea(animacoes[0], desenharCirculo);
         const anim2 = new AnimacaoSimultanea(animacoes[1], circuloCrescendo);
-        const anim3 = this.thirdDialogue(animacoes[2], centro, circulo);
+        const anim3 = this.thirdDialogue(animacoes[2], position, circulo);
         const anim4 = animacoes[3].setValorFinal(100);
         const anim5 = this.fifthDialogue( animacoes[4], circulo);
         const anim6 = animacoes[5];
@@ -110,7 +110,7 @@ export class Fase4 {
 
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
 
-        const tracejado = new Tracejado(circulo.centro, pontoDoCirculo.centro);
+        const tracejado = new Tracejado(circulo.position, pontoDoCirculo.position);
         
 
         const moverPonto = (posicaoFinal) => new Animacao(pontoDoCirculo)
@@ -121,7 +121,7 @@ export class Fase4 {
                                         .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
                                         .setUpdateFunction((angulo) => {
                                             const posicao = new THREE.Vector3(3*Math.sin(angulo), 3*Math.cos(angulo), 0)
-                                            pontoDoCirculo.centro = posicao;
+                                            pontoDoCirculo.position = posicao;
                                             tracejado.destino = posicao.clone().multiplyScalar(0.95);
                                             pontoDoCirculo.update(); //Refatorar circulo, update deve ser apenas update
                                             tracejado.update();
@@ -149,7 +149,7 @@ export class Fase4 {
 
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
 
-        const tracejado = new Tracejado(circulo.centro, pontoDoCirculo.centro);
+        const tracejado = new Tracejado(circulo.position, pontoDoCirculo.position);
         
 
         
@@ -177,7 +177,7 @@ export class Fase4 {
                                         )
                                         .setUpdateFunction((angulo) => {
                                             const posicao = new THREE.Vector3(3*Math.sin(angulo), 3*Math.cos(angulo), 0)
-                                            pontoDoCirculo.centro = posicao;
+                                            pontoDoCirculo.position = posicao;
                                             tracejado.destino = posicao.clone().multiplyScalar(0.95);
                                             pontoDoCirculo.update(); //Refatorar circulo, update deve ser apenas update
                                             tracejado.update();

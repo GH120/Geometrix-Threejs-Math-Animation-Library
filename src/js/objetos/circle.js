@@ -11,9 +11,7 @@ export default class Circle extends Objeto{
 
         this.material =new THREE.MeshBasicMaterial({color:0xff0000});
 
-        console.log(this.hitbox.position)
-
-        this.centro = centro;
+        this.position = centro;
         this.raio = raio;
         this.grossura = grossura;
 
@@ -100,7 +98,8 @@ export default class Circle extends Objeto{
         this.scene.remove(this.mesh);
         this.render();
         this.scene.add(this.mesh);
-        this.mesh.position.copy(this.centro);
+        this.mesh.position.copy(this.position);
+        this.hitbox.position.copy(this.position);
     }
 
     moveTo(position){
@@ -108,19 +107,13 @@ export default class Circle extends Objeto{
         this.hitbox.position.copy(position);
     }
 
-    get centro(){
-        return this.hitbox.position.clone();
-    }
-
-    set centro(centro){
-        this.hitbox.position.copy(centro);
+    addToScene(scene){
+        super.addToScene(scene);
+        scene.add(this.hitbox);
+        return this;
     }
 
     get length(){
         return 2*Math.PI*this.raio;
-    }
-
-    get position(){
-        return this.mesh.position;
     }
 }

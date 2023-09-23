@@ -31,6 +31,7 @@ import Circle from '../objetos/circle';
 import DesenharMalha from '../animacoes/desenharMalha';
 import RelogioGLB from '../../assets/Relogio.glb'
 import { Angle } from '../objetos/angle';
+import ColorirOnHover from '../handlers/colorirOnHover';
   
 
 export class Fase4 {
@@ -291,6 +292,12 @@ export class Fase4 {
         })
 
         this.hoverable = new Hoverable(this.ponto2,this.camera);
+
+        const colorirPonto = new ColorirOnHover(this.ponto2,0xff0000,0xff00ff).setCanvas(this);
+
+        this.hoverable.addObserver(colorirPonto)
+        this.draggable.addObserver(colorirPonto)
+
 
         dialogue.setOnTermino(() =>{
 

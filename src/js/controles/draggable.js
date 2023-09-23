@@ -37,14 +37,17 @@ export class Draggable extends Controler{
 
       if(!colision) return;
 
+      this.lastPosition = colision.point;
+
       //Notifica todos os observadores da nova posição
-      this.notify({position: colision.point});
+      this.notify({position: colision.point, dragging:true});
     }
     
   }
 
   onMouseUp() {
     this.dragging = false;
+    this.notify({position:this.lastPosition, dragging:false})
   }
 
   notify(estado){

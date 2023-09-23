@@ -99,6 +99,8 @@ export default class Animacao {
 
             this.update(valor);
 
+            if(this.stop) return this.update(this.valorInicial);
+
             yield frame;
         }
 
@@ -111,6 +113,9 @@ export default class Animacao {
 
         //Enquanto estiver com a flag para manter a execução, continue retornando o ultimo frame
         while(this.manter) {
+            
+            if(this.stop) return this.update(this.valorInicial);
+
             yield this.update(this.valorFinal);
         }
 

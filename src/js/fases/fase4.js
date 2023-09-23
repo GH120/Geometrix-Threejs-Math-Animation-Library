@@ -26,7 +26,7 @@ import { Divisao } from '../animacoes/divisao';
 import { Triangle } from '../objetos/triangle';
 import Bracket from '../objetos/bracket';
 import Pythagoras from '../equations/pythagoras';
-import { Addition, Value, Variable } from '../equations/expressions';
+import { Addition, Equality, Value, Variable, VariableMultiplication } from '../equations/expressions';
 import Circle from '../objetos/circle';
 import DesenharMalha from '../animacoes/desenharMalha';
 import RelogioGLB from '../../assets/Relogio.glb'
@@ -573,6 +573,9 @@ export class Fase4 {
         }
     }
 
+    //Adicionar equação 4 horas = 120 graus, onde graus e horas são variáveis
+    //Adicionar possibilidade de resolver equação por meios algébricos
+    //Adicionar menu de perguntas
     problemas = {
 
         0: {
@@ -595,6 +598,88 @@ export class Fase4 {
 
                 fase.animar(new AnimacaoSequencial(animacao1,animacao2))
             }
+        },
+
+        1: {
+            satisfeito(fase){
+
+                console.log(fase.angle.degrees)
+
+                return Math.round(150 - fase.angle.degrees) == 0;
+            },
+
+            consequencia(fase){
+
+                const dialogo1 = `5 horas tem 150°, como acabou de demonstrar`
+
+                const animacao1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo1))
+
+                const dialogo2 = `Mas será que é preciso medir os graus toda vez?`
+
+                const animacao2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo2))
+
+                const dialogo3 = "Veja, você sabe que uma hora tem 30°"
+
+                const animacao3 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo3));
+
+                const mostrarHora = fase.mostrarHora();
+
+                fase.animar(new AnimacaoSequencial(animacao1,animacao2, new AnimacaoSimultanea(mostrarHora)))
+            }
         }
+    }
+
+    //Animações dos problemas
+
+    mostrarHora(){
+
+        const moverPonteiro =  new Animacao(this.ponto2)
+                                .setValorInicial(Math.PI*150/180)
+                                .setValorFinal(Math.PI*1/6)
+                                .setInterpolacao((inicial, final, peso) => inicial*(1-peso) + final*peso)
+                                .setDuration(200)
+                                .voltarAoInicio(false)
+                                .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+                                .setUpdateFunction((angulo) => {
+                                    const posicao = new THREE.Vector3(3*Math.sin(angulo), 3*Math.cos(angulo), 0)
+                                    this.ponto2.position = posicao;
+                                    this.ponto2.update(); //Refatorar circulo, update deve ser apenas update
+                                    this.ponto2.updateObservers();
+                                });
+
+        const equacao = new Equality(
+                                new VariableMultiplication(new Value(1), new Variable(" horas")),
+                                new VariableMultiplication(new Value(30), new Variable("°"))
+                            );
+
+        const placeholder = this.createEquationBox("1 hora = ", new THREE.Vector3(4,2,0));
+
+        const PlaceholderAparecendo = new TextoAparecendo(placeholder.element);
+
+        this.scene.add(placeholder);
+
+        console.log(placeholder)
+
+        const anguloText = this.mostrarAngulo.text.elemento
+
+        const moverAngulo = new Animacao(anguloText)
+                                .setValorInicial(anguloText.position.clone())
+                                .setValorFinal(new THREE.Vector3(5,2,0))
+                                .setDuration(200)
+                                .voltarAoInicio(false)
+                                .setInterpolacao((inicial,final,peso) => new THREE.Vector3().lerpVectors(inicial,final,peso))
+                                .setUpdateFunction(value => {
+                                    anguloText.position.copy(value);
+                                })
+        //Animação desativar mostrarÂngulo, mover texto do ângulo
+        //Criar texto 1 hora = {Angulo}
+
+        return new AnimacaoSequencial(
+                    moverPonteiro, 
+                    new AnimacaoSimultanea(
+                        PlaceholderAparecendo, 
+                        moverAngulo
+                    )
+                );
     }
 }

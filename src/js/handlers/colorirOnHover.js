@@ -13,16 +13,21 @@ export default class ColorirOnHover extends Handler{
 
     update(estado){
 
+        if(estado.position) this.selecionado = estado.dragging;
+
+        if(this.selecionado) return;
+
+        if(this.animation) this.animation.stop = true;
 
         if(estado.dentro){
 
             const animacao = colorirAngulo(this.objeto)
                              .setValorInicial(this.corInicial)
                              .setValorFinal(this.corFinal)
-                             .setDuration(30)
+                             .setDuration(60)
                              .voltarAoInicio(false)
                              .manterExecucao(true)
-                             .setCurva(x => x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2)
+                             .setCurva(x => 1 - Math.pow(1 - x, 3))
 
             this.animation = animacao;
 

@@ -156,6 +156,8 @@ export class Fase4 {
         const tracejado = new Tracejado(circulo.position, pontoDoCirculo.position);
 
         this.angle = angle;
+
+        this.ponto2.tracejado = tracejado;
         
         //Função para dar update em todos os observadores dependetes do ponto
         pontoDoCirculo.updateObservers = () => {
@@ -293,10 +295,13 @@ export class Fase4 {
 
         this.hoverable = new Hoverable(this.ponto2,this.camera);
 
-        const colorirPonto = new ColorirOnHover(this.ponto2,0xff0000,0xff00ff).setCanvas(this);
+        const colorirPonto = new ColorirOnHover(this.ponto2,0xaa0000,0xffff33).setCanvas(this);
+        const colorirTracejado = new ColorirOnHover(this.ponto2.tracejado, 0xaa0000, 0xffff33).setCanvas(this);
 
         this.hoverable.addObserver(colorirPonto)
+        this.hoverable.addObserver(colorirTracejado)
         this.draggable.addObserver(colorirPonto)
+        this.draggable.addObserver(colorirTracejado)
 
 
         dialogue.setOnTermino(() =>{

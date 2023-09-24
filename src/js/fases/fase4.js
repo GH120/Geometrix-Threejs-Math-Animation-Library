@@ -219,22 +219,37 @@ export class Fase4 {
         
         tracejados.map(tracejado => tracejado.material = new THREE.MeshBasicMaterial({color:0x000000}))
 
-        const mostrarTracejados = tracejados.map(tracejado => new MostrarTracejado(tracejado,this.scene));
+        const scene = this.scene;
 
-        const sequencial = new AnimacaoSequencial();
+        //Adiciona um por um os retângulos dos graus
+        const sequencial = new Animacao(tracejados)
+                           .setValorInicial(0)
+                           .setValorFinal(360)
+                           .setDuration(360)
+                           .setInterpolacao((a,b,c) => a*(1-c) + b*c)
+                           .setUpdateFunction(function(index){
+                                const inicio = (this.counter)? this.counter : 0;
 
-        sequencial.animacoes = mostrarTracejados;
+                                console.log(this.counter,inicio)
 
-        sequencial.setDuration(1);
+                                for(let i = inicio; i < index; i++){
+
+                                    const tracejado = this.objeto[i];
+                                    tracejado.addToScene(scene);
+                                    tracejado.update();
+                                }
+
+                                this.counter = Math.ceil(index);
+                           })
 
         //Transformar isso em apenas uma animação, usar um array de tracejados que dá pop
         //Deletar os angulos maiores que 120
         //Juntar os tracejados em um contador que vira depois 120 graus
-        sequencial.frames = 720;
 
-        const descolorir = tracejados.slice(121,360).map(tracejado => colorirAngulo(tracejado)
+        const descolorir = tracejados.map(tracejado => colorirAngulo(tracejado)
                                                                     .setValorInicial(0x000000)
                                                                     .setValorFinal(0xffffff)
+                                                                    .setDuration(50)
                                                                     .setOnStart(() => tracejado.scene = this.scene)
                                                                     .setCurva(x => 1 - Math.sqrt(1 - Math.pow(x, 2)))
                                                                     .setOnTermino(() => this.scene.remove(tracejado.mesh))
@@ -242,11 +257,13 @@ export class Fase4 {
 
         const simultanea = new AnimacaoSimultanea();
 
-        simultanea.animacoes = descolorir;
-
         simultanea.setDuration(50);
 
-        this.tracejados = tracejados.slice(0,121);
+        simultanea.setOnStart(() => {
+            const graus          = Math.round(this.angle.degrees);
+            simultanea.animacoes = descolorir.slice(graus, 360)
+            this.tracejados      = tracejados.slice(0, graus + 1);
+        })
 
         return new AnimacaoSimultanea(dialogue, new AnimacaoSequencial(sequencial,simultanea));
     }
@@ -257,19 +274,22 @@ export class Fase4 {
 
         const textHtml = mostrarAngulo.text.elemento.element;
 
-        mostrarAngulo.increment = (() => {let a = 0; return () => {textHtml.textContent = `120° = ${a++} segmentos`}})()
-    
-        const animacoes = this.tracejados.map((tracejado, index) => this.moverTracejado(tracejado,index));
-
-        animacoes.map(tracejado => tracejado.setOnTermino(function(){
-                                        mostrarAngulo.increment();
-                                        mostrarAngulo.text.elemento.position.x = 1.8
-                                    })
-                     )
+        mostrarAngulo.increment = (() => {let a = 0; return () => {textHtml.textContent = `${Math.round(this.angle.degrees)}° = ${a++} segmentos`}})()
 
         const simultanea = new AnimacaoSimultanea();
 
-        simultanea.animacoes = animacoes;
+        //Vai esperar a animação ser executada antes de pegar os tracejados
+        simultanea.setOnStart(() => {
+            const animacoes = this.tracejados.map((tracejado, index) => this.moverTracejado(tracejado,index));
+
+            animacoes.map(tracejado => tracejado.setOnTermino(function(){
+                                            mostrarAngulo.increment();
+                                            mostrarAngulo.text.elemento.position.x = 1.8
+                                        })
+                        )
+
+            simultanea.animacoes = animacoes;
+        })
 
         simultanea.frames = 240;
 
@@ -659,6 +679,15 @@ export class Fase4 {
         this.scene.add(placeholder);
 
         console.log(placeholder)
+
+        //Forma algébrica, desenvolver animações para lidar com isso (criar carta e mover)
+        //Adicionar carta (círculo tem 360°)
+        //Adicionar carta (relógio tem 12 horas)
+        //Adicionar carta (relógio é um círculo)
+        //Resolução: 12 horas tem 360°
+        //Então 6 horas tem 180°
+        //e 1 hora tem 30°
+        //Shortcut,adicionar bônus se resolver por essa maneira
 
         const anguloText = this.mostrarAngulo.text.elemento
 

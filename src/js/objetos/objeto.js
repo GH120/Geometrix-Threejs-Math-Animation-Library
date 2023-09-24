@@ -16,6 +16,11 @@ export class Objeto{
         return this;
     }
 
+    removeFromScene(){
+        this.scene.remove(this.mesh);
+        return this;
+    } 
+
     //Como padrão, a hitbox de um objeto seria sua malha
     // get hitbox(){
     //     return this.mesh;

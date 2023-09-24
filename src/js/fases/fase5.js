@@ -127,6 +127,7 @@ export class Fase5 {
 
         let ativado = false;
         let tracejado = null;
+        let desenharTracejado = null;
 
         return {
             update: (estado) => {
@@ -139,11 +140,29 @@ export class Fase5 {
                     
                     tracejado = new Tracejado(posicao.clone().sub(vetorTracejado), posicao.clone().add(vetorTracejado))
                     tracejado.addToScene(this.scene);
+                    
+                    // animação
+                    desenharTracejado = new Animacao(tracejado)
+                        .setValorInicial(0)
+                        .setValorFinal(2)
+                        .setDuration(200)
+                        .setInterpolacao((inicial, final, peso) => inicial * (1 - peso) + final*peso)
+                        .setUpdateFunction((progresso) => {
+                            tracejado.origem = posicao.clone().sub(vetorTracejado.clone().multiplyScalar(progresso))
+                            tracejado.destino = posicao.clone().add(vetorTracejado.clone().multiplyScalar(progresso))
+                            tracejado.update();
+                        })
+                        .setCurva((x) => 1 - (1 - x) * (1 - x))
+                        .voltarAoInicio(false);
+                    
+                    this.animar(desenharTracejado);
+                    
 
                 } else if (estado.clicado) {
                     
                     ativado = !ativado
                     
+                    desenharTracejado.stop = true;
                     tracejado.removeFromScene(this.scene)
                 }
             }

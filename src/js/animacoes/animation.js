@@ -91,15 +91,17 @@ export default class Animacao {
         //Executa os frames da animação, interpolando os valores iniciais e finais
         for(let frame = 1; frame <= this.frames; frame++){
 
-            if(this.chosen) console.log(frame)
-
             const lerp = (peso) => this.interpolacao(this.valorInicial, this.valorFinal, this.curva(peso));
 
             const valor = lerp(frame/this.frames);
 
             this.update(valor);
 
-            if(this.stop) return this.update(this.valorInicial);
+            // while (this.pause) yield this.update(valor); //se estiver pausado, continua executando// A FAZER
+
+            if(this.stop) return this.update(this.valorInicial); //se parar a execução, volta ao inicio
+
+            // if(this.skip) return this.endExecution(); //se quiser pular a execução, termina a animação// A FAZER
 
             yield frame;
         }
@@ -145,6 +147,9 @@ export default class Animacao {
         return new AnimacaoSequencial(animacoes);
     }
 
+    //Gambiarra para ter delay antes da animação, 
+    //Basicamente cria uma animação sequencial onde a primeira animação não faz nada e tem duração do delay
+    //Enquanto a segunda animação é essa
     filler(delay){
         return new AnimacaoSequencial(
                                       new Animacao(null)
@@ -159,6 +164,7 @@ export default class Animacao {
 
 export class AnimacaoSimultanea extends Animacao{
 
+    //** Aceita um spread de animações do tipo (anim1,anim2,anim3), MAS NÃO UMA LISTA [anim1,anim2,anim3] */
     constructor(...animacoes){
         super();
 
@@ -208,6 +214,14 @@ export class AnimacaoSimultanea extends Animacao{
         this.onTermino();
     }
 
+    //** Quando for colocar uma lista de animações [anim1,anim2,anim3,anim4...] ao invés de um spread */
+    setAnimacoes(animacoes){
+        this.animacoes = animacoes;
+        this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
+                               .reduce((acumulado, atual) => acumulado + atual, 0)
+        return this;
+    }
+
     setDuration(frames){
         this.frames = frames
         this.animacoes.map(animacao => animacao.setDuration(frames));
@@ -229,6 +243,7 @@ export class AnimacaoSimultanea extends Animacao{
 
 export class AnimacaoSequencial extends Animacao{
 
+    //** Aceita um spread de animações do tipo (anim1,anim2,anim3), MAS NÃO UMA LISTA [anim1,anim2,anim3] */
     constructor(...animacoes){
         super();
 
@@ -287,6 +302,14 @@ export class AnimacaoSequencial extends Animacao{
         completedActions.map(action => action.next());
 
         this.onTermino();
+    }
+
+    //** Quando for colocar uma lista de animações [anim1,anim2,anim3,anim4...] ao invés de um spread */
+    setAnimacoes(animacoes){
+        this.animacoes = animacoes;
+        this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
+                               .reduce((acumulado, atual) => acumulado + atual, 0)
+        return this;
     }
 
     setDuration = function(frames){

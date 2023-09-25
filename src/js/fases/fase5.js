@@ -64,12 +64,10 @@ export class Fase5 {
             )
         })
         
-        const sequencial = new AnimacaoSequencial() 
+        //Bug de threads consertado, usar setAnimações toda vez que lidar com listas de animações
+        //Do tipo [anim1,anim2,anim3,anim4...]
+        const sequencial = new AnimacaoSequencial().setAnimacoes(animacoesTextos);
         
-        // colocar animacoes e frames por bug de threads 
-        sequencial.animacoes = animacoesTextos;
-        sequencial.frames = 600; // texto aparecendo = 200; delay = 100; dois textos = (200 + 100) * 2 = 600
-
         return sequencial;
             
     }

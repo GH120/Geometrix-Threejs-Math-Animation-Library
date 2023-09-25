@@ -114,7 +114,35 @@ export class Fase5 {
     createControlers(){
         const clickableVertice = this.triangulo.vertices.map((vertice) => new Clickable({mesh:vertice, hitbox: vertice}, this.camera))
         for (let i = 0; i < 3; ++i) {
-            clickableVertice[i].addObserver(this.handlerClickVertice[i]);
+            clickableVertice[i].addObserver(this.handlerClickVertice[i])
+        }
+
+        const angleDragglable = this.triangulo.angles.map((angle) => new Draggable(angle, this.camera))
+        for (let i = 0; i < 3; ++i) {
+            angleDragglable[i].addObserver(this.handlerDragAngle[i])
+        }
+    }
+
+    createHandlers(){
+        this.handlerClickVertice = this.triangulo.vertices.map(vertex => this.criarTracejado(vertex))
+        this.handlerDragAngle = this.triangulo.angles.map(angle => this.criarMovimentacaoDeAngulo(angle))
+    }
+
+    criarMovimentacaoDeAngulo = (angle) => {
+
+
+        return {
+            update: (estado) => {
+                let posicao = estado.position;
+                const posAngulo = new THREE.Vector3(angle.position[0], angle.position[1], angle.position[2])
+
+                angle.mesh.position.copy(posicao.sub(posAngulo));
+                // angle.mesh.moveTo(posicao)
+
+                if (!estado.dragging) {
+                    angle.mesh.position.copy(new THREE.Vector3(0, 0, 0));
+                }
+            }
         }
     }
 
@@ -165,10 +193,6 @@ export class Fase5 {
                 }
             }
         }
-    }
-
-    createHandlers(){
-        this.handlerClickVertice = this.triangulo.vertices.map(vertex => this.criarTracejado(vertex))
     }
 
     animar(animacao){

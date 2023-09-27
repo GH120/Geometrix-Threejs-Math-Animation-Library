@@ -7,8 +7,6 @@ export class MostrarAngulo extends Handler{
     constructor(triangulo, index){
         super();
 
-        this.triangulo = triangulo;
-        this.vertice = triangulo.vertices[index];
         this.angulo = triangulo.angles[index];
         this.estado  = {};
         this.createText();
@@ -38,7 +36,7 @@ export class MostrarAngulo extends Handler{
 
             const vetor = new THREE.Vector3(0,0,0).lerpVectors(angulo.vetor2,angulo.vetor1,0.5).normalize().multiplyScalar(1.5*angulo.angleRadius);
 
-            const position = this.vertice.position.clone();
+            const position = this.angulo.position.clone();
 
             const newPosition = position.sub(vetor)
 
@@ -68,9 +66,5 @@ export class MostrarAngulo extends Handler{
     addToScene(scene){
         this.scene = scene;
         return this;
-    }
-
-    get centro(){
-        return this.triangulo.vertices.map(vertice => vertice.position.clone()).reduce((a,b) => a.add(b), new THREE.Vector3(0,0,0)).multiplyScalar(1/3);
     }
 }

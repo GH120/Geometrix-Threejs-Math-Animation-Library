@@ -42,6 +42,7 @@ export class Objeto{
     static fromMesh(mesh){
         const novo = new Objeto();
         novo.mesh = mesh;
+        novo.hitbox = mesh;
         return novo
     }
 }

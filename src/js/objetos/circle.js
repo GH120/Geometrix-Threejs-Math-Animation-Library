@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { Objeto } from './Objeto';
+import { Objeto } from './objeto';
 
 export default class Circle extends Objeto{
 

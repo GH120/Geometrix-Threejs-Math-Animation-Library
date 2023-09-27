@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {Angle} from './angle';
 import {Edge} from './edge.js';
-import { Objeto } from './Objeto';
+import { Objeto } from './objeto';
 
 
 export class Triangle extends Objeto{

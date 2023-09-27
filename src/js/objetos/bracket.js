@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import DesenharMalha from '../animacoes/desenharMalha';
 import { AnimacaoSequencial } from '../animacoes/animation';
-import { Objeto } from './Objeto';
+import { Objeto } from './objeto';
 
 export default class Bracket extends Objeto{
 

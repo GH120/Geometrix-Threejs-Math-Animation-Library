@@ -28,14 +28,16 @@ export class Triangle extends Objeto{
     }
 
     renderVertices(){
-        this.vertices = this.positions.map(position => {
+        const esferas = this.positions.map(position => {
             const esfera = new THREE.Mesh(this.sphereGeometry, this.sphereMaterial);
             esfera.position.set(...position);
             return esfera;
         });
 
         //Gambiarra enquanto não transforma o vértice em um objeto
-        this.vertices.map(vertice => vertice.moveTo = (position) => vertice.position.copy(position));
+        this.vertices = esferas.map(vertice => Objeto.fromMesh(vertice));
+
+        console.log(this.vertices)
 
         return this;
     }
@@ -58,7 +60,7 @@ export class Triangle extends Objeto{
 
         this.scene = scene;
 
-        this.vertices.map(vertex => scene.add(vertex));
+        this.vertices.map(vertex => vertex.addToScene(scene))
         this.edges.map(   edge   => edge.addToScene(scene));
         this.angles.map(  angle  => angle.addToScene(scene));
 
@@ -73,7 +75,7 @@ export class Triangle extends Objeto{
 
         this.vertices.map(vertex => scene.remove(vertex));
         this.edges.map(   edge   => scene.remove(edge.mesh));
-        this.angles.map(  angle  => scene.remove(angle.mesh));
+        // this.angles.map(  angle  => scene.remove(angle.mesh));
 
         return this;
     }
@@ -86,7 +88,7 @@ export class Triangle extends Objeto{
         this.edges.map(edge => edge.update());
 
         //Atualiza a malha dos ângulos
-        this.angles.map(angle => angle.update())
+        // this.angles.map(angle => angle.update())
     }
 
     retangulo(){

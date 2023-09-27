@@ -21,18 +21,18 @@ export class Edge extends Objeto{
         
         const proximo        = (this.index+1)%vertices.length;
 
-        const esfera         = vertices[this.index];
-        const esferaSeguinte = vertices[proximo];
+        const esfera         = vertices[this.index].mesh;
+        const esferaSeguinte = vertices[proximo].mesh;
 
-        const media     = (eixo) => (esfera.position[eixo] + esferaSeguinte.position[eixo])/2;
-        const diferenca = (eixo) => (-esfera.position[eixo] + esferaSeguinte.position[eixo]);
+        const vetor = esferaSeguinte.position.clone().sub(esfera.position);
 
-        const tamanho = ["x","y","z"].map(eixo => diferenca(eixo)).map(d => d*d).reduce((a,b) => a+b , 0);
-
-        const cylinderGeometry = new THREE.CylinderGeometry(this.grossura, this.grossura, Math.sqrt(tamanho), 16);
-
+        const cylinderGeometry = new THREE.CylinderGeometry(this.grossura, this.grossura, vetor.length(), 16);
+        
         const cano = new THREE.Mesh(cylinderGeometry, this.material);
-        cano.position.set(media("x"), media("y"), media("z"));
+        
+        const posicao = esferaSeguinte.position.clone().add(esfera.position).multiplyScalar(0.5);
+
+        cano.position.copy(posicao);
 
         cano.lookAt(esferaSeguinte.position);
 

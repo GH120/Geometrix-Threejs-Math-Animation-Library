@@ -4,6 +4,7 @@ import {Triangle} from './objetos/triangle';
 import grid from '../assets/grid.avif';
 import { Fase } from './fases/fase1';
 import { Fase2 } from './fases/fase2';
+import { Fase4 } from './fases/fase4';
 import Bracket from './objetos/bracket'
 import DesenharMalha from './animacoes/desenharMalha';
 import { Fase3 } from './fases/fase3';
@@ -40,10 +41,10 @@ document.body.appendChild(labelRenderer.domElement);
 const triangle = new Triangle()
                     .renderVertices()
                     .renderEdges()
-                    .renderAngles()
+                    // .renderAngles()
                     .addToScene(scene);
 
-const programa = new Fase5(triangle,scene,camera);
+const programa = new Fase(triangle,scene,camera);
 
 programa.canvas = canvas;
 

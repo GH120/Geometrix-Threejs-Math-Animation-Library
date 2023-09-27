@@ -28,14 +28,14 @@ export class Fase {
         this.animacoes = [];
         this.trigonometria = [];
 
-        this.createControlers();
-        this.createHandlers();
-        this.setUpAnimar();
-        this.addToScene(scene);
-        this.setupInterface();
+        // this.createControlers();
+        // this.createHandlers();
+        // this.setUpAnimar();
+        // this.addToScene(scene);
+        // this.setupInterface();
         this.setupTextBox();
 
-        this.levelDesign();
+        // this.levelDesign();
     }
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
@@ -319,7 +319,7 @@ export class Fase {
     }
 
     update(){
-        this.atualizarOptions();
+        // this.atualizarOptions();
 
         this.frames.map(frame => frame.next()); //Roda as animações do programa
 

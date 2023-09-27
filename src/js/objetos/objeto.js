@@ -38,4 +38,10 @@ export class Objeto{
     moveTo(position){
         this.mesh.position.copy(position);
     }
+
+    static fromMesh(mesh){
+        const novo = new Objeto();
+        novo.mesh = mesh;
+        return novo
+    }
 }

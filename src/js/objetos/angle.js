@@ -13,6 +13,8 @@ export class Angle extends Objeto{
         this.grossura = 0.065;
         this.material = new THREE.MeshBasicMaterial({color:0xff0000})
 
+        // this.mesh = new THREE.Mesh(new THREE.SphereGeometry(1), this.material)
+
     }
 
     render(){
@@ -25,7 +27,9 @@ export class Angle extends Objeto{
     setPositions(){
 
         const index     = this.index;
-        const positions = this.vertices.map(vertex => [vertex.position.x, vertex.position.y, vertex.position.z]);
+        const positions = this.vertices.map(vertex => vertex.mesh.position.clone());
+
+        console.log(positions, "posições");
         
         this.position = positions[index];
         this.seguinte = positions[(index+1)%positions.length];
@@ -35,14 +39,9 @@ export class Angle extends Objeto{
     }
 
     getVetores(){
-
-        const diferenca = (origem, destino, eixo) => (destino[eixo] - origem[eixo]);
-
-        const CriarVetor = (origem, destino) => new THREE.Vector3( ...[0,1,2].map(eixo => diferenca(destino, origem, eixo)));
-
         //Dois vetores apontando para os vértices opostos a esse
-        let vetor1 = CriarVetor(this.position, this.seguinte).normalize();
-        let vetor2 = CriarVetor(this.position, this.anterior).normalize();
+        let vetor1 = this.position.clone().sub(this.seguinte).normalize();
+        let vetor2 = this.position.clone().sub(this.anterior).normalize();
 
         //Se estiverem no sentido horário, inverter sua ordem
         const sentidoHorario = new THREE.Vector3(0,0,0).crossVectors(vetor1, vetor2).dot(new THREE.Vector3(0,0,1)) > 0;
@@ -57,6 +56,8 @@ export class Angle extends Objeto{
         this.vetor1 = vetor1;
         this.vetor2 = vetor2;
         this.angulo = vetor1.angleTo(vetor2);
+
+        console.log(vetor1,vetor2)
         
         return this;
     }
@@ -66,7 +67,7 @@ export class Angle extends Objeto{
         // Create the geometry for the sector
         const sectorGeometry = new THREE.BufferGeometry();
         const sectorVertices = [];
-        const center = this.position;
+        const center = [this.position.x, this.position.y, this.position.z];
 
         let last = [...center];
 
@@ -99,6 +100,7 @@ export class Angle extends Objeto{
         const noventaGraus = Math.round(this.angulo*180/Math.PI) == 90;
 
         this.mesh   = (noventaGraus)? MalhaReto : MalhaAngulo;
+
         this.hitbox =  MalhaAngulo;
         
         return this;
@@ -156,15 +158,15 @@ export class Angle extends Objeto{
     
     update(){
 
-        const scene = this.scene;
+        // const scene = this.scene;
 
-        this.mesh.geometry.dispose();
-        this.mesh.material.dispose();
-        scene.remove(this.mesh);
+        // this.mesh.geometry.dispose();
+        // this.mesh.material.dispose();
+        // scene.remove(this.mesh);
 
-        this.render();
+        // this.render();
 
-        scene.add(this.mesh);
+        // scene.add(this.mesh);
     }
 
     get degrees(){

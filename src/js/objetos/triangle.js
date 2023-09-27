@@ -73,9 +73,9 @@ export class Triangle extends Objeto{
 
         const scene = this.scene;
 
-        this.vertices.map(vertex => scene.remove(vertex));
+        this.vertices.map(vertex => scene.remove(vertex.mesh));
         this.edges.map(   edge   => scene.remove(edge.mesh));
-        // this.angles.map(  angle  => scene.remove(angle.mesh));
+        this.angles.map(  angle  => scene.remove(angle.mesh));
 
         return this;
     }
@@ -88,7 +88,7 @@ export class Triangle extends Objeto{
         this.edges.map(edge => edge.update());
 
         //Atualiza a malha dos ângulos
-        // this.angles.map(angle => angle.update())
+        this.angles.map(angle => angle.update())
     }
 
     retangulo(){

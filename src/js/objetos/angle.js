@@ -13,6 +13,10 @@ export class Angle extends Objeto{
         this.grossura = 0.065;
         this.material = new THREE.MeshBasicMaterial({color:0xff0000})
 
+        console.log(
+            "teste"
+        )
+
         // this.mesh = new THREE.Mesh(new THREE.SphereGeometry(1), this.material)
 
     }
@@ -57,7 +61,7 @@ export class Angle extends Objeto{
         this.vetor2 = vetor2;
         this.angulo = vetor1.angleTo(vetor2);
 
-        console.log(vetor1,vetor2)
+        console.log(vetor1,vetor2, `sentido horário ${sentidoHorario}`)
         
         return this;
     }

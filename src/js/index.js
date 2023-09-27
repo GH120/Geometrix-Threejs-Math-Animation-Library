@@ -41,7 +41,7 @@ document.body.appendChild(labelRenderer.domElement);
 const triangle = new Triangle()
                     .renderVertices()
                     .renderEdges()
-                    // .renderAngles()
+                    .renderAngles()
                     .addToScene(scene);
 
 const programa = new Fase(triangle,scene,camera);

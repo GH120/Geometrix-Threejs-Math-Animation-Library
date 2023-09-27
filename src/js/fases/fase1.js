@@ -325,9 +325,9 @@ export class Fase {
 
         // if(options.atualizar) triangle.update();
 
-        if (this.triangulo.equilatero()) {
-            this.changeText("VITORIA!!!");
-            // botar notif
-        }
+        // if (this.triangulo.equilatero()) {
+        //     this.changeText("VITORIA!!!");
+        //     // botar notif
+        // }
     }
 }

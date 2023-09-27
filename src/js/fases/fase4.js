@@ -149,7 +149,7 @@ export class Fase4 {
 
         const angle = new Angle([circulo, this.ponto2, this.ponto1], 0).render()
 
-        const mostrarAngulo = new MostrarAngulo({vertices:[circulo,this.ponto2, this.ponto1], angles:[angle]}, 0).addToScene(this.scene);
+        const mostrarAngulo = new MostrarAngulo(angle).addToScene(this.scene);
 
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
 

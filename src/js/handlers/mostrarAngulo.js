@@ -4,10 +4,10 @@ import { Handler } from './handler';
 
 export class MostrarAngulo extends Handler{
 
-    constructor(triangulo, index){
+    constructor(angle){
         super();
 
-        this.angulo = triangulo.angles[index];
+        this.angulo = angle;
         this.estado  = {};
         this.createText();
 

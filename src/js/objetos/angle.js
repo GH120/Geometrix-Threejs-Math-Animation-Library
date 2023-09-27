@@ -154,15 +154,15 @@ export class Angle extends Objeto{
     
     update(){
 
-        // const scene = this.scene;
+        const scene = this.scene;
 
-        // this.mesh.geometry.dispose();
-        // this.mesh.material.dispose();
-        // scene.remove(this.mesh);
+        this.mesh.geometry.dispose();
+        this.mesh.material.dispose();
+        scene.remove(this.mesh);
 
-        // this.render();
+        this.render();
 
-        // scene.add(this.mesh);
+        scene.add(this.mesh);
     }
 
     get degrees(){

@@ -3,11 +3,11 @@ import * as THREE from 'three';
 
 //Preciso adicionar smoothing para valores como 30°, 45°, 60° e 90°
 //Implementar o smoothing como o vídeo do autotargeting ensinou
+//** Não atualiza triângulo por padrão, tem que adicionar draggable.addObserver(triangulo) */
 export default class MoverVertice extends Handler{
 
-    constructor(triangulo, vertice){
+    constructor(vertice){
         super();
-        this.triangulo = triangulo;
         this.vertice = vertice;
 
     }
@@ -30,7 +30,6 @@ export default class MoverVertice extends Handler{
 
         this.vertice.moveTo(point);
 
-        this.triangulo.update();
     }
 
     //Retorna os pontos focais, ou seja, os pontos que iriam satisfazer um dos requisitos

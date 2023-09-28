@@ -43,7 +43,15 @@ export class Triangle extends Objeto{
     }
 
     renderEdges(){
-        this.edges = this.vertices.map((esfera, indice) => new Edge(this,indice));
+
+        const proximo = (index) => this.vertices[(index+1)%3];
+
+        const getPosition = (objeto) => objeto.mesh.position;
+
+        this.edges = this.vertices.map(
+                        (vertice, index) => new Edge(getPosition(vertice), getPosition(proximo(index)))
+                    );
+
         return this;
     }
 

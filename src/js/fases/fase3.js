@@ -176,13 +176,13 @@ export class Fase3 {
 
         // //Liga esses observers ao hover/drag, quando acionados, eles avisam seus observers
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
-        this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
-        this.clickable.map((clickable, index)=> clickable.addObserver(this.bissetrizes[index]));
-        this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
-        this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
+        // this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
+        // this.clickable.map((clickable, index)=> clickable.addObserver(this.bissetrizes[index]));
+        // this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
+        // this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.mostrarAngulo[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
-        this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
+        // this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
         this.draggable.map(draggable => draggable.addObserver(this.triangulo));
 
         this.handlers = [...this.moverVertice,

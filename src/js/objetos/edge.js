@@ -3,12 +3,13 @@ import { Objeto } from './objeto';
 
 export class Edge extends Objeto{
 
-    constructor(triangle, index){
+    constructor(origem, destino){
 
         super();
 
-        this.triangle = triangle;
-        this.index    = index;
+        this.origem = origem;
+        this.destino = destino;
+
         this.material = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.grossura = 0.05;
 
@@ -17,24 +18,20 @@ export class Edge extends Objeto{
 
     render(){
 
-        const vertices       = this.triangle.vertices;
-        
-        const proximo        = (this.index+1)%vertices.length;
+        const origem  = this.origem;
+        const destino = this.destino;
 
-        const esfera         = vertices[this.index].mesh;
-        const esferaSeguinte = vertices[proximo].mesh;
-
-        const vetor = esferaSeguinte.position.clone().sub(esfera.position);
+        const vetor = destino.clone().sub(origem);
 
         const cylinderGeometry = new THREE.CylinderGeometry(this.grossura, this.grossura, vetor.length(), 16);
         
         const cano = new THREE.Mesh(cylinderGeometry, this.material);
         
-        const posicao = esferaSeguinte.position.clone().add(esfera.position).multiplyScalar(0.5);
+        const posicao = destino.clone().add(origem).multiplyScalar(0.5);
 
         cano.position.copy(posicao);
 
-        cano.lookAt(esferaSeguinte.position);
+        cano.lookAt(destino);
 
         cano.rotateX(Math.PI/2);
 

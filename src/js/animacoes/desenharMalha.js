@@ -1,23 +1,32 @@
 //Desenha triângulo por triângulo a malha desejada, em ordem
 import * as THREE from 'three';
 import Animacao from "./animation";
+import { Objeto } from '../objetos/objeto';
 
 export default class DesenharMalha extends Animacao{
 
     constructor(objeto, scene){
+
         super(objeto);
 
-        this.scene = scene;
+        //Gambiarra
+        //Objeto é uma mesh, transforma ele em um Objeto
+        if(!objeto.mesh){
 
+            objeto = Objeto.fromMesh(objeto);
+            this.objeto = objeto;
+        }
+
+        this.scene = scene;
         this.valorInicial = 0;
         this.frames = 44;
         this.voltar = false;
+
+        objeto.mesh.visible = false;
         
         this.onStart = () => {
             
             objeto.addToScene(scene);
-            objeto.update();
-            objeto.mesh.visible = false;
             this.valorFinal   = objeto.mesh.geometry.attributes.position.count;
             
         }
@@ -50,7 +59,7 @@ export default class DesenharMalha extends Animacao{
 
     onTermino(){
         this.scene.remove(this.malha);
-        this.objeto.mesh.visible = true;
+        if(!this.voltar) this.objeto.mesh.visible = true;
     }
 
     interpolacao(inicial, final, peso){

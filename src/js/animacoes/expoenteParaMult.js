@@ -1,6 +1,6 @@
 import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from "./animation";
 import { TextoAparecendo } from "./textoAparecendo";
-
+//Consertar desenharMalha, deletar malhas de linhas das setas da distributividade
 export class ExpoenteParaMult extends Animacao{
 
     constructor(element, base, expoente){

@@ -481,22 +481,22 @@ export class Fase4 {
         const triangulo = this.triangulo;
 
         //É um observer, quando há um arraste do objeto, ele move o objeto para a nova posição
-        this.moverVertice = triangulo.vertices.map(vertex => new MoverVertice(triangulo,vertex));
+        this.moverVertice = triangulo.vertices.map(vertex => new MoverVertice(vertex));
         //É um observer, quando onHover é acionado, adiciona ou remove o texto do ângulo
-        this.mostrarAngulo = triangulo.angles.map((angle, index) => new MostrarAngulo(triangulo, index));
+        this.mostrarAngulo = triangulo.angles.map(angle => new MostrarAngulo(angle).addToScene(this.scene));
         //É um observer, colore os ângulos quando o triangulo é isóceles/equilatero
         this.colorirIsoceles = new ColorirIsoceles(triangulo);
-        //É um observer, mostra o tipo desse triângulo
-        this.mostrarTipo = new MostrarTipo(triangulo);
-        //É um observer, mostra a bissetriz do ângulo
-        this.bissetrizes = triangulo.angles.map(angle => new MostrarBissetriz(triangulo, angle));
+        // //É um observer, mostra o tipo desse triângulo
+        this.mostrarTipo = new MostrarTipo(triangulo).addToScene(this.scene);
+        // //É um observer, mostra a bissetriz do ângulo
+        this.bissetrizes = triangulo.angles.map(angle => new MostrarBissetriz(triangulo, angle,this.scene));
 
         // //Liga esses observers ao hover/drag, quando acionados, eles avisam seus observers
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
         // this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
         // this.clickable.map((clickable, index)=> clickable.addObserver(this.bissetrizes[index]));
         // this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
-        this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
+        // this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.mostrarAngulo[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
         // this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
@@ -510,6 +510,7 @@ export class Fase4 {
         
         return this;
     }
+
 
     addToScene(scene){
         this.mostrarAngulo.map(m => m.addToScene(scene));

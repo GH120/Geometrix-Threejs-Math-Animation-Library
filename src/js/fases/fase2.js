@@ -74,14 +74,14 @@ export class Fase2 {
 
         const retornaAnim = (vertice, posfinal) => 
             new Animacao(vertice)
-                .setValorInicial(vertice.position.clone())
+                .setValorInicial(vertice.mesh.position.clone())
                 .setValorFinal(posfinal)
                 .setDuration(100)
                 .setInterpolacao(function(inicial,final,peso){
                     return new THREE.Vector3().lerpVectors(inicial,final,peso);
                 })
                 .setUpdateFunction(function(valor){
-                    vertice.position.copy(valor);
+                    vertice.mesh.position.copy(valor);
                     triangulo.update();
                 })
         

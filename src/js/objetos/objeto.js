@@ -43,6 +43,7 @@ export class Objeto{
         const novo = new Objeto();
         novo.mesh = mesh;
         novo.hitbox = mesh;
+        novo.material = mesh.material;
         return novo
     }
 }

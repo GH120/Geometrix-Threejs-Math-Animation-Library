@@ -44,7 +44,7 @@ const triangle = new Triangle()
                     .renderAngles()
                     .addToScene(scene);
 
-const programa = new Fase(triangle,scene,camera);
+const programa = new Fase4(triangle,scene,camera);
 
 programa.canvas = canvas;
 

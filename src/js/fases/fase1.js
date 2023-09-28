@@ -225,11 +225,11 @@ export class Fase {
         //É um observer, quando há um arraste do objeto, ele move o objeto para a nova posição
         this.moverVertice = triangulo.vertices.map(vertex => new MoverVertice(vertex));
         //É um observer, quando onHover é acionado, adiciona ou remove o texto do ângulo
-        this.mostrarAngulo = triangulo.angles.map(angle => new MostrarAngulo(angle).addToScene(this.scene));
+        this.mostrarAngulo = triangulo.angles.map(angle => new MostrarAngulo(angle));
         //É um observer, colore os ângulos quando o triangulo é isóceles/equilatero
         this.colorirIsoceles = new ColorirIsoceles(triangulo);
         // //É um observer, mostra o tipo desse triângulo
-        this.mostrarTipo = new MostrarTipo(triangulo).addToScene(this.scene);
+        this.mostrarTipo = new MostrarTipo(triangulo);
         // //É um observer, mostra a bissetriz do ângulo
         this.bissetrizes = triangulo.angles.map(angle => new MostrarBissetriz(triangulo, angle,this.scene));
 

@@ -97,9 +97,13 @@ export default class Bracket extends Objeto{
   }
 
   animacao(){
+
+    const linhaCima  = this.mesh.children[0];
+    const linhaBaixo = this.mesh.children[1];
+
     return new AnimacaoSequencial(
-                    new DesenharMalha(this.mesh.children[0],this.scene).reverse(),
-                    new DesenharMalha(this.mesh.children[1],this.scene)
+                    new DesenharMalha(linhaBaixo,this.scene).reverse(),
+                    new DesenharMalha(linhaCima, this.scene)
               )
               .setOnTermino(() => this.scene.remove(this.mesh))
 

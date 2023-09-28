@@ -21,7 +21,7 @@ export class MostrarTipo extends Handler{
 
         tipo += (this.triangulo.isoceles())? (this.triangulo.equilatero())? "Equilatero " : "Isoceles" : "Escaleno";
 
-        const posicaoMaisAlta = this.triangulo.vertices.map(vertice => vertice.position)
+        const posicaoMaisAlta = this.triangulo.angles.map(angle => angle.position)
                                                        .reduce((a,b) =>(a.y>b.y)? a : b)
                                                        .clone();
 
@@ -39,11 +39,11 @@ export class MostrarTipo extends Handler{
     }
 
     get centro(){
-        return this.triangulo.vertices.map(vertice => vertice.position.clone()).reduce((a,b) => a.add(b), new THREE.Vector3(0,0,0)).multiplyScalar(1/3);
+        return this.triangulo.angles.map(angle => angle.position.clone()).reduce((a,b) => a.add(b), new THREE.Vector3(0,0,0)).multiplyScalar(1/3);
     }
 
     get raio(){
-        return this.triangulo.vertices[0].position.clone().sub(this.centro).length();
+        return this.triangulo.angles[0].position.clone().sub(this.centro).length();
     }
 
     createText(){

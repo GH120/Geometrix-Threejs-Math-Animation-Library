@@ -16,7 +16,7 @@ export class MostrarBissetriz extends Handler{
 
         this.estado = {selecionado:false, clicados:[]};
 
-        const origem  = this.vertice.position.clone();
+        const origem  = this.angulo.position.clone();
         const destino = this.ladoOposto.mesh.position.clone();
 
         this.tracejado = new Tracejado(origem,destino);
@@ -30,7 +30,7 @@ export class MostrarBissetriz extends Handler{
 
         if(this.estado.dentro){
 
-            this.tracejado.origem  = this.vertice.position.clone();
+            this.tracejado.origem  = this.angulo.position.clone();
             this.tracejado.destino = this.ladoOposto.mesh.position.clone();
             this.tracejado.render();
 

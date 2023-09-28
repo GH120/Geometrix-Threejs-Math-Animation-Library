@@ -30,12 +30,12 @@ export class Fase {
 
         this.createControlers();
         this.createHandlers();
-        // this.setUpAnimar();
-        // this.addToScene(scene);
-        // this.setupInterface();
+        this.setUpAnimar();
+        this.addToScene(scene);
+        this.setupInterface();
         this.setupTextBox();
 
-        // this.levelDesign();
+        this.levelDesign();
     }
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
@@ -229,26 +229,26 @@ export class Fase {
         //É um observer, colore os ângulos quando o triangulo é isóceles/equilatero
         this.colorirIsoceles = new ColorirIsoceles(triangulo);
         // //É um observer, mostra o tipo desse triângulo
-        // this.mostrarTipo = new MostrarTipo(triangulo);
+        this.mostrarTipo = new MostrarTipo(triangulo).addToScene(this.scene);
         // //É um observer, mostra a bissetriz do ângulo
-        // this.bissetrizes = triangulo.angles.map(angle => new MostrarBissetriz(triangulo, angle));
+        this.bissetrizes = triangulo.angles.map(angle => new MostrarBissetriz(triangulo, angle,this.scene));
 
         // //Liga esses observers ao hover/drag, quando acionados, eles avisam seus observers
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
-        // this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
-        // this.clickable.map((clickable, index)=> clickable.addObserver(this.bissetrizes[index]));
-        // this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
+        this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
+        this.clickable.map((clickable, index)=> clickable.addObserver(this.bissetrizes[index]));
+        this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.mostrarAngulo[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
-        // this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
+        this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
         this.draggable.map(draggable => draggable.addObserver(this.triangulo));
 
-        // this.handlers = [...this.moverVertice,
-        //                  ...this.mostrarAngulo,
-        //                  ...this.bissetrizes, 
-        //                  this.colorirIsoceles, 
-        //                  this.mostrarTipo];
+        this.handlers = [...this.moverVertice,
+                         ...this.mostrarAngulo,
+                         ...this.bissetrizes, 
+                         this.colorirIsoceles, 
+                         this.mostrarTipo];
         
         return this;
     }
@@ -319,15 +319,15 @@ export class Fase {
     }
 
     update(){
-        // this.atualizarOptions();
+        this.atualizarOptions();
 
         this.frames.map(frame => frame.next()); //Roda as animações do programa
 
         // if(options.atualizar) triangle.update();
 
-        // if (this.triangulo.equilatero()) {
-        //     this.changeText("VITORIA!!!");
-        //     // botar notif
-        // }
+        if (this.triangulo.equilatero()) {
+            this.changeText("VITORIA!!!");
+            // botar notif
+        }
     }
 }

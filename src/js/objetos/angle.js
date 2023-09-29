@@ -147,17 +147,19 @@ export class Angle extends Objeto{
 
         mesh.position.copy(posicao);
 
+        const group = new THREE.Group();
+
+        group.add(mesh);
+
         // mesh.lookAt(new THREE.Vector3(-1,-1,0))
 
-        return mesh;
+        return group;
     }
     
     update(){
 
         const scene = this.scene;
 
-        this.mesh.geometry.dispose();
-        this.mesh.material.dispose();
         scene.remove(this.mesh);
 
         this.render();

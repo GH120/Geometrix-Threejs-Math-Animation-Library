@@ -23,7 +23,7 @@ export class Triangle extends Objeto{
     render(){
         this.renderVertices();
         this.renderEdges();
-        this.renderVertices();
+        this.renderAngles();
         return this;
     }
 

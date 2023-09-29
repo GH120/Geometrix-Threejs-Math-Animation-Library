@@ -21,13 +21,13 @@ import { Fase } from './fase';
 
 export class Fase5  extends Fase{
 
-    constructor(scene, camera){
+    constructor(){
 
-        super(scene,camera);
-        
+        super();
+
         this.triangulo = new Triangle()
                         .render()
-                        .addToScene(scene);
+                        .addToScene(this.scene);
 
 
         this.trigonometria = [];
@@ -117,7 +117,7 @@ export class Fase5  extends Fase{
 
     createControlers(){
         //Inputs
-        const clickableVertice = this.triangulo.vertices.map((vertice) => new Clickable({mesh:vertice, hitbox: vertice}, this.camera))
+        const clickableVertice = this.triangulo.vertices.map((vertice) => new Clickable(vertice, this.camera))
         for (let i = 0; i < 3; ++i) {
             clickableVertice[i].addObserver(this.handlerClickVertice[i])
         }
@@ -136,17 +136,19 @@ export class Fase5  extends Fase{
 
     criarMovimentacaoDeAngulo = (angle) => {
 
-
         return {
             update: (estado) => {
                 let posicao = estado.position;
-                const posAngulo = new THREE.Vector3(angle.position[0], angle.position[1], angle.position[2])
+                const posAngulo = angle.position;
 
-                angle.mesh.position.copy(posicao.sub(posAngulo));
-                // angle.mesh.moveTo(posicao)
+            
+
+                // angle.mesh.position.copy(posicao.sub(posAngulo));
+                if(posicao) angle.mesh.position.copy((posicao.sub(posAngulo)))
 
                 if (!estado.dragging) {
                     angle.mesh.position.copy(new THREE.Vector3(0, 0, 0));
+                    
                 }
             }
         }
@@ -167,8 +169,8 @@ export class Fase5  extends Fase{
                     
                     ativado = !ativado
 
-                    const posicao = vertex.position.clone();
-                    const vetorTracejado = outros_dois[0].position.clone().sub(outros_dois[1].position.clone());
+                    const posicao = vertex.mesh.position.clone();
+                    const vetorTracejado = outros_dois[0].mesh.position.clone().sub(outros_dois[1].mesh.position.clone());
                     
                     tracejado = new Tracejado(posicao.clone().sub(vetorTracejado), posicao.clone().add(vetorTracejado))
                     tracejado.addToScene(this.scene);

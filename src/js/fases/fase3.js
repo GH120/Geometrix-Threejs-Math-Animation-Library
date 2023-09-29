@@ -6,7 +6,6 @@ import { MostrarTipo } from '../handlers/mostrarTipo';
 import  MoverVertice  from '../handlers/moverVertice';
 import { MostrarBissetriz } from '../handlers/mostrarBissetriz';
 import { Clickable, MultipleClickable } from '../controles/clickable';
-import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
@@ -21,24 +20,27 @@ import Bracket from '../objetos/bracket';
 import Pythagoras from '../equations/pythagoras';
 import { Addition, Value, Variable } from '../equations/expressions';
 import { Fase } from './fase';
+import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
+import grid from '../../assets/grid.avif';
+
   
 
 export class Fase3 extends Fase{
 
-    constructor(scene, camera){
+    constructor(){
 
-        super(scene,camera)
+        super()
 
         this.triangulo = new Triangle()
                         .render()
-                        .addToScene(scene);
+                        .addToScene(this.scene);
         
         this.trigonometria = [];
 
         this.createControlers();
         this.createHandlers();
         this.setUpAnimar();
-        this.addToScene(scene);
+        this.addToScene(this.scene);
         this.setupInterface();
         this.setupTextBox();
 
@@ -272,6 +274,140 @@ export class Fase3 extends Fase{
         if (this.triangulo.equilatero()) {
             this.changeText("VITORIA!!!");
             // botar notif
+        }
+    }
+
+    //Ajeitar isso depois, inclui lógica da whiteboard para escrever equações e manipular elas
+    //Segregar posteriormente em uma classe Whiteboard
+    setupThreejs(){
+
+        const scene = new THREE.Scene();
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        console.log(this)
+
+        const canvas = document.getElementById('triangulo');
+        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        camera.position.z = 5;
+
+        scene.background = new THREE.TextureLoader().load(grid);
+
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        document.body.appendChild(labelRenderer.domElement);
+
+        this.scene  = scene;
+        this.camera = camera;
+        this.canvas = canvas;
+
+        this.renderer      = renderer;
+        this.labelRenderer = labelRenderer
+
+        window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+  
+        document.addEventListener("DOMContentLoaded", function() {
+            const openButton = document.getElementById("openEquationWindow");
+            const closeButton = document.getElementById("closeButton");
+            const equationWindow = document.getElementById("equationWindow");
+            const options = document.getElementById("options");
+        
+            let whiteboard;
+        
+            // const options = new Operations(elemento,programa).getOptions();
+        
+            // document.body.appendChild(options);
+        
+            openButton.addEventListener("click", function() {
+                openButton.classList.add("hidden");
+                equationWindow.classList.remove("hidden");
+                options.classList.remove("hidden");
+                
+                //Adiciona plano de fundo branco a tela de equações
+                //Ele é um objeto do threejs, que tem as proporções da tela html, que é transparente
+                whiteboard = addWhiteBoard(equationWindow);
+        
+                scene.add(whiteboard);
+                
+            });
+        
+            closeButton.addEventListener("click", function() {
+                openButton.classList.remove("hidden");
+                equationWindow.classList.add("hidden");
+                options.classList.add("hidden");
+        
+                scene.remove(whiteboard)
+            });
+        });
+        
+        
+        function addWhiteBoard(equationWindow){
+        
+            const rect = equationWindow.getBoundingClientRect();
+        
+            const bottomleft = pixelToCoordinates(rect.left, rect.bottom);
+        
+            const topright   = pixelToCoordinates(rect.right, rect.top) 
+        
+            const width = topright.x - bottomleft.x;
+        
+            const height = topright.y - bottomleft.y;
+        
+            //Gambiarra para os objetos estarem em cima do html, mas ter um fundo branco ao invés do background do threejs
+            const planeGeometry = new THREE.PlaneGeometry(width,height); // Width, height
+        
+            // Create a white material
+            const whiteMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // White color
+        
+            // Create a mesh using the geometry and material
+            const whitePlane = new THREE.Mesh(planeGeometry, whiteMaterial);
+        
+            whitePlane.position.x = bottomleft.x + width/2;
+            whitePlane.position.y = bottomleft.y + height/2;
+        
+            return whitePlane;
+        }
+        
+        function pixelToCoordinates(x,y){
+        
+            const raycaster = new THREE.Raycaster();
+        
+            raycaster.setFromCamera(normalizar(x,y), camera);
+            
+            const intersects = raycaster.intersectObject(new THREE.Mesh(
+            new THREE.PlaneGeometry(100,100),
+            new THREE.MeshBasicMaterial({color:0xffffff})
+            ));
+        
+            if (intersects.length > 0) {
+            // Update the object's position to the intersection point
+            return intersects[0].point;
+            }
+        
+        }
+        
+        function normalizar(x, y) {
+            const rect = canvas.getBoundingClientRect();
+            const normalizedX = (x - rect.left) / canvas.width * 2 - 1;
+            const normalizedY = -(y - rect.top) / canvas.height * 2 + 1;
+            return new THREE.Vector2(normalizedX,normalizedY);
         }
     }
 }

@@ -13,23 +13,24 @@ import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
 import Animacao, { AnimacaoSequencial } from '../animacoes/animation';
 import { Fase } from './fase';
+import { Triangle } from '../objetos/triangle';
 
 export class Fase2 extends Fase{
 
-    constructor(scene, camera){
+    constructor(){
 
-        super(scene,camera);
-        
+        super();
+
         this.triangulo = new Triangle()
                             .render()
-                            .addToScene(scene);
+                            .addToScene(this.scene);
        
         this.trigonometria = [];
 
         this.createControlers();
         this.createHandlers();
         this.setUpAnimar();
-        this.addToScene(scene);
+        this.addToScene(this.scene);
         this.setupInterface();
         this.setupTextBox();
 

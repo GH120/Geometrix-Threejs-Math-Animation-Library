@@ -21,20 +21,20 @@ import { Fase } from './fase';
 
 export class Fase1  extends Fase{
 
-    constructor(scene, camera){
+    constructor(){
 
-        super(scene,camera);
+        super();
 
         this.triangulo = new Triangle()
-                        .render()
-                        .addToScene(scene);
-        
+                            .render()
+                            .addToScene(this.scene);
+
         this.trigonometria = [];
 
         this.createControlers();
         this.createHandlers();
         this.setUpAnimar();
-        this.addToScene(scene);
+        this.addToScene(this.scene);
         this.setupInterface();
         this.setupTextBox();
 
@@ -238,13 +238,13 @@ export class Fase1  extends Fase{
 
         // //Liga esses observers ao hover/drag, quando acionados, eles avisam seus observers
         this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
-        this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
-        this.clickable.map((clickable, index)=> clickable.addObserver(this.bissetrizes[index]));
-        this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
+        // this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
+        // this.clickable.map((clickable, index)=> clickable.addObserver(this.bissetrizes[index]));
+        // this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
         this.draggable.map((draggable,index) => draggable.addObserver(this.mostrarAngulo[index]));
         this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
-        this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
+        // this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
         this.draggable.map(draggable => draggable.addObserver(this.triangulo));
 
         this.handlers = [...this.moverVertice,
@@ -322,15 +322,15 @@ export class Fase1  extends Fase{
     }
 
     update(){
-        this.atualizarOptions();
+        // this.atualizarOptions();
 
         this.frames.map(frame => frame.next()); //Roda as animações do programa
 
         // if(options.atualizar) triangle.update();
 
-        if (this.triangulo.equilatero()) {
-            this.changeText("VITORIA!!!");
-            // botar notif
-        }
+        // if (this.triangulo.equilatero()) {
+        //     this.changeText("VITORIA!!!");
+        //     // botar notif
+        // }
     }
 }

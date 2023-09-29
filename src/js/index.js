@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import {Triangle} from './objetos/triangle';
 import grid from '../assets/grid.avif';
-import { Fase } from './fases/fase1';
+import { Fase1 } from './fases/fase1';
 import { Fase2 } from './fases/fase2';
 import { Fase4 } from './fases/fase4';
 import Bracket from './objetos/bracket'
@@ -37,14 +37,7 @@ labelRenderer.domElement.style.position = 'absolute';
 labelRenderer.domElement.style.top = '0px';
 document.body.appendChild(labelRenderer.domElement);
 
-//Cria o triângulo e o programa
-const triangle = new Triangle()
-                    .renderVertices()
-                    .renderEdges()
-                    .renderAngles()
-                    .addToScene(scene);
-
-const programa = new Fase4(triangle,scene,camera);
+const programa = new Fase4(scene,camera);
 
 programa.canvas = canvas;
 

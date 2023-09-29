@@ -32,17 +32,16 @@ import DesenharMalha from '../animacoes/desenharMalha';
 import RelogioGLB from '../../assets/Relogio.glb'
 import { Angle } from '../objetos/angle';
 import ColorirOnHover from '../handlers/colorirOnHover';
+import { Fase } from './fase';
   
 
-export class Fase4 {
+export class Fase4 extends Fase{
 
-    constructor(triangle, scene, camera){
-        this.triangulo = triangle;
-        this.scene  = scene;
-        this.camera = camera;
-        this.frames = [];
-        this.animacoes = [];
-        this.trigonometria = [];
+    constructor(scene, camera){
+    
+        super(scene,camera);
+
+        console.log(scene)
 
         // this.createControlers();
         // this.createHandlers();
@@ -57,9 +56,6 @@ export class Fase4 {
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
     levelDesign(){
-
-        //Tira o triângulo padrão da cena
-        this.triangulo.removeFromScene();
 
         const dialogo = ["O círculo é uma das figuras geométricas mais básicas",
                          "Ele tem um centro",

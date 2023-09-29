@@ -20,16 +20,19 @@ import { Triangle } from '../objetos/triangle';
 import Bracket from '../objetos/bracket';
 import Pythagoras from '../equations/pythagoras';
 import { Addition, Value, Variable } from '../equations/expressions';
+import { Fase } from './fase';
   
 
-export class Fase3 {
+export class Fase3 extends Fase{
 
-    constructor(triangle, scene, camera){
-        this.triangulo = triangle;
-        this.scene  = scene;
-        this.camera = camera;
-        this.frames = [];
-        this.animacoes = [];
+    constructor(scene, camera){
+
+        super(scene,camera)
+
+        this.triangulo = new Triangle()
+                        .render()
+                        .addToScene(scene);
+        
         this.trigonometria = [];
 
         this.createControlers();
@@ -39,9 +42,9 @@ export class Fase3 {
         this.setupInterface();
         this.setupTextBox();
 
-        triangle.edges[0].valor = new Addition(new Variable("x"), new Value(-1));
-        triangle.edges[1].valor = new Addition(new Variable("x"), new Value(-2));
-        triangle.edges[2].valor = new Variable("x");
+        this.triangulo.edges[0].valor = new Addition(new Variable("x"), new Value(-1));
+        this.triangulo.edges[1].valor = new Addition(new Variable("x"), new Value(-2));
+        this.triangulo.edges[2].valor = new Variable("x");
 
         this.levelDesign();
     }

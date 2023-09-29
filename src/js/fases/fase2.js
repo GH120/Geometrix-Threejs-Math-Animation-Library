@@ -12,15 +12,18 @@ import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
 import Animacao, { AnimacaoSequencial } from '../animacoes/animation';
+import { Fase } from './fase';
 
-export class Fase2 {
+export class Fase2 extends Fase{
 
-    constructor(triangle, scene, camera){
-        this.triangulo = triangle;
-        this.scene  = scene;
-        this.camera = camera;
-        this.frames = [];
-        this.animacoes = [];
+    constructor(scene, camera){
+
+        super(scene,camera);
+        
+        this.triangulo = new Triangle()
+                            .render()
+                            .addToScene(scene);
+       
         this.trigonometria = [];
 
         this.createControlers();

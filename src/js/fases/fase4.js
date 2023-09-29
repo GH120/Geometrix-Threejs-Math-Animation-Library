@@ -147,7 +147,7 @@ export class Fase4 {
 
         this.ponto2 = pontoDoCirculo;
 
-        const angle = new Angle([circulo, this.ponto2, this.ponto1], 0).render()
+        const angle = new Angle([circulo, this.ponto2, this.ponto1]).render()
 
         const mostrarAngulo = new MostrarAngulo(angle).addToScene(this.scene);
 
@@ -168,6 +168,7 @@ export class Fase4 {
             mostrarAngulo.update({dentro:true})
         }
         
+        //Consertar desenhar malha do angulo
         const desenharAngulo = new DesenharMalha(angle, this.scene)
 
         const moverPonto = (posicaoFinal) => new Animacao(pontoDoCirculo)

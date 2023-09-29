@@ -112,6 +112,7 @@ export class Fase5 {
     }
 
     createControlers(){
+        //Inputs
         const clickableVertice = this.triangulo.vertices.map((vertice) => new Clickable({mesh:vertice, hitbox: vertice}, this.camera))
         for (let i = 0; i < 3; ++i) {
             clickableVertice[i].addObserver(this.handlerClickVertice[i])
@@ -124,6 +125,7 @@ export class Fase5 {
     }
 
     createHandlers(){
+        //Outputs
         this.handlerClickVertice = this.triangulo.vertices.map(vertex => this.criarTracejado(vertex))
         this.handlerDragAngle = this.triangulo.angles.map(angle => this.criarMovimentacaoDeAngulo(angle))
     }

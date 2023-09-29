@@ -24,22 +24,4 @@ export class Hoverable extends Controler {
 
     this.isInside = isInside;
   }
-
-
-  notify(estado){
-    for(const observer of this.observers) {
-      if(observer == null) continue;
-      observer.update(estado);
-    }
-  }
-
-  addObserver(observer){
-      this.observers.push(observer);
-      return this;
-  }
-
-  removeObserver(criteria){
-      this.observers = this.observers.filter(criteria);
-      return this;
-  }
 }

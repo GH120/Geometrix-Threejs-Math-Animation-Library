@@ -22,20 +22,6 @@ export class Clickable extends Controler{
     this.notify({clicado: selecionado});
     
   }
-
-  notify(estado){
-    for(const observer of this.observers) if(observer) observer.update(estado);
-  }
-
-  addObserver(observer){
-    this.observers.push(observer);
-    return this;
-  }
-
-  removeObserver(criteria = () => false){
-    this.observers = this.observers.filter(criteria);
-    return this;
-  }
 }
 
 export class MultipleClickable extends Controler{
@@ -56,19 +42,5 @@ export class MultipleClickable extends Controler{
         //Notifica todos os observadores da nova posição
         this.notify({clicados: selecionados});
         
-      }
-    
-      notify(estado){
-        for(const observer of this.observers) if(observer) observer.update(estado);
-      }
-    
-      addObserver(observer){
-        this.observers.push(observer);
-        return this;
-      }
-    
-      removeObserver(criteria){
-        this.observers = this.observers.filter(criteria);
-        return this;
       }
 }

@@ -3,7 +3,7 @@ import { Objeto } from './objeto';
 
 export class Angle extends Objeto{
 
-    constructor(vertices, index){
+    constructor(vertices, index=0){
 
         super();
 

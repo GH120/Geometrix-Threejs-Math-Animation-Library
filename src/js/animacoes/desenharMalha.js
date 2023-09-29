@@ -27,6 +27,8 @@ export default class DesenharMalha extends Animacao{
         this.onStart = () => {
             
             objeto.addToScene(scene);
+            objeto.update()
+            objeto.mesh.visible = false;
             this.valorFinal   = objeto.mesh.geometry.attributes.position.count;
             
         }

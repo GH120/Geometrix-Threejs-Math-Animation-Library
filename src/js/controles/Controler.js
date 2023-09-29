@@ -1,4 +1,6 @@
 import * as THREE from 'three'
+
+//É o input do usuário, pode ser ligado a um output no handler
 export class Controler{
 
     constructor(object, camera){
@@ -32,5 +34,22 @@ export class Controler{
         }
     
         return null;
+      }
+
+      //Implementação do observable
+      notify(estado){
+        for(const observer of this.observers) if(observer) observer.update(estado);
+      }
+    
+      addObserver(observer){
+        this.observers.push(observer);
+        return this;
+      }
+    
+      removeObserver(criteria){
+        this.observers = this.observers.filter(criteria);
+    
+        console.log(this.observers.filter(criteria))
+        return this;
       }
 }

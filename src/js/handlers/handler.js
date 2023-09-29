@@ -1,10 +1,24 @@
 //Observer dos controlers
 export class Handler{
 
-    /**função de update que recebe o estado novo e atualiza o que for necessário*/
-    update(estado){
-
+    constructor(){
+        this.observers = [];
+        this.estado    = {};
     }
+
+    /**função de update que recebe o estado novo e atualiza o que for necessário*/
+    update(novoEstado){
+
+        this._update(novoEstado); // função update privada
+
+        this.notify(this.estado);
+    }
+
+    setUpdateFunction(update){
+        this._update = update;
+        return this;
+    }
+
 
     /** A fase vira o canvas do handler. Ou seja, todo this.animar() chamado no handler é o this.animar() da fase.
      * Faz com que possa colocar uma animação para rodar na fase sem ter que ter a referencia da fase no handler.
@@ -13,4 +27,24 @@ export class Handler{
         this.animar = fase.animar.bind(fase);
         return this;
     }
+
+    //Implementação do observable, é possível um handler observar um handler, fazendo uma cadeia de outputs
+    //input -> output -> output -> output...
+    //draggable -> moverVertice -> update triângulo por exemplo
+    notify(estado){
+        for(const observer of this.observers) if(observer) observer.update(estado);
+    }
+
+    addObserver(observer){
+        this.observers.push(observer);
+        return this;
+    }
+    
+    removeObserver(criteria){
+        this.observers = this.observers.filter(criteria);
+
+        console.log(this.observers.filter(criteria))
+        return this;
+    }
+
 }

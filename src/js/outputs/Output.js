@@ -28,8 +28,8 @@ export class Output{
         return this;
     }
 
-    //Implementação do observable, é possível um handler observar um handler, fazendo uma cadeia de Inputs
-    //input -> Input -> Input -> Input...
+    //Implementação do observable, é possível um output observar um output, fazendo uma cadeia de outputs
+    //input -> Output -> Output -> Output...
     //draggable -> moverVertice -> update triângulo por exemplo
     notify(estado){
         for(const observer of this.observers) if(observer) observer.update(estado);

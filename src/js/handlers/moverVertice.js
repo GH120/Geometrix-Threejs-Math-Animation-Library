@@ -12,7 +12,7 @@ export default class MoverVertice extends Handler{
 
     }
 
-    update(novoEstado){
+    _update(novoEstado){
 
         this.estado = {...this.estado, ...novoEstado};
 

@@ -49,7 +49,7 @@ export class MostrarAngulo extends Handler{
         }
     }
 
-    update(novoEstado){
+    _update(novoEstado){
 
         this.estado = {...this.estado, ...novoEstado};
 

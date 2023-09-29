@@ -11,7 +11,7 @@ export default class ColorirOnHover extends Handler{
         this.animation = null;
     }
 
-    update(estado){
+    _update(estado){
 
         if(estado.position) this.selecionado = estado.dragging;
 

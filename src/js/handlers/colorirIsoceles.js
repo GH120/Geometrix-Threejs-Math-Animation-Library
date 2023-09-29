@@ -8,7 +8,7 @@ export class ColorirIsoceles extends Handler{
         this.triangulo = triangulo;
     }
 
-    update(){
+    _update(){
         console.log("funcionou")
 
         const isoceles = this.triangulo.isoceles();

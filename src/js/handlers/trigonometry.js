@@ -202,7 +202,7 @@ export class TrigOnHover extends Handler{
         
     }
 
-    update(estadoNovo){
+    _update(estadoNovo){
         //Atualiza o estado com a informação nova do controler
         this.estado = {...this.estado, ...estadoNovo};
 

@@ -22,7 +22,7 @@ export class MostrarBissetriz extends Handler{
         this.tracejado = new Tracejado(origem,destino);
     }
 
-    update(estadoNovo){
+    _update(estadoNovo){
 
         this.estado = {...this.estado, ...estadoNovo};
 

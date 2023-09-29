@@ -12,7 +12,7 @@ export class MostrarTipo extends Handler{
         this.createText();
     }
 
-    update(){
+    _update(){
         let tipo = "Triângulo ";
 
         const maiorAngulo = this.triangulo.angles.reduce((a,b) => (a.degrees > b.degrees)? a : b, 0);

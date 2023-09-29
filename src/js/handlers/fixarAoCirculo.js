@@ -8,7 +8,7 @@ export default class FixarAoCirculo extends Handler{
         this.vertice = vertice;
     }
 
-    update(novoEstado){
+    _update(novoEstado){
 
         this.estado = {...this.estado, ...novoEstado};
 

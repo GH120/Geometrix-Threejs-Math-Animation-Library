@@ -1,6 +1,6 @@
-import { Handler } from './handler';
+import { Output } from './Output';
 
-export default class FixarAoCirculo extends Handler{
+export default class FixarAoCirculo extends Output{
 
     constructor(circulo, vertice){
         super();

@@ -1,21 +1,21 @@
-import {Draggable} from './controles/draggable';
-import {Hoverable} from './controles/hoverable';
-import {MostrarAngulo} from './handlers/mostrarAngulo';
-import { ColorirIsoceles } from './handlers/colorirIsoceles';
-import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './handlers/trigonometry';
-import { MostrarTipo } from './handlers/mostrarTipo';
-import  MoverVertice  from './handlers/moverVertice';
+import {Draggable} from './inputs/draggable';
+import {Hoverable} from './inputs/hoverable';
+import {MostrarAngulo} from './outputs/mostrarAngulo';
+import { ColorirIsoceles } from './outputs/colorirIsoceles';
+import {SenoOnHover, CossenoOnHover, TangenteOnHover} from './outputs/trigonometry';
+import { MostrarTipo } from './outputs/mostrarTipo';
+import  MoverVertice  from './outputs/moverVertice';
 import Circle from './objetos/circle';
 import * as THREE from 'three'
 import Circunscrever from './animacoes/circunscrever';
-import { MostrarBissetriz } from './handlers/mostrarBissetriz';
-import { Clickable, MultipleClickable } from './controles/clickable';
-import FixarAoCirculo from './handlers/fixarAoCirculo';
+import { MostrarBissetriz } from './outputs/mostrarBissetriz';
+import { Clickable, MultipleClickable } from './inputs/clickable';
+import FixarAoCirculo from './outputs/fixarAoCirculo';
 
 import * as dat from 'dat.gui';
 
 //Responsável por adiconar os controles de arrasto e hover
-//liga os handlers aos controlers
+//liga os handlers aos Inputs
 //handlers são objetos que fazem ações quando acionados pelos controles
 //Nesse caso, são os handlers que mostram o texto, criam animações, mudam cor...
 export class Programa {
@@ -28,7 +28,7 @@ export class Programa {
         this.animacoes = [];
         this.trigonometria = [];
 
-        this.createControlers();
+        this.createInputs();
         this.createHandlers();
         this.setUpAnimar();
         this.addToScene(scene);
@@ -36,7 +36,7 @@ export class Programa {
         this.getEstados();
     }
 
-    createControlers(){
+    createInputs(){
         
         const triangulo = this.triangulo;
         const camera = this.camera;

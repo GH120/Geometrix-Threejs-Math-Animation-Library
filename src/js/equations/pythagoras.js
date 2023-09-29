@@ -1,6 +1,6 @@
 import Equation from "./equations";
 import {TextoAparecendo} from '../animacoes/textoAparecendo'
-import { Clickable } from "../controles/clickable";
+import { Clickable } from "../inputs/clickable";
 import { colorirAngulo } from "../animacoes/colorirAngulo";
 import { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/animation";
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";

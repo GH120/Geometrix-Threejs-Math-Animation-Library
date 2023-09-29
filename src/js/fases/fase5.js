@@ -1,11 +1,11 @@
-import {Draggable} from '../controles/draggable';
-import {Hoverable} from '../controles/hoverable';
-import {MostrarAngulo} from '../handlers/mostrarAngulo';
-import { ColorirIsoceles } from '../handlers/colorirIsoceles';
-import { MostrarTipo } from '../handlers/mostrarTipo';
-import  MoverVertice  from '../handlers/moverVertice';
-import { MostrarBissetriz } from '../handlers/mostrarBissetriz';
-import { Clickable, MultipleClickable } from '../controles/clickable';
+import {Draggable} from '../inputs/draggable';
+import {Hoverable} from '../inputs/hoverable';
+import {MostrarAngulo} from '../outputs/mostrarAngulo';
+import { ColorirIsoceles } from '../outputs/colorirIsoceles';
+import { MostrarTipo } from '../outputs/mostrarTipo';
+import  MoverVertice  from '../outputs/moverVertice';
+import { MostrarBissetriz } from '../outputs/mostrarBissetriz';
+import { Clickable, MultipleClickable } from '../inputs/clickable';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 import * as dat from 'dat.gui';
@@ -33,7 +33,7 @@ export class Fase5  extends Fase{
         this.trigonometria = [];
 
         this.createHandlers();
-        this.createControlers();
+        this.createInputs();
         this.setupTextBox();
 
         this.levelDesign();
@@ -115,7 +115,7 @@ export class Fase5  extends Fase{
         });
     }
 
-    createControlers(){
+    createInputs(){
         //Inputs
         const clickableVertice = this.triangulo.vertices.map((vertice) => new Clickable(vertice, this.camera))
         for (let i = 0; i < 3; ++i) {
@@ -129,7 +129,7 @@ export class Fase5  extends Fase{
     }
 
     createHandlers(){
-        //Outputs
+        //Inputs
         this.handlerClickVertice = this.triangulo.vertices.map(vertex => this.criarTracejado(vertex))
         this.handlerDragAngle = this.triangulo.angles.map(angle => this.criarMovimentacaoDeAngulo(angle))
     }

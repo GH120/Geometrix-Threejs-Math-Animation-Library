@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Controler } from './Controler';
+import { Input } from './Input';
 
-export class Hoverable extends Controler {
+export class Hoverable extends Input {
 
   constructor(object, camera) {
 

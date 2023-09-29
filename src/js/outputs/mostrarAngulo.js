@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
-import { Handler } from './handler';
+import { Output } from './Output';
 
-export class MostrarAngulo extends Handler{
+export class MostrarAngulo extends Output{
 
     constructor(angle){
         super();

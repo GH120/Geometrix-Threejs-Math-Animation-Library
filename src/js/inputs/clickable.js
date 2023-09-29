@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Controler } from './Controler';
+import { Input } from './Input';
 
-export class Clickable extends Controler{
+export class Clickable extends Input{
 
   constructor(object,camera) {
     super(object,camera);
@@ -24,7 +24,7 @@ export class Clickable extends Controler{
   }
 }
 
-export class MultipleClickable extends Controler{
+export class MultipleClickable extends Input{
 
     constructor(objects,camera) {
 

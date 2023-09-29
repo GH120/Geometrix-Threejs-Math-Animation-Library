@@ -1,11 +1,11 @@
-import {Draggable} from '../controles/draggable';
-import {Hoverable} from '../controles/hoverable';
-import {MostrarAngulo} from '../handlers/mostrarAngulo';
-import { ColorirIsoceles } from '../handlers/colorirIsoceles';
-import { MostrarTipo } from '../handlers/mostrarTipo';
-import  MoverVertice  from '../handlers/moverVertice';
-import { MostrarBissetriz } from '../handlers/mostrarBissetriz';
-import { Clickable, MultipleClickable } from '../controles/clickable';
+import {Draggable} from '../inputs/draggable';
+import {Hoverable} from '../inputs/hoverable';
+import {MostrarAngulo} from '../outputs/mostrarAngulo';
+import { ColorirIsoceles } from '../outputs/colorirIsoceles';
+import { MostrarTipo } from '../outputs/mostrarTipo';
+import  MoverVertice  from '../outputs/moverVertice';
+import { MostrarBissetriz } from '../outputs/mostrarBissetriz';
+import { Clickable, MultipleClickable } from '../inputs/clickable';
 
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
@@ -70,11 +70,11 @@ export class Fase {
     }
 
     //Inputs de drag, hover, click...
-    createControlers(){
+    createInputs(){
         
     }
 
-    //Outputs que são ligados ao drag, hover e click
+    //Inputs que são ligados ao drag, hover e click
     createHandlers(){
 
         

@@ -1,10 +1,10 @@
-import { Handler } from './handler';
+import { Output } from './Output';
 import * as THREE from 'three';
 
 //Preciso adicionar smoothing para valores como 30°, 45°, 60° e 90°
 //Implementar o smoothing como o vídeo do autotargeting ensinou
 //** Não atualiza triângulo por padrão, tem que adicionar draggable.addObserver(triangulo) */
-export default class MoverVertice extends Handler{
+export default class MoverVertice extends Output{
 
     constructor(vertice){
         super();

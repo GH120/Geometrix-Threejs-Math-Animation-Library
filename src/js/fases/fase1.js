@@ -1,11 +1,11 @@
-import {Draggable} from '../controles/draggable';
-import {Hoverable} from '../controles/hoverable';
-import {MostrarAngulo} from '../handlers/mostrarAngulo';
-import { ColorirIsoceles } from '../handlers/colorirIsoceles';
-import { MostrarTipo } from '../handlers/mostrarTipo';
-import  MoverVertice  from '../handlers/moverVertice';
-import { MostrarBissetriz } from '../handlers/mostrarBissetriz';
-import { Clickable, MultipleClickable } from '../controles/clickable';
+import {Draggable} from '../inputs/draggable';
+import {Hoverable} from '../inputs/hoverable';
+import {MostrarAngulo} from '../outputs/mostrarAngulo';
+import { ColorirIsoceles } from '../outputs/colorirIsoceles';
+import { MostrarTipo } from '../outputs/mostrarTipo';
+import  MoverVertice  from '../outputs/moverVertice';
+import { MostrarBissetriz } from '../outputs/mostrarBissetriz';
+import { Clickable, MultipleClickable } from '../inputs/clickable';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 import * as dat from 'dat.gui';
@@ -31,7 +31,7 @@ export class Fase1  extends Fase{
 
         this.trigonometria = [];
 
-        this.createControlers();
+        this.createInputs();
         this.createHandlers();
         this.setUpAnimar();
         this.addToScene(this.scene);
@@ -207,7 +207,7 @@ export class Fase1  extends Fase{
         });
     }
 
-    createControlers(){
+    createInputs(){
         
         const triangulo = this.triangulo;
         const camera = this.camera;

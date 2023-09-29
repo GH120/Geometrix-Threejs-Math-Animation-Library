@@ -1,5 +1,5 @@
-//Observer dos controlers
-export class Handler{
+//Observer dos Inputs
+export class Output{
 
     constructor(){
         this.observers = [];
@@ -28,8 +28,8 @@ export class Handler{
         return this;
     }
 
-    //Implementação do observable, é possível um handler observar um handler, fazendo uma cadeia de outputs
-    //input -> output -> output -> output...
+    //Implementação do observable, é possível um handler observar um handler, fazendo uma cadeia de Inputs
+    //input -> Input -> Input -> Input...
     //draggable -> moverVertice -> update triângulo por exemplo
     notify(estado){
         for(const observer of this.observers) if(observer) observer.update(estado);

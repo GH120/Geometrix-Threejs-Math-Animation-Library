@@ -1,7 +1,7 @@
-import { Handler } from './handler';
+import { Output } from './Output';
 import * as THREE from 'three';
 
-export class ColorirIsoceles extends Handler{
+export class ColorirIsoceles extends Output{
 
     constructor(triangulo){
         super();

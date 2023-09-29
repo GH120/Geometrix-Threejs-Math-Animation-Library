@@ -1,9 +1,9 @@
 import MostrarTracejado from "../animacoes/mostrarTracejado";
-import { Handler } from './handler';
+import { Output } from './Output';
 import { Tracejado } from "../objetos/tracejado";
 
 //No ato de criar uma bissetriz, criar um novo triangulo?
-export class MostrarBissetriz extends Handler{
+export class MostrarBissetriz extends Output{
 
     constructor(triangulo, angulo, scene){
         super();

@@ -1,17 +1,17 @@
-import {Draggable} from '../controles/draggable';
-import {Hoverable} from '../controles/hoverable';
-import {MostrarAngulo} from '../handlers/mostrarAngulo';
-import { ColorirIsoceles } from '../handlers/colorirIsoceles';
-import { MostrarTipo } from '../handlers/mostrarTipo';
-import  MoverVertice  from '../handlers/moverVertice';
-import { MostrarBissetriz } from '../handlers/mostrarBissetriz';
-import { Clickable, MultipleClickable } from '../controles/clickable';
+import {Draggable} from '../inputs/draggable';
+import {Hoverable} from '../inputs/hoverable';
+import {MostrarAngulo} from '../outputs/mostrarAngulo';
+import { ColorirIsoceles } from '../outputs/colorirIsoceles';
+import { MostrarTipo } from '../outputs/mostrarTipo';
+import  MoverVertice  from '../outputs/moverVertice';
+import { MostrarBissetriz } from '../outputs/mostrarBissetriz';
+import { Clickable, MultipleClickable } from '../inputs/clickable';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
 import {TGALoader} from 'three/examples/jsm/loaders/TGALoader';
 import {MTLLoader} from 'three/examples/jsm/loaders/MTLLoader';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader'
-import FixarAoCirculo from '../handlers/fixarAoCirculo';
+import FixarAoCirculo from '../outputs/fixarAoCirculo';
 
 
 
@@ -31,7 +31,7 @@ import Circle from '../objetos/circle';
 import DesenharMalha from '../animacoes/desenharMalha';
 import RelogioGLB from '../../assets/Relogio.glb'
 import { Angle } from '../objetos/angle';
-import ColorirOnHover from '../handlers/colorirOnHover';
+import ColorirOnHover from '../outputs/colorirOnHover';
 import { Fase } from './fase';
   
 
@@ -41,7 +41,7 @@ export class Fase4 extends Fase{
     
         super();
 
-        // this.createControlers();
+        // this.createInputs();
         // this.createHandlers();
         // this.setUpAnimar();
         // this.addToScene(scene);
@@ -457,7 +457,7 @@ export class Fase4 extends Fase{
         return cPointLabel;
     }
 
-    createControlers(){
+    createInputs(){
         
         const triangulo = this.triangulo;
         const camera = this.camera;

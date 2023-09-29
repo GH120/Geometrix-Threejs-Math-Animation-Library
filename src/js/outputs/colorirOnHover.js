@@ -1,7 +1,7 @@
 import { colorirAngulo } from "../animacoes/colorirAngulo";
-import { Handler } from "./handler";
+import { Output } from "./Output";
 
-export default class ColorirOnHover extends Handler{
+export default class ColorirOnHover extends Output{
 
     constructor(objeto, corInicial, corFinal){
         super()

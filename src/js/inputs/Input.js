@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 
-//É o input do usuário, pode ser ligado a um output no handler
-export class Controler{
+//É o input do usuário, pode ser ligado a um Input no handler
+export class Input{
 
     constructor(object, camera){
 

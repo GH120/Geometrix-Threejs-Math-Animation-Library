@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
-import { Handler } from './handler';
+import { Output } from './Output';
 
 
 //mostra o tipo do triângulo
-export class MostrarTipo extends Handler{
+export class MostrarTipo extends Output{
 
     constructor(triangulo){
         super();

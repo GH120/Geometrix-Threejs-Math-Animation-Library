@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Controler } from './Controler';
+import { Input } from './Input';
 
-export class Draggable extends Controler{
+export class Draggable extends Input{
 
   constructor(object,camera) {
     super(object,camera);
@@ -39,7 +39,7 @@ export class Draggable extends Controler{
 
       this.lastPosition = colision.point;
 
-      //Notifica todos os observadores da nova posição, metodo do controler
+      //Notifica todos os observadores da nova posição, metodo do Input
       this.notify({position: colision.point, dragging:true});
     }
     

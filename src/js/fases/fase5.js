@@ -26,7 +26,11 @@ export class Fase5  extends Fase{
 
         super();
 
-        this.triangulo = new Triangle()
+        this.triangulo = new Triangle([
+            [-1,-1,0],
+            [1,2.5,0],
+            [4,1.6,0]
+        ])
                         .render()
                         .addToScene(this.scene);
 
@@ -163,6 +167,49 @@ export class Fase5  extends Fase{
                 if(estado.valido && !estado.dragging){
                     console.log("finalizado")
                     estado.finalizado = true;
+
+                    const anguloInicial = angle;
+                    const anguloFinal = angle.correspondente;
+
+                    const quaternionInicial = anguloInicial.mesh.quaternion.clone(); 
+                    const quaternionFinal = new THREE.Quaternion();
+
+                    const vAnguloInicial = anguloInicial.vetor1.clone().add(anguloInicial.vetor2).normalize()
+                    const vAnguloFinal = anguloFinal.vetor1.clone().add(anguloFinal.vetor2).normalize()
+
+                    // quaternionInicial.setFromUnitVectors(vAnguloInicial, vAnguloFinal);
+                    // quaternionFinal.setFromUnitVectors(vAnguloInicial, vAnguloFinal);
+                    quaternionFinal.setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI);
+
+                    const tempoInterpolacao = 0.5; // Define o tempo de duração da interpolação (ajuste conforme necessário)
+                    const quaternionInterpolado = new THREE.Quaternion();
+                    quaternionInterpolado.slerp(quaternionInicial, quaternionFinal, tempoInterpolacao);
+
+                    console.log('V1', vAnguloInicial)
+                    console.log('V2', vAnguloFinal)
+
+                    console.log('Q1', quaternionInicial)
+                    console.log('Q2', quaternionFinal)
+
+                    const position = angle.mesh.position.clone();
+
+                    // animação
+                
+                    const animacaoRodaeMoveAngulo = new Animacao()
+                        .setValorInicial(quaternionInicial)
+                        .setValorFinal(quaternionFinal)
+                        .setDuration(100)
+                        .setInterpolacao(function(inicial, final, peso) {
+                            return new THREE.Quaternion().slerpQuaternions(inicial, final, peso)
+                        })
+                        .setUpdateFunction(function(quaternum) {
+                            anguloInicial.mesh.quaternion.copy(quaternum)
+                            console.log('UPDATE', quaternum)
+                        })
+                    
+                    this.animar(animacaoRodaeMoveAngulo);
+                    
+
                     return;
                 }
 
@@ -224,11 +271,13 @@ export class Fase5  extends Fase{
 
                     angulo1 = new Angle(triangulo1.vertices);
                     angulo2 = new Angle(triangulo2.vertices);
+                    angulo1.angleRadius = 1;
+                    angulo2.angleRadius = 1;
 
                     angulo1.render();
-                    angulo1.addToScene(this.scene);
+                    // angulo1.addToScene(this.scene);
                     angulo2.render();
-                    angulo2.addToScene(this.scene)
+                    // angulo2.addToScene(this.scene)
 
                     this.hoverInvisivel1 = new Hoverable(angulo1, this.camera)
                     this.hoverInvisivel2 = new Hoverable(angulo2, this.camera)
@@ -238,8 +287,15 @@ export class Fase5  extends Fase{
                         //Apenas liga se o ângulo for o mesmo
                         const angle = this.triangulo.angles[index];
 
-                        if(angle.igual(angulo1)) this.hoverInvisivel1.addObserver(handler);
-                        if(angle.igual(angulo2)) this.hoverInvisivel2.addObserver(handler);
+                        if(angle.igual(angulo1)) {
+                            this.hoverInvisivel1.addObserver(handler);
+                            angle.correspondente = angulo1;
+                        }
+                        if(angle.igual(angulo2)) {
+                            this.hoverInvisivel2.addObserver(handler);
+                            angle.correspondente = angulo2;
+                            
+                        }
                     })
 
                     // animação

@@ -206,9 +206,19 @@ export class Fase5  extends Fase{
                             console.log('UPDATE', quaternum)
                         })
                         .voltarAoInicio(false) //Pra não resetar quando terminada a animação
+
+                    // const moveAngulo = new Animacao()
+                    //                    .setValorInicial(anguloInicial.mesh.position.clone())
+                    //                    .setValorFinal(anguloFinal.mesh.position.clone())
+                    //                    .setInterpolacao(new THREE.Vector3().lerpVectors)
+                    //                    .setUpdateFunction(function(posicao){
+                    //                         anguloInicial.mesh.position.copy(posicao)
+                    //                    })
+                    //                    .voltarAoInicio(false)
+                    //                    .setDuration(100);
                     
                     this.animar(animacaoRodaeMoveAngulo);
-                    
+                    // this.animar(moveAngulo)
 
                     return;
                 }

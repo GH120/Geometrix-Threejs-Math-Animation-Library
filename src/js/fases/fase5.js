@@ -152,9 +152,8 @@ export class Fase5  extends Fase{
 
                 if(estado.dragging){
                     let posicao = estado.position.clone();
-                    const posAngulo = angle.position;
 
-                    if(posicao) angle.mesh.position.copy((posicao.sub(posAngulo)))
+                    if(posicao) angle.mesh.position.copy((posicao))
                 }
 
                 //Se arrastou e está em cima do ângulo invisível, estado é valido
@@ -206,6 +205,7 @@ export class Fase5  extends Fase{
                             anguloInicial.mesh.quaternion.copy(quaternum)
                             console.log('UPDATE', quaternum)
                         })
+                        .voltarAoInicio(false) //Pra não resetar quando terminada a animação
                     
                     this.animar(animacaoRodaeMoveAngulo);
                     
@@ -214,7 +214,7 @@ export class Fase5  extends Fase{
                 }
 
                 if (!estado.dragging) {
-                    angle.mesh.position.copy(new THREE.Vector3(0, 0, 0));
+                    angle.mesh.position.copy(angle.position);
                     
                 }
 
@@ -275,9 +275,12 @@ export class Fase5  extends Fase{
                     angulo2.angleRadius = 1;
 
                     angulo1.render();
-                    // angulo1.addToScene(this.scene);
+                    angulo1.addToScene(this.scene);
                     angulo2.render();
-                    // angulo2.addToScene(this.scene)
+                    angulo2.addToScene(this.scene)
+
+                    angulo1.mesh.visible = false;
+                    angulo2.mesh.visible = false;
 
                     this.hoverInvisivel1 = new Hoverable(angulo1, this.camera)
                     this.hoverInvisivel2 = new Hoverable(angulo2, this.camera)

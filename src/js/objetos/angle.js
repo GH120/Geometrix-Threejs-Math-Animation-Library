@@ -63,7 +63,7 @@ export class Angle extends Objeto{
         // Create the geometry for the sector
         const sectorGeometry = new THREE.BufferGeometry();
         const sectorVertices = [];
-        const center = [this.position.x, this.position.y, this.position.z];
+        const center = [0,0,0];
 
         let last = [...center];
 
@@ -94,6 +94,8 @@ export class Angle extends Objeto{
         const MalhaAngulo  = new THREE.Mesh(sectorGeometry, this.material)
         const MalhaReto    = this.anguloReto;
         const noventaGraus = Math.round(this.angulo*180/Math.PI) == 90;
+
+        MalhaAngulo.position.copy(this.position)
 
         this.mesh   = (noventaGraus)? MalhaReto : MalhaAngulo;
 

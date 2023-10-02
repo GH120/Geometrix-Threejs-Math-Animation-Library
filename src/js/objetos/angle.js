@@ -170,4 +170,8 @@ export class Angle extends Objeto{
     get degrees(){
         return this.angulo*(180/Math.PI);
     }
+
+    igual(angulo){
+        return Math.round(angulo.degrees - this.degrees) == 0
+    }
 }

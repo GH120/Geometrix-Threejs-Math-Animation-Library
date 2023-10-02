@@ -137,24 +137,41 @@ export class Fase5  extends Fase{
 
     criarMovimentacaoDeAngulo = (angle) => {
 
-        let state = {
-
-        }
+        let estado = {}
 
         return {
-            update: (estado) => {
-                let posicao = estado.position;
-                const posAngulo = angle.position;
+            update: (estadoNovo) => {
 
-            
+                estado = {...estado, ...estadoNovo}
 
-                // angle.mesh.position.copy(posicao.sub(posAngulo));
-                if(posicao) angle.mesh.position.copy((posicao.sub(posAngulo)))
+                if(estado.finalizado) return;
+
+                if(estado.dragging){
+                    let posicao = estado.position.clone();
+                    const posAngulo = angle.position;
+
+                    if(posicao) angle.mesh.position.copy((posicao.sub(posAngulo)))
+                }
+
+                //Se arrastou e está em cima do ângulo invisível, estado é valido
+                if(estado.dragging && estado.dentro){
+                    estado.valido = true;
+                    return;
+                }
+
+                //Se o estado for valido e soltar o mouse, então finaliza a execução
+                if(estado.valido && !estado.dragging){
+                    console.log("finalizado")
+                    estado.finalizado = true;
+                    return;
+                }
 
                 if (!estado.dragging) {
                     angle.mesh.position.copy(new THREE.Vector3(0, 0, 0));
                     
                 }
+
+                estado.valido = false;
             }
         }
     }
@@ -203,29 +220,27 @@ export class Fase5  extends Fase{
                     triangulo2.positions = [posicao, posVtov2, posVtracejado2].map((vetor) => vetor.toArray());
 
                     triangulo1.render();
-                    // triangulo1.addToScene(this.scene);
-
                     triangulo2.render();
-                    // triangulo2.addToScene(this.scene);
 
                     angulo1 = new Angle(triangulo1.vertices);
                     angulo2 = new Angle(triangulo2.vertices);
 
-                    // this.hoverInvisivel1 = new Hoverable(angulo1, this.camera)
-                    // this.hoverInvisivel2 = new Hoverable(angulo2, this.camera)
-
-                    // this.handlerDragAngle.forEach((handler) => {
-                    //     this.hoverInvisivel1.addObserver(handler);
-                    //     this.hoverInvisivel2.addObserver(handler);
-                    // })
-
-
-                    
                     angulo1.render();
                     angulo1.addToScene(this.scene);
-                    
                     angulo2.render();
-                    angulo2.addToScene(this.scene);
+                    angulo2.addToScene(this.scene)
+
+                    this.hoverInvisivel1 = new Hoverable(angulo1, this.camera)
+                    this.hoverInvisivel2 = new Hoverable(angulo2, this.camera)
+
+                    this.handlerDragAngle.forEach((handler,index) => {
+
+                        //Apenas liga se o ângulo for o mesmo
+                        const angle = this.triangulo.angles[index];
+
+                        if(angle.igual(angulo1)) this.hoverInvisivel1.addObserver(handler);
+                        if(angle.igual(angulo2)) this.hoverInvisivel2.addObserver(handler);
+                    })
 
                     // animação
                     desenharTracejado = new Animacao(tracejado)

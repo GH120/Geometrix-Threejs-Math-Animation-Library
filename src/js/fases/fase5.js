@@ -197,7 +197,7 @@ export class Fase5  extends Fase{
                     const animacaoRodaeMoveAngulo = new Animacao()
                         .setValorInicial(quaternionInicial)
                         .setValorFinal(quaternionFinal)
-                        .setDuration(100)
+                        .setDuration(75)
                         .setInterpolacao(function(inicial, final, peso) {
                             return new THREE.Quaternion().slerpQuaternions(inicial, final, peso)
                         })
@@ -206,19 +206,25 @@ export class Fase5  extends Fase{
                             console.log('UPDATE', quaternum)
                         })
                         .voltarAoInicio(false) //Pra não resetar quando terminada a animação
+                        .setCurva(function easeInOutSine(x) {
+                            return -(Math.cos(Math.PI * x) - 1) / 2;
+                        })
 
-                    // const moveAngulo = new Animacao()
-                    //                    .setValorInicial(anguloInicial.mesh.position.clone())
-                    //                    .setValorFinal(anguloFinal.mesh.position.clone())
-                    //                    .setInterpolacao(new THREE.Vector3().lerpVectors)
-                    //                    .setUpdateFunction(function(posicao){
-                    //                         anguloInicial.mesh.position.copy(posicao)
-                    //                    })
-                    //                    .voltarAoInicio(false)
-                    //                    .setDuration(100);
+                    const moveAngulo = new Animacao()
+                                       .setValorInicial(anguloInicial.mesh.position.clone())
+                                       .setValorFinal(anguloFinal.mesh.position.clone())
+                                       .setInterpolacao(new THREE.Vector3().lerpVectors)
+                                       .setUpdateFunction(function(posicao){
+                                            anguloInicial.mesh.position.copy(posicao)
+                                       })
+                                       .voltarAoInicio(false)
+                                       .setDuration(75)
+                                       .setCurva(function easeInOutSine(x) {
+                                            return -(Math.cos(Math.PI * x) - 1) / 2;
+                                        })
                     
                     this.animar(animacaoRodaeMoveAngulo);
-                    // this.animar(moveAngulo)
+                    this.animar(moveAngulo)
 
                     return;
                 }

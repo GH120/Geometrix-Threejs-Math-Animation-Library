@@ -18,6 +18,7 @@ import MostrarTracejado from '../animacoes/mostrarTracejado';
 import { Divisao } from '../animacoes/divisao';
 import { Triangle } from '../objetos/triangle';
 import { Fase } from './fase';
+import { Angle } from '../objetos/angle';
 
 export class Fase5  extends Fase{
 
@@ -136,6 +137,10 @@ export class Fase5  extends Fase{
 
     criarMovimentacaoDeAngulo = (angle) => {
 
+        let state = {
+
+        }
+
         return {
             update: (estado) => {
                 let posicao = estado.position;
@@ -163,6 +168,12 @@ export class Fase5  extends Fase{
         let tracejado = null;
         let desenharTracejado = null;
 
+        let triangulo1 = null;
+        let triangulo2 = null;
+
+        let angulo1 = null;
+        let angulo2 = null;
+
         return {
             update: (estado) => {
                 if (estado.clicado && !ativado){
@@ -170,11 +181,52 @@ export class Fase5  extends Fase{
                     ativado = !ativado
 
                     const posicao = vertex.mesh.position.clone();
-                    const vetorTracejado = outros_dois[0].mesh.position.clone().sub(outros_dois[1].mesh.position.clone());
+                    const vetorTracejado1 = outros_dois[0].mesh.position.clone().sub(outros_dois[1].mesh.position.clone());
+                    const vetorTracejado2 = outros_dois[1].mesh.position.clone().sub(outros_dois[0].mesh.position.clone());
                     
-                    tracejado = new Tracejado(posicao.clone().sub(vetorTracejado), posicao.clone().add(vetorTracejado))
+                    tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1), posicao.clone().add(vetorTracejado1))
                     tracejado.addToScene(this.scene);
+
+                    const vtov1 = outros_dois[0].mesh.position.clone().sub(posicao);
+                    const vtov2 = outros_dois[1].mesh.position.clone().sub(posicao);
+
+                    const posVtov1 = vtov1.clone().normalize().add(posicao);
+                    const posVtov2 = vtov2.clone().normalize().add(posicao);
+
+                    const posVtracejado1 = vetorTracejado1.clone().normalize().add(posicao);
+                    const posVtracejado2 = vetorTracejado2.clone().normalize().add(posicao);
+
+                    triangulo1 = new Triangle();
+                    triangulo1.positions = [posicao, posVtov1, posVtracejado1].map((vetor) => vetor.toArray());
                     
+                    triangulo2 = new Triangle();
+                    triangulo2.positions = [posicao, posVtov2, posVtracejado2].map((vetor) => vetor.toArray());
+
+                    triangulo1.render();
+                    // triangulo1.addToScene(this.scene);
+
+                    triangulo2.render();
+                    // triangulo2.addToScene(this.scene);
+
+                    angulo1 = new Angle(triangulo1.vertices);
+                    angulo2 = new Angle(triangulo2.vertices);
+
+                    // this.hoverInvisivel1 = new Hoverable(angulo1, this.camera)
+                    // this.hoverInvisivel2 = new Hoverable(angulo2, this.camera)
+
+                    // this.handlerDragAngle.forEach((handler) => {
+                    //     this.hoverInvisivel1.addObserver(handler);
+                    //     this.hoverInvisivel2.addObserver(handler);
+                    // })
+
+
+                    
+                    angulo1.render();
+                    angulo1.addToScene(this.scene);
+                    
+                    angulo2.render();
+                    angulo2.addToScene(this.scene);
+
                     // animação
                     desenharTracejado = new Animacao(tracejado)
                         .setValorInicial(0)
@@ -182,8 +234,8 @@ export class Fase5  extends Fase{
                         .setDuration(200)
                         .setInterpolacao((inicial, final, peso) => inicial * (1 - peso) + final*peso)
                         .setUpdateFunction((progresso) => {
-                            tracejado.origem = posicao.clone().sub(vetorTracejado.clone().multiplyScalar(progresso))
-                            tracejado.destino = posicao.clone().add(vetorTracejado.clone().multiplyScalar(progresso))
+                            tracejado.origem = posicao.clone().sub(vetorTracejado1.clone().multiplyScalar(progresso))
+                            tracejado.destino = posicao.clone().add(vetorTracejado1.clone().multiplyScalar(progresso))
                             tracejado.update();
                         })
                         .setCurva((x) => 1 - (1 - x) * (1 - x))
@@ -198,6 +250,8 @@ export class Fase5  extends Fase{
                     
                     desenharTracejado.stop = true;
                     tracejado.removeFromScene(this.scene)
+                    angulo1.removeFromScene(this.scene)
+                    angulo2.removeFromScene(this.scene)
                 }
             }
         }

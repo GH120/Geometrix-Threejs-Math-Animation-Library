@@ -127,6 +127,13 @@ export class Fase5  extends Fase{
 
     criarMovimentacaoDeAngulo = (angle) => {
 
+
+        //Inputs: hoverable do ângulo invisível -> {dentro: bool}, 
+        //                                      -> diz se o mouse está dentro do invisível
+        //
+        //        draggable do ângulo real      -> {posicao: vetor, dragging: bool}, 
+        //                                      -> diz a posição do mouse e se ele está arrastando o angulo real
+
         let estado = {}
 
         const fase = this;
@@ -220,6 +227,8 @@ export class Fase5  extends Fase{
     }
 
     criarTracejado = (vertex) => {
+
+        //Input: clickable do vertice, diz se foi o vertice clicado ou não
 
         //Para usar nas funções auxiliares
         const fase = this;

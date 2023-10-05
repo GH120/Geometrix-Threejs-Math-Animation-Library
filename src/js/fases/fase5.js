@@ -19,6 +19,7 @@ import { Divisao } from '../animacoes/divisao';
 import { Triangle } from '../objetos/triangle';
 import { Fase } from './fase';
 import { Angle } from '../objetos/angle';
+import { Output } from '../outputs/Output';
 
 export class Fase5  extends Fase{
 
@@ -31,14 +32,15 @@ export class Fase5  extends Fase{
             [1,2.5,0],
             [4,1.6,0]
         ])
-                        .render()
-                        .addToScene(this.scene);
+        .render()
+        .addToScene(this.scene);
 
 
         this.trigonometria = [];
 
-        this.createHandlers();
         this.createInputs();
+        this.createOutputs();
+        this.ligarInputAoOutput();
         this.setupTextBox();
 
         this.levelDesign();
@@ -81,165 +83,146 @@ export class Fase5  extends Fase{
             
     }
 
-    //Cria a caixa de texto onde o texto vai aparecer
-    setupTextBox(){
-        // Create a parent element to hold the spans
-        const container = document.createElement('p');
-        container.style.fontFamily = "Courier New, monospace";
-        container.style.fontSize = "25px";
-        container.style.fontWeight ="italic";
-        container.style.display = 'inline-block';
-
-        // Create the CSS2DObject using the container
-        const cPointLabel = new CSS2DObject(container);       
-
-        this.text = cPointLabel;
-
-        this.text.position.y = 3.5;
-
-        this.scene.add(this.text);
-
-        this.changeText("Crie um triangulo equilatero");
-    }
-
-    //Muda o conteúdo da caixa de texto
-    changeText(texto){
-
-        console.log(texto);
-
-        this.text.element.textContent = '';
-
-        // Split the text into individual characters
-        const characters = texto.split('');
-
-        // Create spans for each character and apply the fading effect
-        characters.forEach((character,index) => {
-            const span = document.createElement('span');
-            span.textContent = character;
-            this.text.element.appendChild(span);
-        });
-    }
 
     createInputs(){
         //Inputs
-        const clickableVertice = this.triangulo.vertices.map((vertice) => new Clickable(vertice, this.camera))
-        for (let i = 0; i < 3; ++i) {
-            clickableVertice[i].addObserver(this.handlerClickVertice[i])
-        }
+        const vertices = this.triangulo.vertices;
+        const angles   = this.triangulo.angles;
 
-        const angleDragglable = this.triangulo.angles.map((angle) => new Draggable(angle, this.camera))
-        for (let i = 0; i < 3; ++i) {
-            angleDragglable[i].addObserver(this.handlerDragAngle[i])
-        }
+        //Adiciona o clickable ao vertice, agora todo vertice tem vertice.clicable
+        vertices.forEach((vertice) => new Clickable(vertice, this.camera));
+
+        //Adiciona o draggable ao angulo, agora todo angulo tem angulo.draggable
+        angles.map((angle) => new Draggable(angle, this.camera));
+
     }
 
-    createHandlers(){
-        //Inputs
-        this.handlerClickVertice = this.triangulo.vertices.map(vertex => this.criarTracejado(vertex))
-        this.handlerDragAngle = this.triangulo.angles.map(angle => this.criarMovimentacaoDeAngulo(angle))
+    createOutputs(){
+        //Outputs
+        this.outputClickVertice = this.triangulo.vertices.map(vertex => this.criarTracejado(vertex))
+        this.outputDragAngle = this.triangulo.angles.map(angle => this.criarMovimentacaoDeAngulo(angle))
+    }
+
+    ligarInputAoOutput(){
+
+        const vertices = this.triangulo.vertices;
+        const angles   = this.triangulo.angles;
+
+        //Liga o vertice.clickable input ao output
+        for (let i = 0; i < 3; ++i) {
+
+            const vertice = vertices[i];
+
+            vertice.clickable.addObserver(this.outputClickVertice[i])
+        }
+
+        //Liga o angulo.draggable ao output do draggable
+        for (let i = 0; i < 3; ++i) {
+
+            const angulo = angles[i];
+
+            angulo.draggable.addObserver(this.outputDragAngle[i]);
+        }
     }
 
     criarMovimentacaoDeAngulo = (angle) => {
 
         let estado = {}
 
-        return {
-            update: (estadoNovo) => {
+        const fase = this;
 
-                estado = {...estado, ...estadoNovo}
+        return new Output()
+               .setUpdateFunction(
+                    (estadoNovo) => {
 
-                if(estado.finalizado) return;
+                        estado = {...estado, ...estadoNovo}
 
-                if(estado.dragging){
-                    let posicao = estado.position.clone();
+                        if(estado.finalizado) return;
 
-                    if(posicao) angle.mesh.position.copy((posicao))
-                }
+                        if(estado.dragging){
+                            let posicao = estado.position.clone();
 
-                //Se arrastou e está em cima do ângulo invisível, estado é valido
-                if(estado.dragging && estado.dentro){
-                    estado.valido = true;
-                    return;
-                }
+                            if(posicao) angle.mesh.position.copy((posicao))
+                        }
 
-                //Se o estado for valido e soltar o mouse, então finaliza a execução
-                if(estado.valido && !estado.dragging){
-                    console.log("finalizado")
-                    estado.finalizado = true;
+                        //Se arrastou e está em cima do ângulo invisível, estado é valido
+                        if(estado.dragging && estado.dentro){
+                            estado.valido = true;
+                            return;
+                        }
 
-                    const anguloInicial = angle;
-                    const anguloFinal = angle.correspondente;
+                        //Se o estado for valido e soltar o mouse, então finaliza a execução
+                        if(estado.valido && !estado.dragging){
+                            console.log("finalizado")
+                            estado.finalizado = true;
 
-                    const quaternionInicial = anguloInicial.mesh.quaternion.clone(); 
-                    const quaternionFinal = new THREE.Quaternion();
+                            //Roda a animação de movimentar ângulo, é uma função auxiliar abaixo
+                            moverAnguloAnimacao(angle);
 
-                    const vAnguloInicial = anguloInicial.vetor1.clone().add(anguloInicial.vetor2).normalize()
-                    const vAnguloFinal = anguloFinal.vetor1.clone().add(anguloFinal.vetor2).normalize()
+                            return;
+                        }
 
-                    // quaternionInicial.setFromUnitVectors(vAnguloInicial, vAnguloFinal);
-                    // quaternionFinal.setFromUnitVectors(vAnguloInicial, vAnguloFinal);
-                    quaternionFinal.setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI);
+                        if (!estado.dragging) {
+                            angle.mesh.position.copy(angle.position);
+                            
+                        }
 
-                    const tempoInterpolacao = 0.5; // Define o tempo de duração da interpolação (ajuste conforme necessário)
-                    const quaternionInterpolado = new THREE.Quaternion();
-                    quaternionInterpolado.slerp(quaternionInicial, quaternionFinal, tempoInterpolacao);
+                        estado.valido = false;
+                    }
+               )
 
-                    console.log('V1', vAnguloInicial)
-                    console.log('V2', vAnguloFinal)
+        //Funções auxiliares
+        function moverAnguloAnimacao(angle){
 
-                    console.log('Q1', quaternionInicial)
-                    console.log('Q2', quaternionFinal)
-
-                    const position = angle.mesh.position.clone();
-
-                    // animação
-                
-                    const animacaoRodaeMoveAngulo = new Animacao()
-                        .setValorInicial(quaternionInicial)
-                        .setValorFinal(quaternionFinal)
-                        .setDuration(75)
-                        .setInterpolacao(function(inicial, final, peso) {
-                            return new THREE.Quaternion().slerpQuaternions(inicial, final, peso)
-                        })
-                        .setUpdateFunction(function(quaternum) {
-                            anguloInicial.mesh.quaternion.copy(quaternum)
-                            console.log('UPDATE', quaternum)
-                        })
-                        .voltarAoInicio(false) //Pra não resetar quando terminada a animação
-                        .setCurva(function easeInOutSine(x) {
-                            return -(Math.cos(Math.PI * x) - 1) / 2;
-                        })
-
-                    const moveAngulo = new Animacao()
-                                       .setValorInicial(anguloInicial.mesh.position.clone())
-                                       .setValorFinal(anguloFinal.mesh.position.clone())
-                                       .setInterpolacao(new THREE.Vector3().lerpVectors)
-                                       .setUpdateFunction(function(posicao){
-                                            anguloInicial.mesh.position.copy(posicao)
-                                       })
-                                       .voltarAoInicio(false)
-                                       .setDuration(75)
-                                       .setCurva(function easeInOutSine(x) {
-                                            return -(Math.cos(Math.PI * x) - 1) / 2;
-                                        })
-                    
-                    this.animar(animacaoRodaeMoveAngulo);
-                    this.animar(moveAngulo)
-
-                    return;
-                }
-
-                if (!estado.dragging) {
-                    angle.mesh.position.copy(angle.position);
-                    
-                }
-
-                estado.valido = false;
-            }
+            const anguloInicial = angle;
+            const anguloFinal   = angle.correspondente;
+    
+            const quaternionInicial = anguloInicial.mesh.quaternion.clone(); 
+            const quaternionFinal = new THREE.Quaternion();
+            quaternionFinal.setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI);
+    
+            const tempoInterpolacao = 0.5; // Define o tempo de duração da interpolação (ajuste conforme necessário)
+            const quaternionInterpolado = new THREE.Quaternion();
+            quaternionInterpolado.slerp(quaternionInicial, quaternionFinal, tempoInterpolacao);
+    
+            // animação
+            const animacaoRodaeMoveAngulo = new Animacao()
+                .setValorInicial(quaternionInicial)
+                .setValorFinal(quaternionFinal)
+                .setDuration(75)
+                .setInterpolacao(function(inicial, final, peso) {
+                    return new THREE.Quaternion().slerpQuaternions(inicial, final, peso)
+                })
+                .setUpdateFunction(function(quaternum) {
+                    anguloInicial.mesh.quaternion.copy(quaternum)
+                })
+                .voltarAoInicio(false) //Pra não resetar quando terminada a animação
+                .setCurva(function easeInOutSine(x) {
+                    return -(Math.cos(Math.PI * x) - 1) / 2;
+                })
+    
+            const moveAngulo = new Animacao()
+                            .setValorInicial(anguloInicial.mesh.position.clone())
+                            .setValorFinal(anguloFinal.mesh.position.clone())
+                            .setInterpolacao(new THREE.Vector3().lerpVectors)
+                            .setUpdateFunction(function(posicao){
+                                    anguloInicial.mesh.position.copy(posicao)
+                            })
+                            .voltarAoInicio(false)
+                            .setDuration(75)
+                            .setCurva(function easeInOutSine(x) {
+                                    return -(Math.cos(Math.PI * x) - 1) / 2;
+                                })
+            
+            fase.animar(animacaoRodaeMoveAngulo);
+            fase.animar(moveAngulo)
         }
     }
 
     criarTracejado = (vertex) => {
+
+        //Para usar nas funções auxiliares
+        const fase = this;
 
         // pegar outros dois vertices:
         const outros_dois = this.triangulo.vertices.filter((vertice) => vertice != vertex);
@@ -248,74 +231,112 @@ export class Fase5  extends Fase{
         let tracejado = null;
         let desenharTracejado = null;
 
-        let triangulo1 = null;
-        let triangulo2 = null;
+        let trianguloInvisivel1 = null;
+        let trianguloInvisivel2 = null;
 
-        let angulo1 = null;
-        let angulo2 = null;
+        let anguloInvisivel1 = null;
+        let anguloInvisivel2 = null;
+        
 
-        return {
-            update: (estado) => {
-                if (estado.clicado && !ativado){
-                    
-                    ativado = !ativado
+        return new Output()
+                .setUpdateFunction(
+                    (estado) => {
+                        if (estado.clicado && !ativado){
+                            
+                            ativado = !ativado
 
-                    const posicao = vertex.mesh.position.clone();
-                    const vetorTracejado1 = outros_dois[0].mesh.position.clone().sub(outros_dois[1].mesh.position.clone());
-                    const vetorTracejado2 = outros_dois[1].mesh.position.clone().sub(outros_dois[0].mesh.position.clone());
-                    
-                    tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1), posicao.clone().add(vetorTracejado1))
-                    tracejado.addToScene(this.scene);
+                            const posicao = vertex.mesh.position.clone();
+                            const vetorTracejado1 = outros_dois[0].mesh.position.clone().sub(outros_dois[1].mesh.position.clone());
+                            const vetorTracejado2 = outros_dois[1].mesh.position.clone().sub(outros_dois[0].mesh.position.clone());
+                            
 
+                            //Função auxiliar, está logo abaixo do return
+                            criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2);
+
+                            ligarHitboxHoverInputAoOutputDragAngle()
+
+                            animacaoTracejado(posicao,vetorTracejado1,vetorTracejado2);
+                            
+
+                        } else if (estado.clicado) {
+                            
+                            ativado = !ativado
+                            
+                            desenharTracejado.stop = true;
+                            tracejado.removeFromScene(this.scene)
+                            anguloInvisivel1.removeFromScene(this.scene)
+                            anguloInvisivel2.removeFromScene(this.scene)
+                        }
+                    }
+                )
+
+                //Funções auxiliares
+                //SEMPRE USAR "FASE" AO INVÉS DE THIS
+                //o this no javascript quando usado em functions se refere a própria function
+                //é como se as functions fossem objetos
+                //isso não acontece com as setinhas
+
+                //Cria os inputs das hitboxes invisíveis
+                function criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2) {
                     const vtov1 = outros_dois[0].mesh.position.clone().sub(posicao);
                     const vtov2 = outros_dois[1].mesh.position.clone().sub(posicao);
-
+        
                     const posVtov1 = vtov1.clone().normalize().add(posicao);
                     const posVtov2 = vtov2.clone().normalize().add(posicao);
-
+        
                     const posVtracejado1 = vetorTracejado1.clone().normalize().add(posicao);
                     const posVtracejado2 = vetorTracejado2.clone().normalize().add(posicao);
-
-                    triangulo1 = new Triangle();
-                    triangulo1.positions = [posicao, posVtov1, posVtracejado1].map((vetor) => vetor.toArray());
+        
+                    trianguloInvisivel1 = new Triangle();
+                    trianguloInvisivel1.positions = [posicao, posVtov1, posVtracejado1].map((vetor) => vetor.toArray());
                     
-                    triangulo2 = new Triangle();
-                    triangulo2.positions = [posicao, posVtov2, posVtracejado2].map((vetor) => vetor.toArray());
+                    trianguloInvisivel2 = new Triangle();
+                    trianguloInvisivel2.positions = [posicao, posVtov2, posVtracejado2].map((vetor) => vetor.toArray());
+        
+                    trianguloInvisivel1.render();
+                    trianguloInvisivel2.render();
+        
+                    anguloInvisivel1 = new Angle(trianguloInvisivel1.vertices);
+                    anguloInvisivel2 = new Angle(trianguloInvisivel2.vertices);
+                    anguloInvisivel1.angleRadius = 1;
+                    anguloInvisivel2.angleRadius = 1;
+        
+                    anguloInvisivel1.render();
+                    anguloInvisivel1.addToScene(fase.scene);
+                    anguloInvisivel2.render();
+                    anguloInvisivel2.addToScene(fase.scene)
+        
+                    anguloInvisivel1.mesh.visible = false;
+                    anguloInvisivel2.mesh.visible = false;
 
-                    triangulo1.render();
-                    triangulo2.render();
+                    fase.hoverInvisivel1 = new Hoverable(anguloInvisivel1, fase.camera)
+                    fase.hoverInvisivel2 = new Hoverable(anguloInvisivel2, fase.camera)
+                }
 
-                    angulo1 = new Angle(triangulo1.vertices);
-                    angulo2 = new Angle(triangulo2.vertices);
-                    angulo1.angleRadius = 1;
-                    angulo2.angleRadius = 1;
-
-                    angulo1.render();
-                    angulo1.addToScene(this.scene);
-                    angulo2.render();
-                    angulo2.addToScene(this.scene)
-
-                    angulo1.mesh.visible = false;
-                    angulo2.mesh.visible = false;
-
-                    this.hoverInvisivel1 = new Hoverable(angulo1, this.camera)
-                    this.hoverInvisivel2 = new Hoverable(angulo2, this.camera)
-
-                    this.handlerDragAngle.forEach((handler,index) => {
+                //liga os inputs hover dos ângulos invisíveis ao output dragAngle
+                function ligarHitboxHoverInputAoOutputDragAngle(){
+                    fase.outputDragAngle.forEach((output,index) => {
 
                         //Apenas liga se o ângulo for o mesmo
-                        const angle = this.triangulo.angles[index];
+                        const angle = fase.triangulo.angles[index];
 
-                        if(angle.igual(angulo1)) {
-                            this.hoverInvisivel1.addObserver(handler);
-                            angle.correspondente = angulo1;
+                        if(angle.igual(anguloInvisivel1)) {
+                            anguloInvisivel1.hoverable.addObserver(output); //liga o input hoverable do angulo invisivel ao output drag do angulo real
+                            angle.correspondente = anguloInvisivel1;
                         }
-                        if(angle.igual(angulo2)) {
-                            this.hoverInvisivel2.addObserver(handler);
-                            angle.correspondente = angulo2;
+                        if(angle.igual(anguloInvisivel2)) {
+                            anguloInvisivel2.hoverable.addObserver(output); //liga o input hoverable do angulo invisivel ao output drag do angulo real
+                            angle.correspondente = anguloInvisivel2;
                             
                         }
                     })
+                }
+
+                //Anima o desenhar tracejado
+                function animacaoTracejado(posicao,vetorTracejado1,vetorTracejado2){
+
+                    tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1), posicao.clone().add(vetorTracejado1))
+                    tracejado.addToScene(fase.scene);
 
                     // animação
                     desenharTracejado = new Animacao(tracejado)
@@ -331,20 +352,8 @@ export class Fase5  extends Fase{
                         .setCurva((x) => 1 - (1 - x) * (1 - x))
                         .voltarAoInicio(false);
                     
-                    this.animar(desenharTracejado);
-                    
-
-                } else if (estado.clicado) {
-                    
-                    ativado = !ativado
-                    
-                    desenharTracejado.stop = true;
-                    tracejado.removeFromScene(this.scene)
-                    angulo1.removeFromScene(this.scene)
-                    angulo2.removeFromScene(this.scene)
+                    fase.animar(desenharTracejado);
                 }
-            }
-        }
     }
 
     animar(animacao){

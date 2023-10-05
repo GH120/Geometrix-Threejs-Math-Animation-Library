@@ -9,6 +9,11 @@ export class Input{
         this.camera     = camera;
         this.observers  = [];
         this.raycaster  = new THREE.Raycaster();
+
+        const input = this.constructor.name.toLowerCase();
+        
+        this.object[input] = this;
+
     }
 
     //Retorna se o evento intersectou o objeto

@@ -48,6 +48,9 @@ export class Input{
     
       addObserver(observer){
         this.observers.push(observer);
+
+        observer.observed.push(this);
+        
         return this;
       }
     

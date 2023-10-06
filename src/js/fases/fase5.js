@@ -99,8 +99,9 @@ export class Fase5  extends Fase{
 
     createOutputs(){
         //Outputs
-        this.outputClickVertice = this.triangulo.vertices.map(vertex => this.criarTracejado(vertex))
-        this.outputDragAngle = this.triangulo.angles.map(angle => this.criarMovimentacaoDeAngulo(angle))
+        this.outputClickVertice   = this.triangulo.vertices.map(vertex =>   this.criarTracejado(vertex))
+        this.outputDragAngle      = this.triangulo.angles.map(  angle =>    this.criarMovimentacaoDeAngulo(angle))
+        this.outputEscolheuErrado = this.triangulo.angles.map(  angle =>    this.outputAnguloErrado(angle))
     }
 
     ligarInputAoOutput(){
@@ -124,6 +125,8 @@ export class Fase5  extends Fase{
             angulo.draggable.addObserver(this.outputDragAngle[i]);
         }
     }
+
+    //Criar output negar ângulo errado (tremedeira + voltar ao inicio)
 
     criarMovimentacaoDeAngulo = (angle) => {
 
@@ -165,6 +168,9 @@ export class Fase5  extends Fase{
 
                             //Roda a animação de movimentar ângulo, é uma função auxiliar abaixo
                             moverAnguloAnimacao(angle);
+
+                            //Desativa escolher errado desse angulo
+                            fase.outputEscolheuErrado[angle.index].removeInputs();
 
                             return;
                         }
@@ -251,7 +257,7 @@ export class Fase5  extends Fase{
                 .setUpdateFunction(
                     function(estado){
                         if (estado.clicado && !ativado){
-                            
+
                             ativado = !ativado
 
                             const posicao = vertex.mesh.position.clone();
@@ -283,6 +289,9 @@ export class Fase5  extends Fase{
                             //Hover não alimenta mais o dragOutput
                             fase.hoverInvisivel1.removeObservers();
                             fase.hoverInvisivel2.removeObservers();
+
+                            //Desativa efeito do output escolheuAnguloErrado
+                            fase.outputEscolheuErrado.map(outputAnguloErrado => outputAnguloErrado.removeInputs());
                         }
 
                         this.ativado = ativado; //Sinaliza se o output foi ativado
@@ -337,16 +346,25 @@ export class Fase5  extends Fase{
             fase.outputDragAngle.forEach((output,index) => {
 
                 //Apenas liga se o ângulo for o mesmo
-                const angle = fase.triangulo.angles[index];
+                const angle             = fase.triangulo.angles[index];
+                const escolheuErrado    = fase.outputEscolheuErrado[index];
 
                 if(angle.igual(anguloInvisivel1)) {
                     anguloInvisivel1.hoverable.addObserver(output); //liga o input hoverable do angulo invisivel ao output drag do angulo real
                     angle.correspondente = anguloInvisivel1;
                 }
+                else{
+                    anguloInvisivel1.hoverable.addObserver(escolheuErrado) // se não for, liga para o output "ERRADO"
+                    angle.draggable.addObserver(escolheuErrado);
+                }
+
                 if(angle.igual(anguloInvisivel2)) {
                     anguloInvisivel2.hoverable.addObserver(output); //liga o input hoverable do angulo invisivel ao output drag do angulo real
-                    angle.correspondente = anguloInvisivel2;
-                    
+                    angle.correspondente = anguloInvisivel2;            
+                }
+                else{
+                    anguloInvisivel2.hoverable.addObserver(escolheuErrado) // se não for, liga para o output "ERRADO"
+                    angle.draggable.addObserver(escolheuErrado);
                 }
             })
         }
@@ -391,6 +409,70 @@ export class Fase5  extends Fase{
                 if(output.ativado) output.update({clicado:true}) 
             }
 
+        }
+    }
+
+    //Se ele colocar o angulo no lugar errado, faz uma animação e devolve o ângulo para o lugar original
+    outputAnguloErrado(angle){
+
+        const fase = this;
+
+        return new Output()
+               .setUpdateFunction(function(estado){
+
+                    this.estado = {...this.estado, ...estado};
+
+                    if(estado.dragging) this.estado.ativado = true;
+                    
+                    if(this.estado.ativado && !this.estado.dragging && this.estado.dentro) {
+                        animarGiro(this.estado.position);
+                        this.estado.ativado = false;
+                    }
+
+               })
+
+        //Função auxiliar////
+        /////////////////////
+        function animarGiro(posicao){
+
+            const quaternionInicial = new THREE.Quaternion();
+            const quaternionFinal   = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,-1), 0.3);
+
+            function easeInOutBack(x) {
+                const c1 = 1.70158;
+                const c2 = c1 * 1.525;
+                
+                return x < 0.5
+                  ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+                  : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+                
+            }
+            
+            const giro =  new Animacao(angle)
+                        .setValorInicial(quaternionInicial)
+                        .setValorFinal(quaternionFinal)
+                        .setDuration(30)
+                        .setInterpolacao(function(inicial,final,peso){
+                            return new THREE.Quaternion().slerpQuaternions(inicial,final,peso);
+                        })
+                        .setCurva(x => (y => Math.sin(y*2*Math.PI))(easeInOutBack(x + 0.03*Math.random())))
+                        .setUpdateFunction(function(quaternion){
+                            angle.mesh.quaternion.copy(quaternion);
+                        });
+
+            const mover = new Animacao()
+                            .setValorInicial(posicao)
+                            .setValorFinal(angle.position.clone())
+                            .setInterpolacao(new THREE.Vector3().lerpVectors)
+                            .setUpdateFunction(function(posicao){
+                                    angle.mesh.position.copy(posicao)
+                            })
+                            .voltarAoInicio(false)
+                            .setDuration(75)
+                            .setCurva(x => (y => (-(Math.cos(Math.PI * y) - 1) / 2))(x === 0 ? 0 : Math.pow(2, 10 * x - 10)))
+
+            fase.animar(giro);
+            fase.animar(mover);
         }
     }
 

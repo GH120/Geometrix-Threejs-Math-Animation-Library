@@ -3,6 +3,7 @@ export class Output{
 
     constructor(){
         this.observers = [];
+        this.observed  = [];
         this.estado    = {};
     }
 
@@ -25,6 +26,13 @@ export class Output{
     */
     setCanvas(fase){
         this.animar = fase.animar.bind(fase);
+        return this;
+    }
+
+    //Output é desligado de todos os seus inputs
+    removeInputs(){
+        console.log(this)
+        for(const observed of this.observed) observed.removeObservers(observer => observer != this);
         return this;
     }
 

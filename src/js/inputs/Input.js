@@ -57,4 +57,11 @@ export class Input{
         console.log(this.observers.filter(criteria))
         return this;
       }
+
+      removeObservers(criteria = () => false){
+        this.observers = this.observers.filter(criteria);
+    
+        console.log(this.observers.filter(criteria))
+        return this;
+      }
 }

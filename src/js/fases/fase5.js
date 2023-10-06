@@ -249,7 +249,7 @@ export class Fase5  extends Fase{
 
         return new Output()
                 .setUpdateFunction(
-                    (estado) => {
+                    function(estado){
                         if (estado.clicado && !ativado){
                             
                             ativado = !ativado
@@ -258,6 +258,9 @@ export class Fase5  extends Fase{
                             const vetorTracejado1 = outros_dois[0].mesh.position.clone().sub(outros_dois[1].mesh.position.clone());
                             const vetorTracejado2 = outros_dois[1].mesh.position.clone().sub(outros_dois[0].mesh.position.clone());
                             
+                            const tracejadoJaExistente = fase.hoverInvisivel1 != null;
+
+                            if(tracejadoJaExistente) desativarTracejados(this) //Se já tiver um tracejado existe, desativa ele
 
                             //Função auxiliar, está logo abaixo do return
                             criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2);
@@ -272,97 +275,123 @@ export class Fase5  extends Fase{
                             ativado = !ativado
                             
                             desenharTracejado.stop = true;
-                            tracejado.removeFromScene(this.scene)
-                            anguloInvisivel1.removeFromScene(this.scene)
-                            anguloInvisivel2.removeFromScene(this.scene)
+                            tracejado.removeFromScene(fase.scene)
+                            anguloInvisivel1.removeFromScene(fase.scene)
+                            anguloInvisivel2.removeFromScene(fase.scene)
+
+                            //Desativa efeito dos outputs de passar por cima dos angulos invisíveis
+                            //Hover não alimenta mais o dragOutput
+                            fase.hoverInvisivel1.removeObservers();
+                            fase.hoverInvisivel2.removeObservers();
                         }
+
+                        this.ativado = ativado; //Sinaliza se o output foi ativado
                     }
                 )
 
-                //Funções auxiliares
-                //SEMPRE USAR "FASE" AO INVÉS DE THIS
-                //o this no javascript quando usado em functions se refere a própria function
-                //é como se as functions fossem objetos
-                //isso não acontece com as setinhas
+        //Funções auxiliares
+        //SEMPRE USAR "FASE" AO INVÉS DE THIS
+        //o this no javascript quando usado em functions se refere a própria function
+        //é como se as functions fossem objetos
+        //isso não acontece com as setinhas
 
-                //Cria os inputs das hitboxes invisíveis
-                function criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2) {
-                    const vtov1 = outros_dois[0].mesh.position.clone().sub(posicao);
-                    const vtov2 = outros_dois[1].mesh.position.clone().sub(posicao);
-        
-                    const posVtov1 = vtov1.clone().normalize().add(posicao);
-                    const posVtov2 = vtov2.clone().normalize().add(posicao);
-        
-                    const posVtracejado1 = vetorTracejado1.clone().normalize().add(posicao);
-                    const posVtracejado2 = vetorTracejado2.clone().normalize().add(posicao);
-        
-                    trianguloInvisivel1 = new Triangle();
-                    trianguloInvisivel1.positions = [posicao, posVtov1, posVtracejado1].map((vetor) => vetor.toArray());
+        //Cria os inputs das hitboxes invisíveis
+        function criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2) {
+            const vtov1 = outros_dois[0].mesh.position.clone().sub(posicao);
+            const vtov2 = outros_dois[1].mesh.position.clone().sub(posicao);
+
+            const posVtov1 = vtov1.clone().normalize().add(posicao);
+            const posVtov2 = vtov2.clone().normalize().add(posicao);
+
+            const posVtracejado1 = vetorTracejado1.clone().normalize().add(posicao);
+            const posVtracejado2 = vetorTracejado2.clone().normalize().add(posicao);
+
+            trianguloInvisivel1 = new Triangle();
+            trianguloInvisivel1.positions = [posicao, posVtov1, posVtracejado1].map((vetor) => vetor.toArray());
+            
+            trianguloInvisivel2 = new Triangle();
+            trianguloInvisivel2.positions = [posicao, posVtov2, posVtracejado2].map((vetor) => vetor.toArray());
+
+            trianguloInvisivel1.render();
+            trianguloInvisivel2.render();
+
+            anguloInvisivel1 = new Angle(trianguloInvisivel1.vertices);
+            anguloInvisivel2 = new Angle(trianguloInvisivel2.vertices);
+            anguloInvisivel1.angleRadius = 1;
+            anguloInvisivel2.angleRadius = 1;
+
+            anguloInvisivel1.render();
+            anguloInvisivel1.addToScene(fase.scene);
+            anguloInvisivel2.render();
+            anguloInvisivel2.addToScene(fase.scene)
+
+            anguloInvisivel1.mesh.visible = false;
+            anguloInvisivel2.mesh.visible = false;
+
+            fase.hoverInvisivel1 = new Hoverable(anguloInvisivel1, fase.camera)
+            fase.hoverInvisivel2 = new Hoverable(anguloInvisivel2, fase.camera)
+        }
+
+        //liga os inputs hover dos ângulos invisíveis ao output dragAngle
+        function ligarHitboxHoverInputAoOutputDragAngle(){
+            fase.outputDragAngle.forEach((output,index) => {
+
+                //Apenas liga se o ângulo for o mesmo
+                const angle = fase.triangulo.angles[index];
+
+                if(angle.igual(anguloInvisivel1)) {
+                    anguloInvisivel1.hoverable.addObserver(output); //liga o input hoverable do angulo invisivel ao output drag do angulo real
+                    angle.correspondente = anguloInvisivel1;
+                }
+                if(angle.igual(anguloInvisivel2)) {
+                    anguloInvisivel2.hoverable.addObserver(output); //liga o input hoverable do angulo invisivel ao output drag do angulo real
+                    angle.correspondente = anguloInvisivel2;
                     
-                    trianguloInvisivel2 = new Triangle();
-                    trianguloInvisivel2.positions = [posicao, posVtov2, posVtracejado2].map((vetor) => vetor.toArray());
-        
-                    trianguloInvisivel1.render();
-                    trianguloInvisivel2.render();
-        
-                    anguloInvisivel1 = new Angle(trianguloInvisivel1.vertices);
-                    anguloInvisivel2 = new Angle(trianguloInvisivel2.vertices);
-                    anguloInvisivel1.angleRadius = 1;
-                    anguloInvisivel2.angleRadius = 1;
-        
-                    anguloInvisivel1.render();
-                    anguloInvisivel1.addToScene(fase.scene);
-                    anguloInvisivel2.render();
-                    anguloInvisivel2.addToScene(fase.scene)
-        
-                    anguloInvisivel1.mesh.visible = false;
-                    anguloInvisivel2.mesh.visible = false;
-
-                    fase.hoverInvisivel1 = new Hoverable(anguloInvisivel1, fase.camera)
-                    fase.hoverInvisivel2 = new Hoverable(anguloInvisivel2, fase.camera)
                 }
+            })
+        }
 
-                //liga os inputs hover dos ângulos invisíveis ao output dragAngle
-                function ligarHitboxHoverInputAoOutputDragAngle(){
-                    fase.outputDragAngle.forEach((output,index) => {
+        //Anima o desenhar tracejado
+        function animacaoTracejado(posicao,vetorTracejado1,vetorTracejado2){
 
-                        //Apenas liga se o ângulo for o mesmo
-                        const angle = fase.triangulo.angles[index];
+            tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1), posicao.clone().add(vetorTracejado1))
+            tracejado.addToScene(fase.scene);
 
-                        if(angle.igual(anguloInvisivel1)) {
-                            anguloInvisivel1.hoverable.addObserver(output); //liga o input hoverable do angulo invisivel ao output drag do angulo real
-                            angle.correspondente = anguloInvisivel1;
-                        }
-                        if(angle.igual(anguloInvisivel2)) {
-                            anguloInvisivel2.hoverable.addObserver(output); //liga o input hoverable do angulo invisivel ao output drag do angulo real
-                            angle.correspondente = anguloInvisivel2;
-                            
-                        }
-                    })
-                }
+            // animação
+            desenharTracejado = new Animacao(tracejado)
+                .setValorInicial(0)
+                .setValorFinal(2)
+                .setDuration(200)
+                .setInterpolacao((inicial, final, peso) => inicial * (1 - peso) + final*peso)
+                .setUpdateFunction((progresso) => {
+                    tracejado.origem = posicao.clone().sub(vetorTracejado1.clone().multiplyScalar(progresso))
+                    tracejado.destino = posicao.clone().add(vetorTracejado1.clone().multiplyScalar(progresso))
+                    tracejado.update();
+                })
+                .setCurva((x) => 1 - (1 - x) * (1 - x))
+                .voltarAoInicio(false);
+            
+            fase.animar(desenharTracejado);
+        }
 
-                //Anima o desenhar tracejado
-                function animacaoTracejado(posicao,vetorTracejado1,vetorTracejado2){
 
-                    tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1), posicao.clone().add(vetorTracejado1))
-                    tracejado.addToScene(fase.scene);
+        function desativarTracejados(outputAtual){
 
-                    // animação
-                    desenharTracejado = new Animacao(tracejado)
-                        .setValorInicial(0)
-                        .setValorFinal(2)
-                        .setDuration(200)
-                        .setInterpolacao((inicial, final, peso) => inicial * (1 - peso) + final*peso)
-                        .setUpdateFunction((progresso) => {
-                            tracejado.origem = posicao.clone().sub(vetorTracejado1.clone().multiplyScalar(progresso))
-                            tracejado.destino = posicao.clone().add(vetorTracejado1.clone().multiplyScalar(progresso))
-                            tracejado.update();
-                        })
-                        .setCurva((x) => 1 - (1 - x) * (1 - x))
-                        .voltarAoInicio(false);
-                    
-                    fase.animar(desenharTracejado);
-                }
+            //Tira o output dos hoversInvisíveis antigos
+            fase.hoverInvisivel1.removeObservers();
+            fase.hoverInvisivel2.removeObservers();
+
+            for(const output of fase.outputClickVertice){
+                
+                if(output == outputAtual) continue; //ignora se é o vertice clicado atual
+                
+                //Desativa o ultimo vértice selecionado, 
+                //como se tivesse clicado de novo
+                //Já que clicar duas vezes desativa
+                if(output.ativado) output.update({clicado:true}) 
+            }
+
+        }
     }
 
     animar(animacao){

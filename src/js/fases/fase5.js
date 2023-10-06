@@ -126,7 +126,19 @@ export class Fase5  extends Fase{
         }
     }
 
-    //Criar output negar ângulo errado (tremedeira + voltar ao inicio)
+    desligarOutputs(){
+        //Desliga os outputs dos inputs
+        this.outputClickVertice.map(  output => output.removeInputs());
+        this.outputDragAngle.map(     output => output.removeInputs());
+        this.outputEscolheuErrado.map(output => output.removeInputs());
+
+
+        //Reseta os estados dos outputs
+        this.outputClickVertice.map(  output => output.estado = {})
+        this.outputDragAngle.map(     output => output.estado = {})
+        this.outputEscolheuErrado.map(output => output.estado = {})
+
+    }
 
     criarMovimentacaoDeAngulo = (angle) => {
 
@@ -137,15 +149,16 @@ export class Fase5  extends Fase{
         //        draggable do ângulo real      -> {posicao: vetor, dragging: bool}, 
         //                                      -> diz a posição do mouse e se ele está arrastando o angulo real
 
-        let estado = {}
-
         const fase = this;
 
         return new Output()
                .setUpdateFunction(
-                    (estadoNovo) => {
+                    function(estadoNovo){
 
-                        estado = {...estado, ...estadoNovo}
+                        this.estado = {...this.estado, ...estadoNovo}
+
+
+                        const estado = this.estado;
 
                         if(estado.finalizado) return;
 
@@ -168,6 +181,7 @@ export class Fase5  extends Fase{
 
                             //Roda a animação de movimentar ângulo, é uma função auxiliar abaixo
                             moverAnguloAnimacao(angle);
+                            animarMudarDeCor(angle);
 
                             //Desativa escolher errado desse angulo
                             fase.outputEscolheuErrado[angle.index].removeInputs();
@@ -230,6 +244,30 @@ export class Fase5  extends Fase{
             fase.animar(animacaoRodaeMoveAngulo);
             fase.animar(moveAngulo)
         }
+        function animarMudarDeCor(angle){
+
+            const corFinal = (fase.amareloUsado)? 0x990000 : 0xcc00830;
+
+            const colorir = colorirAngulo(angle)
+                            .setValorInicial(0xff0000)
+                            .setValorFinal(corFinal)
+                            .setDuration(100)
+                            //Gambiarra pois a classe angle foi mal feita, ignorar
+                            .setUpdateFunction(valor => {
+                                angle.material = new THREE.MeshBasicMaterial({color: valor})
+                                angle.position.copy(angle.mesh.position);
+                                const quaternion = angle.mesh.quaternion.clone();
+                                angle.removeFromScene();
+                                angle.renderMalha();
+                                angle.mesh.quaternion.copy(quaternion)
+                                angle.addToScene(fase.scene)
+                            })
+                            .voltarAoInicio(false)
+                            .filler(100)
+                            .setOnStart(() => fase.amareloUsado = true)
+            
+            fase.animar(colorir);               
+        }
     }
 
     criarTracejado = (vertex) => {
@@ -285,13 +323,12 @@ export class Fase5  extends Fase{
                             anguloInvisivel1.removeFromScene(fase.scene)
                             anguloInvisivel2.removeFromScene(fase.scene)
 
-                            //Desativa efeito dos outputs de passar por cima dos angulos invisíveis
-                            //Hover não alimenta mais o dragOutput
-                            fase.hoverInvisivel1.removeObservers();
-                            fase.hoverInvisivel2.removeObservers();
+                            //Reseta outputs para sua configuração inicial
+                            fase.desligarOutputs(); 
+                            fase.ligarInputAoOutput();
 
-                            //Desativa efeito do output escolheuAnguloErrado
-                            fase.outputEscolheuErrado.map(outputAnguloErrado => outputAnguloErrado.removeInputs());
+                            fase.triangulo.removeFromScene();
+                            fase.triangulo.addToScene(fase.scene);
                         }
 
                         this.ativado = ativado; //Sinaliza se o output foi ativado
@@ -412,6 +449,7 @@ export class Fase5  extends Fase{
         }
     }
 
+    //Criar output negar ângulo errado (tremedeira + voltar ao inicio)
     //Se ele colocar o angulo no lugar errado, faz uma animação e devolve o ângulo para o lugar original
     outputAnguloErrado(angle){
 

@@ -1,10 +1,12 @@
 //Observer dos Inputs
 export class Output{
 
-    constructor(){
+    constructor(observed = []){
         this.observers = [];
-        this.observed  = [];
         this.estado    = {};
+        this.observed  = observed; //Inputs ou Outputs que avisam esse daqui
+
+        for(const watched of observed) watched.observers.push(this);
     }
 
     /**função de update que recebe o estado novo e atualiza o que for necessário*/

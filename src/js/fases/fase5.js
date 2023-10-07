@@ -55,6 +55,8 @@ export class Fase5  extends Fase{
 
         const anim1 = this.firstAnim(dialogo);
 
+        this.outputDragAngle.map(output => output.removeInputs()); // desativa o arraste inicialmente, até clicar no vértice
+
         this.animar(new AnimacaoSequencial(anim1));
 
     }
@@ -102,6 +104,11 @@ export class Fase5  extends Fase{
         this.outputClickVertice   = this.triangulo.vertices.map(vertex =>   this.criarTracejado(vertex))
         this.outputDragAngle      = this.triangulo.angles.map(  angle =>    this.criarMovimentacaoDeAngulo(angle))
         this.outputEscolheuErrado = this.triangulo.angles.map(  angle =>    this.outputAnguloErrado(angle))
+
+        this.clicouPrimeiroVertice  = this.primeiroClick();   //Muda texto quando o player clica no primeiro vértice e ativa o arraste
+        // this.arrastouPrimeiroAngulo = this.primeiroDrag();    //Muda texto quando o player arrasta o primeiro ângulo
+        // this.fechou180Graus         = this.output180Graus();  //Verifica se os angulos fecharam 180 graus. Se sim, ativa output pra proxima etapa
+
     }
 
     ligarInputAoOutput(){
@@ -293,7 +300,12 @@ export class Fase5  extends Fase{
 
         return new Output()
                 .setUpdateFunction(
-                    function(estado){
+                    function(novoEstado){
+
+                        this.estado = {...this.estado, ...novoEstado}
+
+                        const estado = this.estado;
+
                         if (estado.clicado && !ativado){
 
                             ativado = !ativado
@@ -513,6 +525,78 @@ export class Fase5  extends Fase{
             fase.animar(mover);
         }
     }
+    
+
+    //Agora os outputs que mudam texto/ avançam a fase
+
+    //No primeiro click dos vértices, muda o texto
+    //Roda apenas uma vez
+    primeiroClick(){
+
+        //Inputs: os 3 criarTracejados -> quando um deles atualiza, notifica esse output também
+
+        const fase = this;
+
+        return new Output(fase.outputClickVertice)
+               .setUpdateFunction(function(novoEstado){
+
+                    console.log(this)
+
+                    this.estado = {...this.estado, ...novoEstado}
+
+                    const estado = this.estado;
+
+                    if(estado.finalizado) return;
+
+                    if(estado.clicado){
+
+                        estado.finalizado = true;
+
+                        mudarTexto();
+                        // ativarArraste(); feito dentro do mudar texto
+                    }
+               })
+
+        //Funções auxiliares
+        function mudarTexto(){
+            
+            const dialogo = ["Veja o tracejado paralelo a aresta oposta ao vértice",
+                             "Ele tem uns buracos onde se encaixam ângulos",
+                             "Tente arrastar os ângulos para esse buraco"]
+
+            const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0]));
+            const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1]));
+            const anim3 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[2]));
+
+
+            anim3.setOnTermino(ativarArraste); // ativa o arraste quando terminar o dialogo
+
+            fase.animar(new AnimacaoSequencial(anim1,anim2,anim3));
+        }
+
+        function ativarArraste(){
+
+            //Liga os outputs do arraste aos inputs do angle
+            for (let i = 0; i < 3; ++i) {
+
+                const angulo = fase.triangulo.angles[i];
+
+                angulo.draggable.addObserver(fase.outputDragAngle[i]);
+            }
+        }
+    }
+    // output180Graus(){
+
+    //     const fase = this;
+
+    //     return new Output()
+    //            .setUpdateFunction(function(){
+                    
+    //                 const tem180Graus = fase.outputDragAngle.map(output => output.estado.finalizado);
+
+    //                 if(tem180Graus)
+    //            })
+    // }
 
     animar(animacao){
 

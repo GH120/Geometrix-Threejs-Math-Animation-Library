@@ -57,6 +57,9 @@ export class Fase5  extends Fase{
 
         this.outputDragAngle.map(output => output.removeInputs()); // desativa o arraste inicialmente, até clicar no vértice
 
+        this.clicouPrimeiroVertice  = this.primeiroClick();   //Muda texto quando o player clica no primeiro vértice e ativa o arraste
+
+
         this.animar(new AnimacaoSequencial(anim1));
 
     }
@@ -105,9 +108,6 @@ export class Fase5  extends Fase{
         this.outputDragAngle      = this.triangulo.angles.map(  angle =>    this.criarMovimentacaoDeAngulo(angle))
         this.outputEscolheuErrado = this.triangulo.angles.map(  angle =>    this.outputAnguloErrado(angle))
 
-        this.clicouPrimeiroVertice  = this.primeiroClick();   //Muda texto quando o player clica no primeiro vértice e ativa o arraste
-        // this.arrastouPrimeiroAngulo = this.primeiroDrag();    //Muda texto quando o player arrasta o primeiro ângulo
-        // this.fechou180Graus         = this.output180Graus();  //Verifica se os angulos fecharam 180 graus. Se sim, ativa output pra proxima etapa
 
     }
 
@@ -528,6 +528,7 @@ export class Fase5  extends Fase{
     
 
     //Agora os outputs que mudam texto/ avançam a fase
+    //São usados nos problemas( ver ultimas linhas dessa classe)
 
     //No primeiro click dos vértices, muda o texto
     //Roda apenas uma vez
@@ -618,6 +619,39 @@ export class Fase5  extends Fase{
         if (this.triangulo.equilatero()) {
             this.changeText("VITORIA!!!");
             // botar notif
+        }
+    }
+
+    problemas = {
+
+        start:{
+            satisfeito: (fase) => true,
+
+            consequencia: (fase) =>{
+                fase.outputDragAngle.map(output => output.removeInputs()); // desativa o arraste inicialmente, até clicar no vértice
+
+                fase.clicouPrimeiroVertice  = fase.primeiroClick();   //Muda texto quando o player clica no primeiro vértice e ativa o arraste
+            },
+
+            proximo: (fase) => "clicouVertice"
+
+        },
+
+        clicouVertice: {
+            satisfeito: (fase) => fase.clicouPrimeiroVertice.estado.finalizado,
+
+            consequencia: (fase) => fase.clicouPrimeiroVertice.removeInputs(),
+
+            proximo: (fase) => 180
+        },
+
+        180: {
+            //Se dois outputs de arraste tiverem finalizado(posições corretas), então 180° está satisfeito
+            satisfeito: (fase) => fase.outputDragAngle.filter(output => output.estado.finalizado).length == 2,
+
+            consequencia: (fase) => null,
+
+            proximo: (fase) => null
         }
     }
 }

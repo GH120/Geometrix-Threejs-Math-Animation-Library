@@ -55,11 +55,6 @@ export class Fase5  extends Fase{
 
         const anim1 = this.firstAnim(dialogo);
 
-        this.outputDragAngle.map(output => output.removeInputs()); // desativa o arraste inicialmente, até clicar no vértice
-
-        this.clicouPrimeiroVertice  = this.primeiroClick();   //Muda texto quando o player clica no primeiro vértice e ativa o arraste
-
-
         this.animar(new AnimacaoSequencial(anim1));
 
     }
@@ -391,6 +386,7 @@ export class Fase5  extends Fase{
         }
 
         //liga os inputs hover dos ângulos invisíveis ao output dragAngle
+        //liga os inputs hover dos ângulos invisiveis errados ao output ERRADO(tremedeira)
         function ligarHitboxHoverInputAoOutputDragAngle(){
             fase.outputDragAngle.forEach((output,index) => {
 
@@ -465,6 +461,9 @@ export class Fase5  extends Fase{
     //Se ele colocar o angulo no lugar errado, faz uma animação e devolve o ângulo para o lugar original
     outputAnguloErrado(angle){
 
+        //Inputs: arraste do ângulo real (angle.draggable)
+        //        hoverable do ângulo invisível errado (anguloInvisivel.hover)
+
         const fase = this;
 
         return new Output()
@@ -525,10 +524,75 @@ export class Fase5  extends Fase{
             fase.animar(mover);
         }
     }
-    
 
-    //Agora os outputs que mudam texto/ avançam a fase
-    //São usados nos problemas( ver ultimas linhas dessa classe)
+    animar(animacao){
+
+        animacao.animationFrames = animacao.getFrames();
+
+        this.frames.push(animacao.animationFrames);
+
+        this.animacoes.push(animacao);
+
+        return this;
+    }
+
+    update(){
+
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+
+        if(!this.progresso) this.progresso = "start";
+
+        const problemaAtual = this.problemas[this.progresso];
+
+        if(problemaAtual.satisfeito(this)){
+
+            problemaAtual.consequencia(this);
+
+            this.progresso = problemaAtual.proximo(this);
+        }
+    }
+
+    problemas = {
+
+        start:{
+            satisfeito: (fase) => true,
+
+            consequencia: (fase) =>{
+
+                // desativa o arraste inicialmente, até clicar no vértice
+                fase.outputDragAngle.map(output => output.removeInputs());
+
+                //Muda texto quando o player clica no primeiro vértice e ativa o arraste
+                fase.clicouPrimeiroVertice  = fase.primeiroClick();   
+            },
+
+            proximo: (fase) => "clicouVertice"
+
+        },
+
+        clicouVertice: {
+            satisfeito: (fase) => fase.clicouPrimeiroVertice.estado.finalizado,
+
+            consequencia: (fase) => null,
+
+            proximo: (fase) => 180
+        },
+
+        180: {
+            //Se dois outputs de arraste tiverem finalizado(posições corretas), então 180° está satisfeito
+            satisfeito: (fase) => fase.outputDragAngle.filter(output => output.estado.finalizado).length == 2,
+
+            consequencia: (fase) => fase.animar180Graus(),
+
+            proximo: (fase) => "finalizado"
+        },
+
+        finalizado:{
+            satisfeito: () => false
+        }
+    }
+
+    //Funções, outputs etc. usados nos problemas
 
     //No primeiro click dos vértices, muda o texto
     //Roda apenas uma vez
@@ -586,72 +650,32 @@ export class Fase5  extends Fase{
             }
         }
     }
-    // output180Graus(){
 
-    //     const fase = this;
+    animar180Graus(){
 
-    //     return new Output()
-    //            .setUpdateFunction(function(){
-                    
-    //                 const tem180Graus = fase.outputDragAngle.map(output => output.estado.finalizado);
 
-    //                 if(tem180Graus)
-    //            })
-    // }
+        const fase = this;
 
-    animar(animacao){
+        const objetos = fase.triangulo.vertices.concat(fase.triangulo.edges);
 
-        animacao.animationFrames = animacao.getFrames();
 
-        this.frames.push(animacao.animationFrames);
+        const apagarTrianguloAnimacao = new Animacao()
+                                        .setValorInicial(1)
+                                        .setValorFinal(0)
+                                        .setInterpolacao((inicial,final,peso) => inicial*(1-peso) + final*peso)
+                                        .setUpdateFunction(function(valor){
 
-        this.animacoes.push(animacao);
+                                            objetos.map(objeto => objeto.mesh.material = new THREE.MeshBasicMaterial({color: objeto.material.color, transparent:true, opacity: valor}))
+                                        })
+                                        .setDuration(200)
+                                        .voltarAoInicio(false)
 
-        return this;
-    }
 
-    update(){
+        fase.animar(apagarTrianguloAnimacao);
 
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
 
-        // if(options.atualizar) triangle.update();
+        const dialogo = ["Veja o ângulo resultante,"]
 
-        if (this.triangulo.equilatero()) {
-            this.changeText("VITORIA!!!");
-            // botar notif
-        }
-    }
-
-    problemas = {
-
-        start:{
-            satisfeito: (fase) => true,
-
-            consequencia: (fase) =>{
-                fase.outputDragAngle.map(output => output.removeInputs()); // desativa o arraste inicialmente, até clicar no vértice
-
-                fase.clicouPrimeiroVertice  = fase.primeiroClick();   //Muda texto quando o player clica no primeiro vértice e ativa o arraste
-            },
-
-            proximo: (fase) => "clicouVertice"
-
-        },
-
-        clicouVertice: {
-            satisfeito: (fase) => fase.clicouPrimeiroVertice.estado.finalizado,
-
-            consequencia: (fase) => fase.clicouPrimeiroVertice.removeInputs(),
-
-            proximo: (fase) => 180
-        },
-
-        180: {
-            //Se dois outputs de arraste tiverem finalizado(posições corretas), então 180° está satisfeito
-            satisfeito: (fase) => fase.outputDragAngle.filter(output => output.estado.finalizado).length == 2,
-
-            consequencia: (fase) => null,
-
-            proximo: (fase) => null
-        }
+        const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.mudarTexto(dialogo[0]))
     }
 }

@@ -37,7 +37,7 @@ export class Triangle extends Objeto{
         //Gambiarra enquanto não transforma o vértice em um objeto
         this.vertices = esferas.map(vertice => Objeto.fromMesh(vertice));
 
-        console.log(this.vertices)
+        // console.log(this.vertices)
 
         return this;
     }

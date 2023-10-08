@@ -33,7 +33,6 @@ export class Output{
 
     //Output é desligado de todos os seus inputs
     removeInputs(){
-        console.log(this)
         for(const observed of this.observed) observed.removeObservers(observer => observer != this);
         return this;
     }

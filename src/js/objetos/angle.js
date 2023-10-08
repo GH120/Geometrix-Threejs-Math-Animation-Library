@@ -147,11 +147,11 @@ export class Angle extends Objeto{
 
         const posicao = new THREE.Vector3(...this.position).sub(vetor);
 
-        mesh.position.copy(posicao);
-
         const group = new THREE.Group();
 
         group.add(mesh);
+
+        group.position.copy(posicao)
 
         // mesh.lookAt(new THREE.Vector3(-1,-1,0))
 

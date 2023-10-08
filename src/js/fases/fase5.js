@@ -191,7 +191,7 @@ export class Fase5  extends Fase{
                             fase.triangulo.vertices.map(vertice => vertice.draggable.removeObservers());
 
                             fase.outputEscolheuErrado[angle.index].removeInputs();
-                            console.log(fase)
+                            // console.log(fase)
 
                             return;
                         }
@@ -307,7 +307,7 @@ export class Fase5  extends Fase{
 
                         const estado = this.estado;
 
-                        console.log(novoEstado)
+                        // console.log(novoEstado)
 
                         //Se um dos outros vértices tiver sendo arrastado, remove tudo e desenha de novo
                         if(estado.dragging){
@@ -336,6 +336,8 @@ export class Fase5  extends Fase{
                             tracejado.addToScene(fase.scene);
 
                             estado.arraste = true;
+
+                            console.log(1)
 
                             return;
                         }
@@ -683,7 +685,7 @@ export class Fase5  extends Fase{
 
                     const estado = this.estado;
 
-                    console.log(estado, "this")
+                    // console.log(estado, "this")
 
                     if(estado.finalizado) return;
 

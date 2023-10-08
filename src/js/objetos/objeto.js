@@ -18,6 +18,11 @@ export class Objeto{
 
     removeFromScene(){
         this.scene.remove(this.mesh);
+
+        if(this.clickable) this.clickable.removeObservers();
+        if(this.draggable) this.draggable.removeObservers();
+        if(this.hoverable) this.hoverable.removeObservers();
+
         return this;
     } 
 
@@ -34,6 +39,10 @@ export class Objeto{
     // set position(value){
     //     this.mesh.position.copy(value);
     // }
+
+    getPosition(){
+        return this.mesh.position.clone();
+    }
 
     moveTo(position){
         this.mesh.position.copy(position);

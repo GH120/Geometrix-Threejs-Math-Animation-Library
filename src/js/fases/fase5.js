@@ -722,6 +722,31 @@ export class Fase5  extends Fase{
 
             consequencia: (fase) => null,
 
+            proximo: (fase) => "arrastouVertice"
+        },
+
+        arrastouVertice: {
+            satisfeito: (fase) => !!fase.jaArrastouVertice,
+
+            consequencia: (fase) => {
+                
+                const dialogo = ["Arrastando esses dois vértices, pode-se criar qualquer triângulo",
+                                 "Ou seja, o que vamos fazer a seguir vale para todo triângulo...",
+                                 "Perceba os buracos entre o ângulo e o tracejado",
+                                 "Eles parecem caber outros ângulos não é?",
+                                 "Tente arrastar os ângulos do triângulo até esses buracos"]
+
+                const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0]));
+                const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1])).setDelay(50);
+                const anim3 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[2]));
+                const anim4 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[3]));
+                const anim5 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[4]));
+
+                fase.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5));
+
+
+            },
+
             proximo: (fase) => 180
         },
 
@@ -772,25 +797,43 @@ export class Fase5  extends Fase{
                         estado.finalizado = true;
 
                         mudarTexto();
-                        // ativarArraste(); feito dentro do mudar texto
+                        ativarArraste(); 
                     }
                })
 
         //Funções auxiliares
         function mudarTexto(){
             
-            const dialogo = ["Veja o tracejado paralelo a aresta oposta ao vértice",
-                             "Ele tem buracos onde se encaixam ângulos",
-                             "Tente arrastar os ângulos para esses buracos"]
+            // const dialogo = ["Veja o tracejado paralelo a aresta oposta ao vértice",
+            //                  "Ele tem buracos onde se encaixam ângulos",
+            //                  "Tente arrastar os ângulos para esses buracos"]
 
-            const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0]));
+            const dialogo = ["Veja esse novo tracejado e a aresta que liga os outros dois vértices",
+                             "Ele é paralelo a ela, isso vale para qualquer triângulo",
+                             "Tente arrastar os vértices não clicados por exemplo"]
+
+            const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0])).setDelay(200);
             const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1]));
             const anim3 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[2]));
 
 
-            anim2.setOnTermino(ativarArraste); // ativa o arraste quando terminar o dialogo
+            const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : -1)
+                                                   .filter(indice => indice != -1)[0];
 
-            fase.animar(new AnimacaoSequencial(anim1,anim2,anim3));
+            const arestaOposta  = fase.triangulo.edges[(index+1)%3];
+
+            const corInicial = arestaOposta.material.color;
+
+            const colorirAresta = colorirAngulo(arestaOposta)
+                                  .setValorInicial(corInicial)
+                                  .setValorFinal(0xcf2200)
+                                  .setDuration(100)
+                                  .setDelay(200)
+                                  .setCurva(x =>-(Math.cos(Math.PI * x) - 1) / 2)
+                                  .filler(100)
+
+
+            fase.animar(new AnimacaoSequencial(new AnimacaoSimultanea(colorirAresta,anim1),anim2, anim3.setOnTermino(() => arestaOposta.material.color = corInicial)));
         }
 
         function ativarArraste(){
@@ -801,6 +844,10 @@ export class Fase5  extends Fase{
                 const angulo = fase.triangulo.angles[i];
 
                 angulo.draggable.addObserver(fase.outputDragAngle[i]);
+
+                const arrastouVertice = new Output().setUpdateFunction(() => fase.jaArrastouVertice = true)
+
+                fase.outputMoverVertice.map(output => output.addObserver(arrastouVertice));
             }
         }
     }
@@ -843,8 +890,8 @@ export class Fase5  extends Fase{
         //Clica automaticamente no vértice, desligando seu output e resetando o triângulo
         const desligarTracejado = () => fase.outputClickVertice.forEach(output => (output.ativado)? output.update({clicado:true}) : null);
 
-        const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0]))
-        const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1]))
+        const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0])).setDelay(200)
+        const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1])).setDelay(100)
         const anim3 = new TextoAparecendo(fase.text.element)
                           .setOnStart(() => fase.changeText(dialogo[2]))
                           .setOnTermino(desligarTracejado)

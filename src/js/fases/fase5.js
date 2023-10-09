@@ -199,7 +199,8 @@ export class Fase5  extends Fase{
 
                             //Retorna o ângulo a sua posição original
                             moverAnguloAnimacao(angle, angle.getPosition(), angle.position);
-
+                            
+                            fase.cor = !fase.cor;
                             animarMudarDeCor(copia);
                             animarMudarDeCor(angle);
 
@@ -279,7 +280,7 @@ export class Fase5  extends Fase{
 
         function animarMudarDeCor(angle){
 
-            const corFinal = 0x00ffff;
+            const corFinal = (fase.cor)? 0x00ffff : 0x009b77;
 
             const colorir = colorirAngulo(angle)
                             .setValorInicial(0xff0000)

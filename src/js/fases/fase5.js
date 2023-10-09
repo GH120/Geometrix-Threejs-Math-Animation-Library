@@ -138,12 +138,14 @@ export class Fase5  extends Fase{
         this.outputEscolheuErrado.map(output => output.removeInputs());
         this.outputMoverVertice.map(  output => output.removeInputs());
 
+    }
+
+    resetOutputs(){
 
         //Reseta os estados dos outputs
         this.outputClickVertice.map(  output => output.estado = {})
         this.outputDragAngle.map(     output => output.estado = {})
         this.outputEscolheuErrado.map(output => output.estado = {})
-
     }
 
     criarMovimentacaoDeAngulo = (angle) => {
@@ -156,6 +158,8 @@ export class Fase5  extends Fase{
         //                                      -> diz a posição do mouse e se ele está arrastando o angulo real
 
         const fase = this;
+
+        let copia  = null;
 
         return new Output()
                .setUpdateFunction(
@@ -184,7 +188,7 @@ export class Fase5  extends Fase{
                         if(estado.valido && !estado.dragging){
                             estado.finalizado = true;
 
-                            const copia = angle.copia().render();
+                            copia = angle.copia().render();
 
                             const invisivel = angle.correspondente;
 
@@ -199,10 +203,9 @@ export class Fase5  extends Fase{
                             animarMudarDeCor(copia);
                             animarMudarDeCor(angle);
 
-                            //Adicona output update copia e desativa drag
-                            fase.triangulo.vertices.map(vertice => vertice.draggable.addObserver({update: () => copia.removeFromScene()}));
-
-                            fase.outputEscolheuErrado[angle.index].removeInputs();
+                            //Muda os outputs que o angulo aceita( não pode ser mais arrastado)
+                            //Adiciona um output que atualiza a copia no arraste
+                            mudarOutputs(angle,copia);
                             // console.log(fase)
 
                             return;
@@ -297,6 +300,56 @@ export class Fase5  extends Fase{
                             .setOnStart(() => fase.amareloUsado = true)
             
             fase.animar(colorir);               
+        }
+
+        function mudarOutputs(){
+
+            const index = fase.outputClickVertice.map((output,index) => (output.estado.ativado)? index : -1)
+                                                 .filter(indice => indice != -1)[0]
+
+            const atualizarCopia = new Output().setUpdateFunction((estado) => {
+                if(estado.dragging){
+
+                    console.log(atualizarCopia)
+                    
+                    copia.removeFromScene();
+
+                    const material = copia.mesh.material.clone();
+
+                    copia = angle.copia();
+
+                    copia.material = material;
+
+                    copia.render().addToScene(fase.scene)
+
+                    copia.mesh.position.copy(vertice.mesh.position)
+
+                    copia.mesh.quaternion.copy(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI))
+                }
+            })
+
+            const vertice = fase.triangulo.vertices[index];
+
+            const deletarCopia = new Output().setUpdateFunction(function(estado){
+                if(estado.clicado){
+                    this.removeInputs();
+
+                    copia.removeFromScene();
+
+                    angle.material.color = 0xff0000;
+
+                    atualizarCopia.removeInputs();
+                }
+            })
+
+            vertice.clickable.addObserver(deletarCopia)
+
+
+            fase.outputMoverVertice.map(output => output.removeInputs());
+            //Adicona output update copia e desativa drag
+            fase.outputMoverVertice.map(output => output.addObserver(atualizarCopia));
+
+            fase.outputEscolheuErrado[angle.index].removeInputs();
         }
     }
 
@@ -397,6 +450,7 @@ export class Fase5  extends Fase{
                             
                             //Reseta outputs para sua configuração inicial
                             fase.desligarOutputs(); 
+                            fase.resetOutputs();
                             fase.ligarInputAoOutput();
                             
                             fase.triangulo.vertices.map(vertice => vertice.draggable.removeObservers())
@@ -755,7 +809,12 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
-        const objetos = fase.triangulo.vertices.concat(fase.triangulo.edges);
+        const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : -1)
+                                               .filter(indice => indice != -1)[0];
+
+        const angulos = fase.triangulo.angles.filter(angulo => angulo.index != index)
+
+        const objetos = fase.triangulo.vertices.concat(fase.triangulo.edges).concat(angulos);
 
 
         const apagarTrianguloAnimacao = new Animacao()
@@ -789,14 +848,10 @@ export class Fase5  extends Fase{
                           .setOnStart(() => fase.changeText(dialogo[2]))
                           .setOnTermino(desligarTracejado)
                           .setDelay(100)
-
-                          
-        const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : false)
-                                               .filter(indice => !!indice)[0];
                           
         const vertice = fase.triangulo.vertices[index];
 
-        const circulo = new Circle(vertice.getPosition(), 0.714);
+        const circulo = new Circle(vertice.getPosition(), 0.740,0.05);
         
         const desenharCirculo = new DesenharMalha(circulo, fase.scene).setDuration(250);
         

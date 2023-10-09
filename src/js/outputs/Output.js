@@ -46,13 +46,24 @@ export class Output{
 
     addObserver(observer){
         this.observers.push(observer);
+
+        if(observer.observed) observer.observed.push(this);
+        
         return this;
     }
+    
     
     removeObserver(criteria){
         this.observers = this.observers.filter(criteria);
 
         console.log(this.observers.filter(criteria))
+        return this;
+    }
+
+    removeObservers(criteria = () => false){
+        
+        this.observers = this.observers.filter(criteria);
+    
         return this;
     }
 

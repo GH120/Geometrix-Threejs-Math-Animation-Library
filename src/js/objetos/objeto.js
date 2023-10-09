@@ -19,6 +19,14 @@ export class Objeto{
     removeFromScene(){
         this.scene.remove(this.mesh);
 
+        //Não abrange grupos recursives, cuidado
+        if(this.mesh.children){
+            this.mesh.children.map(child => child.geometry.dispose());
+        }
+        else{
+            this.mesh.geometry.dispose();
+        }
+
         if(this.clickable) this.clickable.removeObservers();
         if(this.draggable) this.draggable.removeObservers();
         if(this.hoverable) this.hoverable.removeObservers();

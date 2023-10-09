@@ -199,7 +199,8 @@ export class Fase5  extends Fase{
                             animarMudarDeCor(copia);
                             animarMudarDeCor(angle);
 
-                            fase.triangulo.vertices.map(vertice => vertice.draggable.removeObservers());
+                            //Adicona output update copia e desativa drag
+                            fase.triangulo.vertices.map(vertice => vertice.draggable.addObserver({update: () => copia.removeFromScene()}));
 
                             fase.outputEscolheuErrado[angle.index].removeInputs();
                             // console.log(fase)

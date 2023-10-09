@@ -48,7 +48,7 @@ export default class DesenharMalha extends Animacao{
 
             this.malha = new this.objeto.mesh.constructor(geometry, this.objeto.material);
 
-            // this.malha.quaternion.copy(this.objeto.quaternion)
+            this.malha.position.copy(this.objeto.mesh.position)
             
             scene.add(this.malha);
         })

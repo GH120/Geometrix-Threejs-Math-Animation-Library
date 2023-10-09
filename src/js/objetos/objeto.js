@@ -55,4 +55,8 @@ export class Objeto{
         novo.material = mesh.material;
         return novo
     }
+
+    copia(){
+        return Objeto.fromMesh(this.mesh.clone());
+    }
 }

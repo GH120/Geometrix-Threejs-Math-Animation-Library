@@ -184,8 +184,19 @@ export class Fase5  extends Fase{
                         if(estado.valido && !estado.dragging){
                             estado.finalizado = true;
 
+                            const copia = angle.copia().render();
+
+                            const invisivel = angle.correspondente;
+
                             //Roda a animação de movimentar ângulo, é uma função auxiliar abaixo
-                            moverAnguloAnimacao(angle, estado.position.clone());
+                            //Move e gira a copia
+                            moverAnguloAnimacao(copia, estado.position.clone(), invisivel.getPosition());
+                            girarAngulo(copia);
+
+                            //Retorna o ângulo a sua posição original
+                            moverAnguloAnimacao(angle, angle.getPosition(), angle.position);
+
+                            animarMudarDeCor(copia);
                             animarMudarDeCor(angle);
 
                             fase.triangulo.vertices.map(vertice => vertice.draggable.removeObservers());
@@ -206,10 +217,32 @@ export class Fase5  extends Fase{
                )
 
         //Funções auxiliares
-        function moverAnguloAnimacao(angle, position){
+        function moverAnguloAnimacao(angle, origem, destino){
+
+            console.log(origem, destino);
 
             const anguloInicial = angle;
-            const anguloFinal   = angle.correspondente;
+            
+    
+            const moveAngulo = new Animacao()
+                            .setValorInicial(origem)
+                            .setValorFinal(destino)
+                            .setInterpolacao(new THREE.Vector3().lerpVectors)
+                            .setUpdateFunction(function(posicao){
+                                    anguloInicial.mesh.position.copy(posicao)
+                            })
+                            .voltarAoInicio(false)
+                            .setDuration(75)
+                            .setCurva(function easeInOutSine(x) {
+                                    return -(Math.cos(Math.PI * x) - 1) / 2;
+                                })
+            
+            fase.animar(moveAngulo)
+        }
+
+        function girarAngulo(angulo){
+
+            const anguloInicial = angulo;
     
             const quaternionInicial = anguloInicial.mesh.quaternion.clone(); 
             const quaternionFinal = new THREE.Quaternion();
@@ -234,26 +267,15 @@ export class Fase5  extends Fase{
                 .setCurva(function easeInOutSine(x) {
                     return -(Math.cos(Math.PI * x) - 1) / 2;
                 })
-    
-            const moveAngulo = new Animacao()
-                            .setValorInicial(position)
-                            .setValorFinal(anguloFinal.mesh.position.clone())
-                            .setInterpolacao(new THREE.Vector3().lerpVectors)
-                            .setUpdateFunction(function(posicao){
-                                    anguloInicial.mesh.position.copy(posicao)
-                            })
-                            .voltarAoInicio(false)
-                            .setDuration(75)
-                            .setCurva(function easeInOutSine(x) {
-                                    return -(Math.cos(Math.PI * x) - 1) / 2;
-                                })
-            
+                .setOnStart(() => angulo.addToScene(fase.scene))
+
             fase.animar(animacaoRodaeMoveAngulo);
-            fase.animar(moveAngulo)
+
         }
+
         function animarMudarDeCor(angle){
 
-            const corFinal = (fase.amareloUsado)? 0x990000 : 0xcc00830;
+            const corFinal = 0x00ffff;
 
             const colorir = colorirAngulo(angle)
                             .setValorInicial(0xff0000)
@@ -702,7 +724,7 @@ export class Fase5  extends Fase{
         function mudarTexto(){
             
             const dialogo = ["Veja o tracejado paralelo a aresta oposta ao vértice",
-                             "Ele tem uns buracos onde se encaixam ângulos",
+                             "Ele tem buracos onde se encaixam ângulos",
                              "Tente arrastar os ângulos para esses buracos"]
 
             const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0]));
@@ -754,8 +776,8 @@ export class Fase5  extends Fase{
 
 
         const dialogo = ["Veja o ângulo resultante da soma dos ângulos do triângulo,",
-                         "Ele tem 180°",
-                        "Mas será que isso vale para todo triângulo?"]
+                         "Ele forma metade de um círculo",
+                        "Se um círculo tem 360°, então quantos graus tem metade de um círculo?"]
         
         //Clica automaticamente no vértice, desligando seu output e resetando o triângulo
         const desligarTracejado = () => fase.outputClickVertice.forEach(output => (output.ativado)? output.update({clicado:true}) : null);
@@ -767,6 +789,17 @@ export class Fase5  extends Fase{
                           .setOnTermino(desligarTracejado)
                           .setDelay(100)
 
-        fase.animar(new AnimacaoSequencial(anim1,anim2,anim3))
+                          
+        const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : false)
+                                               .filter(indice => !!indice)[0];
+                          
+        const vertice = fase.triangulo.vertices[index];
+
+        const circulo = new Circle(vertice.getPosition(), 0.714);
+        
+        const desenharCirculo = new DesenharMalha(circulo, fase.scene).setDuration(250);
+        
+        fase.animar(new AnimacaoSequencial(anim1,new AnimacaoSimultanea(anim2,desenharCirculo),anim3))
+        
     }
 }

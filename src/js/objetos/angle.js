@@ -176,4 +176,9 @@ export class Angle extends Objeto{
     igual(angulo){
         return Math.round(angulo.degrees - this.degrees) == 0
     }
+
+    copia(){
+        console.log(this.index)
+        return new Angle(this.vertices, this.index);
+    }
 }

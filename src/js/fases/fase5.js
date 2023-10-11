@@ -121,6 +121,8 @@ export class Fase5  extends Fase{
 
     }
 
+    //Configurações que ligam inputs aos outputs
+    //Basicamente os controles de cada estado da fase
     Configuracao1(){
 
         const fase = this;
@@ -159,7 +161,9 @@ export class Fase5  extends Fase{
         const vertices           = fase.triangulo.vertices;
         const angles             = fase.triangulo.angles;
 
-        //Para cada vértice diferente do selecionado, adiciona output moverVertice
+        //Para cada vértice diferente do selecionado, vertice.draggable:
+        //adiciona output moverVertice, atualizar triângulo e atualizar criarTracejado
+
         vertices.forEach((vertice, index) => {
             
             //Output criar tracejado continua no vértice selecionado, para desligar
@@ -170,8 +174,15 @@ export class Fase5  extends Fase{
 
             vertice.draggable.addObserver(fase.outputMoverVertice[index]);
 
+
+            const atualizarTriangulo = new Output()
+                                      .setUpdateFunction(estado => {
+                                            if(estado.dragging) 
+                                                fase.triangulo.update();
+                                      })
+
             //Vértice arrastado atualiza triângulo
-            vertice.draggable.addObserver(fase.triangulo);
+            vertice.draggable.addObserver(atualizarTriangulo);
 
             //Vértice arrastado notifica esse criarTracejado
             vertice.draggable.addObserver(criarTracejado);
@@ -306,6 +317,8 @@ export class Fase5  extends Fase{
     //     }
     // }
 
+
+    //Outputs abaixo
     criarMovimentacaoDeAngulo = (angle) => {
 
 
@@ -612,35 +625,6 @@ export class Fase5  extends Fase{
             fase.hoverInvisivel2 = new Hoverable(anguloInvisivel2, fase.camera)
         }
 
-        //liga os inputs hover dos ângulos invisíveis ao output dragAngle
-        //liga os inputs hover dos ângulos invisiveis errados ao output ERRADO(tremedeira)
-        function ligarHitboxHoverInputAoOutputDragAngle(){
-            fase.outputDragAngle.forEach((output,index) => {
-
-                //Apenas liga se o ângulo for o mesmo
-                const angle             = fase.triangulo.angles[index];
-                const escolheuErrado    = fase.outputEscolheuErrado[index];
-
-                if(angle.igual(anguloInvisivel1)) {
-                    anguloInvisivel1.hoverable.addObserver(output); //liga o input hoverable do angulo invisivel ao output drag do angulo real
-                    angle.correspondente = anguloInvisivel1;
-                }
-                else{
-                    anguloInvisivel1.hoverable.addObserver(escolheuErrado) // se não for, liga para o output "ERRADO"
-                    angle.draggable.addObserver(escolheuErrado);
-                }
-
-                if(angle.igual(anguloInvisivel2)) {
-                    anguloInvisivel2.hoverable.addObserver(output); //liga o input hoverable do angulo invisivel ao output drag do angulo real
-                    angle.correspondente = anguloInvisivel2;            
-                }
-                else{
-                    anguloInvisivel2.hoverable.addObserver(escolheuErrado) // se não for, liga para o output "ERRADO"
-                    angle.draggable.addObserver(escolheuErrado);
-                }
-            })
-        }
-
         //Anima o desenhar tracejado
         function animacaoTracejado(posicao,vetorTracejado1,vetorTracejado2){
 
@@ -665,45 +649,6 @@ export class Fase5  extends Fase{
         }
 
 
-        function desativarTracejados(outputAtual){
-
-            //Tira o output dos hoversInvisíveis antigos
-            fase.hoverInvisivel1.removeObservers();
-            fase.hoverInvisivel2.removeObservers();
-
-            for(const output of fase.outputClickVertice){
-                
-                if(output == outputAtual) continue; //ignora se é o vertice clicado atual
-                
-                //Desativa o ultimo vértice selecionado, 
-                //como se tivesse clicado de novo
-                //Já que clicar duas vezes desativa
-                if(output.ativado) output.update({clicado:true}) 
-            }
-
-        }
-
-        //Ativa o arraste dos outros vértices e desativa seus click tracejado
-        function ativarMoverOutrosVertices(outputCriarTracejado){
-            
-            fase.triangulo.vertices.map((vertice,index) => {
-
-                if(vertice != vertex){
-
-                    vertice.clickable.removeObservers()
-
-                    //Vértice não selecionado pode ser arrastado
-                    vertice.draggable.addObserver(fase.outputMoverVertice[index]);
-
-                    vertice.draggable.addObserver(fase.triangulo);
-
-                    //Vértice arrastado notifica esse criarTracejado
-                    vertice.draggable.addObserver(outputCriarTracejado);
-
-                }
-
-            })
-        }
     }
 
     //Criar output negar ângulo errado (tremedeira + voltar ao inicio)
@@ -771,6 +716,68 @@ export class Fase5  extends Fase{
 
             fase.animar(giro);
             fase.animar(mover);
+        }
+    }
+
+    //No primeiro click dos vértices, muda o texto
+    //Roda apenas uma vez
+    primeiroClick(){
+
+        //Inputs: os 3 criarTracejados -> quando um deles atualiza, notifica esse output também
+
+        const fase = this;
+
+        return new Output(fase.outputClickVertice)
+               .setUpdateFunction(function(novoEstado){
+
+
+                    this.estado = {...this.estado, ...novoEstado}
+
+                    const estado = this.estado;
+
+                    if(estado.finalizado) return;
+
+                    if(estado.ativado){
+
+                        estado.finalizado = true;
+
+                        mudarTexto();
+                    }
+               })
+
+        //Funções auxiliares
+        function mudarTexto(){
+            
+            // const dialogo = ["Veja o tracejado paralelo a aresta oposta ao vértice",
+            //                  "Ele tem buracos onde se encaixam ângulos",
+            //                  "Tente arrastar os ângulos para esses buracos"]
+
+            const dialogo = ["Veja esse novo tracejado e a aresta que liga os outros dois vértices",
+                             "Ele é paralelo a ela, isso vale para qualquer triângulo",
+                             "Tente arrastar os vértices não clicados por exemplo"]
+
+            const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0])).setDelay(200);
+            const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1]));
+            const anim3 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[2]));
+
+
+            const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : -1)
+                                                   .filter(indice => indice != -1)[0];
+
+            const arestaOposta  = fase.triangulo.edges[(index+1)%3];
+
+            const corInicial = arestaOposta.material.color;
+
+            const colorirAresta = colorirAngulo(arestaOposta)
+                                  .setValorInicial(corInicial)
+                                  .setValorFinal(0xcf2200)
+                                  .setDuration(100)
+                                  .setDelay(200)
+                                  .setCurva(x =>-(Math.cos(Math.PI * x) - 1) / 2)
+                                  .filler(100)
+
+
+            fase.animar(new AnimacaoSequencial(new AnimacaoSimultanea(colorirAresta,anim1),anim2, anim3.setOnTermino(() => arestaOposta.material.color = corInicial)));
         }
     }
 
@@ -873,89 +880,6 @@ export class Fase5  extends Fase{
     }
 
     //Funções, outputs etc. usados nos problemas
-
-    //No primeiro click dos vértices, muda o texto
-    //Roda apenas uma vez
-    primeiroClick(){
-
-        //Inputs: os 3 criarTracejados -> quando um deles atualiza, notifica esse output também
-
-        const fase = this;
-
-        return new Output(fase.outputClickVertice)
-               .setUpdateFunction(function(novoEstado){
-
-
-                    this.estado = {...this.estado, ...novoEstado}
-
-                    const estado = this.estado;
-
-                    // console.log(estado, "this")
-
-                    if(estado.finalizado) return;
-
-                    if(estado.ativado){
-
-                        estado.finalizado = true;
-
-                        mudarTexto();
-                        // ativarArraste(); 
-                    }
-               })
-
-        //Funções auxiliares
-        function mudarTexto(){
-            
-            // const dialogo = ["Veja o tracejado paralelo a aresta oposta ao vértice",
-            //                  "Ele tem buracos onde se encaixam ângulos",
-            //                  "Tente arrastar os ângulos para esses buracos"]
-
-            const dialogo = ["Veja esse novo tracejado e a aresta que liga os outros dois vértices",
-                             "Ele é paralelo a ela, isso vale para qualquer triângulo",
-                             "Tente arrastar os vértices não clicados por exemplo"]
-
-            const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0])).setDelay(200);
-            const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1]));
-            const anim3 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[2]));
-
-
-            const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : -1)
-                                                   .filter(indice => indice != -1)[0];
-
-            const arestaOposta  = fase.triangulo.edges[(index+1)%3];
-
-            const corInicial = arestaOposta.material.color;
-
-            const colorirAresta = colorirAngulo(arestaOposta)
-                                  .setValorInicial(corInicial)
-                                  .setValorFinal(0xcf2200)
-                                  .setDuration(100)
-                                  .setDelay(200)
-                                  .setCurva(x =>-(Math.cos(Math.PI * x) - 1) / 2)
-                                  .filler(100)
-
-
-            fase.animar(new AnimacaoSequencial(new AnimacaoSimultanea(colorirAresta,anim1),anim2, anim3.setOnTermino(() => arestaOposta.material.color = corInicial)));
-        }
-
-        function ativarArraste(){
-
-            const arrastouVertice = new Output().setUpdateFunction((estado) => {
-                
-                if(estado.dragging) fase.jaArrastouVertice = true
-            })
-
-            fase.outputMoverVertice.map(output => output.addObserver(arrastouVertice));
-
-            //Liga os outputs do arraste aos inputs do angle
-            for (let i = 0; i < 3; ++i) {
-
-                // const angulo = fase.triangulo.angles[i];
-
-                // angulo.draggable.addObserver(fase.outputDragAngle[i]);
-            }
-        }
-    }
 
     animar180Graus(){
 

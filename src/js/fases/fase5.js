@@ -42,8 +42,10 @@ export class Fase5  extends Fase{
 
         this.createInputs();
         this.createOutputs();
-        this.ligarInputAoOutput();
         this.setupTextBox();
+        this.Configuracao1(); //É uma versão generalizada do ligar Input ao Output
+
+        this.informacao = {}
 
         this.levelDesign();
     }
@@ -85,7 +87,6 @@ export class Fase5  extends Fase{
             
     }
 
-
     createInputs(){
         //Inputs
         const vertices = this.triangulo.vertices;
@@ -109,44 +110,201 @@ export class Fase5  extends Fase{
 
     }
 
-    ligarInputAoOutput(){
+    resetarInputs(){
 
         const vertices = this.triangulo.vertices;
         const angles   = this.triangulo.angles;
+
+        vertices.map(vertice => vertice.draggable.removeObservers());
+        vertices.map(vertice => vertice.clickable.removeObservers());
+        angles.map(  angle => angle.draggable.removeObservers());
+
+    }
+
+    Configuracao1(){
+
+        const fase = this;
+
+        fase.resetarInputs();
+        
+
+        //Ligações feitas: click vertice => cria tracejado
+
+        const vertices = fase.triangulo.vertices;
+        const angles   = fase.triangulo.angles;
 
         //Liga o vertice.clickable input ao output
         for (let i = 0; i < 3; ++i) {
 
             const vertice = vertices[i];
 
-            vertice.clickable.addObserver(this.outputClickVertice[i])
-        }
-
-        //Liga o angulo.draggable ao output do draggable
-        for (let i = 0; i < 3; ++i) {
-
-            const angulo = angles[i];
-
-            angulo.draggable.addObserver(this.outputDragAngle[i]);
+            vertice.clickable.addObserver(fase.outputClickVertice[i])
         }
     }
 
-    desligarOutputs(){
-        //Desliga os outputs dos inputs
-        this.outputClickVertice.map(  output => output.removeInputs());
-        this.outputDragAngle.map(     output => output.removeInputs());
-        this.outputEscolheuErrado.map(output => output.removeInputs());
-        this.outputMoverVertice.map(  output => output.removeInputs());
+    Configuracao2(informacao){
+
+        const fase = this;
+
+        fase.resetarInputs();
+
+        fase.informacao = {...fase.informacao, ...informacao};
+
+        console.log(informacao, fase.informacao)
+
+        const verticeSelecionado = fase.informacao.verticeSelecionado;
+        const criarTracejado     = fase.informacao.criarTracejadoSelecionado;
+        const angulosInvisiveis  = fase.informacao.angulosInvisiveis;
+
+        const vertices           = fase.triangulo.vertices;
+        const angles             = fase.triangulo.angles;
+
+        //Para cada vértice diferente do selecionado, adiciona output moverVertice
+        vertices.forEach((vertice, index) => {
+            
+            //Output criar tracejado continua no vértice selecionado, para desligar
+            if(vertice == verticeSelecionado){ 
+                verticeSelecionado.clickable.addObserver(criarTracejado);
+                return;
+            }
+
+            vertice.draggable.addObserver(fase.outputMoverVertice[index]);
+
+            //Vértice arrastado atualiza triângulo
+            vertice.draggable.addObserver(fase.triangulo);
+
+            //Vértice arrastado notifica esse criarTracejado
+            vertice.draggable.addObserver(criarTracejado);
+        })
+
+        //angle.draggable => outputDragAngle
+        angles.forEach((angle, index) => {
+            angle.draggable.addObserver(fase.outputDragAngle[index])
+        })
+
+        //invisivel.hoverable => outputDragAngle
+        //invisivel.hoverable => outputErrado
+        //Liga os hoverables dos angulos invisíveis ao arraste
+        //As combinações angulo real invisivel corretas são ligadas ao outputDragAngle
+        //As combinações erradas são ligadas ao output escolheu errado
+        fase.outputDragAngle.forEach((arraste,index) => {
+
+            //Apenas liga se o ângulo for o mesmo
+            const angle             = fase.triangulo.angles[index];
+            const escolheuErrado    = fase.outputEscolheuErrado[index];
+
+            angulosInvisiveis.forEach(anguloInvisivel => {
+
+                if(angle.igual(anguloInvisivel)) {
+                    anguloInvisivel.hoverable.addObserver(arraste); //liga o input hoverable do angulo invisivel ao output drag do angulo real
+                    angle.correspondente = anguloInvisivel;
+                }
+                else{
+                    anguloInvisivel.hoverable.addObserver(escolheuErrado) // se não for, liga para o output "ERRADO"
+                    angle.draggable.addObserver(escolheuErrado);
+                }
+            })
+        })
+
+
+
+        //Finalmente, um pequeno output para verificar se o vertice foi arastado
+        //Só funciona uma vez
+        if(fase.jaArrastouVertice) return;
+
+        const arrastouVertice = new Output().setUpdateFunction((estado) => {   
+            if(estado.dragging) fase.jaArrastouVertice = true
+        })
+
+        fase.outputMoverVertice.map(output => output.addObserver(arrastouVertice));
+
 
     }
 
-    resetOutputs(){
+    Configuracao3(informacao){
 
-        //Reseta os estados dos outputs
-        this.outputClickVertice.map(  output => output.estado = {})
-        this.outputDragAngle.map(     output => output.estado = {})
-        this.outputEscolheuErrado.map(output => output.estado = {})
+        const fase = this;
+
+        fase.resetarInputs();
+
+        fase.Configuracao2({}); //Passa nenhuma informação nova, usa a mesma configuração
+
+        fase.informacao = {...fase.informacao, ...informacao};
+        
+
+        const angle              = fase.informacao.anguloSelecionado;
+        const copia              = fase.informacao.copiaDoAngulo;
+        const verticeSelecionado = fase.informacao.verticeSelecionado;
+        
+        //Output atualiza a copia
+        const atualizarCopia = new Output().setUpdateFunction((estado) => {
+            if(estado.dragging){
+
+                console.log(atualizarCopia)
+                
+                copia.removeFromScene();
+
+                const material = copia.mesh.material.clone();
+
+                copia = angle.copia();
+
+                copia.material = material;
+
+                copia.render().addToScene(fase.scene)
+
+                copia.mesh.position.copy(vertice.mesh.position)
+
+                copia.mesh.quaternion.copy(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI))
+            }
+        })
+
+        const deletarCopia = new Output().setUpdateFunction(function(estado){
+            if(estado.clicado){
+                this.removeInputs();
+
+                copia.removeFromScene();
+
+                angle.material.color = 0xff0000;
+
+                atualizarCopia.removeInputs();
+            }
+        })
+
+        verticeSelecionado.clickable.addObserver(deletarCopia) //Deleta a copia ao desativar o criarTracejado
+        // fase.outputMoverVertice.map(output => output.removeInputs());
+        fase.outputMoverVertice.map(output => output.addObserver(atualizarCopia)); //Atualiza copia ao mover vértice
+        fase.outputEscolheuErrado[angle.index].removeInputs(); //Não consegue errar mais pois já está selecionado
     }
+
+    Configuracao4(){
+
+        const fase = this;
+
+        fase.resetarInputs();
+    }
+
+    //Agora é a configuração 1
+    // ligarInputAoOutput(){
+
+    //     const vertices = this.triangulo.vertices;
+    //     const angles   = this.triangulo.angles;
+
+    //     //Liga o vertice.clickable input ao output
+    //     for (let i = 0; i < 3; ++i) {
+
+    //         const vertice = vertices[i];
+
+    //         vertice.clickable.addObserver(this.outputClickVertice[i])
+    //     }
+
+    //     //Liga o angulo.draggable ao output do draggable
+    //     for (let i = 0; i < 3; ++i) {
+
+    //         const angulo = angles[i];
+
+    //         angulo.draggable.addObserver(this.outputDragAngle[i]);
+    //     }
+    // }
 
     criarMovimentacaoDeAngulo = (angle) => {
 
@@ -206,8 +364,7 @@ export class Fase5  extends Fase{
 
                             //Muda os outputs que o angulo aceita( não pode ser mais arrastado)
                             //Adiciona um output que atualiza a copia no arraste
-                            mudarOutputs(angle,copia);
-                            // console.log(fase)
+                            fase.Configuracao3({anguloSelecionado: angle, copiaDoAngulo: copia});
 
                             return;
                         }
@@ -302,56 +459,6 @@ export class Fase5  extends Fase{
             
             fase.animar(colorir);               
         }
-
-        function mudarOutputs(){
-
-            const index = fase.outputClickVertice.map((output,index) => (output.estado.ativado)? index : -1)
-                                                 .filter(indice => indice != -1)[0]
-
-            const atualizarCopia = new Output().setUpdateFunction((estado) => {
-                if(estado.dragging){
-
-                    console.log(atualizarCopia)
-                    
-                    copia.removeFromScene();
-
-                    const material = copia.mesh.material.clone();
-
-                    copia = angle.copia();
-
-                    copia.material = material;
-
-                    copia.render().addToScene(fase.scene)
-
-                    copia.mesh.position.copy(vertice.mesh.position)
-
-                    copia.mesh.quaternion.copy(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI))
-                }
-            })
-
-            const vertice = fase.triangulo.vertices[index];
-
-            const deletarCopia = new Output().setUpdateFunction(function(estado){
-                if(estado.clicado){
-                    this.removeInputs();
-
-                    copia.removeFromScene();
-
-                    angle.material.color = 0xff0000;
-
-                    atualizarCopia.removeInputs();
-                }
-            })
-
-            vertice.clickable.addObserver(deletarCopia)
-
-
-            fase.outputMoverVertice.map(output => output.removeInputs());
-            //Adicona output update copia e desativa drag
-            fase.outputMoverVertice.map(output => output.addObserver(atualizarCopia));
-
-            fase.outputEscolheuErrado[angle.index].removeInputs();
-        }
     }
 
     criarTracejado = (vertex) => {
@@ -394,9 +501,6 @@ export class Fase5  extends Fase{
                             anguloInvisivel1.removeFromScene(fase.scene)
                             anguloInvisivel2.removeFromScene(fase.scene)
 
-                            fase.desligarOutputs(); 
-                            fase.ligarInputAoOutput();
-
                             const posicao = vertex.mesh.position.clone();
                             const vetorTracejado1 = outros_dois[0].mesh.position.clone().sub(outros_dois[1].mesh.position.clone());
                             const vetorTracejado2 = outros_dois[1].mesh.position.clone().sub(outros_dois[0].mesh.position.clone());
@@ -404,9 +508,13 @@ export class Fase5  extends Fase{
                             //Funções auxiliares, estão logo abaixo do return
                             criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2);
 
-                            ligarHitboxHoverInputAoOutputDragAngle();
+                            // ativarMoverOutrosVertices(this);
 
-                            ativarMoverOutrosVertices(this);
+                            fase.Configuracao2({
+                                verticeSelecionado: vertex, 
+                                criarTracejadoSelecionado: this,
+                                angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
+                            });
 
                             tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1.multiplyScalar(3)), posicao.clone().add(vetorTracejado1.multiplyScalar(3)))
 
@@ -426,19 +534,17 @@ export class Fase5  extends Fase{
                             const posicao = vertex.mesh.position.clone();
                             const vetorTracejado1 = outros_dois[0].mesh.position.clone().sub(outros_dois[1].mesh.position.clone());
                             const vetorTracejado2 = outros_dois[1].mesh.position.clone().sub(outros_dois[0].mesh.position.clone());
-                            
-                            const tracejadoJaExistente = fase.hoverInvisivel1 != null;
-
-                            if(tracejadoJaExistente) desativarTracejados(this) //Se já tiver um tracejado existe, desativa ele
 
                             //Funções auxiliares, estão logo abaixo do return
                             criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2);
 
-                            ligarHitboxHoverInputAoOutputDragAngle()
-
                             animacaoTracejado(posicao,vetorTracejado1,vetorTracejado2);
 
-                            ativarMoverOutrosVertices(this);
+                            fase.Configuracao2({
+                                verticeSelecionado: vertex, 
+                                criarTracejadoSelecionado: this,
+                                angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
+                            })
 
                         } else if (estado.clicado) {
 
@@ -450,12 +556,8 @@ export class Fase5  extends Fase{
                             anguloInvisivel2.removeFromScene(fase.scene)
                             
                             //Reseta outputs para sua configuração inicial
-                            fase.desligarOutputs(); 
-                            fase.resetOutputs();
-                            fase.ligarInputAoOutput();
+                            fase.Configuracao1({})
                             
-                            fase.triangulo.vertices.map(vertice => vertice.draggable.removeObservers())
-
                             fase.triangulo.removeFromScene();
                             fase.triangulo.addToScene(fase.scene);
                         }
@@ -706,8 +808,8 @@ export class Fase5  extends Fase{
 
             consequencia: (fase) =>{
 
-                // desativa o arraste inicialmente, até clicar no vértice
-                fase.outputDragAngle.map(output => output.removeInputs());
+                // // desativa o arraste inicialmente, até clicar no vértice
+                // fase.outputDragAngle.map(output => output.removeInputs());
 
                 //Muda texto quando o player clica no primeiro vértice e ativa o arraste
                 fase.clicouPrimeiroVertice  = fase.primeiroClick();   
@@ -758,7 +860,7 @@ export class Fase5  extends Fase{
 
                 fase.animar180Graus();
 
-                fase.outputDragAngle.map(output => output.removeInputs());
+                fase.Configuracao4();
 
             },
 
@@ -797,7 +899,7 @@ export class Fase5  extends Fase{
                         estado.finalizado = true;
 
                         mudarTexto();
-                        ativarArraste(); 
+                        // ativarArraste(); 
                     }
                })
 
@@ -838,16 +940,19 @@ export class Fase5  extends Fase{
 
         function ativarArraste(){
 
+            const arrastouVertice = new Output().setUpdateFunction((estado) => {
+                
+                if(estado.dragging) fase.jaArrastouVertice = true
+            })
+
+            fase.outputMoverVertice.map(output => output.addObserver(arrastouVertice));
+
             //Liga os outputs do arraste aos inputs do angle
             for (let i = 0; i < 3; ++i) {
 
-                const angulo = fase.triangulo.angles[i];
+                // const angulo = fase.triangulo.angles[i];
 
-                angulo.draggable.addObserver(fase.outputDragAngle[i]);
-
-                const arrastouVertice = new Output().setUpdateFunction(() => fase.jaArrastouVertice = true)
-
-                fase.outputMoverVertice.map(output => output.addObserver(arrastouVertice));
+                // angulo.draggable.addObserver(fase.outputDragAngle[i]);
             }
         }
     }

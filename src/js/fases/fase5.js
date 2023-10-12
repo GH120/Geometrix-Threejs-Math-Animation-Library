@@ -133,7 +133,6 @@ export class Fase5  extends Fase{
         //Ligações feitas: click vertice => cria tracejado
 
         const vertices = fase.triangulo.vertices;
-        const angles   = fase.triangulo.angles;
 
         //Liga o vertice.clickable input ao output
         for (let i = 0; i < 3; ++i) {
@@ -142,6 +141,9 @@ export class Fase5  extends Fase{
 
             vertice.clickable.addObserver(fase.outputClickVertice[i])
         }
+
+        //Reseta o estado do output, nenhum ângulo selecionado
+        fase.outputDragAngle.map(output => output.estado = {});
     }
 
     Configuracao2(informacao){
@@ -275,7 +277,12 @@ export class Fase5  extends Fase{
 
                 copia.removeFromScene();
 
-                angle.material.color = 0xff0000;
+                console.log(angle)
+
+                //Por que isso? analisar depois...
+                angle.material = new THREE.MeshBasicMaterial({color: 0xff0000});
+
+                angle.update();
 
                 atualizarCopia.removeInputs();
             }

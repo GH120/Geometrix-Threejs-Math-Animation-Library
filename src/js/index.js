@@ -21,3 +21,46 @@ const programa = new Fase5();
 
 //Inicia o loop de animação
 programa.start();
+
+
+const criarCartas = function(){
+
+    const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
+    const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"];
+    
+    const deck = [];
+    
+    for (const suit of suits) {
+        for (const value of values) {
+            deck.push(`${value} of ${suit}`);
+        }
+    }
+
+    const cardContainer = document.createElement("div");
+
+    cardContainer.style.position = "absolute";
+    cardContainer.style.right = 0;
+    cardContainer.style.bottom  = "170px";
+
+    let shift = 0;
+    let depth = 100;
+
+    for (const card of deck) {
+        const cardDiv = document.createElement("div");
+        cardDiv.classList.add("card");
+        cardDiv.textContent = card;
+
+        cardDiv.style.position = "absolute";
+        cardDiv.style.depth    = `${depth--}px` ;
+        cardDiv.style.right    = `${shift+= 4}px`;
+
+        cardContainer.appendChild(cardDiv);
+    }
+
+    console.log(cardContainer)
+
+    document.body.append(cardContainer)
+
+}
+
+// criarCartas()

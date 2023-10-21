@@ -95,6 +95,23 @@ table {
             border: none;
             background-color: #ccc;
         }
+
+        .card {
+            width: 100px;
+            height: 150px;
+            vertical-align: middle;
+            background-color: white;
+            border: 1px solid #ccc;
+            display: inline;
+            margin: 10px;
+            transition: transform 0.3s, z-index 0.1s; /* Added z-index transition */
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-20px);
+            z-index: 1; /* Change z-index to bring the card to the top */
+        }
       
         .listafases {
             margin: 1em 0 0em;

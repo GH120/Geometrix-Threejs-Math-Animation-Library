@@ -23,6 +23,7 @@ import { Output } from '../outputs/Output';
 import Circle from '../objetos/circle';
 import DesenharMalha from '../animacoes/desenharMalha';
 import { Poligono } from '../objetos/poligono';
+import { apagarObjeto } from '../animacoes/apagarObjeto';
 
 export class Fase6 extends Fase{
 
@@ -37,7 +38,7 @@ export class Fase6 extends Fase{
             [0,2,0]
         ])
         .render()
-        .addToScene(this.scene);
+        // .addToScene(this.scene);
 
 
         this.trigonometria = [];
@@ -57,7 +58,7 @@ export class Fase6 extends Fase{
 
         
         const dialogo = ["Polígonos são figuras geométricas muito conhecidas",
-                         "Triângulos, quadrados, pentagonos e etc.",
+                         "Triângulos, quadrados, pentagonos...",
                          "Todos eles tem em comum terem pontos, os vertices",
                          "ligados por arestas, linhas",
     ]
@@ -73,15 +74,25 @@ export class Fase6 extends Fase{
 
         const animacoesTextos = [];
 
-        textos.forEach((texto) => {
-            animacoesTextos.push(
-                new TextoAparecendo(this.text.element)
-                    .setOnStart(
-                        () => {
-                            this.changeText(texto);
-                        })
-                    .setDelay(100)
-            )
+        const efeitos = {
+            0: this.animCreateVertices,
+            2: this.animColorirVertices
+        };
+
+        textos.forEach((texto, index) => {
+
+            const efeito = efeitos[index];
+
+            const dialogo = new TextoAparecendo(this.text.element)
+                            .setOnStart(
+                                () => {
+                                    this.changeText(texto);
+                                })
+                            .setDelay(20);
+
+            const dialogoMaisEfeito = (efeito)? new AnimacaoSimultanea(dialogo, efeito.bind(this)()) : dialogo
+
+            animacoesTextos.push(dialogoMaisEfeito)
         })
         
         //Bug de threads consertado, usar setAnimações toda vez que lidar com listas de animações
@@ -131,6 +142,45 @@ export class Fase6 extends Fase{
     Configuracao1(){
 
         
+    }
+
+    animCreateVertices(){
+        // .addToScene(this.scene);
+
+        this.poligono.inserirVertice(3, [1,3,0])
+
+        const verticesAnim = this.poligono.vertices.map((vertice,index) => apagarObjeto(vertice).reverse().setDuration(50 + 50*index));
+
+        const arestasAnim  = this.poligono.edges.map((edge, index) => apagarObjeto(edge)
+                                                                     .reverse()
+                                                                     .setProgresso(0)
+                                                                     .setDuration(30)
+                                                                     .filler(40*-(Math.cos(Math.PI * index/4) - 1) / 2)
+                                                                     .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+                                                     )
+
+        const mostrarVertices = new AnimacaoSimultanea()
+                                .setAnimacoes(verticesAnim)
+                                .setOnStart(() => this.poligono.vertices.map(vertice => vertice.addToScene(this.scene)));
+
+        const mostrarArestas  = new AnimacaoSimultanea()
+                                .setAnimacoes(arestasAnim)
+                                .setOnStart(() => this.poligono.edges.map(edge => edge.addToScene(this.scene)));
+        
+        const animacaoConjunta = new AnimacaoSequencial(mostrarVertices, mostrarArestas);
+
+        return animacaoConjunta;
+        
+    }
+
+    animColorirVertices(){
+
+        const colorirVertice = (vertice) => colorirAngulo(vertice).setValorInicial(0x8c8c8c)
+        
+        const animacoes = this.poligono.vertices.map(vertice => new AnimacaoSequencial(colorirVertice(vertice), colorirVertice(vertice).reverse()))
+
+        return new AnimacaoSimultanea().setAnimacoes(animacoes);
+
     }
 
     animar(animacao){

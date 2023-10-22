@@ -160,6 +160,17 @@ export default class Animacao {
                                       this
                                      );
     }
+
+    reverse(){
+
+        const inicial = this.valorInicial;
+        
+        this.valorInicial = this.valorFinal;
+        this.valorFinal   = inicial;
+        
+        console.log(this.valorInicial, this.valorFinal)
+        return this;
+    }
 }
 
 export class AnimacaoSimultanea extends Animacao{

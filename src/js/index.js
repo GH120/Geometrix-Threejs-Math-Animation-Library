@@ -13,11 +13,12 @@ import { Addition, Equality, Multiplication, Square, Value, Variable } from './e
 import { Operations } from './equations/operations';
 import { Fase5 } from './fases/fase5';
 import { Programa } from './programa';
+import { Fase6 } from './fases/fase6';
 
 //Adicionar interface de colisão => hover.objeto = objeto, hover.objeto.hitbox -> angulo.hitbox returns angulo.mesh
 //triangulo.hitbox = new Plane().setPosition(triangulo.center)
 
-const programa = new Fase5();
+const programa = new Fase6();
 
 //Inicia o loop de animação
 programa.start();

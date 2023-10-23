@@ -168,7 +168,6 @@ export default class Animacao {
         this.valorInicial = this.valorFinal;
         this.valorFinal   = inicial;
         
-        console.log(this.valorInicial, this.valorFinal)
         return this;
     }
 }
@@ -203,8 +202,6 @@ export class AnimacaoSimultanea extends Animacao{
         this.frames =   animacoes.map(animacao => animacao.frames + animacao.delay)
                                  .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
 
-        console.log(this.frames,this.delay)
-
         const actions = animacoes.map(animacao => animacao.getFrames());
 
         //Avança os frames simultâneamente das animações
@@ -229,7 +226,7 @@ export class AnimacaoSimultanea extends Animacao{
     setAnimacoes(animacoes){
         this.animacoes = animacoes;
         this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
-                               .reduce((acumulado, atual) => acumulado + atual, 0)
+                               .reduce((maior, atual) => (maior > atual)? maior : atual, 0)
         return this;
     }
 
@@ -282,6 +279,9 @@ export class AnimacaoSequencial extends Animacao{
         this.onStart();
 
         const animacoes = this.animacoes;
+
+        this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
+                               .reduce((acumulado, atual) => acumulado + atual, 0)
         
         const completedActions = [];
 
@@ -318,6 +318,7 @@ export class AnimacaoSequencial extends Animacao{
     //** Quando for colocar uma lista de animações [anim1,anim2,anim3,anim4...] ao invés de um spread */
     setAnimacoes(animacoes){
         this.animacoes = animacoes;
+
         this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
                                .reduce((acumulado, atual) => acumulado + atual, 0)
         return this;

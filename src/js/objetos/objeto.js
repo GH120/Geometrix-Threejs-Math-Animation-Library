@@ -1,3 +1,5 @@
+import * as THREE from 'three'
+
 export class Objeto{
 
     //Cria a malha do objeto
@@ -7,6 +9,14 @@ export class Objeto{
     //Retira a malha da cena, atualiza a malha e adicioca ela de novo a cena
     update(){
 
+        this.position = this.mesh.position.clone();
+        // this.rotation
+
+        this.scene.remove(this.mesh);
+
+        this.render();
+
+        this.scene.add(this.mesh);
     }
 
     //Adiciona a malha a cena e seta a cena do objeto
@@ -60,7 +70,13 @@ export class Objeto{
         const novo = new Objeto();
         novo.mesh = mesh;
         novo.hitbox = mesh;
-        novo.material = mesh.material;
+        novo.material = mesh.material.clone();
+        novo.geometry = mesh.geometry.clone();
+
+        novo.render = () => {
+            novo.mesh = new THREE.Mesh(novo.geometry, novo.material);
+            novo.mesh.position.copy(novo.position);
+        }
         return novo
     }
 

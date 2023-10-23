@@ -40,6 +40,8 @@ export class Fase6 extends Fase{
         .render()
         // .addToScene(this.scene);
 
+        this.poligono.inserirVertice(3, [1,3,0])
+
 
         this.trigonometria = [];
 
@@ -75,8 +77,13 @@ export class Fase6 extends Fase{
         const animacoesTextos = [];
 
         const efeitos = {
-            0: this.animCreateVertices,
-            2: this.animColorirVertices
+            0: () => this.animCreateVertices(this.poligono),
+
+            1: this.animCriarPoligonos,
+            
+            2: this.animColorirVertices,
+            
+            3: this.animColorirArestas
         };
 
         textos.forEach((texto, index) => {
@@ -88,9 +95,13 @@ export class Fase6 extends Fase{
                                 () => {
                                     this.changeText(texto);
                                 })
-                            .setDelay(20);
+                            .setDelay(100);
 
             const dialogoMaisEfeito = (efeito)? new AnimacaoSimultanea(dialogo, efeito.bind(this)()) : dialogo
+
+            dialogoMaisEfeito.frames += 100 // corrigir bug 64.1 frames 
+
+            console.log(dialogoMaisEfeito)
 
             animacoesTextos.push(dialogoMaisEfeito)
         })
@@ -98,7 +109,9 @@ export class Fase6 extends Fase{
         //Bug de threads consertado, usar setAnimações toda vez que lidar com listas de animações
         //Do tipo [anim1,anim2,anim3,anim4...]
         const sequencial = new AnimacaoSequencial().setAnimacoes(animacoesTextos);
-        
+
+        sequencial.frames += 100
+
         return sequencial;
             
     }
@@ -144,14 +157,12 @@ export class Fase6 extends Fase{
         
     }
 
-    animCreateVertices(){
+    animCreateVertices(poligono){
         // .addToScene(this.scene);
 
-        this.poligono.inserirVertice(3, [1,3,0])
+        const verticesAnim = poligono.vertices.map((vertice,index) => apagarObjeto(vertice).reverse().setDuration(50 + 50*index));
 
-        const verticesAnim = this.poligono.vertices.map((vertice,index) => apagarObjeto(vertice).reverse().setDuration(50 + 50*index));
-
-        const arestasAnim  = this.poligono.edges.map((edge, index) => apagarObjeto(edge)
+        const arestasAnim  = poligono.edges.map((edge, index) => apagarObjeto(edge)
                                                                      .reverse()
                                                                      .setProgresso(0)
                                                                      .setDuration(30)
@@ -161,11 +172,11 @@ export class Fase6 extends Fase{
 
         const mostrarVertices = new AnimacaoSimultanea()
                                 .setAnimacoes(verticesAnim)
-                                .setOnStart(() => this.poligono.vertices.map(vertice => vertice.addToScene(this.scene)));
+                                .setOnStart(() => poligono.vertices.map(vertice => vertice.addToScene(this.scene)));
 
         const mostrarArestas  = new AnimacaoSimultanea()
                                 .setAnimacoes(arestasAnim)
-                                .setOnStart(() => this.poligono.edges.map(edge => edge.addToScene(this.scene)));
+                                .setOnStart(() => poligono.edges.map(edge => edge.addToScene(this.scene)));
         
         const animacaoConjunta = new AnimacaoSequencial(mostrarVertices, mostrarArestas);
 
@@ -173,13 +184,49 @@ export class Fase6 extends Fase{
         
     }
 
+    animCriarPoligonos(){
+
+        const triangulo = new Poligono([[-4,0,0],[-2,0,0],[-2,2,0]]).render()
+
+        const quadrado  = new Poligono([[-3,-3,0],[-3,-1.5,0],[-1.5,-1.5,0], [-1.5, -3, 0]]).render();
+
+        this.poligonos = [triangulo, quadrado];
+
+        return new AnimacaoSimultanea(
+            this.animCreateVertices(triangulo),
+            this.animCreateVertices(quadrado)
+        )
+
+    }
+
     animColorirVertices(){
 
-        const colorirVertice = (vertice) => colorirAngulo(vertice).setValorInicial(0x8c8c8c)
+        const colorirVertice = (vertice) => colorirAngulo(vertice)
+                                            .setValorInicial(0x8c8c8c)
+                                            .setValorFinal(0xff0000)
+                                            .setDuration(30)
+                                            .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+                                            .voltarAoInicio(false)
         
-        const animacoes = this.poligono.vertices.map(vertice => new AnimacaoSequencial(colorirVertice(vertice), colorirVertice(vertice).reverse()))
+        const animacoes = this.poligono.vertices.map(vertice => new AnimacaoSequencial(colorirVertice(vertice).setDelay(140), colorirVertice(vertice).reverse()))
 
         return new AnimacaoSimultanea().setAnimacoes(animacoes);
+
+    }
+
+    animColorirArestas(){
+
+        const colorirAresta = (aresta) => colorirAngulo(aresta)
+                                            .setValorInicial(0xe525252)
+                                            .setDuration(30)
+                                            .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+                                            .voltarAoInicio(false)
+        
+        const animacoes = this.poligono.edges.map(edge => new AnimacaoSequencial(colorirAresta(edge).setDelay(100), colorirAresta(edge).reverse()))
+
+        const simultanea = new AnimacaoSimultanea().setAnimacoes(animacoes);
+
+        return simultanea;
 
     }
 

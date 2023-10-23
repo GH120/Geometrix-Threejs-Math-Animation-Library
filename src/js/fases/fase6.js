@@ -24,6 +24,7 @@ import Circle from '../objetos/circle';
 import DesenharMalha from '../animacoes/desenharMalha';
 import { Poligono } from '../objetos/poligono';
 import { apagarObjeto } from '../animacoes/apagarObjeto';
+import { mover } from '../animacoes/mover';
 
 export class Fase6 extends Fase{
 
@@ -39,6 +40,7 @@ export class Fase6 extends Fase{
         ])
         .render()
         // .addToScene(this.scene);
+
 
         this.poligono.inserirVertice(3, [1,3,0])
 
@@ -63,6 +65,7 @@ export class Fase6 extends Fase{
                          "Triângulos, quadrados, pentagonos...",
                          "Todos eles tem em comum terem pontos, os vertices",
                          "ligados por arestas, linhas",
+                         "Um poligono regular é aquele onde seus lados são iguais",
     ]
 
         const anim1 = this.firstAnim(dialogo);
@@ -83,7 +86,9 @@ export class Fase6 extends Fase{
             
             2: this.animColorirVertices,
             
-            3: this.animColorirArestas
+            3: this.animColorirArestas,
+
+            4: this.animCriarPentagono
         };
 
         textos.forEach((texto, index) => {
@@ -180,7 +185,11 @@ export class Fase6 extends Fase{
         
         const animacaoConjunta = new AnimacaoSequencial(mostrarVertices, mostrarArestas);
 
-        return animacaoConjunta;
+        return animacaoConjunta.setOnTermino(() => {
+            this.poligono.addToScene(this.scene);
+
+            this.poligono.angles.map(angle => angle.removeFromScene())
+        });
         
     }
 
@@ -207,8 +216,11 @@ export class Fase6 extends Fase{
                                             .setDuration(30)
                                             .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
                                             .voltarAoInicio(false)
+
+
+        const vertices  = this.poligono.vertices.concat(this.poligonos[0].vertices).concat(this.poligonos[1].vertices);
         
-        const animacoes = this.poligono.vertices.map(vertice => new AnimacaoSequencial(colorirVertice(vertice).setDelay(140), colorirVertice(vertice).reverse()))
+        const animacoes = vertices.map(vertice => new AnimacaoSequencial(colorirVertice(vertice).setDelay(140), colorirVertice(vertice).reverse()))
 
         return new AnimacaoSimultanea().setAnimacoes(animacoes);
 
@@ -221,12 +233,55 @@ export class Fase6 extends Fase{
                                             .setDuration(30)
                                             .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
                                             .voltarAoInicio(false)
+
+        const arestas  = this.poligono.edges.concat(this.poligonos[0].edges).concat(this.poligonos[1].edges);
         
-        const animacoes = this.poligono.edges.map(edge => new AnimacaoSequencial(colorirAresta(edge).setDelay(100), colorirAresta(edge).reverse()))
+        const animacoes = arestas.map(edge => new AnimacaoSequencial(colorirAresta(edge).setDelay(100), colorirAresta(edge).reverse()))
 
         const simultanea = new AnimacaoSimultanea().setAnimacoes(animacoes);
 
         return simultanea;
+
+    }
+
+    animCriarPentagono(){
+
+        const objetos = this.poligonos.flatMap(poligono => poligono.edges.concat(poligono.vertices));
+
+        const apagarExemplos = new AnimacaoSimultanea().setAnimacoes(objetos.map(objeto => apagarObjeto(objeto)));
+
+        const sin = (inteiro) => Math.sin(Math.PI*inteiro/5);
+        const cos = (inteiro) => Math.cos(Math.PI*inteiro/5);
+
+        let novasPosicoes = [
+            [sin(2),  cos(2),  0],
+            [sin(4),  cos(4),  0],
+            [sin(6),  cos(6),  0],
+            [sin(8),  cos(8),  0],
+            [sin(10), cos(10), 0]
+        ];
+
+        novasPosicoes = novasPosicoes.map(posicao => new THREE.Vector3(...posicao));
+
+        const movimentos = this.poligono.vertices.map((vertice, index) => mover(vertice, vertice.getPosition(), novasPosicoes[index])
+                                                                         .voltarAoInicio(false)
+                                                                        //  .filler(50*-(Math.cos(Math.PI * index) - 1) / 2)
+                                                    )
+
+
+        const atualizarPoligono = new Animacao(this.poligono)
+                                 .setInterpolacao(() => null)
+                                 .setUpdateFunction(() => {
+                                    this.poligono.edges.map(edge => edge.removeFromScene())
+                                    this.poligono.renderEdges();
+                                    this.poligono.edges.map(edge => edge.addToScene(this.scene))
+
+                                 })
+                                 .setDuration(500)
+
+        const moverVertices = new AnimacaoSimultanea().setAnimacoes(movimentos);
+        
+        return new AnimacaoSimultanea(apagarExemplos, moverVertices, atualizarPoligono);
 
     }
 

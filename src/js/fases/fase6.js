@@ -25,6 +25,7 @@ import DesenharMalha from '../animacoes/desenharMalha';
 import { Poligono } from '../objetos/poligono';
 import { apagarObjeto } from '../animacoes/apagarObjeto';
 import { mover } from '../animacoes/mover';
+import { Edge } from '../objetos/edge';
 
 export class Fase6 extends Fase{
 
@@ -66,6 +67,7 @@ export class Fase6 extends Fase{
                          "Todos eles tem em comum terem pontos, os vertices",
                          "ligados por arestas, linhas",
                          "Um poligono regular é aquele onde seus lados são iguais",
+                         "Faça imediatamente",
     ]
 
         const anim1 = this.firstAnim(dialogo);
@@ -88,7 +90,9 @@ export class Fase6 extends Fase{
             
             3: this.animColorirArestas,
 
-            4: this.animCriarPentagono
+            4: this.animCriarPentagono,
+
+            5: this.animMostrarIgualdadeLado
         };
 
         textos.forEach((texto, index) => {
@@ -281,7 +285,81 @@ export class Fase6 extends Fase{
 
         const moverVertices = new AnimacaoSimultanea().setAnimacoes(movimentos);
         
-        return new AnimacaoSimultanea(apagarExemplos, moverVertices, atualizarPoligono);
+        return new AnimacaoSimultanea(apagarExemplos, moverVertices, atualizarPoligono).setOnTermino(() => this.animMostrarIgualdadeLado());
+
+    }
+
+    animMostrarIgualdadeLado(){
+
+        const vertice1  = this.poligono.vertices[0];
+        const vertice2  = this.poligono.vertices[1];
+        const vertice3  = this.poligono.vertices[2];
+        const vertice4  = this.poligono.vertices[3];
+        const vertice5  = this.poligono.vertices[4];
+ 
+        const lado = new Edge(vertice1.getPosition(),vertice2.getPosition());
+
+        console.log("lado", lado)
+
+
+
+        return this.animGirarLado(lado, vertice1, vertice2, vertice3, vertice2)
+    }
+
+    animGirarLado(lado, origem, destino, origem2, pivot){
+
+        var quaternion = new THREE.Quaternion();
+
+        var vectorA;
+        var vectorB;
+        var vectorC;
+
+        var length;
+
+        const scene = this.scene;
+
+        const pivoNaOrigem = lado.origem.equals(pivot.getPosition())
+
+        return new Animacao(lado)
+               .setInterpolacao(new THREE.Vector3().lerpVectors)
+               .setUpdateFunction(function(interpolado){
+
+                    console.log(posicao, interpolado, )
+
+                    const posicao = pivot.getPosition().add(interpolado.multiplyScalar(length))
+
+                    if(pivoNaOrigem){
+
+                        lado.destino = posicao
+                    }
+                    else{
+                        lado.origem  = posicao
+                    }
+
+                    lado.update()
+               })
+               .setOnStart(function(){
+
+
+                    lado = new Edge(origem.getPosition(), destino.getPosition())
+
+                    lado.addToScene(scene);
+
+                    // Define vectors A, B, and C
+                    vectorA = pivot.getPosition();  // Replace with your values
+                    vectorB = origem.getPosition();  // Replace with your values
+                    vectorC = origem2.getPosition();  // Replace with your values
+
+                    length = new THREE.Vector3().subVectors(vectorB, destino.getPosition()).length();
+
+                    // Calculate normalized vectors from A to B and A to C
+                    vectorB.subVectors(vectorB, vectorA).normalize();
+                    vectorC.subVectors(vectorC, vectorA).normalize();
+
+                    this.setValorInicial(vectorB.clone());
+                    this.setValorFinal(vectorC.clone())
+                })
+               .setDuration(200)
 
     }
 

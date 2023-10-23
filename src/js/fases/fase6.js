@@ -250,8 +250,8 @@ export class Fase6 extends Fase{
 
         const apagarExemplos = new AnimacaoSimultanea().setAnimacoes(objetos.map(objeto => apagarObjeto(objeto)));
 
-        const sin = (inteiro) => Math.sin(Math.PI*inteiro/5);
-        const cos = (inteiro) => Math.cos(Math.PI*inteiro/5);
+        const sin = (inteiro) => 1.3*Math.sin(Math.PI*inteiro/5);
+        const cos = (inteiro) => 1.3*Math.cos(Math.PI*inteiro/5);
 
         let novasPosicoes = [
             [sin(2),  cos(2),  0],

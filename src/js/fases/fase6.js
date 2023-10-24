@@ -67,7 +67,7 @@ export class Fase6 extends Fase{
                          "Todos eles tem em comum terem pontos, os vertices",
                          "ligados por arestas, linhas",
                          "Um poligono regular é aquele onde seus lados são iguais",
-                         "Faça imediatamente",
+                         "Veja:",
     ]
 
         const anim1 = this.firstAnim(dialogo);
@@ -301,14 +301,29 @@ export class Fase6 extends Fase{
 
         console.log("lado", lado)
 
+        const colorir = colorirAngulo(lado)
+                        .setValorInicial(0x525252)
+                        .setValorInicial(0xff0000)
+                        .voltarAoInicio(false)
+                        .setOnStart(() => {
+                            lado.addToScene(this.scene);
+                            lado.origem  = vertice1.getPosition();
+                            lado.destino = vertice2.getPosition();
+                            lado.update();
+                        })
 
 
-        return this.animGirarLado(lado, vertice1, vertice2, vertice3, vertice2)
+
+        return new AnimacaoSequencial(
+            colorir,
+            this.animGirarLado(lado, vertice1, vertice2, vertice3, vertice2),
+            this.animGirarLado(lado, vertice2, vertice3, vertice4, vertice3),
+            this.animGirarLado(lado, vertice3, vertice4, vertice5, vertice4),
+            this.animGirarLado(lado, vertice4, vertice5, vertice1, vertice5),
+        )
     }
 
     animGirarLado(lado, origem, destino, origem2, pivot){
-
-        var quaternion = new THREE.Quaternion();
 
         var vectorA;
         var vectorB;
@@ -321,12 +336,10 @@ export class Fase6 extends Fase{
         const pivoNaOrigem = lado.origem.equals(pivot.getPosition())
 
         return new Animacao(lado)
-               .setInterpolacao(new THREE.Vector3().lerpVectors)
+               .setInterpolacao((inicio,final,peso) => new THREE.Vector3().lerpVectors(inicio,final, peso).normalize())
                .setUpdateFunction(function(interpolado){
 
-                    console.log(posicao, interpolado, )
-
-                    const posicao = pivot.getPosition().add(interpolado.multiplyScalar(length))
+                    const posicao = pivot.getPosition().add(interpolado.clone().multiplyScalar(length))
 
                     if(pivoNaOrigem){
 
@@ -336,28 +349,31 @@ export class Fase6 extends Fase{
                         lado.origem  = posicao
                     }
 
-                    lado.update()
+                    lado.update();
+
+                    console.log(lado.length)
                })
                .setOnStart(function(){
 
 
-                    lado = new Edge(origem.getPosition(), destino.getPosition())
-
-                    lado.addToScene(scene);
+                    lado.origem  = origem.getPosition();
+                    lado.destino = destino.getPosition();
+                    lado.update();
 
                     // Define vectors A, B, and C
                     vectorA = pivot.getPosition();  // Replace with your values
                     vectorB = origem.getPosition();  // Replace with your values
                     vectorC = origem2.getPosition();  // Replace with your values
-
-                    length = new THREE.Vector3().subVectors(vectorB, destino.getPosition()).length();
-
+                    
+                    
                     // Calculate normalized vectors from A to B and A to C
-                    vectorB.subVectors(vectorB, vectorA).normalize();
-                    vectorC.subVectors(vectorC, vectorA).normalize();
+                    vectorB.subVectors(vectorB, vectorA);
+                    vectorC.subVectors(vectorC, vectorA);
 
-                    this.setValorInicial(vectorB.clone());
-                    this.setValorFinal(vectorC.clone())
+                    length = vectorB.length();
+
+                    this.setValorInicial(vectorB.clone().normalize());
+                    this.setValorFinal(vectorC.clone().normalize())
                 })
                .setDuration(200)
 
@@ -376,6 +392,10 @@ export class Fase6 extends Fase{
 
     update(){
 
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
         this.frames.map(frame => frame.next()); //Roda as animações do programa
 
         if(!this.progresso) this.progresso = "start";

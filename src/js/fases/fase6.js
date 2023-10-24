@@ -67,7 +67,7 @@ export class Fase6 extends Fase{
                          "Todos eles tem em comum terem pontos, os vertices",
                          "ligados por arestas, linhas",
                          "Um poligono regular é aquele onde seus lados são iguais",
-                         "Veja:",
+                         "Veja, o lado é igual a todos os outros",
     ]
 
         const anim1 = this.firstAnim(dialogo);
@@ -299,7 +299,7 @@ export class Fase6 extends Fase{
  
         const lado = new Edge(vertice1.getPosition(),vertice2.getPosition());
 
-        console.log("lado", lado)
+        lado.grossura = 0.06
 
         const colorir = colorirAngulo(lado)
                         .setValorInicial(0x525252)
@@ -321,6 +321,7 @@ export class Fase6 extends Fase{
             this.animGirarLado(lado, vertice3, vertice4, vertice5, vertice4),
             this.animGirarLado(lado, vertice4, vertice5, vertice1, vertice5),
         )
+        .setOnTermino(() => lado.removeFromScene());
     }
 
     animGirarLado(lado, origem, destino, origem2, pivot){
@@ -375,7 +376,8 @@ export class Fase6 extends Fase{
                     this.setValorInicial(vectorB.clone().normalize());
                     this.setValorFinal(vectorC.clone().normalize())
                 })
-               .setDuration(200)
+               .setDuration(100)
+               .setDelay(25)
 
     }
 
@@ -393,10 +395,14 @@ export class Fase6 extends Fase{
     update(){
 
         this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        // this.frames.map(frame => frame.next()); //Roda as animações do programa
+        // this.frames.map(frame => frame.next()); //Roda as animações do programa
+        // this.frames.map(frame => frame.next()); //Roda as animações do programa
+        // this.frames.map(frame => frame.next()); //Roda as animações do programa
+        // this.frames.map(frame => frame.next()); //Roda as animações do programa
+        // this.frames.map(frame => frame.next()); //Roda as animações do programa
+        // this.frames.map(frame => frame.next()); //Roda as animações do programa
+        // this.frames.map(frame => frame.next()); //Roda as animações do programa
 
         if(!this.progresso) this.progresso = "start";
 

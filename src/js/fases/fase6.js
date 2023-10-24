@@ -132,7 +132,6 @@ export class Fase6 extends Fase{
 
         //Adiciona o clickable ao vertice, agora todo vertice tem vertice.clicable
         vertices.forEach((vertice) => new Clickable(vertice, this.camera));
-        vertices.forEach((vertice) => new Draggable(vertice, this.camera));
 
         //Adiciona o draggable ao angulo, agora todo angulo tem angulo.draggable
         angles.map((angle) => new Draggable(angle, this.camera));
@@ -141,10 +140,7 @@ export class Fase6 extends Fase{
 
     createOutputs(){
         //Outputs
-        // this.outputClickVertice   = this.poligono.vertices.map(vertex =>   this.criarTracejado(vertex))
-        // this.outputDragAngle      = this.poligono.angles.map(  angle =>    this.criarMovimentacaoDeAngulo(angle))
-        // this.outputEscolheuErrado = this.poligono.angles.map(  angle =>    this.outputAnguloErrado(angle))
-        // this.outputMoverVertice   = this.poligono.vertices.map(vertice => new MoverVertice(vertice));
+        this.outputCriarTriangulo = this.poligono.vertices.map(vertex => this.selecionarVertice(vertex))
 
     }
 
@@ -153,9 +149,7 @@ export class Fase6 extends Fase{
         const vertices = this.poligono.vertices;
         const angles   = this.poligono.angles;
 
-        vertices.map(vertice => vertice.draggable.removeObservers());
         vertices.map(vertice => vertice.clickable.removeObservers());
-        angles.map(  angle => angle.draggable.removeObservers());
 
     }
 
@@ -163,6 +157,119 @@ export class Fase6 extends Fase{
     //Basicamente os controles de cada estado da fase
     Configuracao1(){
 
+        this.resetarInputs();
+
+        var index = 0;
+        for(const vertice of this.poligono.vertices){
+            const criarTriangulo = this.outputCriarTriangulo[index];
+
+            vertice.clickable.addObserver(criarTriangulo);
+
+            index++;
+        }
+    }
+
+    Configuracao2(informacao){
+
+        this.resetarInputs();
+
+        //Adicionar tracejados?
+
+        this.informacao = {...this.informacao, ...informacao};
+
+        const selecionados = this.informacao.VerticesSelecionados;
+
+
+
+        var index = 0;
+        for(const vertice of this.poligono.vertices){
+            
+            if(vertice in selecionados) continue;
+
+            const adicionarVertice = this.adicionarVertice[index];
+
+            vertice.clickable.addObserver(adicionarVertice);
+
+            index++;
+        }
+
+        index = 0;
+        for(const vertice of this.poligono.vertices){
+            
+            if(!(vertice in selecionados)) continue;
+
+            const removerVertice = this.removerVertice[index];
+
+            vertice.clickable.addObserver(removerVertice);
+
+            index++;
+        }
+    }
+
+    Configuracao3(){
+
+        this.resetarInputs();
+
+        var index = 0;
+        for(const vertice of this.poligono.vertices){
+            const criarTriangulo = this.outputCriarTriangulo[index];
+
+            vertice.clickable.addObserver(criarTriangulo);
+
+            index++;
+        }
+    }
+
+    //Outputs
+    selecionarVertice(vertice){
+
+        const fase = this;
+        
+        return new Output()
+               .setUpdateFunction(function(estadoNovo){
+
+                    this.estado = {...this.estado, ...estadoNovo};
+
+                    const estado = this.estado;
+
+                    if(estado.clicado){
+
+                        fase.Configuracao2({
+                            VerticesSelecionados: [vertice, ]
+                        });
+
+                        console.log(this.informacao)
+                    }
+               })
+    }
+
+    adicionarVertice(vertice){
+
+        const fase = this;
+
+        return new Output()
+               .setUpdateFunction(function(estadoNovo){
+
+                    this.estado = {...this.estado, ...estadoNovo};
+
+                    const estado = this.estado;
+
+                    const selecionados = this.informacao.VerticesSelecionados;
+
+                    if(estado.clicado){
+
+                        selecionados.push(vertice);
+                        console.log(this.informacao)
+
+                    }
+
+                    if(selecionados.length >= 3){
+                        fase.Configuracao3();
+                    }
+               })
+    }
+
+    removerVertice(vertice){
         
     }
 

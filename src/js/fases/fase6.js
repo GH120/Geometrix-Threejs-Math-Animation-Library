@@ -51,7 +51,6 @@ export class Fase6 extends Fase{
         this.createInputs();
         this.createOutputs();
         this.setupTextBox();
-        this.Configuracao1(); //É uma versão generalizada do ligar Input ao Output
 
         this.informacao = {}
 
@@ -115,8 +114,6 @@ export class Fase6 extends Fase{
         //Do tipo [anim1,anim2,anim3,anim4...]
         const sequencial = new AnimacaoSequencial().setAnimacoes(animacoesTextos);
 
-        console.log(sequencial, "isso")
-
         return sequencial;
             
     }
@@ -137,13 +134,12 @@ export class Fase6 extends Fase{
     createOutputs(){
         //Outputs
         this.outputCriarTriangulo = this.poligono.vertices.map(vertex => this.selecionarVertice(vertex))
-
+        this.outputAdicionarVertice = this.poligono.vertices.map(vertex => this.adicionarVertice(vertex))
     }
 
     resetarInputs(){
 
         const vertices = this.poligono.vertices;
-        const angles   = this.poligono.angles;
 
         vertices.map(vertice => vertice.clickable.removeObservers());
 
@@ -169,37 +165,35 @@ export class Fase6 extends Fase{
 
         this.resetarInputs();
 
-        //Adicionar tracejados?
+        // Adicionar tracejados?
 
         this.informacao = {...this.informacao, ...informacao};
 
         const selecionados = this.informacao.VerticesSelecionados;
-
-
 
         var index = 0;
         for(const vertice of this.poligono.vertices){
             
             if(vertice in selecionados) continue;
 
-            const adicionarVertice = this.adicionarVertice[index];
+            const adicionarVertice = this.outputAdicionarVertice[index];
 
             vertice.clickable.addObserver(adicionarVertice);
 
             index++;
         }
 
-        index = 0;
-        for(const vertice of this.poligono.vertices){
+        // index = 0;
+        // for(const vertice of this.poligono.vertices){
             
-            if(!(vertice in selecionados)) continue;
+        //     if(!(vertice in selecionados)) continue;
 
-            const removerVertice = this.removerVertice[index];
+        //     const removerVertice = this.removerVertice[index];
 
-            vertice.clickable.addObserver(removerVertice);
+        //     vertice.clickable.addObserver(removerVertice);
 
-            index++;
-        }
+        //     index++;
+        // }
     }
 
     Configuracao3(){
@@ -228,13 +222,16 @@ export class Fase6 extends Fase{
 
                     const estado = this.estado;
 
+                    console.log(estado)
+
                     if(estado.clicado){
 
                         fase.Configuracao2({
                             VerticesSelecionados: [vertice, ]
                         });
 
-                        console.log(this.informacao)
+                         vertice.mesh.material = new THREE.MeshBasicMaterial({color:0xff0000})
+
                     }
                })
     }
@@ -250,12 +247,14 @@ export class Fase6 extends Fase{
 
                     const estado = this.estado;
 
-                    const selecionados = this.informacao.VerticesSelecionados;
+                    const selecionados = fase.informacao.VerticesSelecionados;
 
                     if(estado.clicado){
 
                         selecionados.push(vertice);
-                        console.log(this.informacao)
+                        console.log(fase.informacao)
+
+                        vertice.mesh.material = new THREE.MeshBasicMaterial({color:0xff0000})
 
                     }
 
@@ -394,6 +393,8 @@ export class Fase6 extends Fase{
 
     animMostrarIgualdadeLado(){
 
+        const fase = this;
+
         const vertice1  = this.poligono.vertices[0];
         const vertice2  = this.poligono.vertices[1];
         const vertice3  = this.poligono.vertices[2];
@@ -424,7 +425,10 @@ export class Fase6 extends Fase{
             this.animGirarLado(lado, vertice3, vertice4, vertice5, vertice4),
             this.animGirarLado(lado, vertice4, vertice5, vertice1, vertice5).setDelay(100),
         )
-        .setOnTermino(() => lado.removeFromScene())
+        .setOnTermino(() => {
+            lado.removeFromScene();
+            fase.Configuracao1(); //Inicializa a configuração 1 dos controles
+        })
     }
 
     animGirarLado(lado, origem, destino, origem2, pivot){
@@ -498,14 +502,14 @@ export class Fase6 extends Fase{
     update(){
 
         this.frames.map(frame => frame.next()); //Roda as animações do programa
-        // this.frames.map(frame => frame.next()); //Roda as animações do programa
-        // this.frames.map(frame => frame.next()); //Roda as animações do programa
-        // this.frames.map(frame => frame.next()); //Roda as animações do programa
-        // this.frames.map(frame => frame.next()); //Roda as animações do programa
-        // this.frames.map(frame => frame.next()); //Roda as animações do programa
-        // this.frames.map(frame => frame.next()); //Roda as animações do programa
-        // this.frames.map(frame => frame.next()); //Roda as animações do programa
-        // this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
 
         if(!this.progresso) this.progresso = "start";
 

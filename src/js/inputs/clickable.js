@@ -14,12 +14,14 @@ export class Clickable extends Input{
 
   onClick(event) {
 
+    console.log(this.object)
+
     const point = this.intersectouObjeto(event, this.object);
 
     const selecionado = !!point;
 
     //Notifica todos os observadores da nova posição
-    this.notify({clicado: selecionado});
+    this.notify({clicado: selecionado, ponto:point});
     
   }
 }

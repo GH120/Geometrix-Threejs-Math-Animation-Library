@@ -139,6 +139,10 @@ export default class Animacao {
         return this;
     }
 
+    calcularFrames(){
+        
+    }
+
     static simultanea(...animacoes){
         return new AnimacaoSimultanea(animacoes);
     }
@@ -199,8 +203,7 @@ export class AnimacaoSimultanea extends Animacao{
 
         const animacoes = this.animacoes;
 
-        this.frames =   animacoes.map(animacao => animacao.frames + animacao.delay)
-                                 .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
+        this.calcularFrames();
 
         const actions = animacoes.map(animacao => animacao.getFrames());
 
@@ -225,9 +228,20 @@ export class AnimacaoSimultanea extends Animacao{
     //** Quando for colocar uma lista de animações [anim1,anim2,anim3,anim4...] ao invés de um spread */
     setAnimacoes(animacoes){
         this.animacoes = animacoes;
-        this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
-                               .reduce((maior, atual) => (maior > atual)? maior : atual, 0)
+       
+        this.calcularFrames();
+
         return this;
+    }
+
+    calcularFrames(){
+
+        const animacoes = this.animacoes;
+
+        animacoes.map(animacao => animacao.calcularFrames());
+
+        this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
+                               .reduce((maior, atual) => (maior > atual)? maior : atual, 0)+animacoes.length;
     }
 
     setDuration(frames){
@@ -280,8 +294,7 @@ export class AnimacaoSequencial extends Animacao{
 
         const animacoes = this.animacoes;
 
-        this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
-                               .reduce((acumulado, atual) => acumulado + atual, 0)
+        this.calcularFrames();
         
         const completedActions = [];
 
@@ -319,8 +332,8 @@ export class AnimacaoSequencial extends Animacao{
     setAnimacoes(animacoes){
         this.animacoes = animacoes;
 
-        this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
-                               .reduce((acumulado, atual) => acumulado + atual, 0)
+        this.calcularFrames();
+
         return this;
     }
 
@@ -333,6 +346,16 @@ export class AnimacaoSequencial extends Animacao{
         this.animacoes.map(animacao => animacao.setProgresso(progresso));
 
         return this;
+    }
+
+    calcularFrames(){
+
+        const animacoes = this.animacoes;
+
+        this.animacoes.map(animacao => animacao.calcularFrames());
+
+        this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
+                               .reduce((acumulado, atual) => acumulado + atual, 0) + animacoes.length;
     }
 
     setDelay(delay){

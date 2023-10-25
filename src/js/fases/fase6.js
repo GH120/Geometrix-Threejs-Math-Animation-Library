@@ -108,10 +108,6 @@ export class Fase6 extends Fase{
 
             const dialogoMaisEfeito = (efeito)? new AnimacaoSimultanea(dialogo, efeito.bind(this)()) : dialogo
 
-            dialogoMaisEfeito.frames += 100 // corrigir bug 64.1 frames 
-
-            console.log(dialogoMaisEfeito)
-
             animacoesTextos.push(dialogoMaisEfeito)
         })
         
@@ -119,7 +115,7 @@ export class Fase6 extends Fase{
         //Do tipo [anim1,anim2,anim3,anim4...]
         const sequencial = new AnimacaoSequencial().setAnimacoes(animacoesTextos);
 
-        sequencial.frames += 100
+        console.log(sequencial, "isso")
 
         return sequencial;
             
@@ -426,9 +422,9 @@ export class Fase6 extends Fase{
             this.animGirarLado(lado, vertice1, vertice2, vertice3, vertice2),
             this.animGirarLado(lado, vertice2, vertice3, vertice4, vertice3),
             this.animGirarLado(lado, vertice3, vertice4, vertice5, vertice4),
-            this.animGirarLado(lado, vertice4, vertice5, vertice1, vertice5),
+            this.animGirarLado(lado, vertice4, vertice5, vertice1, vertice5).setDelay(100),
         )
-        .setOnTermino(() => lado.removeFromScene());
+        .setOnTermino(() => lado.removeFromScene())
     }
 
     animGirarLado(lado, origem, destino, origem2, pivot){
@@ -459,7 +455,6 @@ export class Fase6 extends Fase{
 
                     lado.update();
 
-                    console.log(lado.length)
                })
                .setOnStart(function(){
 
@@ -485,6 +480,7 @@ export class Fase6 extends Fase{
                 })
                .setDuration(100)
                .setDelay(25)
+               .voltarAoInicio(false);
 
     }
 

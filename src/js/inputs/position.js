@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Input } from './Input';
 
-export class Hoverable extends Input {
+export class Position extends Input {
 
   constructor(object, camera) {
 
@@ -16,14 +16,10 @@ export class Hoverable extends Input {
 
     const colision = this.intersectouObjeto(event,this.object);
 
-    const isInside = !!colision;
-
-    //Ignora se continua no mesmo estado
-    if(this.isInside == isInside) return;
+    if(!colision) return;
 
     //Manda os observadores atualizarem
-    this.notify({dentro: isInside, position: colision.point});
+    this.notify({position: colision.point});
 
-    this.isInside = isInside;
   }
 }

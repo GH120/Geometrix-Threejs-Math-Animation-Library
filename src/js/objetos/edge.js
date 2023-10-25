@@ -13,7 +13,7 @@ export class Edge extends Objeto{
         this.material = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.grossura = 0.05;
 
-        this.render();
+        if(origem && destino) this.render();
     }
 
     render(){

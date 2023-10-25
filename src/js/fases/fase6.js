@@ -26,6 +26,8 @@ import { Poligono } from '../objetos/poligono';
 import { apagarObjeto } from '../animacoes/apagarObjeto';
 import { mover } from '../animacoes/mover';
 import { Edge } from '../objetos/edge';
+import { Objeto } from '../objetos/objeto';
+import { Position } from '../inputs/position';
 
 export class Fase6 extends Fase{
 
@@ -120,21 +122,32 @@ export class Fase6 extends Fase{
 
     createInputs(){
         //Inputs
-        const vertices = this.poligono.vertices;
-        const angles   = this.poligono.angles;
+        const vertices     = this.poligono.vertices;
 
         //Adiciona o clickable ao vertice, agora todo vertice tem vertice.clicable
         vertices.forEach((vertice) => new Clickable(vertice, this.camera));
+        
+        const plano        = Objeto.fromMesh(new THREE.Mesh(
+            new THREE.PlaneGeometry(100,100),
+            new THREE.MeshBasicMaterial({color:0xffffff})
+        ))
+        
+        this.plano = plano;
 
-        //Adiciona o draggable ao angulo, agora todo angulo tem angulo.draggable
-        angles.map((angle) => new Draggable(angle, this.camera));
-
+        new Position(plano, this.camera);
     }
 
     createOutputs(){
+
+        const vertices   = this.poligono.vertices;
+
+        const tracejados = vertices.map(v => new Tracejado().addToScene(this.scene))
+
+
         //Outputs
-        this.outputCriarTriangulo = this.poligono.vertices.map(vertex => this.selecionarVertice(vertex))
-        this.outputAdicionarVertice = this.poligono.vertices.map(vertex => this.adicionarVertice(vertex))
+        this.outputCriarTriangulo    =  vertices.map(vertex => this.selecionarVertice(vertex))
+        this.outputAdicionarVertice  =  vertices.map(vertex => this.adicionarVertice(vertex))
+        this.outputDesenharTracejado =  vertices.map((vertex, index) => this.desenharTracejado(vertex, tracejados[index]))
     }
 
     resetarInputs(){
@@ -183,17 +196,32 @@ export class Fase6 extends Fase{
             index++;
         }
 
-        // index = 0;
-        // for(const vertice of this.poligono.vertices){
-            
-        //     if(!(vertice in selecionados)) continue;
+        this.Configuracao2b({})
+    }
 
-        //     const removerVertice = this.removerVertice[index];
+    //Ativa o desenhar tracejado dos vertices selecionados
+    Configuracao2b(informacao){
 
-        //     vertice.clickable.addObserver(removerVertice);
+        this.plano.position.removeObservers();
 
-        //     index++;
-        // }
+
+        this.informacao = {...this.informacao, ...informacao};
+
+        const selecionados = this.informacao.VerticesSelecionados.slice(-1);
+
+
+        var index = 0;
+        for(const vertice of this.poligono.vertices){
+
+            const desenharTracejado = this.outputDesenharTracejado[index];
+
+            if(selecionados.includes(vertice)){
+
+                this.plano.position.addObserver(desenharTracejado);
+
+            }
+            index++;
+        }
     }
 
     Configuracao3(){
@@ -230,7 +258,7 @@ export class Fase6 extends Fase{
                             VerticesSelecionados: [vertice, ]
                         });
 
-                         vertice.mesh.material = new THREE.MeshBasicMaterial({color:0xff0000})
+                         vertice.mesh.material = new THREE.MeshBasicMaterial({color:0xff00ff})
 
                     }
                })
@@ -251,11 +279,11 @@ export class Fase6 extends Fase{
 
                     if(estado.clicado){
 
-                        selecionados.push(vertice);
-                        console.log(fase.informacao)
-
                         vertice.mesh.material = new THREE.MeshBasicMaterial({color:0xff0000})
 
+                        fase.Configuracao2b({
+                            VerticesSelecionados: [...selecionados, vertice]
+                        })
                     }
 
                     if(selecionados.length >= 3){
@@ -266,6 +294,32 @@ export class Fase6 extends Fase{
 
     removerVertice(vertice){
         
+    }
+
+    desenharTracejado(vertice, tracejado){
+
+        //Input hover do plano, diz a posição do mouse
+
+        const fase = this;
+
+        return new Output()
+               .setUpdateFunction(function(novoEstado){
+
+                    this.estado = {...this.estado, novoEstado};
+
+                    const estado = novoEstado;
+
+                    //Pega tracejado e desenha ele do vértice até a posição do mouse
+                    //Desenha um tracejado desse vértice até o ponto
+
+                    tracejado.origem  = vertice.getPosition();
+
+                    tracejado.destino = estado.position;
+
+                    console.log(estado.position)
+
+                    tracejado.update();
+               })
     }
 
     animCreateVertices(poligono){

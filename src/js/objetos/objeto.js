@@ -77,7 +77,6 @@ export class Objeto{
             novo.mesh = new THREE.Mesh(novo.geometry, novo.material);
             novo.mesh.position.copy(novo.position);
             novo.hitbox = novo.mesh;
-            novo.hitbox = novo.mesh;
         }
         return novo
     }

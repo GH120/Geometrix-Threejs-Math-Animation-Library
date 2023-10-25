@@ -14,8 +14,6 @@ export class Clickable extends Input{
 
   onClick(event) {
 
-    console.log(this.object)
-
     const point = this.intersectouObjeto(event, this.object);
 
     const selecionado = !!point;

@@ -296,8 +296,6 @@ export class Fase6 extends Fase{
 
                     if(selecionados.length >= 3){
 
-                        //Desenhar triângulo com os vértices
-                        //Remover tracejados
                         desenharTriangulo();
 
                         fase.Configuracao3();
@@ -326,11 +324,17 @@ export class Fase6 extends Fase{
             // const triangulo = new Triangle(posicoes.map(posicao => posicao.toArray()));
             const geometry = new THREE.BufferGeometry().setFromPoints(posicoes);
             const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });  
+
+            const trianguloTransparente = new THREE.Mesh(geometry, material);
             
-            fase.scene.add(new THREE.Mesh(geometry, material));
+            fase.scene.add(trianguloTransparente);
 
-            console.log(fase.scene)
+            const animarAparecendo = apagarObjeto(Objeto.fromMesh(trianguloTransparente))
+                                    .reverse()
+                                    .setDuration(2000)
+                                    .setValorFinal(0.5)
 
+            fase.animar(animarAparecendo)
         }
     }
 

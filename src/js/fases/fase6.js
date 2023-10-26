@@ -156,6 +156,9 @@ export class Fase6 extends Fase{
         const vertices = this.poligono.vertices;
 
         vertices.map(vertice => vertice.clickable.removeObservers());
+        vertices.map(vertice => vertice.hoverable.removeObservers());
+
+        this.plano.hoverposition.removeObservers();
 
     }
 
@@ -211,7 +214,7 @@ export class Fase6 extends Fase{
 
         this.informacao = {...this.informacao, ...informacao};
 
-        const selecionados = this.informacao.VerticesSelecionados.slice(-1);
+        const selecionados = this.informacao.VerticesSelecionados;
 
 
         var index = 0;
@@ -292,9 +295,43 @@ export class Fase6 extends Fase{
                     }
 
                     if(selecionados.length >= 3){
+
+                        //Desenhar triângulo com os vértices
+                        //Remover tracejados
+                        desenharTriangulo();
+
                         fase.Configuracao3();
+
                     }
                })
+
+        function desenharTriangulo(){
+
+            const vertices  = fase.informacao.VerticesSelecionados;
+
+            const posicoes  = vertices.map(vertice => vertice.getPosition())
+
+            console.log(vertices,posicoes,"ssiiiiiim")
+
+            const v1 = new THREE.Vector3().copy(posicoes[1]).sub(posicoes[0]);
+            const v2 = new THREE.Vector3().copy(posicoes[2]).sub(posicoes[0]);
+            const crossProduct = v1.cross(v2);
+
+            if(crossProduct.z < 0){
+                const temporario = posicoes[1];
+                posicoes[1] = posicoes[0];
+                posicoes[0] = temporario
+            }
+
+            // const triangulo = new Triangle(posicoes.map(posicao => posicao.toArray()));
+            const geometry = new THREE.BufferGeometry().setFromPoints(posicoes);
+            const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });  
+            
+            fase.scene.add(new THREE.Mesh(geometry, material));
+
+            console.log(fase.scene)
+
+        }
     }
 
     removerVertice(vertice){
@@ -653,6 +690,15 @@ export class Fase6 extends Fase{
 
     update(){
 
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
         this.frames.map(frame => frame.next()); //Roda as animações do programa
         this.frames.map(frame => frame.next()); //Roda as animações do programa
         this.frames.map(frame => frame.next()); //Roda as animações do programa

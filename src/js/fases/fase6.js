@@ -321,8 +321,6 @@ export class Fase6 extends Fase{
 
                     tracejado.destino = estado.position;
 
-                    console.log(estado.position)
-
                     tracejado.update();
                })
     }
@@ -389,14 +387,14 @@ export class Fase6 extends Fase{
             aresta.update();
         }
 
-        function voltarCorInicial(aresta){
+        function voltarCorInicial(){
 
             vertex.material = materialAntigoVertex;
 
             vertex.update();
 
             if(!aresta) return;
-
+            
             aresta.material = materialAntigoAresta;
 
             aresta.update();

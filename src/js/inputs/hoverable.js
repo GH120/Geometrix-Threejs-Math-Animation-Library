@@ -22,7 +22,7 @@ export class Hoverable extends Input {
     if(this.isInside == isInside) return;
 
     //Manda os observadores atualizarem
-    this.notify({dentro: isInside, position: colision.point});
+    this.notify({dentro: isInside});
 
     this.isInside = isInside;
   }

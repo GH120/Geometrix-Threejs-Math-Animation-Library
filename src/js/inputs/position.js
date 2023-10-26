@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Input } from './Input';
 
-export class Position extends Input {
+export class HoverPosition extends Input {
 
   constructor(object, camera) {
 

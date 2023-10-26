@@ -27,7 +27,7 @@ import { apagarObjeto } from '../animacoes/apagarObjeto';
 import { mover } from '../animacoes/mover';
 import { Edge } from '../objetos/edge';
 import { Objeto } from '../objetos/objeto';
-import { Position } from '../inputs/position';
+import { HoverPosition } from '../inputs/position';
 
 export class Fase6 extends Fase{
 
@@ -126,6 +126,7 @@ export class Fase6 extends Fase{
 
         //Adiciona o clickable ao vertice, agora todo vertice tem vertice.clicable
         vertices.forEach((vertice) => new Clickable(vertice, this.camera));
+        vertices.forEach((vertice) => new Hoverable(vertice, this.camera));
         
         const plano        = Objeto.fromMesh(new THREE.Mesh(
             new THREE.PlaneGeometry(100,100),
@@ -134,7 +135,7 @@ export class Fase6 extends Fase{
         
         this.plano = plano;
 
-        new Position(plano, this.camera);
+        new HoverPosition(plano, this.camera);
     }
 
     createOutputs(){
@@ -143,10 +144,10 @@ export class Fase6 extends Fase{
 
         const tracejados = vertices.map(v => new Tracejado().addToScene(this.scene))
 
-
         //Outputs
         this.outputCriarTriangulo    =  vertices.map(vertex => this.selecionarVertice(vertex))
         this.outputAdicionarVertice  =  vertices.map(vertex => this.adicionarVertice(vertex))
+        this.outputHighlightArestas  =  vertices.map((vertex,index)  => this.highlightArestas(vertex, index))
         this.outputDesenharTracejado =  vertices.map((vertex, index) => this.desenharTracejado(vertex, tracejados[index]))
     }
 
@@ -190,8 +191,11 @@ export class Fase6 extends Fase{
             if(vertice in selecionados) continue;
 
             const adicionarVertice = this.outputAdicionarVertice[index];
+            const highlightAresta  = this.outputHighlightArestas[index];
 
             vertice.clickable.addObserver(adicionarVertice);
+            vertice.hoverable.addObserver(highlightAresta);
+            vertice.clickable.addObserver(highlightAresta);
 
             index++;
         }
@@ -202,7 +206,7 @@ export class Fase6 extends Fase{
     //Ativa o desenhar tracejado dos vertices selecionados
     Configuracao2b(informacao){
 
-        this.plano.position.removeObservers();
+        this.plano.hoverposition.removeObservers();
 
 
         this.informacao = {...this.informacao, ...informacao};
@@ -217,9 +221,10 @@ export class Fase6 extends Fase{
 
             if(selecionados.includes(vertice)){
 
-                this.plano.position.addObserver(desenharTracejado);
+                this.plano.hoverposition.addObserver(desenharTracejado);
 
             }
+
             index++;
         }
     }
@@ -258,7 +263,7 @@ export class Fase6 extends Fase{
                             VerticesSelecionados: [vertice, ]
                         });
 
-                         vertice.mesh.material = new THREE.MeshBasicMaterial({color:0xff00ff})
+                         vertice.mesh.material = new THREE.MeshBasicMaterial({color:0xaa00aa})
 
                     }
                })
@@ -320,6 +325,101 @@ export class Fase6 extends Fase{
 
                     tracejado.update();
                })
+    }
+
+    highlightArestas(vertex){
+
+        //Inputs hover dos vértices para ativar a aresta
+        //       click dos vértices para fixar sua cor
+
+        const fase = this;
+
+        var aresta;
+        var materialAntigoAresta;
+        var materialAntigoVertex;
+
+        return new Output()
+               .setUpdateFunction(function(estadoNovo){
+
+                    this.estado = {...this.estado, ...estadoNovo};
+
+                    const estado = this.estado;
+
+                    if(estado.finalizado) return;
+
+                    if(!aresta) encontrarAresta();
+
+                    if(estado.dentro){
+
+                        estado.valido = true;
+
+                        mudarCor();
+                    }
+
+                    if(estado.valido && estado.clicado){
+
+                        estado.finalizado = true;
+
+                        aresta = null;
+                    }
+
+                    if(estado.valido && !estado.dentro){
+
+                        estado.valido = false;
+                        
+                        voltarCorInicial();
+                    }
+               })
+
+        //Funções auxiliares
+        function mudarCor(){
+
+            materialAntigoVertex  = vertex.material.clone();
+
+            vertex.material = new THREE.MeshBasicMaterial({color:0xcc0000});
+
+            vertex.update();
+
+            if(!aresta) return;
+
+            materialAntigoAresta  = aresta.material.clone();
+
+            aresta.material = new THREE.MeshBasicMaterial({color:0xaa2233});
+
+            aresta.update();
+        }
+
+        function voltarCorInicial(aresta){
+
+            vertex.material = materialAntigoVertex;
+
+            vertex.update();
+
+            if(!aresta) return;
+
+            aresta.material = materialAntigoAresta;
+
+            aresta.update();
+
+            console.log(aresta)
+        }
+
+        function encontrarAresta(){
+
+            const vertex2 = fase.informacao.VerticesSelecionados.slice(-1)[0];
+
+            const arestasValidas = fase.poligono.edges.map(edge => (edge.origem.equals(vertex2.getPosition()) && 
+                                                            edge.destino.equals(vertex.getPosition())) ||
+                                                            (edge.origem.equals(vertex.getPosition())  &&
+                                                            edge.destino.equals(vertex2.getPosition()))
+                                                            )
+
+            const indices = arestasValidas.map((valida, index) => (valida)? index : -1).filter(valor => valor != -1);
+
+            console.log(arestasValidas, indices)
+
+            aresta = (indices.length)? fase.poligono.edges[indices[0]] : null;
+        }
     }
 
     animCreateVertices(poligono){

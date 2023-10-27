@@ -148,7 +148,7 @@ export class Fase6 extends Fase{
         this.outputSelecionarVertice    =  vertices.map(vertex => this.selecionarVertice(vertex))
         this.outputAdicionarVertice     =  vertices.map(vertex => this.adicionarVertice(vertex))
         this.outputHighlightArestas     =  vertices.map((vertex,index)  => this.highlightArestas(vertex, index))
-        this.outputDesenharTracejado    =  vertices.map((vertex, index) => this.desenharTracejado(vertex, tracejados[index]))
+        //this.outputDesenharTracejado    =  vertices.map((vertex, index) => this.desenharTracejado(vertex, tracejados[index]))
     }
 
     resetarInputs(){
@@ -220,7 +220,7 @@ export class Fase6 extends Fase{
         var index = 0;
         for(const vertice of this.poligono.vertices){
 
-            const desenharTracejado = this.outputDesenharTracejado[index];
+            const desenharTracejado = this.desenharTracejado(vertice, new Tracejado().addToScene(this.scene));
 
             if(selecionados.includes(vertice)){
 
@@ -238,6 +238,7 @@ export class Fase6 extends Fase{
 
         this.informacao     = {...this.informacao, ...novaInformacao};
 
+        //Muda algumas informações, como vértices usados e triângulos ativos
         const informacao    = this.informacao;
 
         if(!informacao.triangulosAtivos) 
@@ -251,6 +252,15 @@ export class Fase6 extends Fase{
 
         console.log(informacao)
 
+        //Reseta cor dos vértices selecionados e colore as arestas
+        informacao.VerticesSelecionados.map(vertice => {
+            vertice.material = new THREE.MeshBasicMaterial({color:0x8d8d8d});
+            vertice.update();
+        })
+
+
+
+        //Ativa os controles
         var index = 0;
         for(const vertice of this.poligono.vertices){
             const criarTriangulo = this.outputSelecionarVertice[index];
@@ -276,13 +286,27 @@ export class Fase6 extends Fase{
                     if(estado.clicado){
 
                         fase.Configuracao2({
-                            VerticesSelecionados: [vertice, ]
+                            VerticesSelecionados: [vertice, ],
+                            cor: corAleatoria()
                         });
 
                          vertice.mesh.material = new THREE.MeshBasicMaterial({color:0xaa00aa})
 
                     }
                })
+
+        //Funções auxiliares
+        //Essa função vai ser usada para escolher a cor do novo triângulo a ser criado
+        //Isso inclui tanto seus vértices quanto suas arestas
+        function corAleatoria() {   
+
+            const inteiroAleatorio = (fator) => Math.round(Math.random() * fator);
+
+            return [0xff0000,0x00ff00,0x0000ff]
+                    .map(cor => inteiroAleatorio(cor))
+                    .reduce((a,b) => a + b);
+            
+        } 
     }
 
     adicionarVertice(vertice){
@@ -297,11 +321,13 @@ export class Fase6 extends Fase{
                     const estado = this.estado;
 
                     const selecionados = fase.informacao.VerticesSelecionados;
+
+                    const cor = fase.informacao.cor;
                 
                     //Adiciona vértice ao triangulo a ser formado
                     if(estado.clicado){
 
-                        vertice.mesh.material = new THREE.MeshBasicMaterial({color:0xff0000})
+                        vertice.mesh.material = new THREE.MeshBasicMaterial({color:cor});
 
                         fase.Configuracao2b({
                             VerticesSelecionados: [...selecionados, vertice]
@@ -326,14 +352,6 @@ export class Fase6 extends Fase{
 
             const posicoes  = vertices.map(vertice => vertice.getPosition())
 
-            //Calcula a cor a ser usada na malha
-
-            const inteiroAleatorio = (fator) => Math.round(Math.random() * fator);
-
-            const corAleatoria     = () => [0xff0000,0x00ff00,0x0000ff]
-                                           .map(cor => inteiroAleatorio(cor))
-                                           .reduce((a,b) => a + b);
-
             //Verifica se está no sentido anti-horário
             const v1 = new THREE.Vector3().copy(posicoes[1]).sub(posicoes[0]);
             const v2 = new THREE.Vector3().copy(posicoes[2]).sub(posicoes[0]);
@@ -346,8 +364,9 @@ export class Fase6 extends Fase{
             }
 
             //Constrói a malha
+            const cor      = fase.informacao.cor;
             const geometry = new THREE.BufferGeometry().setFromPoints(posicoes);
-            const material = new THREE.MeshBasicMaterial({ color: corAleatoria() });  
+            const material = new THREE.MeshBasicMaterial({ color: cor });  
 
             const trianguloTransparente = new THREE.Mesh(geometry, material);
             
@@ -439,9 +458,11 @@ export class Fase6 extends Fase{
         //Funções auxiliares
         function mudarCor(){
 
+            const cor = fase.informacao.cor;
+
             materialAntigoVertex  = vertex.material.clone();
 
-            vertex.material = new THREE.MeshBasicMaterial({color:0xcc0000});
+            vertex.material = new THREE.MeshBasicMaterial({color:cor});
 
             vertex.update();
 
@@ -449,7 +470,7 @@ export class Fase6 extends Fase{
 
             materialAntigoAresta  = aresta.material.clone();
 
-            aresta.material = new THREE.MeshBasicMaterial({color:0xaa2233});
+            aresta.material = new THREE.MeshBasicMaterial({color:cor});
 
             aresta.update();
         }

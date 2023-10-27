@@ -439,7 +439,6 @@ export class Fase6 extends Fase{
 
                     const estado = this.estado;
 
-                    // if(estado.finalizado) return;
 
                     estado.arestas = encontrarAresta();
 
@@ -471,6 +470,7 @@ export class Fase6 extends Fase{
                         estado.valido = false;
                         
                         voltarCorInicial(estado.arestas);
+
                     }
 
 
@@ -489,6 +489,7 @@ export class Fase6 extends Fase{
 
             
         }
+        //Concertar a gambiarra da aresta, as vezes não verifica aresta finalizada
 
         function mudarCorArestas(arestas){
 
@@ -498,6 +499,7 @@ export class Fase6 extends Fase{
 
             arestas.map(aresta => {
 
+                if(fase.informacao.arestas.has(aresta)) return;
                 
                 materialAntigoAresta  = aresta.material.clone();
                 
@@ -517,6 +519,8 @@ export class Fase6 extends Fase{
 
 
             arestas.map(aresta => {
+
+                if(fase.informacao.arestas.has(aresta)) return;
 
                 aresta.material = materialAntigoAresta;
                 

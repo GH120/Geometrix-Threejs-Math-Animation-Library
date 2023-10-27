@@ -147,7 +147,7 @@ export class Fase6 extends Fase{
         //Outputs
         this.outputSelecionarVertice    =  vertices.map(vertex => this.selecionarVertice(vertex))
         this.outputAdicionarVertice     =  vertices.map(vertex => this.adicionarVertice(vertex))
-        this.outputHighlightArestas     =  vertices.map((vertex,index)  => this.highlightArestas(vertex, index))
+        this.outputHighlightArestas     =  vertices.map(vertex => this.highlightArestas(vertex))
         //this.outputDesenharTracejado    =  vertices.map((vertex, index) => this.desenharTracejado(vertex, tracejados[index]))
     }
 
@@ -167,6 +167,8 @@ export class Fase6 extends Fase{
     Configuracao1(){
 
         this.resetarInputs();
+
+        this.informacao.arestas = new Set()
 
         var index = 0;
         for(const vertice of this.poligono.vertices){
@@ -272,6 +274,9 @@ export class Fase6 extends Fase{
     }
 
     //Outputs
+
+    //Clique no primeiro vértice começa processo de criar triângulo
+    //Escolhe a cor aleatória do triângulo
     selecionarVertice(vertice){
 
         const fase = this;
@@ -285,12 +290,14 @@ export class Fase6 extends Fase{
 
                     if(estado.clicado){
 
+                        const cor = corAleatoria()
+
                         fase.Configuracao2({
                             VerticesSelecionados: [vertice, ],
-                            cor: corAleatoria()
+                            cor: cor
                         });
 
-                         vertice.mesh.material = new THREE.MeshBasicMaterial({color:0xaa00aa})
+                         vertice.mesh.material = new THREE.MeshBasicMaterial({color:cor});
 
                     }
                })
@@ -309,6 +316,7 @@ export class Fase6 extends Fase{
         } 
     }
 
+    //Adiciona vértices ao triângulo sendo construido
     adicionarVertice(vertice){
 
         const fase = this;
@@ -418,7 +426,7 @@ export class Fase6 extends Fase{
 
         const fase = this;
 
-        var aresta;
+        var arestas;
         var materialAntigoAresta;
         var materialAntigoVertex;
 
@@ -429,22 +437,26 @@ export class Fase6 extends Fase{
 
                     const estado = this.estado;
 
-                    if(estado.finalizado) return;
+                    // if(estado.finalizado) return;
 
-                    if(!aresta) encontrarAresta();
+                    encontrarAresta();
 
                     if(estado.dentro){
 
                         estado.valido = true;
 
-                        mudarCor();
+                        if(!estado.finalizado) mudarCorVertice();
+
+                        mudarCorArestas();
                     }
 
                     if(estado.valido && estado.clicado){
 
                         estado.finalizado = true;
 
-                        aresta = null;
+                        if(arestas) arestas.forEach(aresta => fase.informacao.arestas.add(aresta));
+
+                        arestas = null;
                     }
 
                     if(estado.valido && !estado.dentro){
@@ -456,7 +468,7 @@ export class Fase6 extends Fase{
                })
 
         //Funções auxiliares
-        function mudarCor(){
+        function mudarCorVertice(){
 
             const cor = fase.informacao.cor;
 
@@ -466,13 +478,24 @@ export class Fase6 extends Fase{
 
             vertex.update();
 
-            if(!aresta) return;
+            
+        }
 
-            materialAntigoAresta  = aresta.material.clone();
+        function mudarCorArestas(){
 
-            aresta.material = new THREE.MeshBasicMaterial({color:cor});
+            const cor = fase.informacao.cor;
 
-            aresta.update();
+            if(!arestas) return;
+
+            arestas.map(aresta => {
+
+                
+                materialAntigoAresta  = aresta.material.clone();
+                
+                aresta.material = new THREE.MeshBasicMaterial({color:cor});
+                
+                aresta.update();
+            })
         }
 
         function voltarCorInicial(){
@@ -481,31 +504,47 @@ export class Fase6 extends Fase{
 
             vertex.update();
 
-            if(!aresta) return;
-            
-            aresta.material = materialAntigoAresta;
+            if(!arestas) return;
 
-            aresta.update();
 
-            console.log(aresta)
+            arestas.map(aresta => {
+
+                aresta.material = materialAntigoAresta;
+                
+                aresta.update();
+
+            })
         }
 
         function encontrarAresta(){
 
-            const vertex2 = fase.informacao.VerticesSelecionados.slice(-1)[0];
+            const arestasFinalizadas = fase.informacao.arestas;
 
-            const arestasValidas = fase.poligono.edges.map(edge => (edge.origem.equals(vertex2.getPosition()) && 
-                                                            edge.destino.equals(vertex.getPosition())) ||
-                                                            (edge.origem.equals(vertex.getPosition())  &&
-                                                            edge.destino.equals(vertex2.getPosition()))
-                                                            )
 
-            const indices = arestasValidas.map((valida, index) => (valida)? index : -1).filter(valor => valor != -1);
+            const arestasValidas = fase.informacao.VerticesSelecionados.flatMap(vertex2 =>
+        
+                fase.poligono.edges.map(edge => 
+
+                        !arestasFinalizadas.has(edge) &&
+                        
+                        (edge.origem.equals(vertex2.getPosition()) && 
+                        edge.destino.equals(vertex.getPosition())) 
+                        ||
+                        (edge.origem.equals(vertex.getPosition())  &&
+                        edge.destino.equals(vertex2.getPosition()))
+                )
+            )
+            console.log(arestasValidas, indices)
+            
+
+            const indices = arestasValidas.map((valida, index) => (valida)? index % 5 : -1).filter(valor => valor != -1);
 
             console.log(arestasValidas, indices)
 
-            aresta = (indices.length)? fase.poligono.edges[indices[0]] : null;
+            arestas = (indices.length)? indices.map(indice => fase.poligono.edges[indice]) : null;
+
         }
+
     }
 
     animCreateVertices(poligono){

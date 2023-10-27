@@ -426,7 +426,6 @@ export class Fase6 extends Fase{
 
         const fase = this;
 
-        var arestas;
         var materialAntigoAresta;
         var materialAntigoVertex;
 
@@ -462,7 +461,7 @@ export class Fase6 extends Fase{
 
                         if(arestas) arestas.forEach(aresta => fase.informacao.arestas.add(aresta));
 
-                        fase.outputHighlightArestas.map(output => output.estado.arestas = null);
+                        fase.outputHighlightArestas.map(output => output.estado = {});
                     }
 
                     if(estado.valido && !estado.dentro){
@@ -550,7 +549,9 @@ export class Fase6 extends Fase{
 
             const indices = arestasValidas.map((valida, index) => (valida)? index % 5 : -1).filter(valor => valor != -1);
 
-            arestas = (indices.length)? indices.map(indice => fase.poligono.edges[indice]) : null;
+            console.log(indices, "sim")
+
+            const arestas = (indices.length)? indices.map(indice => fase.poligono.edges[indice]) : null;
 
             return arestas;
         }

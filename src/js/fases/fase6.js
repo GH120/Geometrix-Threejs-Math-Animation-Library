@@ -54,7 +54,11 @@ export class Fase6 extends Fase{
         this.createOutputs();
         this.setupTextBox();
 
-        this.informacao = {}
+        this.informacao = {
+            verticesUsados: [], 
+            arestas: new Set(),
+            trianguloAtual: 0
+        }
 
         this.levelDesign();
     }
@@ -168,10 +172,17 @@ export class Fase6 extends Fase{
 
         this.resetarInputs();
 
-        this.informacao.arestas = new Set()
+        const finalizados = this.informacao.verticesUsados;
+
 
         var index = 0;
         for(const vertice of this.poligono.vertices){
+
+            if(finalizados.includes(vertice)) {
+                index++
+                continue;
+            };
+
             const criarTriangulo = this.outputSelecionarVertice[index];
 
             vertice.clickable.addObserver(criarTriangulo);
@@ -189,11 +200,21 @@ export class Fase6 extends Fase{
         this.informacao = {...this.informacao, ...informacao};
 
         const selecionados = this.informacao.VerticesSelecionados;
+        const finalizados  = this.informacao.verticesUsados;
 
-        var index = 0;
+
+        var index = -1;
         for(const vertice of this.poligono.vertices){
+            console.log(finalizados, "configuração")
+
+            index++;
+
             
             if(vertice in selecionados) continue;
+
+            if(finalizados.includes(vertice)) continue;
+
+            
 
             const adicionarVertice = this.outputAdicionarVertice[index];
             const highlightAresta  = this.outputHighlightArestas[index];
@@ -201,8 +222,6 @@ export class Fase6 extends Fase{
             vertice.clickable.addObserver(adicionarVertice);
             vertice.hoverable.addObserver(highlightAresta);
             vertice.clickable.addObserver(highlightAresta);
-
-            index++;
         }
 
         this.Configuracao2b({})
@@ -250,9 +269,28 @@ export class Fase6 extends Fase{
         
         const novoTriangulo = informacao.trianguloDesenhado;
 
+        const arestasUsadas = informacao.arestas;
+
         informacao.triangulosAtivos.push(novoTriangulo);
 
-        console.log(informacao)
+
+        for(const vertice of this.poligono.vertices){
+
+            const position = vertice.getPosition();
+
+            const arestasDesseVertice = Array.from(arestasUsadas).filter(aresta => aresta.origem .equals(position) || 
+                                                                                   aresta.destino.equals(position))
+
+            const duasArestas    = arestasDesseVertice.length == 2;
+
+            if(duasArestas){
+
+                const mesmoTriangulo = arestasDesseVertice[0].trianguloId == arestasDesseVertice[1].trianguloId;
+
+                if(mesmoTriangulo) 
+                    informacao.verticesUsados.push(vertice)
+            } 
+        }
 
         //Reseta cor dos vértices selecionados e colore as arestas
         informacao.VerticesSelecionados.map(vertice => {
@@ -262,16 +300,25 @@ export class Fase6 extends Fase{
 
 
 
-        //Ativa os controles
-        var index = 0;
-        for(const vertice of this.poligono.vertices){
-            const criarTriangulo = this.outputSelecionarVertice[index];
-
-            vertice.clickable.addObserver(criarTriangulo);
-
-            index++;
-        }
+        this.Configuracao1();
     }
+
+    Configuracao3b(informacao){
+
+        //Adiciona arestas novas
+        this.informacao = {...this.informacao, ...informacao};
+
+        const trianguloId = this.informacao.trianguloAtual;
+
+        const arestas     = this.informacao.arestasNovas;
+
+        console.log(this.informacao, arestas)
+
+        arestas.map(aresta => aresta.trianguloId = trianguloId);
+
+        arestas.forEach(aresta => this.informacao.arestas.add(aresta))
+    }
+
 
     //Outputs
 
@@ -288,13 +335,19 @@ export class Fase6 extends Fase{
 
                     const estado = this.estado;
 
+
+
                     if(estado.clicado){
+
+                        console.log("aquiiii",vertice,fase.informacao.verticesUsados.includes(vertice))
+
 
                         const cor = corAleatoria()
 
                         fase.Configuracao2({
                             VerticesSelecionados: [vertice, ],
-                            cor: cor
+                            cor: cor,
+                            trianguloAtual: fase.informacao.trianguloAtual+1
                         });
 
                          vertice.mesh.material = new THREE.MeshBasicMaterial({color:cor});
@@ -459,7 +512,7 @@ export class Fase6 extends Fase{
                         
                         const arestas = estado.arestas;
 
-                        if(arestas) arestas.forEach(aresta => fase.informacao.arestas.add(aresta));
+                        if(arestas) fase.Configuracao3b({arestasNovas: arestas});
 
                         fase.outputHighlightArestas.map(output => output.estado = {});
                     }
@@ -549,7 +602,7 @@ export class Fase6 extends Fase{
 
             const indices = arestasValidas.map((valida, index) => (valida)? index % 5 : -1).filter(valor => valor != -1);
 
-            console.log(indices, "sim")
+            // console.log(indices, "sim")
 
             const arestas = (indices.length)? indices.map(indice => fase.poligono.edges[indice]) : null;
 

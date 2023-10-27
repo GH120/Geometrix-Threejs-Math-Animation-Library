@@ -57,7 +57,8 @@ export class Fase6 extends Fase{
         this.informacao = {
             verticesUsados: [], 
             arestas: new Set(),
-            trianguloAtual: 0
+            trianguloAtual: 0,
+            triangulosAtivos: []
         }
 
         this.levelDesign();
@@ -262,10 +263,6 @@ export class Fase6 extends Fase{
         //Muda algumas informações, como vértices usados e triângulos ativos
         const informacao    = this.informacao;
 
-        if(!informacao.triangulosAtivos) 
-            informacao.triangulosAtivos = [];
-        if(!informacao.verticesUsados)
-            informacao.verticesUsados   = [];
         
         const novoTriangulo = informacao.trianguloDesenhado;
 
@@ -286,6 +283,8 @@ export class Fase6 extends Fase{
             if(duasArestas){
 
                 const mesmoTriangulo = arestasDesseVertice[0].trianguloId == arestasDesseVertice[1].trianguloId;
+
+                //Resolver problema de triângulo consecutivo
 
                 if(mesmoTriangulo) 
                     informacao.verticesUsados.push(vertice)
@@ -611,6 +610,8 @@ export class Fase6 extends Fase{
 
     }
 
+
+    //Animações
     animCreateVertices(poligono){
         // .addToScene(this.scene);
 

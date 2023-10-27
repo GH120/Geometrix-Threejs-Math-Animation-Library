@@ -145,10 +145,10 @@ export class Fase6 extends Fase{
         const tracejados = vertices.map(v => new Tracejado().addToScene(this.scene))
 
         //Outputs
-        this.outputCriarTriangulo    =  vertices.map(vertex => this.selecionarVertice(vertex))
-        this.outputAdicionarVertice  =  vertices.map(vertex => this.adicionarVertice(vertex))
-        this.outputHighlightArestas  =  vertices.map((vertex,index)  => this.highlightArestas(vertex, index))
-        this.outputDesenharTracejado =  vertices.map((vertex, index) => this.desenharTracejado(vertex, tracejados[index]))
+        this.outputSelecionarVertice    =  vertices.map(vertex => this.selecionarVertice(vertex))
+        this.outputAdicionarVertice     =  vertices.map(vertex => this.adicionarVertice(vertex))
+        this.outputHighlightArestas     =  vertices.map((vertex,index)  => this.highlightArestas(vertex, index))
+        this.outputDesenharTracejado    =  vertices.map((vertex, index) => this.desenharTracejado(vertex, tracejados[index]))
     }
 
     resetarInputs(){
@@ -170,7 +170,7 @@ export class Fase6 extends Fase{
 
         var index = 0;
         for(const vertice of this.poligono.vertices){
-            const criarTriangulo = this.outputCriarTriangulo[index];
+            const criarTriangulo = this.outputSelecionarVertice[index];
 
             vertice.clickable.addObserver(criarTriangulo);
 
@@ -232,13 +232,28 @@ export class Fase6 extends Fase{
         }
     }
 
-    Configuracao3(){
+    Configuracao3(novaInformacao){
 
         this.resetarInputs();
 
+        this.informacao     = {...this.informacao, ...novaInformacao};
+
+        const informacao    = this.informacao;
+
+        if(!informacao.triangulosAtivos) 
+            informacao.triangulosAtivos = [];
+        if(!informacao.verticesUsados)
+            informacao.verticesUsados   = [];
+        
+        const novoTriangulo = informacao.trianguloDesenhado;
+
+        informacao.triangulosAtivos.push(novoTriangulo);
+
+        console.log(informacao)
+
         var index = 0;
         for(const vertice of this.poligono.vertices){
-            const criarTriangulo = this.outputCriarTriangulo[index];
+            const criarTriangulo = this.outputSelecionarVertice[index];
 
             vertice.clickable.addObserver(criarTriangulo);
 
@@ -257,8 +272,6 @@ export class Fase6 extends Fase{
                     this.estado = {...this.estado, ...estadoNovo};
 
                     const estado = this.estado;
-
-                    console.log(estado)
 
                     if(estado.clicado){
 
@@ -284,7 +297,8 @@ export class Fase6 extends Fase{
                     const estado = this.estado;
 
                     const selecionados = fase.informacao.VerticesSelecionados;
-
+                
+                    //Adiciona vértice ao triangulo a ser formado
                     if(estado.clicado){
 
                         vertice.mesh.material = new THREE.MeshBasicMaterial({color:0xff0000})
@@ -294,11 +308,14 @@ export class Fase6 extends Fase{
                         })
                     }
 
+                    //Três vértices selecionados, então triangulo está pronto para ser desenhado
                     if(selecionados.length >= 3){
 
-                        desenharTriangulo();
+                        const triangulo = desenharTriangulo();
 
-                        fase.Configuracao3();
+                        fase.Configuracao3({
+                            trianguloDesenhado: triangulo
+                        });
 
                     }
                })
@@ -309,8 +326,15 @@ export class Fase6 extends Fase{
 
             const posicoes  = vertices.map(vertice => vertice.getPosition())
 
-            console.log(vertices,posicoes,"ssiiiiiim")
+            //Calcula a cor a ser usada na malha
 
+            const inteiroAleatorio = (fator) => Math.round(Math.random() * fator);
+
+            const corAleatoria     = () => [0xff0000,0x00ff00,0x0000ff]
+                                           .map(cor => inteiroAleatorio(cor))
+                                           .reduce((a,b) => a + b);
+
+            //Verifica se está no sentido anti-horário
             const v1 = new THREE.Vector3().copy(posicoes[1]).sub(posicoes[0]);
             const v2 = new THREE.Vector3().copy(posicoes[2]).sub(posicoes[0]);
             const crossProduct = v1.cross(v2);
@@ -321,9 +345,9 @@ export class Fase6 extends Fase{
                 posicoes[0] = temporario
             }
 
-            // const triangulo = new Triangle(posicoes.map(posicao => posicao.toArray()));
+            //Constrói a malha
             const geometry = new THREE.BufferGeometry().setFromPoints(posicoes);
-            const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });  
+            const material = new THREE.MeshBasicMaterial({ color: corAleatoria() });  
 
             const trianguloTransparente = new THREE.Mesh(geometry, material);
             
@@ -335,6 +359,8 @@ export class Fase6 extends Fase{
                                     .setValorFinal(0.5)
 
             fase.animar(animarAparecendo)
+
+            return trianguloTransparente;
         }
     }
 

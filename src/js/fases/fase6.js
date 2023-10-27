@@ -430,6 +430,8 @@ export class Fase6 extends Fase{
         var materialAntigoAresta;
         var materialAntigoVertex;
 
+        fase.poligono.edges.map((aresta,index) => aresta.index = index)
+
         return new Output()
                .setUpdateFunction(function(estadoNovo){
 
@@ -439,7 +441,7 @@ export class Fase6 extends Fase{
 
                     // if(estado.finalizado) return;
 
-                    encontrarAresta();
+                    estado.arestas = encontrarAresta();
 
                     if(estado.dentro){
 
@@ -447,24 +449,31 @@ export class Fase6 extends Fase{
 
                         if(!estado.finalizado) mudarCorVertice();
 
-                        mudarCorArestas();
+                        mudarCorArestas(estado.arestas);
+                        
                     }
 
                     if(estado.valido && estado.clicado){
 
                         estado.finalizado = true;
 
+                        estado.valido     = false;
+                        
+                        const arestas = estado.arestas;
+
                         if(arestas) arestas.forEach(aresta => fase.informacao.arestas.add(aresta));
 
-                        arestas = null;
+                        fase.outputHighlightArestas.map(output => output.estado.arestas = null);
                     }
 
                     if(estado.valido && !estado.dentro){
 
                         estado.valido = false;
                         
-                        voltarCorInicial();
+                        voltarCorInicial(estado.arestas);
                     }
+
+
                })
 
         //Funções auxiliares
@@ -481,7 +490,7 @@ export class Fase6 extends Fase{
             
         }
 
-        function mudarCorArestas(){
+        function mudarCorArestas(arestas){
 
             const cor = fase.informacao.cor;
 
@@ -498,7 +507,7 @@ export class Fase6 extends Fase{
             })
         }
 
-        function voltarCorInicial(){
+        function voltarCorInicial(arestas){
 
             vertex.material = materialAntigoVertex;
 
@@ -534,15 +543,12 @@ export class Fase6 extends Fase{
                         edge.destino.equals(vertex2.getPosition()))
                 )
             )
-            console.log(arestasValidas, indices)
-            
 
             const indices = arestasValidas.map((valida, index) => (valida)? index % 5 : -1).filter(valor => valor != -1);
 
-            console.log(arestasValidas, indices)
-
             arestas = (indices.length)? indices.map(indice => fase.poligono.edges[indice]) : null;
 
+            return arestas;
         }
 
     }

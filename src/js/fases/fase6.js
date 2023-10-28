@@ -73,7 +73,11 @@ export class Fase6 extends Fase{
                          "Todos eles tem em comum terem pontos, os vertices",
                          "ligados por arestas, linhas",
                          "Um poligono regular é aquele onde seus lados são iguais",
-                         "Veja, o lado é igual a todos os outros",
+                         "Veja, esse lado é igual a todos os outros",
+                         "Já que todos os lados são iguais, os ângulos também são por simetria",
+                         "Mas não sabemos o valor desses ângulos...",
+                         "Um palpite seria quebrar esse poligono em triângulos",
+                         "Clique em um vértice qualquer"
     ]
 
         const anim1 = this.firstAnim(dialogo);
@@ -122,6 +126,82 @@ export class Fase6 extends Fase{
         const sequencial = new AnimacaoSequencial().setAnimacoes(animacoesTextos);
 
         return sequencial;
+            
+    }
+
+    secondAnim() {
+
+        const textos = [
+            "Clique em outros dois vértices, vamos formar um triângulo"
+        ]
+
+        const animacoesTextos = [];
+
+        textos.forEach((texto, index) => {
+
+            const dialogo = new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto))
+
+            animacoesTextos.push(dialogo)
+        })
+        
+        //Bug de threads consertado, usar setAnimações toda vez que lidar com listas de animações
+        //Do tipo [anim1,anim2,anim3,anim4...]
+        const sequencial = new AnimacaoSequencial().setAnimacoes(animacoesTextos);
+
+        this.animar(sequencial)
+            
+    }
+
+    thirdAnim() {
+
+        const textos = [
+            "Com esse triângulo formado, falta apenas outros dois",
+            "Crie eles e preencha o pentagono"
+        ]
+
+        const animacoesTextos = [];
+
+        textos.forEach((texto, index) => {
+
+            const dialogo = new TextoAparecendo(this.text.element)
+                            .setOnStart(
+                                () => {
+                                    this.changeText(texto);
+                                })
+                            .setDelay(50)
+
+            animacoesTextos.push(dialogo)
+        })
+        
+        //Bug de threads consertado, usar setAnimações toda vez que lidar com listas de animações
+        //Do tipo [anim1,anim2,anim3,anim4...]
+        const sequencial = new AnimacaoSequencial().setAnimacoes(animacoesTextos);
+
+        this.animar(sequencial)
+            
+    }
+
+    fourthAnim() {
+
+        const textos = [
+            "Veja, os ângulos dos triângulos formam os ângulos do pentagono",
+            "O que isso quer dizer?"
+        ]
+
+        const animacoesTextos = [];
+
+        textos.forEach((texto, index) => {
+
+            const dialogo = new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto))
+
+            animacoesTextos.push(dialogo)
+        })
+        
+        //Bug de threads consertado, usar setAnimações toda vez que lidar com listas de animações
+        //Do tipo [anim1,anim2,anim3,anim4...]
+        const sequencial = new AnimacaoSequencial().setAnimacoes(animacoesTextos);
+
+        this.animar(sequencial)
             
     }
 
@@ -879,19 +959,41 @@ export class Fase6 extends Fase{
     problemas = {
 
         start:{
-            satisfeito: (fase) => false,
+            satisfeito: (fase) => fase.informacao.VerticesSelecionados,
 
             consequencia: (fase) =>{
 
-                // // desativa o arraste inicialmente, até clicar no vértice
-                // fase.outputDragAngle.map(output => output.removeInputs());
-
-                //Muda texto quando o player clica no primeiro vértice e ativa o arraste
-                // fase.clicouPrimeiroVertice  = fase.primeiroClick();   
+                fase.secondAnim(); 
             },
 
             proximo: (fase) => "clicouVertice"
 
+        },
+
+        clicouVertice:{
+            satisfeito: (fase) => fase.informacao.triangulosAtivos.length > 0,
+
+            consequencia: (fase) =>  {
+                fase.thirdAnim();
+            },
+
+            proximo: () => "DividindoEmTriangulos"
+        },
+
+        DividindoEmTriangulos:{
+            satisfeito: (fase) => fase.informacao.triangulosAtivos.length >= 3,
+
+            consequencia: (fase) =>  {
+                fase.fourthAnim();
+            },
+
+            proximo: () => "CompletamenteDividido"
+        },
+
+        CompletamenteDividido:{
+            satisfeito: () => false
         }
+
+        
     }
 }

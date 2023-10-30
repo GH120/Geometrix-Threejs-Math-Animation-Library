@@ -514,7 +514,7 @@ export class Fase6 extends Fase{
 
             const animarAparecendo = apagarObjeto(Objeto.fromMesh(trianguloTransparente))
                                     .reverse()
-                                    .setDuration(2000)
+                                    .setDuration(100)
                                     .setValorFinal(0.5)
 
             fase.animar(animarAparecendo)
@@ -925,23 +925,6 @@ export class Fase6 extends Fase{
 
     update(){
 
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
         this.frames.map(frame => frame.next()); //Roda as animações do programa
 
         if(!this.progresso) this.progresso = "start";

@@ -221,6 +221,10 @@ export class Fase6 extends Fase{
         this.plano = plano;
 
         new HoverPosition(plano, this.camera);
+
+        new Clickable(this.plano, this.camera)
+
+        this.plano.clickable.addObserver(new Output().setUpdateFunction(() => this.animacoes.map(animacao => animacao.stop = true)))
     }
 
     createOutputs(){
@@ -914,10 +918,6 @@ export class Fase6 extends Fase{
 
     animar(animacao){
 
-        animacao.animationFrames = animacao.getFrames();
-
-        this.frames.push(animacao.animationFrames);
-
         this.animacoes.push(animacao);
 
         return this;
@@ -925,7 +925,7 @@ export class Fase6 extends Fase{
 
     update(){
 
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.animacoes.map(animation => animation.run(true)); //Roda as animações do programa
 
         if(!this.progresso) this.progresso = "start";
 

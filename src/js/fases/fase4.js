@@ -37,9 +37,9 @@ import { Fase } from './fase';
 
 export class Fase4 extends Fase{
 
-    constructor(){
+    constructor({scene, width, height, renderer, camera, labelRenderer}){
     
-        super();
+        super({scene, width, height, renderer, camera, labelRenderer});
 
         // this.createInputs();
         // this.createHandlers();

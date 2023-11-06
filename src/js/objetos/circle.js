@@ -95,11 +95,14 @@ export default class Circle extends Objeto{
     }
 
     update(){
-        this.scene.remove(this.mesh);
-        this.render();
-        this.scene.add(this.mesh);
-        this.mesh.position.copy(this.position);
-        this.hitbox.position.copy(this.position);
+        if (this.scene) {
+
+            this.scene.remove(this.mesh);
+            this.render();
+            this.scene.add(this.mesh);
+            this.mesh.position.copy(this.position);
+            this.hitbox.position.copy(this.position);
+        }
     }
 
     moveTo(position){

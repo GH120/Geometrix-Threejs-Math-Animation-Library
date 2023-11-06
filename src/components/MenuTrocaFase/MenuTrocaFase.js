@@ -66,16 +66,16 @@ const MenuTrocaFase = ({ fases, onTrocarFase }) => {
           <h2>Menu de Troca de Fase</h2>
         </div>
         <ul>
-          {fases.map((fase, index) => (
+          {fases.map((fase, index) => { return (
             <li
               key={index}
               className={index === faseSelecionada ? 'fase-selecionada' : ''}
               onClick={() => handleChangeFase(index)}
             >
               {/* {fase} */}
-              fase {index+1}
+              {[2, 3, 5].includes(index) ? 'REFATORAR' : 'Fase ' + (index+1)}
             </li>
-          ))}
+          )})}
         </ul>
       </div>
 

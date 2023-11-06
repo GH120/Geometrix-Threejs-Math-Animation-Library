@@ -1,0 +1,19 @@
+.lista-cartas {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    right: 7%;
+    bottom: 5%;
+  }
+  
+  .carta-container {
+    position: relative;
+    margin-right: -50px; /* Margem negativa para empilhar as cartas */
+    transition: margin-right 0.2s;
+  }
+  
+  .carta-container.em-frente {
+    margin-right: 0; /* Muda a margem para 0 para colocar a carta em destaque na frente */
+    z-index: 1; /* Coloca a carta em destaque na frente das outras */
+  }
+  

@@ -17,9 +17,9 @@ import { Triangle } from '../objetos/triangle';
 
 export class Fase2 extends Fase{
 
-    constructor(){
+    constructor({scene, width, height, renderer, camera, labelRenderer}){
 
-        super();
+        super({scene, width, height, renderer, camera, labelRenderer});
 
         this.triangulo = new Triangle()
                             .render()
@@ -31,7 +31,7 @@ export class Fase2 extends Fase{
         this.createHandlers();
         this.setUpAnimar();
         this.addToScene(this.scene);
-        this.setupInterface();
+        // this.setupInterface();
         this.setupTextBox();
 
         this.levelDesign();
@@ -276,7 +276,7 @@ export class Fase2 extends Fase{
 
 
     update(){
-        this.atualizarOptions();
+        // this.atualizarOptions();
 
         this.frames.map(frame => frame.next()); //Roda as animações do programa
 

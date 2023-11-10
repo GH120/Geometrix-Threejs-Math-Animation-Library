@@ -25,9 +25,9 @@ import DesenharMalha from '../animacoes/desenharMalha';
 
 export class Fase5  extends Fase{
 
-    constructor({scene, width, height, renderer, camera, labelRenderer}){
+    constructor(){
 
-        super({scene, width, height, renderer, camera, labelRenderer});
+        super();
 
         this.triangulo = new Triangle([
             [-1,-1,0],

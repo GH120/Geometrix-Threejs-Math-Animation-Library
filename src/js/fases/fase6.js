@@ -31,9 +31,9 @@ import { HoverPosition } from '../inputs/position';
 
 export class Fase6 extends Fase{
 
-    constructor({scene, width, height, renderer, camera, labelRenderer}){
+    constructor(){
 
-        super({scene, width, height, renderer, camera, labelRenderer});
+        super();
 
         this.poligono = new Poligono([
             [0,0,0],

@@ -15,9 +15,41 @@ import grid from '../../assets/grid.avif';
 export class Fase {
 
     
-    constructor({scene, width, height, renderer, camera, labelRenderer}){
+    constructor(){
 
-        this.setupThreejs({scene, width, height, renderer, camera, labelRenderer});
+        const width = 10;
+        const height = 8;
+
+        // === THREE.JS CODE START ===
+        const scene = new THREE.Scene();
+        // const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2+1, height / - 2 +1, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.domElement.id = 'MEUCANVAS';
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        labelRenderer.domElement.hidden = false;
+        labelRenderer.domElement.id = "dialogo"
+
+        this.setupThreejs({scene, 
+            width: window.innerWidth,
+            height: window.innerHeight,
+            renderer,
+            camera,
+            labelRenderer})
+
+        const container = document.createElement('p');
+        container.style.fontFamily = "Courier New, monospace";
+        container.style.fontSize = "25px";
+        container.style.fontWeight ="italic";
+        container.style.display = 'inline-block';
+        console.log('SETUPTEXTBOX CONTAINER', container)
+
+        camera.position.z = 150;
         
         this.frames = [];
         this.animacoes = [];
@@ -161,6 +193,9 @@ export class Fase {
         const camera        = this.camera;
 
         function animate() {
+
+            if(programa.stop) return;
+
             requestAnimationFrame( animate );
         
             //Atualiza o programa

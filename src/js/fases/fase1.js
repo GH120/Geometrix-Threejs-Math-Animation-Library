@@ -21,9 +21,9 @@ import { Fase } from './fase';
 
 export class Fase1 extends Fase{
 
-    constructor({scene, width, height, renderer, camera, labelRenderer}){
+    constructor(){
 
-        super({scene, width, height, renderer, camera, labelRenderer});
+        super();
 
         this.triangulo = new Triangle()
                             .render()

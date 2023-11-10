@@ -4,7 +4,7 @@ import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import './style.css'
 
 const MenuTrocaFase = ({ fases, onTrocarFase }) => {
-  const [faseSelecionada, setFaseSelecionada] = useState(0);
+  const [faseSelecionada, setFaseSelecionada] = useState(4);
 
   const handleChangeFase = (faseIndex) => {
     console.log("INDEX ATUAL:", faseIndex);
@@ -20,42 +20,19 @@ const MenuTrocaFase = ({ fases, onTrocarFase }) => {
 
     const parenteCanvas = meuCanvas.parentNode;
 
-    parenteCanvas.removeChild(meuCanvas);
-    const faseAtual = fases[faseSelecionada];
+    //Limpa o canvas do pai
+    parenteCanvas.innerHTML = '';
 
-    const width = 10;
-    const height = 8;
+    //Tira o dialogo do labelRenderer
+    document.body.removeChild(document.getElementById("dialogo"))
+    
+    const faseAtual = new fases[faseSelecionada]();
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.domElement.id = 'MEUCANVAS';
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.position.z = 150;
+    // use ref as a mount point of the Three.js scene instead of the document.body
+    parenteCanvas.appendChild(faseAtual.renderer.domElement);
+    document.body.appendChild(faseAtual.labelRenderer.domElement)
 
-    const labelRenderer = new CSS2DRenderer();
-    labelRenderer.setSize(window.innerWidth, window.innerHeight);
-    labelRenderer.domElement.style.position = 'absolute';
-    labelRenderer.domElement.style.top = '0px';
-    labelRenderer.domElement.hidden = false;
-
-    const objetoFaseAtual = new faseAtual({
-      scene,
-      width: window.innerWidth,
-      height: window.innerHeight,
-      renderer,
-      camera,
-      labelRenderer
-    });
-
-    parenteCanvas.appendChild(renderer.domElement)
-
-    const animate = () => {
-      requestAnimationFrame(animate);
-      objetoFaseAtual.update();
-      renderer.render(scene, camera);
-    };
-    animate();
+    faseAtual.start(); //Começa o loop de animações
 
   }, [faseSelecionada]);
 

@@ -17,9 +17,9 @@ import { Triangle } from '../objetos/triangle';
 
 export class Fase2 extends Fase{
 
-    constructor({scene, width, height, renderer, camera, labelRenderer}){
+    constructor(){
 
-        super({scene, width, height, renderer, camera, labelRenderer});
+        super();
 
         this.triangulo = new Triangle()
                             .render()

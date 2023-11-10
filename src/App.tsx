@@ -46,7 +46,7 @@ function MyThree() {
     // === THREE.JS CODE START ===
     const scene = new THREE.Scene();
     // const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 0.1, 1000);
+    const camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2+1, height / - 2 +1, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.domElement.id = 'MEUCANVAS';
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -73,18 +73,11 @@ function MyThree() {
     container.style.display = 'inline-block';
     console.log('SETUPTEXTBOX CONTAINER', container)
 
-    // Create the CSS2DObject using the container
-    const cPointLabel = new CSS2DObject(container);   
-    cPointLabel.position.y = 3.5
-    console.log('CPOINTLABEL', cPointLabel)
-
-    cPointLabel.element.textContent = 'teste'
-
-    scene.add(cPointLabel);
-
     // use ref as a mount point of the Three.js scene instead of the document.body
     refContainer.current && refContainer.current.appendChild(renderer.domElement);
     // refContainer.current && refContainer.current.appendChild(labelRenderer.domElement);
+
+    document.body.appendChild(labelRenderer.domElement)
 
     camera.position.z = 150;
 
@@ -92,6 +85,7 @@ function MyThree() {
       requestAnimationFrame(animate);
       fase.update();
       renderer.render(scene, camera);
+      labelRenderer.render( scene, camera );
     };
     animate();
   }, []);

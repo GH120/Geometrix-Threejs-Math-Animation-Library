@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three'
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import './style.css'
 
 const MenuTrocaFase = ({ fases, onTrocarFase }) => {
-  const [faseSelecionada, setFaseSelecionada] = useState(4);
+  const [faseSelecionada, setFaseSelecionada] = useState(0);
+  const prevFase = useRef(null);
 
   const handleChangeFase = (faseIndex) => {
     console.log("INDEX ATUAL:", faseIndex);
@@ -13,6 +14,10 @@ const MenuTrocaFase = ({ fases, onTrocarFase }) => {
   };
 
   useEffect(() => {
+    prevFase.current = faseSelecionada;
+    console.log('FASE ANTERIOR: ', prevFase.current);
+    delete prevFase.current;
+
     const meuCanvas = document.getElementById('MEUCANVAS');
     if (!meuCanvas) {
       return;
@@ -24,13 +29,13 @@ const MenuTrocaFase = ({ fases, onTrocarFase }) => {
     parenteCanvas.innerHTML = '';
 
     //Tira o dialogo do labelRenderer
-    document.body.removeChild(document.getElementById("dialogo"))
+    // document.body.removeChild(document.getElementById("dialogo"))
     
     const faseAtual = new fases[faseSelecionada]();
 
     // use ref as a mount point of the Three.js scene instead of the document.body
     parenteCanvas.appendChild(faseAtual.renderer.domElement);
-    document.body.appendChild(faseAtual.labelRenderer.domElement)
+    parenteCanvas.appendChild(faseAtual.labelRenderer.domElement)
 
     faseAtual.start(); //Começa o loop de animações
 

@@ -9,7 +9,7 @@
     align-items: center;
     background-color: #007bff;
     padding: 10px;
-    color: #fff;
+    /* color: #fff; */
   }
   
   .navbar-title {
@@ -17,19 +17,22 @@
     text-align: center;
     font-family:monospace;
     letter-spacing: 7px;
+    color: #fff;
   }
   
   .navbar-links {
+    /*
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #333;
+    background-color: #333; 
     position: absolute;
     top: 60px;
     left: 0;
     right: 0;
     text-align: center;
     padding: 10px;
+    */
     opacity: 0;
     transition: all 0.3s;
   }
@@ -38,11 +41,11 @@
     opacity: 1;
   }
   
-  .navbar-links a {
+  /* .navbar-links a {
     color: #fff;
     text-decoration: none;
     margin: 10px;
-  }
+  } */
   
   .menu-button {
     background-color: #fff;
@@ -51,7 +54,7 @@
     color: #fff;
     font-size: 20px;
     cursor: pointer;
-    margin: 0;
+    margin: 10px;
     padding: 0;
     justify-content: center;
     align-items: center;

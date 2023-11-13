@@ -1,9 +1,10 @@
 .lista-cartas {
     display: flex;
     flex-direction: row;
-    position: absolute;
+    position: fixed;
     right: 7%;
     bottom: 5%;
+    z-index: 10;
   }
   
   .carta-container {

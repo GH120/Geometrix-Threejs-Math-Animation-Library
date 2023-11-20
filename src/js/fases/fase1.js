@@ -38,7 +38,7 @@ export class Fase1 extends Fase{
         // this.setupInterface();
         this.setupTextBox();
 
-        this.levelDesign();
+        // this.levelDesign();
     }
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
@@ -327,6 +327,8 @@ export class Fase1 extends Fase{
         // this.atualizarOptions();
 
         this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.map(frame => frame.next()); //Roda as animações do programa
+ 
 
         // if(options.atualizar) triangle.update();
 

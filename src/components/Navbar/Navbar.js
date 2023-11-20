@@ -16,6 +16,7 @@ import { Fase6 } from '../../js/fases/fase6';
 
 import { FiMenu } from 'react-icons/fi'
 import { GiCardAceSpades } from 'react-icons/gi'
+import { Fase7 } from '../../js/fases/fase7';
 
 
 
@@ -25,7 +26,8 @@ const fases = [
   Fase3,
   Fase4,
   Fase5,
-  Fase6
+  Fase6,
+  Fase7
 ];
 
 const cartas = [

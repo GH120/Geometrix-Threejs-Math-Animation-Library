@@ -17,6 +17,7 @@ import MenuTrocaFase from './components/MenuTrocaFase/MenuTrocaFase';
 import Navbar from './components/Navbar/Navbar';
 import Carta from './components/Carta/Carta';
 import CartasContainer from './components/CartasContainer/CartasContainer';
+import { Fase7 } from './js/fases/fase7';
 
 // const fases = [
 //   Fase1,
@@ -39,7 +40,7 @@ function MyThree() {
 
   useEffect(() => {
 
-    const fase = new Fase1();
+    const fase = new Fase7();
 
     // use ref as a mount point of the Three.js scene instead of the document.body
     refContainer.current && refContainer.current.appendChild(fase.renderer.domElement);

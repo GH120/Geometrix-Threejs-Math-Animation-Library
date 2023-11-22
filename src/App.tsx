@@ -40,7 +40,7 @@ function MyThree() {
 
   useEffect(() => {
 
-    const fase = new Fase7();
+    const fase = new Fase1();
 
     // use ref as a mount point of the Three.js scene instead of the document.body
     refContainer.current && refContainer.current.appendChild(fase.renderer.domElement);

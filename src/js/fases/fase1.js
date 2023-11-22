@@ -38,7 +38,7 @@ export class Fase1 extends Fase{
         // this.setupInterface();
         this.setupTextBox();
 
-        // this.levelDesign();
+        this.levelDesign();
     }
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto

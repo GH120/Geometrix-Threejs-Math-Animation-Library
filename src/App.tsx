@@ -18,6 +18,7 @@ import Navbar from './components/Navbar/Navbar';
 import Carta from './components/Carta/Carta';
 import CartasContainer from './components/CartasContainer/CartasContainer';
 import { Fase7 } from './js/fases/fase7';
+import MenuEquacoes from './components/MenuEquacoes/MenuEquacoes';
 
 // const fases = [
 //   Fase1,

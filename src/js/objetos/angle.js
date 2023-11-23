@@ -41,8 +41,6 @@ export class Angle extends Objeto{
         let vetor1 = this.position.clone().sub(this.seguinte).normalize();
         let vetor2 = this.position.clone().sub(this.anterior).normalize();
 
-        console.log(vetor1,vetor2)
-
         //Se estiverem no sentido horário, inverter sua ordem
         const sentidoHorario = new THREE.Vector3(0,0,0).crossVectors(vetor1, vetor2).dot(new THREE.Vector3(0,0,1)) > 0;
 
@@ -180,7 +178,6 @@ export class Angle extends Objeto{
     }
 
     copia(){
-        console.log(this.index)
         return new Angle(this.vertices, this.index);
     }
 }

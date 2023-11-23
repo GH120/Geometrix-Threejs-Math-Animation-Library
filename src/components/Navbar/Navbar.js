@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import MenuTrocaFase from '../MenuTrocaFase/MenuTrocaFase';
 import AboveContainer  from '../AboveContainer/AboveContainer'
 import CartasContainer from '../CartasContainer/CartasContainer';
+import MenuEquacoes from '../MenuEquacoes/MenuEquacoes';
 
 
 import './style.css'; // Importe o arquivo de estilo
@@ -40,6 +41,8 @@ const cartas = [
 function Navbar() {
   const [FaseMenuOpen, setFaseMenuOpen] = useState(false);
   const [CardsMenuOpen, setCardsMenuOpen] = useState(false);
+  const [EquationMenuOpen, setEquationMenuOpen] = useState(false);
+
 
   const toggleFaseMenu = () => {
     setFaseMenuOpen(!FaseMenuOpen);
@@ -47,6 +50,10 @@ function Navbar() {
 
   const toggleCardsMenu = () => {
     setCardsMenuOpen(!CardsMenuOpen);
+  };
+
+  const toggleEquationMenu = () => {
+    setEquationMenuOpen(!EquationMenuOpen);
   };
 
 
@@ -59,7 +66,11 @@ function Navbar() {
         </button>
         <button className="menu-button" onClick={toggleCardsMenu}>
           <GiCardAceSpades />
+        </button> 
+        <button className="menu-button" onClick={toggleEquationMenu}>
+          <GiCardAceSpades />
         </button>
+        
       </div>
       <div className={`navbar-links ${FaseMenuOpen ? 'open' : ''}`}>
         {/* colocar modal de fases aqui (eu acho) */}
@@ -78,6 +89,14 @@ function Navbar() {
           <CartasContainer cartas={cartas} />
         {/* </AboveContainer> */}
       </div>
+
+      <div className={`navbar-links ${EquationMenuOpen ? 'open' : ''}`}>
+        {/* colocar modal de fases aqui (eu acho) */}
+        {/* <AboveContainer top={150} left={50}> */}
+          <MenuEquacoes></MenuEquacoes>
+        {/* </AboveContainer> */}
+      </div>
+
       <h1 className="navbar-title">GEOMETRIX</h1>
     </nav>
   );

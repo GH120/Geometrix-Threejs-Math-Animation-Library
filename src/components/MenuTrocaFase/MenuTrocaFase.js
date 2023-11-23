@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import './style.css'
 
-const MenuTrocaFase = ({ fases, onTrocarFase }) => {
+const MenuTrocaFase = ({ fases, onTrocarFase, settings }) => {
   const [faseSelecionada, setFaseSelecionada] = useState(0);
   const prevFase = useRef(null);
 
@@ -38,6 +38,12 @@ const MenuTrocaFase = ({ fases, onTrocarFase }) => {
     parenteCanvas.appendChild(faseAtual.labelRenderer.domElement)
 
     faseAtual.start(); //Começa o loop de animações
+
+    settings.fase = faseAtual;
+
+    console.log("primeiro")
+
+    console.log(settings.fase, "esse daqui")
 
   }, [faseSelecionada]);
 

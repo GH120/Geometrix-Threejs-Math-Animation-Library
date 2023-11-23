@@ -1,4 +1,6 @@
-class Whiteboard {
+import * as THREE from 'three';
+
+export class Whiteboard {
 
     constructor(camera, scene, canvas){
 
@@ -20,9 +22,9 @@ class Whiteboard {
         
         const rect = equationWindow.getBoundingClientRect();
     
-        const bottomleft = pixelToCoordinates(rect.left, rect.bottom);
+        const bottomleft = this.pixelToCoordinates(rect.left, rect.bottom);
     
-        const topright   = pixelToCoordinates(rect.right, rect.top) 
+        const topright   = this.pixelToCoordinates(rect.right, rect.top) 
     
         const width = topright.x - bottomleft.x;
     
@@ -47,7 +49,7 @@ class Whiteboard {
     
         const raycaster = new THREE.Raycaster();
     
-        raycaster.setFromCamera(normalizar(x,y), this.camera);
+        raycaster.setFromCamera(this.normalizar(x,y), this.camera);
         
         const intersects = raycaster.intersectObject(new THREE.Mesh(
         new THREE.PlaneGeometry(100,100),
@@ -62,7 +64,10 @@ class Whiteboard {
     }
     
     normalizar(x, y) {
-        const rect = canvas.getBoundingClientRect();
+
+        const canvas = this.canvas;
+
+        const rect = this.canvas.getBoundingClientRect();
         const normalizedX = (x - rect.left) / canvas.width * 2 - 1;
         const normalizedY = -(y - rect.top) / canvas.height * 2 + 1;
         return new THREE.Vector2(normalizedX,normalizedY);

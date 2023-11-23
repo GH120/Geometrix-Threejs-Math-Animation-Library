@@ -38,10 +38,13 @@ const cartas = [
   // Adicione mais cartas conforme necessário
 ];
 
-function Navbar() {
+
+function Navbar(props) {
   const [FaseMenuOpen, setFaseMenuOpen] = useState(false);
   const [CardsMenuOpen, setCardsMenuOpen] = useState(false);
   const [EquationMenuOpen, setEquationMenuOpen] = useState(false);
+
+  const settings = props.settings;
 
 
   const toggleFaseMenu = () => {
@@ -55,6 +58,8 @@ function Navbar() {
   const toggleEquationMenu = () => {
     setEquationMenuOpen(!EquationMenuOpen);
   };
+
+  console.log(settings)
 
 
   return (
@@ -80,6 +85,7 @@ function Navbar() {
             onTrocarFase={() => {
               console.log()
             }}
+            settings={settings}
           />
         </AboveContainer>
       </div>
@@ -93,7 +99,7 @@ function Navbar() {
       <div className={`navbar-links ${EquationMenuOpen ? 'open' : ''}`}>
         {/* colocar modal de fases aqui (eu acho) */}
         {/* <AboveContainer top={150} left={50}> */}
-          <MenuEquacoes></MenuEquacoes>
+          <MenuEquacoes fase={settings.fase} hidden= {EquationMenuOpen}></MenuEquacoes>
         {/* </AboveContainer> */}
       </div>
 

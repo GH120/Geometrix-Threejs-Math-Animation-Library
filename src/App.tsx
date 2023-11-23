@@ -29,6 +29,17 @@ import MenuEquacoes from './components/MenuEquacoes/MenuEquacoes';
 //   Fase6
 // ]
 
+
+
+
+
+
+
+
+
+
+const settings = {fase: new Fase1()}
+
 function MyThree() {
   const refContainer = useRef<HTMLDivElement | null>(null); // Adicionando o tipo HTMLDivElement | null
   const [indFase, SetIndFase] = useState(1);
@@ -41,7 +52,7 @@ function MyThree() {
 
   useEffect(() => {
 
-    const fase = new Fase1();
+    const fase = settings.fase;
 
     // use ref as a mount point of the Three.js scene instead of the document.body
     refContainer.current && refContainer.current.appendChild(fase.renderer.domElement);
@@ -77,7 +88,7 @@ function MyThree() {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <Navbar />
+      <Navbar settings={settings}/>
       {/* <CartasContainer cartas={cartas}/> */}
       <div className='container de tudo' ref={refContainer}></div>
     </div>

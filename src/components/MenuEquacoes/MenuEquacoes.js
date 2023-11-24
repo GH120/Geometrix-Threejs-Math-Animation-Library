@@ -12,6 +12,7 @@ import './style.css'; // Importe o arquivo de estilo
 import { FiMenu } from 'react-icons/fi'
 import { GiCardAceSpades } from 'react-icons/gi'
 import { Whiteboard } from '../../js/cards/whiteboard';
+import { Equality, Value, Variable } from '../../js/equations/expressions';
 
 
 const cartas = [
@@ -33,6 +34,8 @@ function MenuEquacoes(props) {
   useEffect(() =>{
 
     if(!whiteboard) whiteboard = new Whiteboard();
+
+    whiteboard.adicionarEquacao(new Equality(new Variable("x"), new Value(8) ))
   })
 
   const hidden = props.hidden

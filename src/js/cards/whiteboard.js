@@ -12,8 +12,21 @@ export class Whiteboard {
         //Consegue o elemento html da tela para criar o quadro em branco nele
         this.equationWindow = document.getElementById("equationWindow");
 
+        this.createEquationList();
+
         this.createThreejsCanvas();
 
+    }
+
+    createEquationList(){
+
+        this.equationList = document.createElement("div");
+
+        this.equationList.style.position = "absolute";
+
+        this.equationList.style.zIndex = 2000;
+
+        this.equationWindow.appendChild(this.equationList);
     }
 
     createThreejsCanvas(){
@@ -24,6 +37,7 @@ export class Whiteboard {
         const telaEquacao = this.equationWindow;
 
         const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xffffff);
         // const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2+1, height / - 2 +1, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -33,11 +47,13 @@ export class Whiteboard {
         // renderer.domElement.style.position = "absolute";
 
         camera.position.z = 150;
-
-        scene.background = new THREE.Color(0xffffff);
         
 
-        renderer.domElement.style.zIndex = 2;
+        renderer.domElement.style.position = 'absolute';
+        renderer.domElement.style.bottom = 0
+        renderer.domElement.style.borderTop = "2px solid black";
+        renderer.domElement.style.borderRight = "2px solid black";
+        renderer.domElement.style.borderTopRightRadius = "15px";
 
         this.scene    = scene;
         this.camera   = camera;
@@ -61,6 +77,14 @@ export class Whiteboard {
     //adiciona a equacao
     adicionarEquacao(equacao){
 
+
+        const ListaEquacoes = this.equationList;
+
+        const htmlElement = equacao.html;
+
+        htmlElement.style.zIndex = 2000;
+
+        ListaEquacoes.appendChild(htmlElement);
     }
 
     addWhiteBoard(equationWindow){

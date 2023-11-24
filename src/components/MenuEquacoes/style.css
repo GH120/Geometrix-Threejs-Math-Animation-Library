@@ -3,14 +3,9 @@
     position: fixed;
     bottom: 0;
     left: 0;
-    height: 40%;
-    width: 70%;
     justify-content: center;
-    padding: 10px;
     box-sizing: border-box;
     background-color: rgba(1,1,1,0);
-    border: 10px solid #ccc;
-    padding: 20px;
     border-top-right-radius: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;

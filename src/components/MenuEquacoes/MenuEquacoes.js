@@ -21,6 +21,8 @@ const cartas = [
   // Adicione mais cartas conforme necessário
 ];
 
+let whiteboard;
+
 function MenuEquacoes(props) {
 
   const equationWindowRef = useRef(null);
@@ -28,25 +30,13 @@ function MenuEquacoes(props) {
   //Corrigir: fase não é sincronizada com a do settings
   console.log(props.fase, "this")
 
+  useEffect(() =>{
+
+    if(!whiteboard) whiteboard = new Whiteboard();
+  })
+
   const hidden = props.hidden
   const fase = props.fase;
-
-
-  useEffect(() => {
-    // This code will run after the component is mounted/rendered
-    // Access the DOM node using the ref
-
-    const canvas = fase.renderer.domElement; 
-
-    const equationWindowNode = equationWindowRef.current;
-
-    const whiteboard = new Whiteboard(fase.camera, fase.scene, canvas);
-
-    //Whiteboard deve criar um novo canvas para adicionar as animações de equações
-    //canvas vai estar em um html próprio
-
-  }, []);
-
 
   return (
     <div id="equationWindow" ref={equationWindowRef}> </div>

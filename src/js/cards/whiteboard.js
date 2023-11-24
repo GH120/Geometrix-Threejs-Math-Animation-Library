@@ -1,17 +1,62 @@
 import * as THREE from 'three';
 
+//Obs: edit layout with google webtools later
 export class Whiteboard {
 
-    constructor(camera, scene, canvas){
+    constructor(){
 
-        this.camera = camera;
-        this.scene  = scene;
-        this.canvas = canvas;
+        // this.camera = camera;
+        // this.scene  = scene;
+        // this.canvas = canvas;
 
         //Consegue o elemento html da tela para criar o quadro em branco nele
         this.equationWindow = document.getElementById("equationWindow");
 
+        this.createThreejsCanvas();
+
     }
+
+    createThreejsCanvas(){
+
+        const width = 10;
+        const height = 8;
+
+        const telaEquacao = this.equationWindow;
+
+        const scene = new THREE.Scene();
+        // const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2+1, height / - 2 +1, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.domElement.id = 'TELAEQUACAO';
+        renderer.setSize(window.innerWidth * 0.7, window.innerHeight * 0.4); //Magic numebers, se o canvas ficar desconfigurado procurar aqui
+
+        // renderer.domElement.style.position = "absolute";
+
+        camera.position.z = 150;
+
+        scene.background = new THREE.Color(0xffffff);
+        
+
+        renderer.domElement.style.zIndex = 2;
+
+        this.scene    = scene;
+        this.camera   = camera;
+        this.renderer = renderer;
+
+        function animate() {
+            requestAnimationFrame(animate);
+        
+            // You can add animations or other updates here
+        
+            // Render the scene
+            renderer.render(scene, camera);
+        }
+
+        animate();
+        
+        telaEquacao.appendChild(renderer.domElement);
+    }
+
 
     //adiciona a equacao
     adicionarEquacao(equacao){

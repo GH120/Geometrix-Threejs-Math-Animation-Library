@@ -23,6 +23,11 @@ export class Whiteboard {
         this.equationList = document.createElement("div");
 
         this.equationList.style.position = "absolute";
+        this.equationList.style.display  = "flex";
+        this.equationList.style.flexDirection = "column"
+        this.equationList.style.alignitems = "center"
+        this.equationList.style.marginLeft = "20px"
+        this.equationList.style.marginTop  = "10px"
 
         this.equationList.style.zIndex = 2000;
 

@@ -44,7 +44,7 @@ export class Fase3 extends Fase{
         this.setUpAnimar();
         this.addToScene(this.scene);
         // this.setupInterface();
-        // this.setupTextBox();
+        this.setupTextBox();
 
         this.triangulo.edges[0].valor = new Addition(new Variable("x"), new Value(-1));
         this.triangulo.edges[1].valor = new Addition(new Variable("x"), new Value(-2));
@@ -58,20 +58,20 @@ export class Fase3 extends Fase{
 
         const dialogo = ["Encontre o valor de x"]
 
-        // this.changeText(dialogo[0]);
+        this.changeText(dialogo[0]);
 
-        // const lado1 = this.createEquationBox("(x - 1)",[4.1,1.5,0])
-        // const lado2 = this.createEquationBox("(x - 2)",[1.5,-0.5,0])
-        // const lado3 = this.createEquationBox("x",[1.1,2,0])
+        const lado1 = this.createEquationBox("(x - 1)",[4.1,1.5,0])
+        const lado2 = this.createEquationBox("(x - 2)",[1.5,-0.5,0])
+        const lado3 = this.createEquationBox("x",[1.1,2,0])
 
         const bracket = new Bracket(0.2).addToScene(this.scene);
         const bracket2 = new Bracket(0.2, [-0.4,-0.35,0], [2.6,-0.35,0]).addToScene(this.scene)
         const bracket3 = new Bracket(-0.2, [-0.3,0.3,0], [2.7,3.3,0]).addToScene(this.scene)
 
-        // const anim1 = new AnimacaoSimultanea(bracket.animacao(), new TextoAparecendo(lado1.element).setProgresso(0))
-        // const anim2 = new AnimacaoSimultanea(bracket2.animacao(), new TextoAparecendo(lado2.element).setProgresso(0))
-        // const anim3 = new AnimacaoSimultanea(bracket3.animacao(), new TextoAparecendo(lado3.element).setProgresso(0))
-        // const anim4 = new TextoAparecendo(this.text.element).setProgresso(0);
+        const anim1 = new AnimacaoSimultanea(bracket.animacao(), new TextoAparecendo(lado1.element).setProgresso(0))
+        const anim2 = new AnimacaoSimultanea(bracket2.animacao(), new TextoAparecendo(lado2.element).setProgresso(0))
+        const anim3 = new AnimacaoSimultanea(bracket3.animacao(), new TextoAparecendo(lado3.element).setProgresso(0))
+        const anim4 = new TextoAparecendo(this.text.element).setProgresso(0);
         
         const removeAll = () => {this.scene.remove(bracket.mesh);    
                                  this.scene.remove(bracket2.mesh); 
@@ -82,77 +82,79 @@ export class Fase3 extends Fase{
         this.animar(new AnimacaoSequencial(bracket.animacao(), bracket2.animacao(), bracket3.animacao()).manterExecucaoTodos(true))
 
 
-        new Pythagoras(this);
+        // new Pythagoras(this);
     }
 
-    //Cria a caixa de texto onde o texto vai aparecer
-    // setupTextBox(){
-    //     // Create a parent element to hold the spans
-    //     const container = document.createElement('p');
-    //     container.style.fontFamily = "Courier New, monospace";
-    //     container.style.fontSize = "25px";
-    //     container.style.fontWeight ="italic";
-    //     container.style.display = 'inline-block';
+    // Cria a caixa de texto onde o texto vai aparecer
+    setupTextBox(){
+        // Create a parent element to hold the spans
+        const container = document.createElement('p');
+        container.style.fontFamily = "Courier New, monospace";
+        container.style.fontSize = "25px";
+        container.style.fontWeight ="italic";
+        container.style.display = 'inline-block';
+        container.style.zIndex = 1000;
 
-    //     // Create the CSS2DObject using the container
-    //     const cPointLabel = new CSS2DObject(container);       
+        // Create the CSS2DObject using the container
+        const cPointLabel = new CSS2DObject(container);       
 
-    //     this.text = cPointLabel;
+        this.text = cPointLabel;
 
-    //     this.text.position.y = 3.5;
+        this.text.position.y = 3.5;
 
-    //     this.scene.add(this.text);
+        this.scene.add(this.text);
 
-    //     this.changeText("Crie um triangulo equilatero");
-    // }
+        this.changeText("Crie um triangulo equilatero");
+    }
 
-    // //Muda o conteúdo da caixa de texto
-    // changeText(texto){
+    //Muda o conteúdo da caixa de texto
+    changeText(texto){
 
-    //     console.log(texto);
+        console.log(texto);
 
-    //     this.text.element.textContent = '';
+        this.text.element.textContent = '';
 
-    //     // Split the text into individual characters
-    //     const characters = texto.split('');
+        // Split the text into individual characters
+        const characters = texto.split('');
 
-    //     // Create spans for each character and apply the fading effect
-    //     characters.forEach((character,index) => {
-    //         const span = document.createElement('span');
-    //         span.textContent = character;
-    //         this.text.element.appendChild(span);
-    //     });
-    // }
+        // Create spans for each character and apply the fading effect
+        characters.forEach((character,index) => {
+            const span = document.createElement('span');
+            span.textContent = character;
+            span.style.zIndex = 1000;
+            this.text.element.appendChild(span);
+        });
+    }
 
-    // createEquationBox(equation, position){
+    createEquationBox(equation, position){
 
-    //     const container = document.createElement('p');
-    //     container.style.fontSize = "25px";
-    //     container.style.fontFamily = "Courier New, monospace";
-    //     container.style.fontWeight = 500;
-    //     container.style.display = 'inline-block';
+        const container = document.createElement('p');
+        container.style.fontSize = "25px";
+        container.style.fontFamily = "Courier New, monospace";
+        container.style.fontWeight = 500;
+        container.style.display = 'inline-block';
 
-    //     // Split the text into individual characters
-    //     const characters = equation.split('');
+        // Split the text into individual characters
+        const characters = equation.split('');
 
-    //     // Create spans for each character and apply the fading effect
-    //     characters.forEach((character,index) => {
-    //         const span = document.createElement('span');
-    //         span.textContent = character;
-    //         container.appendChild(span);
-    //     });
+        // Create spans for each character and apply the fading effect
+        characters.forEach((character,index) => {
+            const span = document.createElement('span');
+            span.textContent = character;
+            container.appendChild(span);
+        });
 
-    //     // Create the CSS2DObject using the container
-    //     const cPointLabel = new CSS2DObject(container);       
+        // Create the CSS2DObject using the container
+        const cPointLabel = new CSS2DObject(container);       
 
-    //     cPointLabel.position.x = position[0];
-    //     cPointLabel.position.y = position[1];
-    //     cPointLabel.position.z = position[2];
+        cPointLabel.position.x = position[0];
+        cPointLabel.position.y = position[1];
+        cPointLabel.position.z = position[2];
 
-    //     this.scene.add(cPointLabel);
+        this.scene.add(cPointLabel);
 
-    //     return cPointLabel;
-    // }
+        return cPointLabel;
+    }
 
     createInputs(){
         

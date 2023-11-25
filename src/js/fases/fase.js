@@ -53,6 +53,7 @@ export class Fase {
         
         this.frames = [];
         this.animacoes = [];
+        this.objetos = [];
     }
     
 

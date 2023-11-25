@@ -13,6 +13,7 @@ import { FiMenu } from 'react-icons/fi'
 import { GiCardAceSpades } from 'react-icons/gi'
 import { Whiteboard } from '../../js/cards/whiteboard';
 import { Equality, Value, Variable } from '../../js/equations/expressions';
+import { PythagorasCard } from '../../js/cards/pythagorasCard';
 
 
 const cartas = [
@@ -33,9 +34,15 @@ function MenuEquacoes(props) {
 
   useEffect(() =>{
 
-    if(!whiteboard) whiteboard = new Whiteboard();
+    if(whiteboard) return
+
+    whiteboard = new Whiteboard();
 
     whiteboard.adicionarEquacao(new Equality(new Variable("x"), new Value(8) ))
+
+    const pythagoras = new PythagorasCard(whiteboard);
+
+    if(props.fase) pythagoras.trigger(props.fase);
   })
 
   const hidden = props.hidden

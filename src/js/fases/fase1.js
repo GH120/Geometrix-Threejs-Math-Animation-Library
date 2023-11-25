@@ -18,6 +18,9 @@ import MostrarTracejado from '../animacoes/mostrarTracejado';
 import { Divisao } from '../animacoes/divisao';
 import { Triangle } from '../objetos/triangle';
 import { Fase } from './fase';
+import { Output } from '../outputs/Output';
+import Pythagoras from '../equations/pythagoras';
+import { PythagorasCard } from '../cards/pythagorasCard';
 
 export class Fase1 extends Fase{
 
@@ -28,6 +31,8 @@ export class Fase1 extends Fase{
         this.triangulo = new Triangle()
                             .render()
                             .addToScene(this.scene);
+
+        this.objetos.push(this.triangulo);
 
         this.trigonometria = [];
 

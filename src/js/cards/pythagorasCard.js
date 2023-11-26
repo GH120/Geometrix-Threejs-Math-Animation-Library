@@ -1,3 +1,4 @@
+import { TextoAparecendo } from "../animacoes/textoAparecendo";
 import { Addition, Equality, Square, Value } from "../equations/expressions";
 import { Hoverable } from "../inputs/hoverable";
 import { Output } from "../outputs/Output";
@@ -32,15 +33,15 @@ export class PythagorasCard {
     
     accept(){
 
-        const trianguloValido = this.outputs.filter(output => output.estado.valido);
+        const trianguloValido    = this.outputs.filter(output => output.estado.valido);
 
-        console.log("processado")
+        const trianguloRetangulo = trianguloValido.length && this.trianguloSelecionado.retangulo()
 
-        console.log(trianguloValido)
+        alert(`Triangulo ${(trianguloValido.length)? "encontrado" : "não encontrado"}`);
 
-        console.log(trianguloValido[0].estado.valido)
+        alert(`Triangulo ${trianguloRetangulo? "retângulo: ACEITO" : "não retângulo: REJEITADO"}`);
 
-        return trianguloValido.length;
+        return trianguloRetangulo;
     }
 
     process(){
@@ -53,6 +54,8 @@ export class PythagorasCard {
 
         console.log("lados", a,b,c, triangulo)
 
+        if(!a.valor || !b.valor || !c.valor) throw new Error("Lados do triângulo não tem valores, tente outra fase")
+
         const equation = new Equality(
                             new Addition(
                                 new Square(c.valor), 
@@ -61,7 +64,21 @@ export class PythagorasCard {
                             new Square(a.valor)
                         )
 
+        // const aparecerEquacao = new TextoAparecendo(equation.element);
+        
+
+        // aparecerEquacao.setDuration(100);
+        // aparecerEquacao.valorInicial(-2);
+        // aparecerEquacao.valorFinal(3);
+
         this.whiteboard.adicionarEquacao(equation);
+        
+        this.whiteboard.animar( 
+                new TextoAparecendo(equation.element)
+                .setValorInicial(-5)
+                .setValorFinal(1)
+                .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+        );
 
         this.a = a;
         this.b = b;

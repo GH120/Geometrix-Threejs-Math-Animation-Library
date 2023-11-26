@@ -4,7 +4,7 @@
     bottom: 0;
     left: 0;
     height:40%;
-    width:70%;
+    width:40%;
     justify-content: center;
     box-sizing: border-box;
     background-color: rgba(1,1,1,0);
@@ -86,3 +86,10 @@ svg {
     color: #007bff;
     margin: 2px;
 }
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.fade-in-image { animation: fadeIn 5s; }

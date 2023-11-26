@@ -59,7 +59,7 @@ function Navbar(props) {
     setEquationMenuOpen(!EquationMenuOpen);
   };
 
-  console.log(settings)
+  settings.toggleEquationMenu = toggleEquationMenu;
 
 
   return (

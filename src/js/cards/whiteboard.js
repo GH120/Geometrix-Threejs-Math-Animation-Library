@@ -9,6 +9,9 @@ export class Whiteboard {
         // this.scene  = scene;
         // this.canvas = canvas;
 
+        this.animacoes  = [];
+        this.frames     = [];
+
         //Consegue o elemento html da tela para criar o quadro em branco nele
         try{
             this.start();
@@ -59,7 +62,7 @@ export class Whiteboard {
         const camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2+1, height / - 2 +1, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.domElement.id = 'TELAEQUACAO';
-        renderer.setSize(window.innerWidth * 0.7, window.innerHeight * 0.4); //Magic numebers, se o canvas ficar desconfigurado procurar aqui
+        renderer.setSize(window.innerWidth * 0.4, window.innerHeight * 0.4); //Magic numebers, se o canvas ficar desconfigurado procurar aqui
 
         // renderer.domElement.style.position = "absolute";
 
@@ -76,10 +79,13 @@ export class Whiteboard {
         this.camera   = camera;
         this.renderer = renderer;
 
-        function animate() {
+        
+
+        const animate = () => {
             requestAnimationFrame(animate);
         
             // You can add animations or other updates here
+            this.frames.map(frame => frame.next());
         
             // Render the scene
             renderer.render(scene, camera);
@@ -156,5 +162,16 @@ export class Whiteboard {
         const normalizedX = (x - rect.left) / canvas.width * 2 - 1;
         const normalizedY = -(y - rect.top) / canvas.height * 2 + 1;
         return new THREE.Vector2(normalizedX,normalizedY);
+    }
+
+    animar(animacao){
+
+        animacao.animationFrames = animacao.getFrames();
+
+        this.frames.push(animacao.animationFrames);
+
+        this.animacoes.push(animacao);
+
+        return this;
     }
 }

@@ -38,11 +38,13 @@ function CartaPythagoras(props) {
 
             //Se sim, processa
             carta.process();
+
+            settings.toggleEquationMenu(); //Abre o menu de equações
         }
 
+        //Espera 100ms antes de verificar se a carta está dentro
+        //Precisa disso pois o hoverable tem um delay para ativar
         await new Promise(resolve => setTimeout(resolve, 100)).then(processar);
-
-        // Use the delay function to wait for 1000 milliseconds (1 second) before calling processar
 
     };
 

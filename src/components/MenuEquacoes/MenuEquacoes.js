@@ -34,15 +34,7 @@ function MenuEquacoes(props) {
 
   useEffect(() =>{
 
-    if(whiteboard) return
-
-    whiteboard = new Whiteboard();
-
-    whiteboard.adicionarEquacao(new Equality(new Variable("x"), new Value(8) ))
-
-    const pythagoras = new PythagorasCard(whiteboard);
-
-    if(props.fase) pythagoras.trigger(props.fase);
+    
   })
 
   const hidden = props.hidden

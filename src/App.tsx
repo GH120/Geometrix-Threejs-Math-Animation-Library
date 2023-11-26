@@ -19,6 +19,7 @@ import Carta from './components/Carta/Carta';
 import CartasContainer from './components/CartasContainer/CartasContainer';
 import { Fase7 } from './js/fases/fase7';
 import MenuEquacoes from './components/MenuEquacoes/MenuEquacoes';
+import { Whiteboard } from './js/cards/whiteboard';
 
 // const fases = [
 //   Fase1,
@@ -38,7 +39,7 @@ import MenuEquacoes from './components/MenuEquacoes/MenuEquacoes';
 
 
 
-const settings = {fase: new Fase1()}
+const settings = {fase: new Fase1(), whiteboard: new Whiteboard()}
 
 function MyThree() {
   const refContainer = useRef<HTMLDivElement | null>(null); // Adicionando o tipo HTMLDivElement | null
@@ -52,13 +53,16 @@ function MyThree() {
 
   useEffect(() => {
 
-    const fase = settings.fase;
+    const fase       = settings.fase;
+    const whiteboard = settings.whiteboard;
 
     // use ref as a mount point of the Three.js scene instead of the document.body
     refContainer.current && refContainer.current.appendChild(fase.renderer.domElement);
     refContainer.current && refContainer.current.appendChild(fase.labelRenderer.domElement)
 
     fase.start(); //Começa o loop de animações
+
+    whiteboard.start();
   }, []);
 
   const handleDragOver = (e: any) => {

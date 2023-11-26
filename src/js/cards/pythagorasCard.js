@@ -32,25 +32,33 @@ export class PythagorasCard {
     
     accept(){
 
-        const trianguloSelecionado = this.outputs.filter(output => output.valido).lenght;
+        const trianguloValido = this.outputs.filter(output => output.estado.valido);
 
-        return trianguloSelecionado;
+        console.log("processado")
+
+        console.log(trianguloValido)
+
+        console.log(trianguloValido[0].estado.valido)
+
+        return trianguloValido.length;
     }
 
     process(){
 
         const triangulo = this.trianguloSelecionado;
 
-        const a = triangulo.edges.reduce((a,b) => a.mesh.length > b.mesh.length);
+        const a = triangulo.edges.reduce((a,b) => (a.length > b.length? a : b))
         const b = triangulo.edges.filter(aresta => aresta != this.a)[0];
         const c = triangulo.edges.filter(aresta => aresta != this.a)[1];
 
+        console.log("lados", a,b,c, triangulo)
+
         const equation = new Equality(
                             new Addition(
-                                new Square(c.value), 
-                                new Square(b.value)
+                                new Square(c.valor), 
+                                new Square(b.valor)
                             ), 
-                            new Square(a.value)
+                            new Square(a.valor)
                         )
 
         this.whiteboard.adicionarEquacao(equation);
@@ -66,14 +74,17 @@ export class PythagorasCard {
 
         const verificador = new Output()
                             .setUpdateFunction(function(estado){
-                                
-                                this.estado.valido = estado.dentro && triangulo.retangulo();
+
+                                this.estado.valido = estado.dentro;
+
+                                console.log("sim", this.estado)
 
                                 carta.trianguloSelecionado = triangulo;
 
-                                if(estado.dentro) console.log((this.estado.valido)? "triangulo aceito" : "triangulo rejeitado")
                             })
 
         triangulo.hoverable.addObserver(verificador);
+
+        this.outputs.push(verificador)
     }
 }

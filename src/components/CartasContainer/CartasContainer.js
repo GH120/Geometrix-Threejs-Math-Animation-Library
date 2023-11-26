@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Carta from '../Carta/Carta';
 import './style.css'
+import CartaPythagoras from '../Carta/CartaPythagoras';
 
 function CartasContainer(props) {
   const [cartaEmFrente, setCartaEmFrente] = useState(null);
@@ -15,6 +16,8 @@ function CartasContainer(props) {
 
   const cartas = props.cartas;
 
+  const settings = props.settings;
+
   return (
     <div className="lista-cartas">
       {cartas.map((carta, index) => (
@@ -24,7 +27,7 @@ function CartasContainer(props) {
           onMouseEnter={() => handleMouseEnter(index)}
           onMouseLeave={handleMouseLeave}
         >
-          <Carta valor={carta.valor} naipe={carta.naipe} />
+          <CartaPythagoras valor={carta.valor} naipe={carta.naipe} settings={settings} />
         </div>
       ))}
     </div>

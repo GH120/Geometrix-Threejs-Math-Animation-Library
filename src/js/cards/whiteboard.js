@@ -10,12 +10,24 @@ export class Whiteboard {
         // this.canvas = canvas;
 
         //Consegue o elemento html da tela para criar o quadro em branco nele
+        try{
+            this.start();
+
+            this.initialized = true;
+        }
+        catch(e){
+
+        }
+
+    }
+
+    start(){
+
         this.equationWindow = document.getElementById("equationWindow");
 
         this.createEquationList();
 
         this.createThreejsCanvas();
-
     }
 
     createEquationList(){
@@ -81,7 +93,6 @@ export class Whiteboard {
 
     //adiciona a equacao
     adicionarEquacao(equacao){
-
 
         const ListaEquacoes = this.equationList;
 

@@ -36,6 +36,14 @@ export class Fase3 extends Fase{
         this.triangulo = new Triangle()
                         .render()
                         .addToScene(this.scene);
+
+
+        this.triangulo.edges[0].valor = new Addition(new Variable("x"), new Value(-1));
+        this.triangulo.edges[1].valor = new Addition(new Variable("x"), new Value(-2));
+        this.triangulo.edges[2].valor = new Variable("x");
+
+
+        this.objetos.push(this.triangulo);
         
         this.trigonometria = [];
 
@@ -45,10 +53,6 @@ export class Fase3 extends Fase{
         this.addToScene(this.scene);
         // this.setupInterface();
         this.setupTextBox();
-
-        this.triangulo.edges[0].valor = new Addition(new Variable("x"), new Value(-1));
-        this.triangulo.edges[1].valor = new Addition(new Variable("x"), new Value(-2));
-        this.triangulo.edges[2].valor = new Variable("x");
 
         this.levelDesign();
     }
@@ -60,9 +64,9 @@ export class Fase3 extends Fase{
 
         this.changeText(dialogo[0]);
 
-        const lado1 = this.createEquationBox("(x - 1)",[4.1,1.5,0])
+        const lado1 = this.createEquationBox("(x - 1)",[3.8,1.8,0])
         const lado2 = this.createEquationBox("(x - 2)",[1.5,-0.5,0])
-        const lado3 = this.createEquationBox("x",[1.1,2,0])
+        const lado3 = this.createEquationBox("x",[1,2.5,0])
 
         const bracket = new Bracket(0.2).addToScene(this.scene);
         const bracket2 = new Bracket(0.2, [-0.4,-0.35,0], [2.6,-0.35,0]).addToScene(this.scene)
@@ -79,7 +83,7 @@ export class Fase3 extends Fase{
         }
 
         // this.animar(new AnimacaoSequencial(anim1,anim2,anim3.setOnTermino(removeAll),anim4).manterExecucaoTodos(true))
-        this.animar(new AnimacaoSequencial(bracket.animacao(), bracket2.animacao(), bracket3.animacao()).manterExecucaoTodos(true))
+        this.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4).manterExecucaoTodos(true).setOnTermino(removeAll))
 
 
         // new Pythagoras(this);

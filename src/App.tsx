@@ -17,9 +17,10 @@ import MenuTrocaFase from './components/MenuTrocaFase/MenuTrocaFase';
 import Navbar from './components/Navbar/Navbar';
 import Carta from './components/Carta/Carta';
 import CartasContainer from './components/CartasContainer/CartasContainer';
-import { Fase7 } from './js/fases/fase7';
+import { Fase4 } from './js/fases/fase4';
 import MenuEquacoes from './components/MenuEquacoes/MenuEquacoes';
 import { Whiteboard } from './js/cards/whiteboard';
+import { Tutorial } from './js/fases/tutorial';
 
 // const fases = [
 //   Fase1,
@@ -39,7 +40,7 @@ import { Whiteboard } from './js/cards/whiteboard';
 
 
 
-const settings = {fase: new Fase1(), whiteboard: new Whiteboard()}
+const settings = {fase: new Tutorial(), whiteboard: new Whiteboard()}
 
 function MyThree() {
   const refContainer = useRef<HTMLDivElement | null>(null); // Adicionando o tipo HTMLDivElement | null

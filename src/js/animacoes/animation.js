@@ -101,6 +101,8 @@ export default class Animacao {
 
             if(this.stop) return this.update(this.valorInicial); //se parar a execução, volta ao inicio
 
+            this.frame = frame;
+
             // if(this.skip) return this.endExecution(); //se quiser pular a execução, termina a animação// A FAZER
 
             yield frame;
@@ -110,6 +112,9 @@ export default class Animacao {
 
         //Parte do delay
         for(let frame = this.frames; frame < this.frames + this.delay; frame++){
+
+            this.frame = frame;
+
             yield this.update(this.valorFinal);
         }
 

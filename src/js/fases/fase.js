@@ -151,15 +151,29 @@ export class Fase {
 
     //** O update que roda no loop de animações*/
     update(){
-        this.atualizarOptions();
 
         this.frames.map(frame => frame.next()); //Roda as animações do programa
 
-        // if(options.atualizar) triangle.update();
+        this.handleCheckpoint();
+    }
 
-        if (this.triangulo.equilatero()) {
-            this.changeText("VITORIA!!!");
-            // botar notif
+    handleCheckpoint(){
+
+        //Quando terminar uma animação, então ele para a execução da sequência
+        for(const animacao of this.animacoes){
+
+            const isSequential = animacao.constructor.name == "AnimacaoSequencial";
+
+            if(!isSequential) continue;
+
+            const hasCheckPoint = animacao.subAnimacaoAtual.checkpoint;
+
+            const lastFrame = animacao.subAnimacaoAtual.frame == animacao.subAnimacaoAtual.frames - 1;
+
+            if(hasCheckPoint && lastFrame){
+                
+                animacao.pause = true;
+            }
         }
     }
 
@@ -187,7 +201,7 @@ export class Fase {
     //Começa a execução do programa inicializando o loop de animações
     start(){
 
-        const programa      = this;
+        const fase      = this;
         const labelRenderer = this.labelRenderer;
         const renderer      = this.renderer;
         const scene         = this.scene;
@@ -195,12 +209,12 @@ export class Fase {
 
         function animate() {
 
-            if(programa.stop) return;
+            if(fase.stop) return;
 
             requestAnimationFrame( animate );
         
-            //Atualiza o programa
-            programa.update();
+            //Atualiza o fase
+            fase.update();
         
             renderer.render( scene, camera );
             labelRenderer.render( scene, camera );

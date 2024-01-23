@@ -6,6 +6,7 @@ export default class Animacao {
         this.delay = 0;
         this.manter = false;
         this.voltar = true;
+        this.checkpoint = true;
     }
 
     setValorInicial(valorInicial){
@@ -97,7 +98,7 @@ export default class Animacao {
 
             this.update(valor);
 
-            // while (this.pause) yield this.update(valor); //se estiver pausado, continua executando// A FAZER
+            while (this.pause) yield this.frame; //se estiver pausado, continua executando// A FAZER
 
             if(this.stop) return this.update(this.valorInicial); //se parar a execução, volta ao inicio
 
@@ -114,6 +115,8 @@ export default class Animacao {
         for(let frame = this.frames; frame < this.frames + this.delay; frame++){
 
             this.frame = frame;
+
+            while (this.pause) yield this.frame;
 
             yield this.update(this.valorFinal);
         }
@@ -203,6 +206,11 @@ export class AnimacaoSimultanea extends Animacao{
 
         //Avança os frames simultâneamente das animações
         for(let frame = 0; frame <= this.frames; frame++){
+
+            this.frame = frame;
+
+            while (this.pause) yield this.frame;
+
             yield actions.map(action => action.next());
         }
 
@@ -276,18 +284,28 @@ export class AnimacaoSequencial extends Animacao{
         this.onStart();
 
         const animacoes = this.animacoes;
+
+        this.frame = 0;
         
         const completedActions = [];
 
         for(const animacao of animacoes){
+            
+            const action           = animacao.getFrames();
 
-            const action = animacao.getFrames();
+            this.subAnimacaoAtual = animacao;
 
             //Retorna um por um os frames da animação atual
             for(let i = 0; i <= animacao.frames + animacao.delay; i++){
-                if(this.chosen) console.log(this.delay)
+
+                this.frame++;
+
+                while (this.pause) yield this.frame;
+
                 yield action.next();
             }
+
+            action.next();
 
             //Quando terminada, adicionar as completadas
             completedActions.push(action);

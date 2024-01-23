@@ -15,7 +15,8 @@ import { Fase4 } from '../../js/fases/fase4';
 import { Fase5 } from '../../js/fases/fase5';
 import { Fase6 } from '../../js/fases/fase6';
 
-import { FiMenu } from 'react-icons/fi'
+import { FiMenu, FiHome } from 'react-icons/fi'
+import { BiMath } from "react-icons/bi";
 import { GiCardAceSpades } from 'react-icons/gi'
 import { Fase7 } from '../../js/fases/fase7';
 
@@ -66,6 +67,9 @@ function Navbar(props) {
     <nav className="navbar">
       <div className="buttons-container">
 
+      <button className="menu-button" onClick={toggleFaseMenu}>
+          <FiHome />
+        </button>
         <button className="menu-button" onClick={toggleFaseMenu}>
           <FiMenu />
         </button>
@@ -73,7 +77,7 @@ function Navbar(props) {
           <GiCardAceSpades />
         </button> 
         <button className="menu-button" onClick={toggleEquationMenu}>
-          <GiCardAceSpades />
+          <BiMath />
         </button>
         
       </div>

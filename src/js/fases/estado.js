@@ -10,7 +10,7 @@ export default class Estado{
         this.informacoes = informacoes
     }
 
-    chageState(fase){
+    changeState(fase){
         fase.objetos = this.objetos
         fase.scene = this.cena
         fase.outputs = this.outputs

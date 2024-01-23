@@ -11,6 +11,9 @@ import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import grid from '../../assets/grid.avif';
+import { TextoAparecendo } from '../animacoes/textoAparecendo';
+import KeyInput from '../inputs/keyInput';
+import { Output } from '../outputs/Output';
 
 export class Fase {
 
@@ -54,6 +57,35 @@ export class Fase {
         this.frames = [];
         this.animacoes = [];
         this.objetos = [];
+
+        this.createPauseHandler();
+    }
+
+    createPauseHandler(){
+
+        const fase = this;
+
+        const keyInput = new KeyInput();
+
+        const pausar = new Output()
+                       .setUpdateFunction(function(novoEstado){
+                            //Enter
+                            if(novoEstado.keyDown == 13){
+
+                                this.estado.pause = !this.estado.pause;
+
+                                const pausado = this.estado.pause;
+
+                                fase.animacoes.map(animacao => animacao.pause = pausado);
+
+                                fase.scene.remove(fase.aviso);
+                            }
+                       });
+
+        keyInput.addObserver(pausar);
+
+        this.keyInput     = keyInput;
+        this.pauseHandler = pausar;
     }
     
 
@@ -151,16 +183,72 @@ export class Fase {
 
     //** O update que roda no loop de animações*/
     update(){
-        this.atualizarOptions();
 
         this.frames.map(frame => frame.next()); //Roda as animações do programa
 
-        // if(options.atualizar) triangle.update();
+        this.handleCheckpoint();
+    }
 
-        if (this.triangulo.equilatero()) {
-            this.changeText("VITORIA!!!");
-            // botar notif
+    handleCheckpoint(){
+
+        //Quando terminar uma animação, então ele para a execução da sequência
+        for(const animacao of this.animacoes){
+
+            const isSequential = animacao.constructor.name == "AnimacaoSequencial";
+
+            if(!isSequential) continue;
+
+            const hasCheckPoint = animacao.subAnimacaoAtual.checkpoint;
+
+            const lastFrame = animacao.subAnimacaoAtual.frame == animacao.subAnimacaoAtual.frames - 1;
+
+            if(hasCheckPoint && lastFrame && !animacao.pause){
+                
+                animacao.pause = true;
+
+                //Avisa pro handler de pause que o estado está pausado
+                this.pauseHandler.estado.pause = true;
+
+                this.animacaoPausar();
+            }
         }
+    }
+
+    //Solução temporária, fazer depois no react
+    animacaoPausar(){
+
+        const container = document.createElement('p');
+        container.style.fontFamily = "Courier New, monospace";
+        container.style.fontSize = "15px";
+        container.style.display = 'inline-block';
+
+        // Create the CSS2DObject using the container
+        const aviso = new CSS2DObject(container);     
+        
+        const texto = "Aperte Enter para proseguir...";
+
+
+        //Refatorar a gambiarra do textoAparecendo
+
+        // Split the text into individual characters
+        const characters = texto.split('');
+
+        // Create spans for each character and apply the fading effect
+        characters.forEach((character,index) => {
+            const span = document.createElement('span');
+            span.textContent = character;
+            aviso.element.appendChild(span);
+        });
+
+        aviso.position.y = -2.5;
+        aviso.position.x = 4;
+
+        this.aviso = aviso;
+
+        this.animar(new TextoAparecendo(aviso.element).setProgresso(0));
+
+        this.scene.add(aviso);
+
     }
 
     // event listener funcionando 
@@ -187,7 +275,7 @@ export class Fase {
     //Começa a execução do programa inicializando o loop de animações
     start(){
 
-        const programa      = this;
+        const fase      = this;
         const labelRenderer = this.labelRenderer;
         const renderer      = this.renderer;
         const scene         = this.scene;
@@ -195,12 +283,12 @@ export class Fase {
 
         function animate() {
 
-            if(programa.stop) return;
+            if(fase.stop) return;
 
             requestAnimationFrame( animate );
         
-            //Atualiza o programa
-            programa.update();
+            //Atualiza o fase
+            fase.update();
         
             renderer.render( scene, camera );
             labelRenderer.render( scene, camera );

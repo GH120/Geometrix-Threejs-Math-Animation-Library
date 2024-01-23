@@ -58,10 +58,10 @@ export class Fase {
         this.animacoes = [];
         this.objetos = [];
 
-        this.pauseHandler();
+        this.createPauseHandler();
     }
 
-    pauseHandler(){
+    createPauseHandler(){
 
         const fase = this;
 
@@ -77,10 +77,15 @@ export class Fase {
                                 const pausado = this.estado.pause;
 
                                 fase.animacoes.map(animacao => animacao.pause = pausado);
+
+                                fase.scene.remove(fase.aviso);
                             }
                        });
 
         keyInput.addObserver(pausar);
+
+        this.keyInput     = keyInput;
+        this.pauseHandler = pausar;
     }
     
 
@@ -201,6 +206,9 @@ export class Fase {
                 
                 animacao.pause = true;
 
+                //Avisa pro handler de pause que o estado está pausado
+                this.pauseHandler.estado.pause = true;
+
                 this.animacaoPausar();
             }
         }
@@ -234,6 +242,8 @@ export class Fase {
 
         aviso.position.y = -2.5;
         aviso.position.x = 4;
+
+        this.aviso = aviso;
 
         this.animar(new TextoAparecendo(aviso.element).setProgresso(0));
 

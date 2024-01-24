@@ -14,6 +14,7 @@ import grid from '../../assets/grid.avif';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
 import KeyInput from '../inputs/keyInput';
 import { Output } from '../outputs/Output';
+import AnimationControler from '../animacoes/animationControler';
 
 export class Fase {
 
@@ -57,35 +58,7 @@ export class Fase {
         this.frames = [];
         this.animacoes = [];
         this.objetos = [];
-
-        this.createPauseHandler();
-    }
-
-    createPauseHandler(){
-
-        const fase = this;
-
-        const keyInput = new KeyInput();
-
-        const pausar = new Output()
-                       .setUpdateFunction(function(novoEstado){
-                            //Enter
-                            if(novoEstado.keyDown == 13){
-
-                                this.estado.pause = !this.estado.pause;
-
-                                const pausado = this.estado.pause;
-
-                                fase.animacoes.map(animacao => animacao.pause = pausado);
-
-                                fase.scene.remove(fase.aviso);
-                            }
-                       });
-
-        keyInput.addObserver(pausar);
-
-        this.keyInput     = keyInput;
-        this.pauseHandler = pausar;
+        this.animationControler = new AnimationControler(null,this,null,null,null);
     }
     
 
@@ -186,69 +159,7 @@ export class Fase {
 
         this.frames.map(frame => frame.next()); //Roda as animações do programa
 
-        this.handleCheckpoint();
-    }
-
-    handleCheckpoint(){
-
-        //Quando terminar uma animação, então ele para a execução da sequência
-        for(const animacao of this.animacoes){
-
-            const isSequential = animacao.constructor.name == "AnimacaoSequencial";
-
-            if(!isSequential) continue;
-
-            const hasCheckPoint = animacao.subAnimacaoAtual.checkpoint;
-
-            const lastFrame = animacao.subAnimacaoAtual.frame == animacao.subAnimacaoAtual.frames - 1;
-
-            if(hasCheckPoint && lastFrame && !animacao.pause){
-                
-                animacao.pause = true;
-
-                //Avisa pro handler de pause que o estado está pausado
-                this.pauseHandler.estado.pause = true;
-
-                this.animacaoPausar();
-            }
-        }
-    }
-
-    //Solução temporária, fazer depois no react
-    animacaoPausar(){
-
-        const container = document.createElement('p');
-        container.style.fontFamily = "Courier New, monospace";
-        container.style.fontSize = "15px";
-        container.style.display = 'inline-block';
-
-        // Create the CSS2DObject using the container
-        const aviso = new CSS2DObject(container);     
-        
-        const texto = "Aperte Enter para proseguir...";
-
-
-        //Refatorar a gambiarra do textoAparecendo
-
-        // Split the text into individual characters
-        const characters = texto.split('');
-
-        // Create spans for each character and apply the fading effect
-        characters.forEach((character,index) => {
-            const span = document.createElement('span');
-            span.textContent = character;
-            aviso.element.appendChild(span);
-        });
-
-        aviso.position.y = -2.5;
-        aviso.position.x = 4;
-
-        this.aviso = aviso;
-
-        this.animar(new TextoAparecendo(aviso.element).setProgresso(0));
-
-        this.scene.add(aviso);
-
+        this.animationControler.handleCheckpoint();
     }
 
     // event listener funcionando 

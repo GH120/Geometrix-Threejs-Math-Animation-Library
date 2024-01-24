@@ -26,7 +26,7 @@ const settings = {fase: new Fase1(), whiteboard: new Whiteboard()}
 
 
 function FirstScreen () {
-  const refContainer = useRef(null); // Adicionando o tipo HTMLDivElement | null
+  const refContainer = useRef(null);
   const [indFase, SetIndFase] = useState(1);
 
   useEffect(() => {

@@ -925,7 +925,7 @@ export class Fase6 extends Fase{
 
     update(){
 
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        super.update();
 
         if(!this.progresso) this.progresso = "start";
 

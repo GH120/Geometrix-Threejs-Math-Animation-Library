@@ -276,19 +276,6 @@ export class Fase3 extends Fase{
     }
     */
 
-    update(){
-        // this.atualizarOptions();
-
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-
-        // if(options.atualizar) triangle.update();
-
-        if (this.triangulo.equilatero()) {
-            // this.changeText("VITORIA!!!");
-            // botar notif
-        }
-    }
-
     //Ajeitar isso depois, inclui lógica da whiteboard para escrever equações e manipular elas
     //Segregar posteriormente em uma classe Whiteboard
     // setupThreejs(){

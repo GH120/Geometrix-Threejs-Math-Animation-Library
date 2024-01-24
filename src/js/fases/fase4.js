@@ -577,7 +577,7 @@ export class Fase4 extends Fase{
     update(){
         // this.atualizarOptions();
 
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        super.update();
 
         // if(options.atualizar) triangle.update();
 

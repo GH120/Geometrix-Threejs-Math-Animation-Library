@@ -196,9 +196,7 @@ export class Fase7 extends Fase{
     update(){
         // this.atualizarOptions();
 
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-
+        super.update();
         this.controls.update()
 
         console.log(this.controls)

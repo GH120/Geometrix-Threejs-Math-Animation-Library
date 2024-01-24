@@ -273,13 +273,4 @@ export class Fase2 extends Fase{
 
     }
     */
-
-
-    update(){
-        // this.atualizarOptions();
-
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-
-        // if(options.atualizar) triangle.update();
-    }
 }

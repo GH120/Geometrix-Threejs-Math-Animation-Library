@@ -22,6 +22,8 @@ export const MenuPrincipal = () => {
     // Acessando o array de posições
     const positions = pyramidGeometry.attributes.position.array;
 
+    console.log(pyramidGeometry)
+
     // Calculando o ponto médio da pirâmide
     const pyramidCenter = new THREE.Vector3();
     for (let i = 0; i < positions.length; i += 3) {
@@ -36,8 +38,8 @@ export const MenuPrincipal = () => {
       const start = new THREE.Vector3(positions[startIdx], positions[startIdx + 1], positions[startIdx + 2]);
       const end = new THREE.Vector3(positions[endIdx], positions[endIdx + 1], positions[endIdx + 2]);
 
-      const cylinderGeometry = new THREE.CylinderGeometry(0.1, 0.1, 2, 16);
-      const cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+      const cylinderGeometry = new THREE.CylinderGeometry(0.1, 0.1, 3, 16);
+      const cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xdddddd });
       const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
 
       // Subtraindo o ponto médio da pirâmide das posições
@@ -57,18 +59,51 @@ export const MenuPrincipal = () => {
 
       scene.add(cylinder);
 
-      // Adicionando os cilindros ao estado para que possam ser acessados no loop de animação
-      cylinder.rotationAxis = direction.clone().normalize();
-      cylinder.rotationSpeed = Math.random() * 0.05 + 0.01; // Ajuste a velocidade de rotação conforme necessário
+      return cylinder
     };
 
+    const addSphere = (startIdx) => {
+      const start = new THREE.Vector3(positions[startIdx], positions[startIdx + 1], positions[startIdx + 2]);
+
+      const sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(0.2),
+        new THREE.MeshBasicMaterial({ color: 0xdd0000 })
+      );
+
+      sphere.position.copy(start);
+
+      scene.add(sphere);
+
+      return sphere;
+    }
+
+    
+    const cilindros = [];
+    
     // Adicionando cilindros para cada aresta
-    addCylinder(0, 9);
-    addCylinder(3, 6);
-    addCylinder(6, 0);
-    addCylinder(0, 3);
-    addCylinder(3, 9);
-    addCylinder(9, 6);
+    cilindros.push([addCylinder(0, 9), [0, 9]]);
+    cilindros.push([addCylinder(3, 6), [3, 6]]);
+    cilindros.push([addCylinder(6, 0), [6, 0]]);
+    cilindros.push([addCylinder(0, 3), [0, 3]]);
+    cilindros.push([addCylinder(3, 9), [3, 9]]);
+    cilindros.push([addCylinder(9, 6), [9, 6]]);
+
+    const spheres = [];
+
+    cilindros.push([addSphere(0), [0]]);
+    cilindros.push([addSphere(3), [3]]);
+    cilindros.push([addSphere(6), [6]]);
+    cilindros.push([addSphere(9), [9]]);
+    
+    const grupo = new THREE.Group();
+    grupo.add(pyramid);
+    cilindros.forEach((cil) => {
+      grupo.add(cil[0]);
+    })
+    spheres.forEach((sph) => {
+      grupo.add(sph[0]);
+    })
+    scene.add(grupo);
 
     // Posicionando a câmera
     camera.position.z = 5;
@@ -78,15 +113,16 @@ export const MenuPrincipal = () => {
       requestAnimationFrame(animate);
 
       // Girar a pirâmide
-      pyramid.rotation.x += 0.01;
-      pyramid.rotation.y += 0.01;
+      grupo.rotation.x += 0.01;
+      grupo.rotation.y += 0.01;
+      // pyramid.rotation.x += 0.01;
+      // pyramid.rotation.y += 0.01;
 
-      scene.children.filter(obj => obj instanceof THREE.Mesh).forEach(mesh => {
-        if (mesh.rotationAxis && mesh.rotationSpeed) {
-          // Usar rotateOnAxis para girar o mesh
-          mesh.rotateOnAxis(mesh.rotationAxis, mesh.rotationSpeed);
-        }
-      });
+      // cilindros.forEach((cil, ind) => {
+      //   scene.remove(cil[0]);
+        
+      //   cilindros[ind] = [addCylinder(...cil[1]), cil[1]]
+      // })
 
       // Renderizar a cena
       renderer.render(scene, camera);

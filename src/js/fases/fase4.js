@@ -33,6 +33,7 @@ import RelogioGLB from '../../assets/Relogio.glb'
 import { Angle } from '../objetos/angle';
 import ColorirOnHover from '../outputs/colorirOnHover';
 import { Fase } from './fase';
+import { apagarObjeto } from '../animacoes/apagarObjeto';
   
 
 export class Fase4 extends Fase{
@@ -49,7 +50,32 @@ export class Fase4 extends Fase{
         this.setupTextBox();
 
         this.progresso = 0;
+        this.setupObjects();
         this.levelDesign();
+    }
+
+    setupObjects(){
+
+        const circulo = new Circle(new THREE.Vector3(0,0,0), 3).addToScene(this.scene);
+
+        this.circulo = circulo;
+
+        const pontoDoCirculo1 = new Circle(new THREE.Vector3(0,3,0), 0.1, 0.2);
+
+        pontoDoCirculo1.material = new THREE.MeshBasicMaterial({color:0x960000});
+
+        this.ponto1 = pontoDoCirculo1;
+
+
+        const pontoDoCirculo2 = new Circle(new THREE.Vector3(3*Math.sin(Math.PI*0.3),3*Math.cos(Math.PI*0.3),0), 0.1, 0.2);
+
+        pontoDoCirculo2.material = new THREE.MeshBasicMaterial({color:0x960000});
+
+        this.ponto2 = pontoDoCirculo2;
+
+        this.angle = new Angle([circulo, this.ponto2, this.ponto1]).render();
+
+
     }
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
@@ -66,12 +92,11 @@ export class Fase4 extends Fase{
                          "Quantos graus tem uma hora no relógio?"]
 
         //Desenha o círculo
-        const circulo         = new Circle(new THREE.Vector3(0,0,0), 3).addToScene(this.scene);
+        const circulo         = this.circulo;
         const desenharCirculo = new DesenharMalha(circulo, this.scene)
                                     .setDuration(300)
                                     .setOnTermino(() => null);
 
-        this.circulo = circulo;
 
         //Efeito de popIn do position
         const position           = new Circle(new THREE.Vector3(0,0,0), 0.1, 0.2);
@@ -96,13 +121,9 @@ export class Fase4 extends Fase{
         this.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7,anim8,anim9));
     }
 
-    thirdDialogue(dialogue, center, circulo){
+    thirdDialogue(dialogue, circulo){
 
-        const pontoDoCirculo = new Circle(new THREE.Vector3(0,3,0), 0.1, 0.2);
-
-        pontoDoCirculo.material = new THREE.MeshBasicMaterial({color:0x960000});
-
-        this.ponto1 = pontoDoCirculo;
+        const pontoDoCirculo = this.ponto1;
 
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
 
@@ -135,21 +156,15 @@ export class Fase4 extends Fase{
 
     fifthDialogue(dialogue, circulo){
 
-        const pontoDoCirculo = new Circle(new THREE.Vector3(3*Math.sin(Math.PI*0.3),3*Math.cos(Math.PI*0.3),0), 0.1, 0.2);
+        const pontoDoCirculo = this.ponto2;
 
-        pontoDoCirculo.material = new THREE.MeshBasicMaterial({color:0x960000});
-
-        this.ponto2 = pontoDoCirculo;
-
-        const angle = new Angle([circulo, this.ponto2, this.ponto1]).render()
+        const angle = this.angle;
 
         const mostrarAngulo = new MostrarAngulo(angle).addToScene(this.scene);
 
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
 
         const tracejado = new Tracejado(circulo.position, pontoDoCirculo.position);
-
-        this.angle = angle;
 
         this.ponto2.tracejado = tracejado;
         
@@ -241,14 +256,13 @@ export class Fase4 extends Fase{
         //Deletar os angulos maiores que 120
         //Juntar os tracejados em um contador que vira depois 120 graus
 
-        const descolorir = tracejados.map(tracejado => colorirAngulo(tracejado)
-                                                                    .setValorInicial(0x000000)
-                                                                    .setValorFinal(0xffffff)
-                                                                    .setDuration(50)
-                                                                    .setOnStart(() => tracejado.scene = this.scene)
-                                                                    .setCurva(x => 1 - Math.sqrt(1 - Math.pow(x, 2)))
-                                                                    .setOnTermino(() => this.scene.remove(tracejado.mesh))
-        );
+        const descolorir = tracejados.map(tracejado => apagarObjeto(tracejado)
+                                                       .setUpdateFunction((valor) => {
+                                                            tracejado.material = new THREE.MeshBasicMaterial({color: tracejado.material.color, transparent:true, opacity: valor});
+                                                            tracejado.update();
+
+                                                            console.log(valor);
+                                                       }));
 
         const simultanea = new AnimacaoSimultanea();
 
@@ -388,191 +402,9 @@ export class Fase4 extends Fase{
                 .setOnStart(() => circulo.addToScene(this.scene))
     }
 
-    //Cria a caixa de texto onde o texto vai aparecer
-    setupTextBox(){
-        // Create a parent element to hold the spans
-        const container = document.createElement('p');
-        container.style.fontFamily = "Courier New, monospace";
-        container.style.fontSize = "25px";
-        container.style.fontWeight ="italic";
-        container.style.display = 'inline-block';
-
-        // Create the CSS2DObject using the container
-        const cPointLabel = new CSS2DObject(container);       
-
-        this.text = cPointLabel;
-
-        this.text.position.y = 3.5;
-
-        this.scene.add(this.text);
-
-        this.changeText("Crie um triangulo equilatero");
-    }
-
-    //Muda o conteúdo da caixa de texto
-    changeText(texto){
-
-        console.log(texto);
-
-        this.text.element.textContent = '';
-
-        // Split the text into individual characters
-        const characters = texto.split('');
-
-        // Create spans for each character and apply the fading effect
-        characters.forEach((character,index) => {
-            const span = document.createElement('span');
-            span.textContent = character;
-            this.text.element.appendChild(span);
-        });
-    }
-
-    createEquationBox(equation, position){
-
-        const container = document.createElement('p');
-        container.style.fontSize = "25px";
-        container.style.fontFamily = "Courier New, monospace";
-        container.style.fontWeight = 500;
-        container.style.display = 'inline-block';
-
-        // Split the text into individual characters
-        const characters = equation.split('');
-
-        // Create spans for each character and apply the fading effect
-        characters.forEach((character,index) => {
-            const span = document.createElement('span');
-            span.textContent = character;
-            container.appendChild(span);
-        });
-
-        // Create the CSS2DObject using the container
-        const cPointLabel = new CSS2DObject(container);       
-
-        cPointLabel.position.x = position[0];
-        cPointLabel.position.y = position[1];
-        cPointLabel.position.z = position[2];
-
-        this.scene.add(cPointLabel);
-
-        return cPointLabel;
-    }
-
-    createInputs(){
-        
-        const triangulo = this.triangulo;
-        const camera = this.camera;
-
-        const selecionar = new MultipleClickable(triangulo.angles, camera)
-        
-        this.clickable = triangulo.angles.map(   angle  => selecionar);
-        this.hoverable = triangulo.angles.map(   angle  => new Hoverable(angle , camera));
-        this.draggable = triangulo.vertices.map( vertex => new Draggable(vertex, camera));
-
-        return this;
-    }
-
-    createHandlers(){
-
-        const triangulo = this.triangulo;
-
-        //É um observer, quando há um arraste do objeto, ele move o objeto para a nova posição
-        this.moverVertice = triangulo.vertices.map(vertex => new MoverVertice(vertex));
-        //É um observer, quando onHover é acionado, adiciona ou remove o texto do ângulo
-        this.mostrarAngulo = triangulo.angles.map(angle => new MostrarAngulo(angle).addToScene(this.scene));
-        //É um observer, colore os ângulos quando o triangulo é isóceles/equilatero
-        this.colorirIsoceles = new ColorirIsoceles(triangulo);
-        // //É um observer, mostra o tipo desse triângulo
-        this.mostrarTipo = new MostrarTipo(triangulo).addToScene(this.scene);
-        // //É um observer, mostra a bissetriz do ângulo
-        this.bissetrizes = triangulo.angles.map(angle => new MostrarBissetriz(triangulo, angle,this.scene));
-
-        // //Liga esses observers ao hover/drag, quando acionados, eles avisam seus observers
-        this.hoverable.map((hoverable,index) => hoverable.addObserver(this.mostrarAngulo[index]));
-        // this.hoverable.map((hoverable,index) => hoverable.addObserver(this.bissetrizes[index]));
-        // this.clickable.map((clickable, index)=> clickable.addObserver(this.bissetrizes[index]));
-        // this.draggable.map((draggable,index) => draggable.addObserver(this.bissetrizes[index]));
-        // this.draggable.map((draggable,index) => draggable.addObserver(this.moverVertice[index]));
-        this.draggable.map((draggable,index) => draggable.addObserver(this.mostrarAngulo[index]));
-        this.draggable.map( draggable => draggable.addObserver(this.colorirIsoceles));
-        // this.draggable.map( draggable => draggable.addObserver(this.mostrarTipo));
-        this.draggable.map(draggable => draggable.addObserver(this.triangulo));
-
-        this.handlers = [...this.moverVertice,
-                         ...this.mostrarAngulo,
-                         ...this.bissetrizes, 
-                         this.colorirIsoceles, 
-                         this.mostrarTipo];
-        
-        return this;
-    }
-
-
-    addToScene(scene){
-        this.mostrarAngulo.map(m => m.addToScene(scene));
-        this.mostrarTipo.addToScene(scene);
-        this.bissetrizes.map(bissetriz => bissetriz.addToScene(scene));
-
-        return this;
-    }
-
-    setUpAnimar(){
-        const linkarHandler = handler => handler.animar = (animacao) => this.animar(animacao);
-
-        this.handlers.map(linkarHandler);
-
-        return this;
-    }
-
-    animar(animacao){
-
-        animacao.animationFrames = animacao.getFrames();
-
-        this.frames.push(animacao.animationFrames);
-
-        this.animacoes.push(animacao);
-
-        return this;
-    }
-
-    //Interface gráfica
-    /*
-    setupInterface(){
-        const gui = new dat.GUI();
-
-        //Configurações
-        const options = {
-        "tamanho da esfera": 0.1,
-        "grossura": 0.05,
-        "raio do ângulo": 0.7,
-        "atualizar": false,
-        "duração da animação":90,
-
-        mudarFuncaoTrigonometrica: {
-            toggleFunction: function() { 
-                button.name(`Mostrando ${this.mudarFuncaoTrigonometrica().estado.nome}`);
-            }
-        }
-        };
-
-        //Atualizar configurações
-        this.atualizarOptions = () => {
-            this.triangulo.edges.map(edge => edge.grossura = options.grossura);
-            this.triangulo.sphereGeometry = new THREE.SphereGeometry(options["tamanho da esfera"]);
-            this.triangulo.angles.map(angle => angle.angleRadius = options["raio do ângulo"])
-        }
-
-        //Botões da interface
-        gui.add(options, 'grossura', 0.01, 0.2).onChange( () => this.triangulo.update());
-        gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => this.triangulo.update());
-        gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => this.triangulo.update());
-        // gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
-        // gui.add( {onClick: () => this.trigonometria.map(trig => trig.animando = !trig.animando)}, 'onClick').name('Mostrar animação de divisão');
-        // gui.add( {onClick: () => this.circunscrever()},'onClick').name('Animação de circunscrever triângulo');
-        gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
-        let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('Mostrando nada');
+    createOutputs(){
 
     }
-    */
 
     update(){
         // this.atualizarOptions();

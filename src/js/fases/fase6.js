@@ -35,21 +35,7 @@ export class Fase6 extends Fase{
 
         super();
 
-        this.poligono = new Poligono([
-            [0,0,0],
-            [2,0,0],
-            [2,2,0],
-            [0,2,0]
-        ])
-        .render()
-        // .addToScene(this.scene);
-
-
-        this.poligono.inserirVertice(3, [1,3,0])
-
-
-        this.trigonometria = [];
-
+        this.setupObjects();
         this.createInputs();
         this.createOutputs();
         this.setupTextBox();
@@ -61,7 +47,32 @@ export class Fase6 extends Fase{
             triangulosAtivos: []
         }
 
-        this.levelDesign();
+    }
+
+    resetObjects(){
+        this.objetos.map(objeto => objeto.removeFromScene());
+
+        this.objetos = [];
+    }
+
+    setupObjects(){
+
+        this.resetObjects();
+
+        this.poligono = new Poligono([
+            [0,0,0],
+            [2,0,0],
+            [2,2,0],
+            [0,2,0]
+        ])
+        .render()
+        // .addToScene(this.scene);
+
+        console.log(this.poligonos)
+
+        this.poligono.inserirVertice(3, [1,3,0]);
+
+        this.objetos.push(this.poligono);
     }
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
@@ -941,7 +952,17 @@ export class Fase6 extends Fase{
 
     problemas = {
 
-        start:{
+        start: {
+            satisfeito: () => true,
+
+            consequencia: (fase) => {
+                fase.levelDesign();
+            },
+
+            proximo: () => "first"
+        },
+
+        first:{
             satisfeito: (fase) => fase.informacao.VerticesSelecionados,
 
             consequencia: (fase) =>{

@@ -262,7 +262,9 @@ export class Fase4 extends Fase{
                                                             tracejado.update();
 
                                                             console.log(valor);
-                                                       }));
+                                                       })
+                                                       .setDuration(30)
+                                                       );
 
         const simultanea = new AnimacaoSimultanea();
 

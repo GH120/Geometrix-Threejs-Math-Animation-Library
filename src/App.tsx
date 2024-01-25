@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createBrowserRouter, RouterProvider, BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
 import FirstScreen from './FirstScreen'
-import { TestScreen } from './TestScreen';
+import { MenuPrincipal } from './screens/MenuPrincipal/MenuPrincipal';
 
 const router = createBrowserRouter([
   {
@@ -13,7 +13,7 @@ const router = createBrowserRouter([
   },
   {
     path: "teste",
-    element: <TestScreen />
+    element: <MenuPrincipal />
   }
 ]);
 

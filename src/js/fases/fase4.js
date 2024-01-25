@@ -102,8 +102,17 @@ export class Fase4 extends Fase{
     //Objetos temporários ou secundários
     setupObjects2(){
 
-       
+        //Cria 360 tracejados que servirão como os graus no círculo
+        const getPoint = angulo => new THREE.Vector3(3.1*Math.sin(angulo), 3.1*Math.cos(angulo), 0);
 
+        const tracejados = new Array(360)
+                                    .fill(0)
+                                    .map((e,index) => index*Math.PI/180)
+                                    .map(angulo => new Tracejado(getPoint(angulo).multiplyScalar(0.95), getPoint(angulo),0.01))
+        
+        tracejados.map(tracejado => tracejado.material = new THREE.MeshBasicMaterial({color:0x000000}))
+
+        this.tracejados = tracejados;
     }
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
@@ -138,18 +147,20 @@ export class Fase4 extends Fase{
         const anim2 = new AnimacaoSimultanea(animacoes[1], circuloCrescendo);
         const anim3 = this.thirdDialogue(animacoes[2], position, circulo);
         const anim4 = animacoes[3].setValorFinal(100);
-        const anim5 = this.fifthDialogue( animacoes[4], circulo);
+        const anim5 = this.fifthDialogue( animacoes[4].setValorFinal(120), circulo);
         const anim6 = animacoes[5];
         const anim7 = this.seventhDialogue(animacoes[6]);
         const anim8 = this.eigthDialogue(animacoes[7].setValorFinal(120).setDuration(200)).setDelay(50);
         const anim9 = this.ninthDialogue(animacoes[8]);
 
-        
+        //Quando começar a animação 4, ativa os controles para mover o ponteiro
+        anim4.setOnTermino(() => this.Configuracao1());
 
         this.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7,anim8,anim9));
 
     }
 
+    //Animações junto com os diálogos
     thirdDialogue(dialogue){
 
         const pontoDoCirculo = this.ponto1;
@@ -229,16 +240,11 @@ export class Fase4 extends Fase{
 
     seventhDialogue(dialogue){
 
-        const getPoint = angulo => new THREE.Vector3(3.1*Math.sin(angulo), 3.1*Math.cos(angulo), 0);
-
-        const tracejados = new Array(360)
-                                    .fill(0)
-                                    .map((e,index) => index*Math.PI/180)
-                                    .map(angulo => new Tracejado(getPoint(angulo).multiplyScalar(0.95), getPoint(angulo),0.01))
-        
-        tracejados.map(tracejado => tracejado.material = new THREE.MeshBasicMaterial({color:0x000000}))
-
         const scene = this.scene;
+
+        this.setupObjects2(); //Criando os tracejados para serem usados nos graus
+
+        const tracejados = this.tracejados;
 
         //Adiciona um por um os retângulos dos graus
         const sequencial = new Animacao(tracejados)
@@ -248,8 +254,6 @@ export class Fase4 extends Fase{
                            .setInterpolacao((a,b,c) => a*(1-c) + b*c)
                            .setUpdateFunction(function(index){
                                 const inicio = (this.counter)? this.counter : 0;
-
-                                console.log(this.counter,inicio)
 
                                 for(let i = inicio; i < index; i++){
 
@@ -269,10 +273,8 @@ export class Fase4 extends Fase{
                                                        .setUpdateFunction((valor) => {
                                                             tracejado.material = new THREE.MeshBasicMaterial({color: tracejado.material.color, transparent:true, opacity: valor});
                                                             tracejado.update();
-
-                                                            console.log(valor);
                                                        })
-                                                       .setDuration(30)
+                                                       .setDuration(45)
                                                        );
 
         const simultanea = new AnimacaoSimultanea();
@@ -291,10 +293,6 @@ export class Fase4 extends Fase{
     eigthDialogue(dialogue){
 
         const mostrarAngulo = this.mostrarAngulo;
-
-        const textHtml = mostrarAngulo.text.elemento.element;
-
-        mostrarAngulo.increment = (() => {let a = 0; return () => {textHtml.textContent = `${Math.round(this.angle.degrees)}° = ${a++} segmentos`}})()
 
         const simultanea = new AnimacaoSimultanea();
 
@@ -318,10 +316,12 @@ export class Fase4 extends Fase{
 
     ninthDialogue(dialogue){
 
+        const fase = this;
+
 
         const light = new THREE.AmbientLight(0xffffff,1);
 
-        this.scene.add(light);
+        fase.scene.add(light);
 
         dialogue.setOnTermino(() =>{
 
@@ -336,9 +336,11 @@ export class Fase4 extends Fase{
                     const relogio = gltf.scene.children[0];
                     relogio.scale.set(7,7,1)
                     relogio.position.z = -0.5
-                    this.scene.add(gltf.scene);
+                    fase.scene.add(gltf.scene);
                 },
-          );
+            );
+
+            fase.dialogoTerminado = true; //Avisa para os problemas saberem que terminou o diálogo
         })
 
         return dialogue;
@@ -392,6 +394,7 @@ export class Fase4 extends Fase{
                 .setOnStart(() => circulo.addToScene(this.scene))
     }
 
+    //Criação dos controles, input e output
     createInputs(){
 
         new Hoverable(this.ponto2,this.camera);
@@ -402,8 +405,19 @@ export class Fase4 extends Fase{
         this.mostrarAngulo    = new MostrarAngulo(this.angle);
         this.colorirPonto     = new ColorirOnHover(this.ponto2,0xaa0000,0xffff33).setCanvas(this);
         this.colorirTracejado = new ColorirOnHover(this.ponto2.tracejado, 0xaa0000, 0xffff33).setCanvas(this);
+
+        //Função auxiliar para incrementar o contador do ângulo começando de 0
+        //Retorna uma closure
+        this.mostrarAngulo.increment = (() => {
+            let a = 0; 
+            return () => {
+                this.mostrarAngulo.text.elemento.element.textContent = `${Math.round(this.angle.degrees)}° = ${a++} segmentos`
+            }
+        })();
+
     }
 
+    //Configurações, nesse caso o controle de arrastar o ponteiro
     Configuracao1(){
 
         //Atualiza a posição do ponto no arraste para ficar restrita ao círculo
@@ -417,10 +431,10 @@ export class Fase4 extends Fase{
         const colorirPonto     = this.colorirPonto;
         const colorirTracejado = this.colorirTracejado;
 
-        this.hoverable.addObserver(colorirPonto)
-        this.hoverable.addObserver(colorirTracejado)
-        this.draggable.addObserver(colorirPonto)
-        this.draggable.addObserver(colorirTracejado)
+        this.ponto2.hoverable.addObserver(colorirPonto)
+        this.ponto2.hoverable.addObserver(colorirTracejado)
+        this.ponto2.draggable.addObserver(colorirPonto)
+        this.ponto2.draggable.addObserver(colorirTracejado)
     }
 
     update(){
@@ -448,9 +462,7 @@ export class Fase4 extends Fase{
         0: {
             satisfeito(fase){
 
-                console.log(fase.angle.degrees)
-
-                return Math.round(30 - fase.angle.degrees) == 0;
+                return fase.dialogoTerminado && Math.round(30 - fase.angle.degrees) == 0;
             },
 
             consequencia(fase){
@@ -495,6 +507,38 @@ export class Fase4 extends Fase{
             }
         }
     }
+
+    //Cria a equação da regra de 3, útil para os problemas
+    createEquationBox(equation, position){
+
+        const container = document.createElement('p');
+        container.style.fontSize = "25px";
+        container.style.fontFamily = "Courier New, monospace";
+        container.style.fontWeight = 500;
+        container.style.display = 'inline-block';
+
+        // Split the text into individual characters
+        const characters = equation.split('');
+
+        // Create spans for each character and apply the fading effect
+        characters.forEach((character,index) => {
+            const span = document.createElement('span');
+            span.textContent = character;
+            container.appendChild(span);
+        });
+
+        // Create the CSS2DObject using the container
+        const cPointLabel = new CSS2DObject(container);       
+
+        cPointLabel.position.x = position[0];
+        cPointLabel.position.y = position[1];
+        cPointLabel.position.z = position[2];
+
+        this.scene.add(cPointLabel);
+
+        return cPointLabel;
+    }
+
 
     //Animações dos problemas
 

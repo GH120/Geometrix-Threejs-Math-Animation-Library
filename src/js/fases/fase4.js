@@ -42,18 +42,16 @@ export class Fase4 extends Fase{
     
         super();
 
-        // this.createInputs();
-        // this.createHandlers();
-        // this.setUpAnimar();
-        // this.addToScene(scene);
-        // this.setupInterface();
         this.setupTextBox();
 
         this.progresso = 0;
         this.setupObjects();
+        this.createInputs();
+        this.createOutputs();
         this.levelDesign();
     }
 
+    //Objetos básicos
     setupObjects(){
 
         const circulo = new Circle(new THREE.Vector3(0,0,0), 3).addToScene(this.scene);
@@ -61,20 +59,50 @@ export class Fase4 extends Fase{
         this.circulo = circulo;
 
         const pontoDoCirculo1 = new Circle(new THREE.Vector3(0,3,0), 0.1, 0.2);
-
-        pontoDoCirculo1.material = new THREE.MeshBasicMaterial({color:0x960000});
+              pontoDoCirculo1.material = new THREE.MeshBasicMaterial({color:0x960000});
 
         this.ponto1 = pontoDoCirculo1;
 
 
-        const pontoDoCirculo2 = new Circle(new THREE.Vector3(3*Math.sin(Math.PI*0.3),3*Math.cos(Math.PI*0.3),0), 0.1, 0.2);
-
-        pontoDoCirculo2.material = new THREE.MeshBasicMaterial({color:0x960000});
+        const pontoDoCirculo2          = new Circle(new THREE.Vector3(3*Math.sin(Math.PI*0.3),3*Math.cos(Math.PI*0.3),0), 0.1, 0.2);
+              pontoDoCirculo2.material = new THREE.MeshBasicMaterial({color:0x960000});
 
         this.ponto2 = pontoDoCirculo2;
 
+
         this.angle = new Angle([circulo, this.ponto2, this.ponto1]).render();
 
+
+        const tracejadoPonto1 = new Tracejado(circulo.position, this.ponto1.position);
+
+        this.ponto1.tracejado = tracejadoPonto1;
+
+
+        const tracejadoPonto2 = new Tracejado(circulo.position, this.ponto2.position);
+
+        this.ponto2.tracejado = tracejadoPonto2;
+
+        //Atualizar o ponteiro como um todo ao mover a ponta dele
+        const criarAtualizadorDeObservers = (ponto, tracejado) => {
+
+            //Função para dar update em todos os observadores dependetes do ponto
+            ponto.updateObservers = () => {
+                tracejado.destino = ponto.position.clone().multiplyScalar(0.95);
+                ponto.update(); //Refatorar circulo, update deve ser apenas update
+                tracejado.update();
+                this.angle.update()
+                this.mostrarAngulo.update({dentro:true})
+            }
+        }
+
+        criarAtualizadorDeObservers(this.ponto1, this.ponto1.tracejado);
+        criarAtualizadorDeObservers(this.ponto2, this.ponto2.tracejado);
+    }
+
+    //Objetos temporários ou secundários
+    setupObjects2(){
+
+       
 
     }
 
@@ -119,18 +147,14 @@ export class Fase4 extends Fase{
         
 
         this.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7,anim8,anim9));
+
     }
 
-    thirdDialogue(dialogue, circulo){
+    thirdDialogue(dialogue){
 
         const pontoDoCirculo = this.ponto1;
-
-        const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
-
-        const tracejado = new Tracejado(circulo.position, pontoDoCirculo.position);
-
-        this.ponto1.tracejado = tracejado;
-        
+        const tracejado      = this.ponto1.tracejado;
+        const criarPonto     = this.circuloCrescendoAnimacao(pontoDoCirculo);
 
         const moverPonto = (posicaoFinal) => new Animacao(pontoDoCirculo)
                                         .setValorInicial(0)
@@ -154,28 +178,15 @@ export class Fase4 extends Fase{
         return new AnimacaoSimultanea(dialogue, demonstrarRaio)
     }
 
-    fifthDialogue(dialogue, circulo){
+    fifthDialogue(dialogue){
 
         const pontoDoCirculo = this.ponto2;
+        const tracejado      = this.ponto2.tracejado;
+        const angle          = this.angle;
 
-        const angle = this.angle;
-
-        const mostrarAngulo = new MostrarAngulo(angle).addToScene(this.scene);
+        this.mostrarAngulo.addToScene(this.scene); //Mostrar ângulo agora visível
 
         const criarPonto = this.circuloCrescendoAnimacao(pontoDoCirculo);
-
-        const tracejado = new Tracejado(circulo.position, pontoDoCirculo.position);
-
-        this.ponto2.tracejado = tracejado;
-        
-        //Função para dar update em todos os observadores dependetes do ponto
-        pontoDoCirculo.updateObservers = () => {
-            tracejado.destino = pontoDoCirculo.position.clone().multiplyScalar(0.95);
-            pontoDoCirculo.update(); //Refatorar circulo, update deve ser apenas update
-            tracejado.update();
-            angle.update()
-            mostrarAngulo.update({dentro:true})
-        }
         
         //Consertar desenhar malha do angulo
         const desenharAngulo = new DesenharMalha(angle, this.scene)
@@ -212,8 +223,6 @@ export class Fase4 extends Fase{
                                     desenharAngulo,
                                     moverPonto(new THREE.Vector3(3,0,0)).setOnStart(() => tracejado.addToScene(this.scene))
                                 )
-
-        this.mostrarAngulo = mostrarAngulo;
 
         return new AnimacaoSimultanea(dialogue, demonstrarRaio)
     }
@@ -314,27 +323,6 @@ export class Fase4 extends Fase{
 
         this.scene.add(light);
 
-        this.draggable = new Draggable(this.ponto2, this.camera);
-
-        //Atualiza a posição do ponto no arraste para ficar restrita ao círculo
-        this.draggable.addObserver(new FixarAoCirculo(this.circulo, this.ponto2))
-
-        //Atualiza todos os objetos dependentes da posição do ponto
-        this.draggable.addObserver({
-            update: this.ponto2.updateObservers
-        })
-
-        this.hoverable = new Hoverable(this.ponto2,this.camera);
-
-        const colorirPonto = new ColorirOnHover(this.ponto2,0xaa0000,0xffff33).setCanvas(this);
-        const colorirTracejado = new ColorirOnHover(this.ponto2.tracejado, 0xaa0000, 0xffff33).setCanvas(this);
-
-        this.hoverable.addObserver(colorirPonto)
-        this.hoverable.addObserver(colorirTracejado)
-        this.draggable.addObserver(colorirPonto)
-        this.draggable.addObserver(colorirTracejado)
-
-
         dialogue.setOnTermino(() =>{
 
             this.mostrarAngulo.update({dentro:true})
@@ -404,8 +392,35 @@ export class Fase4 extends Fase{
                 .setOnStart(() => circulo.addToScene(this.scene))
     }
 
-    createOutputs(){
+    createInputs(){
 
+        new Hoverable(this.ponto2,this.camera);
+        new Draggable(this.ponto2, this.camera);
+    }
+
+    createOutputs(){
+        this.mostrarAngulo    = new MostrarAngulo(this.angle);
+        this.colorirPonto     = new ColorirOnHover(this.ponto2,0xaa0000,0xffff33).setCanvas(this);
+        this.colorirTracejado = new ColorirOnHover(this.ponto2.tracejado, 0xaa0000, 0xffff33).setCanvas(this);
+    }
+
+    Configuracao1(){
+
+        //Atualiza a posição do ponto no arraste para ficar restrita ao círculo
+        this.ponto2.draggable.addObserver(new FixarAoCirculo(this.circulo, this.ponto2))
+
+        //Atualiza todos os objetos dependentes da posição do ponto
+        this.ponto2.draggable.addObserver({
+            update: this.ponto2.updateObservers
+        })
+
+        const colorirPonto     = this.colorirPonto;
+        const colorirTracejado = this.colorirTracejado;
+
+        this.hoverable.addObserver(colorirPonto)
+        this.hoverable.addObserver(colorirTracejado)
+        this.draggable.addObserver(colorirPonto)
+        this.draggable.addObserver(colorirTracejado)
     }
 
     update(){

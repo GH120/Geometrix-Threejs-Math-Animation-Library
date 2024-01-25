@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import * as THREE from 'three';
 import grid from '../../assets/grid.avif';
 import './style.css';
+import BotaoFase from '../../components/BotaoFase/BotaoFase';
 
 export const MenuPrincipal = () => {
   useEffect(() => {
@@ -110,6 +111,7 @@ export const MenuPrincipal = () => {
   return (
     <div className="menu">
       <div className="options">
+        <BotaoFase />
         <h2>Menu Principal</h2>
         <ul>
           <li><Link to="/">Iniciar Jogo</Link></li>

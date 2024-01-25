@@ -15,23 +15,24 @@ function CartasContainer(props) {
   };
 
   const cartas = props.cartas;
-
   const settings = props.settings;
+  const mostrarCartas = props.mostrarCartas;
 
-  return (
-    <div className="lista-cartas">
-      {cartas.map((carta, index) => (
-        <div
-          key={index}
-          className={`carta-container ${index === cartaEmFrente ? 'em-frente' : ''}`}
-          onMouseEnter={() => handleMouseEnter(index)}
-          onMouseLeave={handleMouseLeave}
-        >
-          <CartaPythagoras valor={carta.valor} naipe={carta.naipe} settings={settings} />
-        </div>
-      ))}
-    </div>
-  );
+  if (mostrarCartas)
+    return (
+      <div className="lista-cartas">
+        {cartas.map((carta, index) => (
+          <div
+            key={index}
+            className={`carta-container ${index === cartaEmFrente ? 'em-frente' : ''}`}
+            onMouseEnter={() => handleMouseEnter(index)}
+            onMouseLeave={handleMouseLeave}
+          >
+            <CartaPythagoras valor={carta.valor} naipe={carta.naipe} settings={settings} />
+          </div>
+        ))}
+      </div>
+    );
 }
 
 export default CartasContainer;

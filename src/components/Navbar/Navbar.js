@@ -96,7 +96,7 @@ function Navbar(props) {
       <div className={`navbar-links ${CardsMenuOpen ? 'open' : ''}`}>
         {/* colocar modal de fases aqui (eu acho) */}
         {/* <AboveContainer top={150} left={50}> */}
-          <CartasContainer cartas={cartas} settings={settings} />
+          <CartasContainer cartas={cartas} settings={settings} mostrarCartas={CardsMenuOpen} />
         {/* </AboveContainer> */}
       </div>
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import './style.css'
 
-import pythagorasImage from '../../assets/pythagoras.png';
+import pythagorasImage from '../../assets/MiniCarta.png';
 import { PythagorasCard } from '../../js/cards/pythagorasCard';
 
 function CartaPythagoras(props) {

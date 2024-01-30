@@ -76,14 +76,29 @@ export default class AnimationControler {
 
         const fase = this.fase;
 
+        const animationControler = this;
+
         const keyInput = new KeyInput();
 
         const pausar = new Output()
                        .setUpdateFunction(function(novoEstado){
-                            //Enter
-                            if(novoEstado.keyDown == 13){
 
+                            if(novoEstado.keyDown == 32){
                                 this.estado.pause = !this.estado.pause;
+
+                                const pausado = this.estado.pause;
+
+                                fase.animacoes.map(animacao => animacao.pause = pausado);
+
+                                fase.scene.remove(fase.aviso);
+
+                                if(this.estado.pause) animationControler.animacaoPausar("***PAUSADO***");
+                            }
+
+                            //Enter
+                            if(novoEstado.keyDown == 13 && this.estado.pause){
+
+                                this.estado.pause = false;
 
                                 const pausado = this.estado.pause;
 
@@ -119,13 +134,13 @@ export default class AnimationControler {
                 //Avisa pro handler de pause que o estado está pausado
                 this.pauseHandler.estado.pause = true;
 
-                this.animacaoPausar();
+                this.animacaoPausar("Aperte Enter para proseguir...");
             }
         }
     }
 
     //Solução temporária, fazer depois no react
-    animacaoPausar(){
+    animacaoPausar(texto){
 
         const container = document.createElement('p');
         container.style.fontFamily = "Courier New, monospace";
@@ -135,9 +150,6 @@ export default class AnimationControler {
         // Create the CSS2DObject using the container
         const aviso = new CSS2DObject(container);     
         
-        const texto = "Aperte Enter para proseguir...";
-
-
         //Refatorar a gambiarra do textoAparecendo
 
         // Split the text into individual characters
@@ -152,6 +164,8 @@ export default class AnimationControler {
 
         aviso.position.y = -2.5;
         aviso.position.x = 4;
+
+        if(this.fase.aviso) this.fase.scene.remove(this.fase.aviso);
 
         this.fase.aviso = aviso;
 

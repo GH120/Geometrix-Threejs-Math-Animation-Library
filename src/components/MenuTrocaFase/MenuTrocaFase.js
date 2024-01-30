@@ -61,7 +61,7 @@ const MenuTrocaFase = ({ fases, onTrocarFase, settings }) => {
               onClick={() => handleChangeFase(index)}
             >
               {/* {fase} */}
-              {[2, 3, 5].includes(index) ? 'REFATORAR' : 'Fase ' + (index+1)}
+              {[5].includes(index) ? 'REFATORAR' : 'Fase ' + (index+1)}
             </li>
           )})}
         </ul>

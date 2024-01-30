@@ -72,7 +72,7 @@ export class Fase5  extends Fase{
 
         const anim1 = this.firstAnim(dialogo);
 
-        this.animar(new AnimacaoSequencial(anim1));
+        this.animar(new AnimacaoSequencial(anim1).setNome("dialogo"));
 
     }
 

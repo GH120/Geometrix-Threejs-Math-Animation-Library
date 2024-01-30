@@ -69,6 +69,11 @@ export default class Animacao {
         return this;
     }
 
+    setNome(nome){
+        this.nome = nome;
+        return this;
+    }
+
     onStart(){
         return null;
     }

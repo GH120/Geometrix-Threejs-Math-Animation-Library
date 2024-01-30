@@ -4,10 +4,10 @@ import './style.css'
 
 import { FiLock } from "react-icons/fi";
 
-function BotaoFase() {
+function BotaoFase({faseSelec = 1, faseLib = true}) {
 
-    const [liberada, setLiberada] = useState(false);
-    const [fase, setFase] = useState(1);
+    const [liberada, setLiberada] = useState(faseLib);
+    const [fase, setFase] = useState(faseSelec);
 
     return (
         <button onClick={() => setLiberada(!liberada)} className={liberada ? 'botao-fase' : 'botao-fase-cadeado'}>

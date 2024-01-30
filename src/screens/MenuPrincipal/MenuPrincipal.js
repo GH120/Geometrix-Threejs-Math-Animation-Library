@@ -1,11 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as THREE from 'three';
 import grid from '../../assets/grid.avif';
 import './style.css';
 import BotaoFase from '../../components/BotaoFase/BotaoFase';
+import Modal from '../../components/modal/Modal';
+import MenuFaseNovo from '../../components/MenuFaseNovo/MenuFaseNovo';
 
 export const MenuPrincipal = () => {
+
+  const [modalOpen, setModalOpen] = useState(false);
+
   useEffect(() => {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -144,20 +149,21 @@ export const MenuPrincipal = () => {
 
   }, []);
 
+
   return (
     <div className="menu">
       <div className="options">
-        <BotaoFase />
         <h2>Menu Principal</h2>
         <ul>
           <li><Link to="/">Iniciar Jogo</Link></li>
-          <li><a href="#">Escolher Fase</a></li>
+          <li onClick={() => {setModalOpen(true)}}><a href="#">Escolher Fase</a></li>
           <li><a href="#">Créditos</a></li>
         </ul>
       </div>
       <div className="canvas-container">
         <canvas id="gameCanvas" width="800" height="600"></canvas>
       </div>
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}><MenuFaseNovo onClose={() => setModalOpen(false)} /></Modal>
     </div>
   );
 };

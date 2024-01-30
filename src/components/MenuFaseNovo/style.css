@@ -1,0 +1,17 @@
+.botao-invisivel {
+    color: transparent;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 25px;
+    margin: 5px 2px;
+}
+
+.tabela {
+    padding: 0px 15px 25px 15px;
+}
+
+.celula {
+    padding: 15px;
+}

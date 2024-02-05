@@ -1,22 +1,16 @@
-import React from 'react'
+import React from 'react';
+import './style.css';
 
-import './style.css'
-
-function Modal({isOpen, onClose, children}) {
-  
-
-
-    if (isOpen) {
-        return (
-            <div onClick={onClose} className='background'>
-                <div onClick={(e) => {
-                    e.stopPropagation();
-                }} className='modal-style'>{children}</div>
-            </div>
-        )
-    } else {
-        return null;
-    }
+function Modal({ isOpen, onClose, children }) {
+  return (
+    isOpen && (
+      <div onClick={onClose} className={`background ${isOpen ? 'open' : ''}`}>
+        <div className={`modal-style ${isOpen ? 'open' : ''}`}>
+          {children}
+        </div>
+      </div>
+    )
+  );
 }
 
-export default Modal
+export default Modal;

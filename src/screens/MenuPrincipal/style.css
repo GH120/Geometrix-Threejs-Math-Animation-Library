@@ -11,15 +11,37 @@ body {
 }
 
 .options {
-  width: 230px;
-  background-color: #5A689B;
+  background-color: #5a689b00;
   color: #fff;
   padding: 20px;
   box-sizing: border-box;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: monospace;
+  font-size: 25px;
 }
 
-.options h2 {
+.elemento-lista-menu {
+  margin: 50px 0;
+  background-color: #5A689B;
+  text-align: center;
+}
+
+.elemento-lista-menu:hover {
+  background-color: #7080b9;
+}
+
+
+.options h1 {
   margin-bottom: 10px;
+  color: #5A689B;
+
 }
 
 ul {
@@ -28,9 +50,9 @@ ul {
   margin: 0;
 }
 
-li {
+/* li {
   margin-bottom: 10px;
-}
+} */
 
 a {
   text-decoration: none;

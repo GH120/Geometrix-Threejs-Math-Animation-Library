@@ -110,30 +110,18 @@ export const MenuPrincipal = () => {
     })
     scene.add(grupo);
 
-    // Posicionando a câmera
     camera.position.z = 5;
 
-    // Função de animação
     const animate = () => {
       requestAnimationFrame(animate);
 
-      // Girar a pirâmide
+      // Girar o grupo
       grupo.rotation.x += 0.01;
       grupo.rotation.y += 0.01;
-      // pyramid.rotation.x += 0.01;
-      // pyramid.rotation.y += 0.01;
-
-      // cilindros.forEach((cil, ind) => {
-      //   scene.remove(cil[0]);
-        
-      //   cilindros[ind] = [addCylinder(...cil[1]), cil[1]]
-      // })
-
-      // Renderizar a cena
+      
       renderer.render(scene, camera);
     };
 
-    // Iniciar a animação
     animate();
 
     // Atualizar o tamanho do canvas quando a janela for redimensionada
@@ -153,11 +141,11 @@ export const MenuPrincipal = () => {
   return (
     <div className="menu">
       <div className="options">
-        <h2>Menu Principal</h2>
+        <h1>Menu Principal</h1>
         <ul>
-          <li><Link to="/">Iniciar Jogo</Link></li>
-          <li onClick={() => {setModalOpen(true)}}><a href="#">Escolher Fase</a></li>
-          <li><a href="#">Créditos</a></li>
+          <li className="elemento-lista-menu"><Link to="/">INICIAR JOGO</Link></li>
+          <li className="elemento-lista-menu" onClick={() => {setModalOpen(true)}}><a href="#">ESCOLHER FASE</a></li>
+          <li className="elemento-lista-menu"><a href="#">CRÉDITOS</a></li>
         </ul>
       </div>
       <div className="canvas-container">

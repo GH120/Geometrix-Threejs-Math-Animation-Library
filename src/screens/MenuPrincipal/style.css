@@ -23,25 +23,37 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-family: monospace;
+  font-family: 'Eagle Lake';
+                                          
   font-size: 25px;
 }
 
 .elemento-lista-menu {
   margin: 50px 0;
-  background-color: #5A689B;
   text-align: center;
+  border: solid none;
+  border-color: #00000000;
+  transition: 1ms ease-out;
+  color:#000000;
 }
 
+/* #5A689B */
+
 .elemento-lista-menu:hover {
-  background-color: #7080b9;
+  background-color: #7080b900;
+  border-style: solid none;
+  border-color: #5A689B;
+}
+
+.elemento-lista-menu:hover a {
+  color: #5A689B;
 }
 
 
 .options h1 {
   margin-bottom: 10px;
-  color: #5A689B;
-
+  color: #000000;
+  text-shadow: 1px 1px 5px #5A689B, 0 0 1em rgb(109, 97, 97);
 }
 
 ul {
@@ -56,14 +68,14 @@ ul {
 
 a {
   text-decoration: none;
-  color: #fff;
+  color: #000000;
   font-weight: bold;
 }
 
 .canvas-container {
   flex: 1;
   display: flex;
-  width: 100%;
+  width: 95%;
   /* justify-content: center;
   align-items: center; */
 }

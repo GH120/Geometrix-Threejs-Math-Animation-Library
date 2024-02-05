@@ -7,6 +7,7 @@ import BotaoFase from '../../components/BotaoFase/BotaoFase';
 import Modal from '../../components/modal/Modal';
 import MenuFaseNovo from '../../components/MenuFaseNovo/MenuFaseNovo';
 
+
 export const MenuPrincipal = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -126,8 +127,13 @@ export const MenuPrincipal = () => {
 
     // Atualizar o tamanho do canvas quando a janela for redimensionada
     window.addEventListener('resize', () => {
-      const newWidth = window.innerWidth;
-      const newHeight = window.innerHeight;
+
+      const canvasDiv = document.getElementById('gameCanvasDiv');
+    
+      const newWidth = canvasDiv.offsetWidth;
+      const newHeight = canvasDiv.offsetHeight;
+
+      console.log('width e height: ', newWidth, newHeight);
 
       camera.aspect = newWidth / newHeight;
       camera.updateProjectionMatrix();
@@ -141,15 +147,15 @@ export const MenuPrincipal = () => {
   return (
     <div className="menu">
       <div className="options">
-        <h1>Menu Principal</h1>
+        <h1>Geometrix</h1>
         <ul>
           <li className="elemento-lista-menu"><Link to="/">INICIAR JOGO</Link></li>
           <li className="elemento-lista-menu" onClick={() => {setModalOpen(true)}}><a href="#">ESCOLHER FASE</a></li>
           <li className="elemento-lista-menu"><a href="#">CRÉDITOS</a></li>
         </ul>
       </div>
-      <div className="canvas-container">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
+      <div id='gameCanvasDiv' className="canvas-container">
+        <canvas id="gameCanvas" width="1600" height="900"></canvas>
       </div>
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}><MenuFaseNovo onClose={() => setModalOpen(false)} /></Modal>
     </div>

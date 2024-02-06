@@ -10,7 +10,7 @@ function MenuFaseNovo({onClose}) {
     return (
         <div>
             <button onClick={onClose} className='botao-invisivel'>
-                <IoClose size={50}/>
+                <IoClose color='#5A689B' size={50}/>
             </button>
             <table className="tabela">
                 <tr>

@@ -5,15 +5,22 @@ import { createBrowserRouter, RouterProvider, BrowserRouter as Router, Route, Li
 
 import FirstScreen from './FirstScreen'
 import { MenuPrincipal } from './screens/MenuPrincipal/MenuPrincipal';
+import ErrorPage from './screens/ErrorPage/ErrorPage';
+import LevelScreen from './screens/LevelScreen/LevelScreen';
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <FirstScreen />
+    element: <MenuPrincipal />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "teste",
     element: <MenuPrincipal />
+  },
+  {
+    path: "/level/:id",
+    element: <LevelScreen />
   }
 ]);
 

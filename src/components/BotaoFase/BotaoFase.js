@@ -16,7 +16,9 @@ function BotaoFase({faseSelec = 1, faseLib = true}) {
         <button 
             onClick={() => {
                 if (liberada)
+                    navigator('/')
                     navigator(`level/${faseSelec}`);
+                    window.location.reload();
             }} 
             className={liberada ? 'botao-fase' : 'botao-fase-cadeado'}
         >

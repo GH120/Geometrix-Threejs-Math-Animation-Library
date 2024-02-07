@@ -68,7 +68,7 @@ function FirstScreen () {
       className="App"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      >
+    >
       <Navbar settings={settings}/>
       {/* <CartasContainer cartas={cartas}/> */}
       <div className='container de tudo' ref={refContainer}></div>

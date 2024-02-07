@@ -26,7 +26,12 @@ export class Whiteboard {
 
     start(){
 
-        this.equationWindow = document.getElementById("equationWindow");
+        // linha abaixo: antigamente possuia um elemento ja criado
+        // this.equationWindow = document.getElementById("equationWindow");
+        // agora o elemento está sendo criado na funcao start
+        this.equationWindow = document.createElement("div"); 
+        this.equationWindow.id = "equationWindow";
+        console.log(this.equationWindow);
 
         this.createEquationList();
 

@@ -66,7 +66,6 @@ const LevelScreen = () => {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       >
-      {/* <Navbar settings={settings}/> */}
       <div className='container de tudo' ref={refContainer}></div>
     </div>
   )

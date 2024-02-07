@@ -12,6 +12,9 @@ function MenuFaseNovo({onClose}) {
             <button onClick={onClose} className='botao-invisivel'>
                 <IoClose color='#5A689B' size={50}/>
             </button>
+            <div className='h2-menu-fase-wrapper'>
+                <h2 className='h2-menu-fase'>Selecione uma fase</h2>
+            </div>
             <table className="tabela">
                 <tr>
                     <td className='celula'><BotaoFase /></td>

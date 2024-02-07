@@ -8,6 +8,18 @@
     margin: 5px 2px;
 }
 
+.h2-menu-fase-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+
+.h2-menu-fase {
+  font-family: 'Eagle Lake';
+  color: black;
+}
+
 .tabela {
     padding: 0px 15px 25px 15px;
 }

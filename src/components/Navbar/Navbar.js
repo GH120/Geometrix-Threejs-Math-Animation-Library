@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import AboveContainer  from '../AboveContainer/AboveContainer'
 import CartasContainer from '../CartasContainer/CartasContainer';
@@ -23,6 +24,7 @@ function Navbar(props) {
   const [FaseMenuOpen, setFaseMenuOpen] = useState(false);
   const [CardsMenuOpen, setCardsMenuOpen] = useState(false);
   const [EquationMenuOpen, setEquationMenuOpen] = useState(false);
+  const navigator = useNavigate();
 
   const settings = props.settings;
 
@@ -43,7 +45,9 @@ function Navbar(props) {
   return (
     <nav className="navbar">
       <div className="buttons-container">
-        <button className="menu-button" onClick={toggleFaseMenu}>
+        <button className="menu-button" onClick={() => {
+          navigator('/')
+        }}>
           <FiHome />
         </button>
         <button className="menu-button" onClick={toggleFaseMenu}>

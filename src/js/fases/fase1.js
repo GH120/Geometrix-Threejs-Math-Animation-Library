@@ -18,8 +18,11 @@ import MostrarTracejado from '../animacoes/mostrarTracejado';
 import { Divisao } from '../animacoes/divisao';
 import { Triangle } from '../objetos/triangle';
 import { Fase } from './fase';
+import { Output } from '../outputs/Output';
+import Pythagoras from '../equations/pythagoras';
+import { PythagorasCard } from '../cards/pythagorasCard';
 
-export class Fase1  extends Fase{
+export class Fase1 extends Fase{
 
     constructor(){
 
@@ -29,13 +32,15 @@ export class Fase1  extends Fase{
                             .render()
                             .addToScene(this.scene);
 
+        this.objetos.push(this.triangulo);
+
         this.trigonometria = [];
 
         this.createInputs();
         this.createHandlers();
         this.setUpAnimar();
         this.addToScene(this.scene);
-        this.setupInterface();
+        // this.setupInterface();
         this.setupTextBox();
 
         this.levelDesign();
@@ -284,6 +289,7 @@ export class Fase1  extends Fase{
     }
 
     //Interface gráfica
+    /*
     setupInterface(){
         const gui = new dat.GUI();
 
@@ -313,24 +319,12 @@ export class Fase1  extends Fase{
         gui.add(options, 'grossura', 0.01, 0.2).onChange( () => this.triangulo.update());
         gui.add(options, 'tamanho da esfera', 0.1, 2).onChange( () => this.triangulo.update());
         gui.add(options, 'raio do ângulo', 0.05, 3).onChange( () => this.triangulo.update());
-        gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
+        // gui.add(options, "duração da animação",45,600).onChange((value) => {divisao.setDuration(value); divisao.delay = value/2})
         // gui.add( {onClick: () => this.trigonometria.map(trig => trig.animando = !trig.animando)}, 'onClick').name('Mostrar animação de divisão');
         // gui.add( {onClick: () => this.circunscrever()},'onClick').name('Animação de circunscrever triângulo');
         gui.add( {onClick: () => options.atualizar = !options.atualizar}, 'onClick').name('atualizar todo frame');
         let button = gui.add(options.mudarFuncaoTrigonometrica, 'toggleFunction').name('Mostrando nada');
 
     }
-
-    update(){
-        // this.atualizarOptions();
-
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
-
-        // if(options.atualizar) triangle.update();
-
-        // if (this.triangulo.equilatero()) {
-        //     this.changeText("VITORIA!!!");
-        //     // botar notif
-        // }
-    }
+    */
 }

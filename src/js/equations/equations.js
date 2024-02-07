@@ -15,19 +15,19 @@
 // x = 3 +- 2 => x = { 1 ; 5}
 //Como todos os lados são positivos, então x = 5;
 
-document.addEventListener("DOMContentLoaded", function() {
-    const openButton = document.getElementById("openEquationWindow");
-    const closeButton = document.getElementById("closeButton");
-    const equationWindow = document.getElementById("equationWindow");
+// document.addEventListener("DOMContentLoaded", function() {
+//     const openButton = document.getElementById("openEquationWindow");
+//     const closeButton = document.getElementById("closeButton");
+//     const equationWindow = document.getElementById("equationWindow");
 
-    openButton.addEventListener("click", function() {
-        equationWindow.classList.remove("hidden");
-    });
+//     openButton.addEventListener("click", function() {
+//         equationWindow.classList.remove("hidden");
+//     });
 
-    closeButton.addEventListener("click", function() {
-        equationWindow.classList.add("hidden");
-    });
-});
+//     closeButton.addEventListener("click", function() {
+//         equationWindow.classList.add("hidden");
+//     });
+// });
 
 export default class Equation{
 

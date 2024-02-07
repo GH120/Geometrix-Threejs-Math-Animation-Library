@@ -101,16 +101,51 @@ export class Poligono extends Objeto{
         this.angles.map(angle => angle.update())
     }
 
-    inserirVertice(numero, posicao){
-        this.positions.splice(numero, 0, posicao);
+    retangulo(){
 
-        if(this.scene) this.removeFromScene();
+        const arredondar = valor => parseFloat(valor.toFixed());
 
-        this.numeroVertices = this.positions.length;
-
-        this.render();
+        const igual = (alpha,beta) => Math.abs(arredondar(alpha) - arredondar(beta)) == 0;
+        
+        return this.angles.map(angulo => igual(angulo.degrees, 90))
+                          .reduce((ehNoventaGraus, existe) => existe || ehNoventaGraus, false);
     }
 
+    isoceles(){
 
+        const arredondar = valor => parseFloat(valor.toFixed());
 
+        const igual = (alpha,beta) => Math.abs(arredondar(alpha.degrees) - arredondar(beta.degrees)) == 0;
+
+        for(const angulo1 of this.angles)
+            for(const angulo2 of this.angles)
+                if(angulo1 != angulo2 && igual(angulo1,angulo2))
+                    return true;
+        
+        return false;
+    }
+
+    equilatero(){
+
+        const arredondar = valor => parseFloat(valor.toFixed());
+
+        const igual = (alpha,beta) => Math.abs(arredondar(alpha.degrees) - arredondar(beta.degrees)) == 0;
+
+        for(const angulo1 of this.angles)
+            for(const angulo2 of this.angles)
+                if(!igual(angulo1,angulo2))
+                    return false;
+        
+        return true;
+    }
+
+    get centro(){
+        return this.vertices.map(vertice => vertice.position.clone())
+                            .reduce((a,b) => a.add(b), new THREE.Vector3(0,0,0))
+                            .multiplyScalar(1/3);
+    }
+
+    get raio(){
+        return this.vertices[0].position.clone().sub(this.centro).length();
+    }
 }

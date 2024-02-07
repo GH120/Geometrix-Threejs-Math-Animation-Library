@@ -193,10 +193,10 @@ export class TrigOnHover extends Output{
         this.equation = equation;
 
         //Carrega o Latex, atualizando o elemento <p> do html
-        MathJax.Hub.Queue(function() {
-            const element = equation.element;
-            MathJax.Hub.Typeset([element]);
-        });
+        // MathJax.Hub.Queue(function() {
+        //     const element = equation.element;
+        //     MathJax.Hub.Typeset([element]);
+        // });
 
         if(isInside) scene.add(this.equation);
         

@@ -1,0 +1,48 @@
+.carta {
+    width: 100px;
+    height: 150px;
+    background-color: white;
+    border: 2px solid #000;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px;
+    font-size: 24px;
+}
+
+.carta:hover {
+    transform: scale(1.5);
+    transition: transform 0.3s ease;
+}
+
+.copas {
+    color: red;
+}
+
+.ouros {
+    color: gold;
+}
+
+.espadas {
+    color: black;
+}
+
+.paus {
+    color: black;
+}
+
+.valor {
+    font-weight: bold;
+}
+
+.naipe {
+    font-size: 36px;
+}
+
+.photo {
+    width:100%;
+    height:100%;
+    padding:0;
+  }

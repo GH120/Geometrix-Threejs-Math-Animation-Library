@@ -14,9 +14,7 @@ export class Hoverable extends Input {
 
   onMouseMove(event) {
 
-    const colision = this.intersectouObjeto(event,this.object);
-
-    const isInside = !!colision;
+    const isInside = !!this.intersectouObjeto(event,this.object);
 
     //Ignora se continua no mesmo estado
     if(this.isInside == isInside) return;

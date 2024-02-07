@@ -21,9 +21,13 @@ export class Triangle extends Objeto{
     }
 
     render(){
+
         this.renderVertices();
         this.renderEdges();
         this.renderAngles();
+
+        this.hitbox = this.getHitbox();
+
         return this;
     }
 
@@ -96,7 +100,9 @@ export class Triangle extends Objeto{
         this.edges.map(edge => edge.update());
 
         //Atualiza a malha dos ângulos
-        this.angles.map(angle => angle.update())
+        this.angles.map(angle => angle.update());
+
+        this.hitbox = this.getHitbox();
     }
 
     retangulo(){
@@ -145,5 +151,27 @@ export class Triangle extends Objeto{
 
     get raio(){
         return this.vertices[0].position.clone().sub(this.centro).length();
+    }
+
+    getHitbox(){
+
+        if(this.hitbox) this.hitbox.geometry.dispose();
+
+        const positions = this.vertices.flatMap(vertice => vertice.getPosition().toArray());
+
+        const geometry = new THREE.BufferGeometry();
+
+        // Define the vertices of the triangle
+        const vertices = new Float32Array([
+            ...positions
+        ]);
+
+        // Create a buffer attribute and set the vertices
+        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+
+        const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:0x000000}));
+
+
+        return mesh;
     }
 }

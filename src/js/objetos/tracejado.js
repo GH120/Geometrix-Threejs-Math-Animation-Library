@@ -14,7 +14,7 @@ export class Tracejado extends Objeto{
         this.spacing = spacingRatio;
         this.material = new THREE.MeshBasicMaterial({color:cor});
 
-        if(origem && destino) this.render();
+        this.render();
     }
 
     render(){

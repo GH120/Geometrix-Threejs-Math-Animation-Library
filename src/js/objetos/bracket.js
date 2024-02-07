@@ -129,9 +129,9 @@ export default class Bracket extends Objeto{
     this.ponto1 = edge.origem;
     this.ponto2 = edge.destino;
 
-    this.largura = ponto1.clone().sub(ponto2).length()*0.5;
+    this.largura = this.ponto1.clone().sub(this.ponto2).length()*0.5;
 
-    this.calculateMatrix(ponto1,ponto2);
+    this.calculateMatrix(this.ponto1,this.ponto2);
 
     this.renderMalha()
   }

@@ -67,23 +67,16 @@ const LevelScreen = () => {
     }
   };
 
-  // if (levelLoad){
-    // console.log('primeiro')
-    return (
-      <div
-      className="App"
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-      >
-        <Navbar settings={{fase, whiteboard}}/>
-        <div className='container de tudo' ref={refContainer}></div>
-      </div>
-    )
-  // }
-  // else
-  //   return (
-  //     <div>loading...</div>
-  //   )
+  return (
+    <div
+    className="App"
+    onDragOver={handleDragOver}
+    onDrop={handleDrop}
+    >
+      <Navbar settings={{fase, whiteboard}}/>
+      <div className='container de tudo' ref={refContainer}></div>
+    </div>
+  )
 }
 
 export default LevelScreen

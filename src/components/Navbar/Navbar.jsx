@@ -65,20 +65,17 @@ function Navbar(props) {
         <MenuFaseNovo />
       </Modal>
       <div className={`navbar-links ${CardsMenuOpen ? 'open' : ''}`}>
-        {/* colocar modal de fases aqui (eu acho) */}
-        {/* <AboveContainer top={150} left={50}> */}
-          <CartasContainer cartas={cartas} settings={settings} mostrarCartas={CardsMenuOpen} />
-        {/* </AboveContainer> */}
+        <CartasContainer cartas={cartas} settings={settings} mostrarCartas={CardsMenuOpen} />
       </div>
 
       <div className={`navbar-links ${EquationMenuOpen ? 'open' : ''}`}>
-        {/* colocar modal de fases aqui (eu acho) */}
-        {/* <AboveContainer top={150} left={50}> */}
-          <MenuEquacoes fase={settings.fase} hidden= {EquationMenuOpen}></MenuEquacoes>
-        {/* </AboveContainer> */}
+        <MenuEquacoes fase={settings.fase} hidden= {EquationMenuOpen}></MenuEquacoes>
       </div>
 
-      <h1 className="navbar-title">GEOMETRIX</h1>
+      
+      <button onClick={() => navigator('/')} className='navbar-title-container'>
+        <h1 className="navbar-title">GEOMETRIX</h1>
+      </button>
     </nav>
   );
 }

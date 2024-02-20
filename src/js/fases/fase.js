@@ -26,21 +26,25 @@ export class Fase {
 
         // === THREE.JS CODE START ===
         const scene = new THREE.Scene();
-        // const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // const camera = new THREE.PerspectiveCamera(75, window.screen.width / window.innerHeight, 0.1, 1000);
         const camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2+1, height / - 2 +1, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+        const wBody = document.getElementsByTagName('body')[0].offsetWidth;
+        const hBody = document.getElementsByTagName('body')[0].offsetHeight;
+
         renderer.domElement.id = 'MEUCANVAS';
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(window.screen.width, window.innerHeight);
 
         const labelRenderer = new CSS2DRenderer();
-        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.setSize(window.screen.width, window.innerHeight);
         labelRenderer.domElement.style.position = 'absolute';
         labelRenderer.domElement.style.top = '0px';
         labelRenderer.domElement.hidden = false;
         labelRenderer.domElement.id = "dialogo"
 
         this.setupThreejs({scene, 
-            width: window.innerWidth,
+            width: window.screen.width,
             height: window.innerHeight,
             renderer,
             camera,
@@ -175,10 +179,10 @@ export class Fase {
         this.camera = camera;
 
         window.addEventListener('resize', function() {
-            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.aspect = window.screen.width / window.innerHeight;
             camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(window.screen.width, window.innerHeight);
+            labelRenderer.setSize(window.screen.width, window.innerHeight);
         });
 
     }
@@ -207,114 +211,4 @@ export class Fase {
         animate();
     }
 
-    // setupThreejs(){
-
-
-    //     if (typeof window !== 'undefined') {
-    //         // O código dentro deste bloco só será executado no navegador
-    //         // const width = window.innerWidth;
-    //         // Resto do seu código que depende do objeto window
-            
-            
-            
-    //         const scene = new THREE.Scene();
-    //         const height = window.innerHeight;
-            
-    //         const canvas = document.getElementById('triangulo');
-    //         const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    //         const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
-    //         renderer.setSize( window.innerWidth, window.innerHeight );
-
-    //         camera.position.z = 5;
-            
-    //         scene.background = new THREE.TextureLoader().load(grid);
-
-    //         console.log('CENA:', scene);
-            
-    //         // const labelRenderer = new CSS2DRenderer();
-    //         // labelRenderer.setSize(window.innerWidth, window.innerHeight);
-    //         // labelRenderer.domElement.style.position = 'absolute';
-    //         // labelRenderer.domElement.style.top = '0px';
-    //         // document.body.appendChild(labelRenderer.domElement);
-            
-    //         this.scene  = scene;
-    //         this.camera = camera;
-    //         this.canvas = canvas;
-            
-    //         this.renderer      = renderer;
-    //         // this.labelRenderer = labelRenderer
-            
-    //         window.addEventListener('resize', function() {
-    //             camera.aspect = window.innerWidth / window.innerHeight;
-    //             camera.updateProjectionMatrix();
-    //             renderer.setSize(window.innerWidth, window.innerHeight);
-    //             // labelRenderer.setSize(window.innerWidth, window.innerHeight);
-    //         });
-        
-    //     }
-
-    //     else {
-    //         // Lida com o caso em que o objeto window não está disponível (por exemplo, em SSR)
-    //         console.warn('O objeto window não está disponível neste contexto.');
-    //     }
-    // }
-
-    // setupThreejs(ref){
-
-    //     console.log(window);
-
-    //     if (typeof window !== 'undefined') {
-    //         // O código dentro deste bloco só será executado no navegador
-    //         // const width = window.innerWidth;
-    //         // Resto do seu código que depende do objeto window
-
-    //         const scene = new THREE.Scene();
-    //         const width = window.innerWidth;
-    //         const height = window.innerHeight;
-
-    //         const canvas = document.getElementById('triangulo');
-    //         const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    //         // const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
-    //         const renderer = new THREE.WebGLRenderer({ antialias:true });
-    //         renderer.setSize( window.innerWidth, window.innerHeight );
-
-            
-    //         camera.position.z = 5;
-            
-    //         scene.background = new THREE.TextureLoader().load(grid);
-            
-    //         // const labelRenderer = new CSS2DRenderer();
-    //         // labelRenderer.setSize(window.innerWidth, window.innerHeight);
-    //         // labelRenderer.domElement.style.position = 'absolute';
-    //         // labelRenderer.domElement.style.top = '0px';
-    //         // document.body.appendChild(labelRenderer.domElement);
-            
-    //         if (ref.current) {
-    //             ref.current.appendChild(renderer.domElement);
-    //         }
-
-    //         console.log('CENA', scene);
-            
-    //         this.scene  = scene;
-    //         this.camera = camera;
-    //         this.canvas = canvas;
-
-    //         this.renderer      = renderer;
-    //         // this.labelRenderer = labelRenderer
-
-    //         window.addEventListener('resize', function() {
-    //             camera.aspect = window.innerWidth / window.innerHeight;
-    //             camera.updateProjectionMatrix();
-    //             renderer.setSize(window.innerWidth, window.innerHeight);
-    //             // labelRenderer.setSize(window.innerWidth, window.innerHeight);
-    //         });
-
-    //     }
-
-    //     else {
-    //         // Lida com o caso em que o objeto window não está disponível (por exemplo, em SSR)
-    //         console.warn('O objeto window não está disponível neste contexto.');
-    //     }
-
-    // }
 }

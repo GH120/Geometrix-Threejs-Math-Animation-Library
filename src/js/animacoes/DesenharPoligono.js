@@ -14,7 +14,7 @@ export default class DesenharPoligono extends AnimacaoSequencial{
                                                                .setValorFinal(1)
                                                                .setDuration(30)
                                                                .setProgresso(0)
-                                                               .filler(10 + 5*index)
+                                                               .filler(30 + 5*index)
                                                     )
 
         const drawEdges =  poligono.edges.map((aresta, index) => new MostrarTracejado(aresta, aresta.mesh.parent).setProgresso(0))

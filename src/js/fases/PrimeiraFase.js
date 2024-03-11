@@ -39,6 +39,12 @@ export class PrimeiraFase extends Fase{
                             [-pi/2,-pi/2  ,     0], 
                             [-2   , 0     ,     0]
                         ]);
+
+        this.pentagono.grossura    = 0.025
+        this.pentagono.raioVertice = 0.04;
+        this.pentagono.raioAngulo  = 0.2;
+
+        this.pentagono.render().escala(0.3,0.5,0).translacao(-1,-1,0)
         
 
 

@@ -11,7 +11,8 @@ export class Poligono extends Objeto{
         super();
 
         this.grossura = 0.05
-        this.sphereGeometry =   new THREE.SphereGeometry(0.1);
+        this.raioVertice = 0.1
+        this.raioAngulo  = 0.7
         this.sphereMaterial =   new THREE.MeshBasicMaterial({ color: 0x8c8c8c });
         this.cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.numeroVertices = positions.length;
@@ -21,6 +22,17 @@ export class Poligono extends Objeto{
         this.edges = [];
         this.angles = [];
     }
+
+    // setupProporcoes(grossuraVertice, grossuraAresta, raioAngulo){
+
+    //     this.sphereGeometry = new THREE.SphereGeometry(grossuraVertice);
+
+    //     this.grossura = grossuraAresta;
+
+    //     this.raioAngulo = raioAngulo;
+
+    //     this._renderVertices();
+    // }
 
     render(){
 
@@ -33,6 +45,9 @@ export class Poligono extends Objeto{
     }
 
     renderVertices(){
+
+        this.sphereGeometry =   new THREE.SphereGeometry(this.raioVertice);
+
         const esferas = this.positions.map(position => {
             const esfera = new THREE.Mesh(this.sphereGeometry, this.sphereMaterial);
             esfera.position.set(...position);
@@ -57,6 +72,8 @@ export class Poligono extends Objeto{
                         (vertice, index) => new Edge(getPosition(vertice), getPosition(proximo(index)))
                     );
 
+        this.edges.map(edge => edge.grossura = this.grossura)
+
         return this;
     }
 
@@ -64,10 +81,33 @@ export class Poligono extends Objeto{
 
         const vertices = this.vertices;
         
-        this.angles = vertices.map( (vertex, index) => new Angle(vertices, index).render());
+        this.angles = vertices.map( (vertex, index) => {
+            
+            const angle = new Angle(vertices, index);
+
+            angle.angleRadius = this.raioAngulo;
+
+            return angle;
+        });
 
         return this;
     }
+
+    // _renderVertices(){
+
+    //     let index = 0;
+        
+    //     for(const vertice of this.vertices){
+
+    //         const esfera = new THREE.Mesh(this.sphereGeometry, this.sphereMaterial);
+
+    //         esfera.position.copy(this.positions[index++]);
+
+    //         if(vertice.scene) vertice.removeFromScene();
+
+    //         vertice.mesh = esfera;
+    //     }
+    // }
 
     addToScene(scene){
 
@@ -105,6 +145,52 @@ export class Poligono extends Objeto{
 
         //Atualiza a malha dos ângulos
         this.angles.map(angle => angle.update())
+    }
+
+    escala(x,y,z){
+
+        //Novas posições
+        this.positions = this.positions.map(posicao => [posicao[0]*x, posicao[1]*y, posicao[2]*z])
+
+        console.log(this.angles, "o this")
+        // //Consertar depois
+        // //Para saber o tamanho dos ângulos
+        // this.angles.map(angle => angle.angleRadius = Math.sqrt(x*x +y*y+z*z) *0.25)
+        // this.angles.map(angle => angle.render());
+        // this.angles.map(angle => angle.render());
+
+
+        //Reseta a malha
+        if(this.scene) this.removeFromScene();
+
+        this.render();
+
+        if(this.scene) this.addToScene(this.scene);
+
+        return this;
+    }
+
+    translacao(x,y,z){
+
+        //Novas posições
+        this.positions = this.positions.map(posicao => [posicao[0]+x, posicao[1]+y, posicao[2]+z])
+
+        console.log(this.angles, "o this")
+        // //Consertar depois
+        // //Para saber o tamanho dos ângulos
+        // this.angles.map(angle => angle.angleRadius = Math.sqrt(x*x +y*y+z*z) *0.25)
+        // this.angles.map(angle => angle.render());
+        // this.angles.map(angle => angle.render());
+
+
+        //Reseta a malha
+        if(this.scene) this.removeFromScene();
+
+        this.render();
+
+        if(this.scene) this.addToScene(this.scene);
+
+        return this;
     }
 
     retangulo(){

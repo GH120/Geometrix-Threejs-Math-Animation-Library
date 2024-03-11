@@ -2,6 +2,7 @@ import { Triangle } from "three";
 import { Fase } from "./fase";
 import { Poligono } from "../objetos/poligono";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
+import DesenharPoligono from "../animacoes/DesenharPoligono";
 
 export class PrimeiraFase extends Fase{
 
@@ -19,6 +20,8 @@ export class PrimeiraFase extends Fase{
         this.setupObjects();
 
         this.pentagono.addToScene(this.scene);
+
+        this.animar(new DesenharPoligono(this.pentagono))
         
     }
 

@@ -1,4 +1,7 @@
+import { Triangle } from "three";
 import { Fase } from "./fase";
+import { Poligono } from "../objetos/poligono";
+import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 
 export class PrimeiraFase extends Fase{
 
@@ -7,17 +10,35 @@ export class PrimeiraFase extends Fase{
         super();
 
         this.setupTextBox();
+        this.changeText("")
 
         this.progresso = 0;
         this.setupObjects();
         this.createInputs();
         this.createOutputs();
-        this.levelDesign();
+        this.setupObjects();
+
+        this.pentagono.addToScene(this.scene);
+        
     }
 
     //Objetos básicos
     setupObjects(){
+
+        const pi = Math.PI;
+
+        this.triangulo1 = new Triangle([[-2,0,0], [3,0,0], [1,3,0]]);
+
+        this.pentagono  = new Poligono([
+                            [0    ,   3   ,     0],
+                            [pi   ,   pi  ,     0],
+                            [pi   ,-pi*0.7,     0],
+                            [-pi/2,-pi/2  ,     0], 
+                            [-2   , 0     ,     0]
+                        ]);
         
+
+
     }
 
     //Objetos temporários ou secundários
@@ -93,6 +114,21 @@ export class PrimeiraFase extends Fase{
         ]
     }
 
+    firstDialogue(){
+
+        const dialogo1 = [
+            "Vimos que dois poligonos são semelhantes quando seus ângulos são congruentes(iguais  overtext )",
+            "e seus respectivos lados são proporcionais.", 
+            "Como os triângulos são os polígonos mais simples,",
+            "também são os mais fáceis de ver se são semelhantes."
+        ]
+
+        //Desenhar um polígono pequeno, desenhar outro polígono maior
+        //highlight dos ângulos respectivos em cada triângulo
+        //highlight dos lados 
+        //Apaga polígonos e desenha o triângulo
+    }
+
     //Criação dos controles, input e output
     createInputs(){
 
@@ -145,20 +181,12 @@ export class PrimeiraFase extends Fase{
         0: {
             satisfeito(fase){
 
-                return fase.dialogoTerminado && Math.round(30 - fase.angle.degrees) == 0;
+                return ;
             },
 
             consequencia(fase){
 
-                const dialogo1 = `Uma hora tem 30°, como acabou de demonstrar`
-
-                const animacao1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo1))
-
-                const dialogo2 = `Agora, consegue mostrar quanto vale 5 horas?`
-
-                const animacao2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo2))
-
-                fase.animar(new AnimacaoSequencial(animacao1,animacao2))
+               
             }
         },
     }

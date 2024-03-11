@@ -9,6 +9,7 @@ import { Fase6 } from '../../js/fases/fase6';
 import { Fase7 } from '../../js/fases/fase7';
 import { Whiteboard } from '../../js/cards/whiteboard';
 import Navbar from '../../components/Navbar/Navbar';
+import { PrimeiraFase } from '../../js/fases/PrimeiraFase';
 
 const fases = {
   '1' : Fase1,
@@ -18,6 +19,7 @@ const fases = {
   '5' : Fase5,
   '6' : Fase6,
   '7' : Fase7,
+  '8' : PrimeiraFase
 }
 
 const LevelScreen = () => {

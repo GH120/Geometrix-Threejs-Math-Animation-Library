@@ -23,6 +23,9 @@ export class Poligono extends Objeto{
     }
 
     render(){
+
+        this.rendered = true;
+
         this.renderVertices();
         this.renderEdges();
         this.renderAngles();
@@ -68,7 +71,10 @@ export class Poligono extends Objeto{
 
     addToScene(scene){
 
-        this.scene = scene;
+        this.scene = scene; 
+
+        //Tratar caso onde não foi renderizado
+        if(!this.rendered) this.render();
 
         this.vertices.map(vertex => vertex.addToScene(scene))
         this.edges.map(   edge   => edge.addToScene(scene));

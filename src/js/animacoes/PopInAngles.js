@@ -12,7 +12,6 @@ export const PopInAngles = (angle) => new Animacao()
                                 angle.removeFromScene()
                                 angle.render();
                                 angle.addToScene(scene);
-                                console.log(angle.angleRadius)
                             })
                             .setCurva(x => {
                                 const c4 = (2 * Math.PI) / 3;

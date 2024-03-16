@@ -4,8 +4,10 @@ import { Poligono } from "../objetos/poligono";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import DesenharPoligono from "../animacoes/DesenharPoligono";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
-import { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/animation";
+import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/animation";
 import { colorirAngulo } from "../animacoes/colorirAngulo";
+import { MostrarAngulo } from "../outputs/mostrarAngulo";
+import { apagarObjeto } from "../animacoes/apagarObjeto";
 
 export class PrimeiraFase extends Fase{
 
@@ -155,8 +157,9 @@ export class PrimeiraFase extends Fase{
 
         const desenharPoligonos = new AnimacaoSimultanea(new DesenharPoligono(this.pentagono), new DesenharPoligono(this.pentagono2).filler(50))
 
-        const primeiraLinha = new AnimacaoSequencial(new AnimacaoSimultanea(animarDialogo[0], desenharPoligonos), this.highlightColorirAngulo(this.pentagono.angles[0]))
+        const mostrarAngulos = this.mostrarGrausHighlightAngulos(this.pentagono,this.pentagono2);
 
+        const primeiraLinha = new AnimacaoSequencial(new AnimacaoSimultanea(animarDialogo[0], desenharPoligonos), mostrarAngulos)
 
         primeiraLinha.animacoes.map(anim => anim.checkpoint = false)
 
@@ -210,17 +213,68 @@ export class PrimeiraFase extends Fase{
     //Animações
 
     highlightColorirAngulo(angulo){
-        return new AnimacaoSequencial(colorirAngulo(this.pentagono.angles[0])
+        return new AnimacaoSequencial(colorirAngulo(angulo)
                                     .setValorInicial(0xff0000)
                                     .setValorFinal(0xffff00)
-                                    .setDuration(100),
-                                    colorirAngulo(this.pentagono.angles[0])
+                                    .setDuration(60),
+                                    colorirAngulo(angulo)
                                     .setValorInicial(0xffff00)
                                     .setValorFinal(0xff0000)
-                                    .setDuration(100))
+                                    .setDuration(60))
+    }
+
+    mostrarGrausAparecendo(angle){
+
+        const mostrarAngulo = new MostrarAngulo(angle).addToScene(this.scene);
+
+        const aparecerTexto = new Animacao()
+                                .setValorInicial(0)
+                                .setValorFinal(1)
+                                .setInterpolacao((a,b,c) => a*(1-c) + b*c)
+                                .setUpdateFunction((valor) => {
+                                    mostrarAngulo.text.elemento.element.style.opacity = valor
+                                })
+                                .setDuration(120)
+                                .setCurva(x => {
+
+                                x = 1 - Math.abs(1 - x*2)
+
+                                return -(Math.cos(Math.PI * x) - 1) / 2;
+                                })
+                                .voltarAoInicio(false)
+                                .manterExecucao(false)
+                                .setOnTermino(() => mostrarAngulo.update({dentro:false}))
+
+        angle.mostrarAngulo = mostrarAngulo;
+
+        return aparecerTexto;
+
     }
 
     mostrarGrausHighlightAngulos(poligono1,poligono2){
+
+        //Uma série de animações sequenciais
+        //Onde para cada angulo do polígono1, um angulo do polígono 2 também sofre highlight ao mesmo tempo
+        return new AnimacaoSequencial()
+               .setAnimacoes(
+                    poligono1.angles
+                    .map((angle1,index) => {
+
+                        const angle2 = poligono2.angles[index];
+
+                        
+                        return new AnimacaoSimultanea(
+                            this.highlightColorirAngulo(angle1), 
+                            this.highlightColorirAngulo(angle2),
+                            this.mostrarGrausAparecendo(angle1),
+                            this.mostrarGrausAparecendo(angle2)
+                        ).setOnStart(() => {
+
+                            angle1.mostrarAngulo.update({dentro:true});
+                            angle2.mostrarAngulo.update({dentro:true});
+                        })
+                    })
+                )
     }
 
     //Adicionar equação 4 horas = 120 graus, onde graus e horas são variáveis

@@ -3,6 +3,9 @@ import { Fase } from "./fase";
 import { Poligono } from "../objetos/poligono";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import DesenharPoligono from "../animacoes/DesenharPoligono";
+import { TextoAparecendo } from "../animacoes/textoAparecendo";
+import { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/animation";
+import { colorirAngulo } from "../animacoes/colorirAngulo";
 
 export class PrimeiraFase extends Fase{
 
@@ -18,10 +21,6 @@ export class PrimeiraFase extends Fase{
         this.createInputs();
         this.createOutputs();
         this.setupObjects();
-
-        this.pentagono.addToScene(this.scene);
-
-        this.animar(new DesenharPoligono(this.pentagono))
         
     }
 
@@ -45,9 +44,20 @@ export class PrimeiraFase extends Fase{
         this.pentagono.raioAngulo  = 0.2;
 
         this.pentagono.render().escala(0.3,0.5,0).translacao(-1,-1,0)
-        
 
+        this.pentagono2  = new Poligono([
+                            [0    ,   3   ,     0],
+                            [pi   ,   pi  ,     0],
+                            [pi   ,-pi*0.7,     0],
+                            [-pi/2,-pi/2  ,     0], 
+                            [-2   , 0     ,     0]
+                        ]);
 
+        this.pentagono2.grossura    = 0.025
+        this.pentagono2.raioVertice = 0.04;
+        this.pentagono2.raioAngulo  = 0.2;
+
+        this.pentagono2.render().escala(0.6,1,0).translacao(2,-0.5,0)
     }
 
     //Objetos temporários ou secundários
@@ -136,6 +146,21 @@ export class PrimeiraFase extends Fase{
         //highlight dos ângulos respectivos em cada triângulo
         //highlight dos lados 
         //Apaga polígonos e desenha o triângulo
+
+        const animarDialogo = dialogo1.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)).setValorFinal(100));
+
+        this.pentagono.addToScene(this.scene);
+
+        this.pentagono2.addToScene(this.scene);
+
+        const desenharPoligonos = new AnimacaoSimultanea(new DesenharPoligono(this.pentagono), new DesenharPoligono(this.pentagono2).filler(50))
+
+        const primeiraLinha = new AnimacaoSequencial(new AnimacaoSimultanea(animarDialogo[0], desenharPoligonos), this.highlightColorirAngulo(this.pentagono.angles[0]))
+
+
+        primeiraLinha.animacoes.map(anim => anim.checkpoint = false)
+
+        this.animar(primeiraLinha)
     }
 
     //Criação dos controles, input e output
@@ -182,20 +207,36 @@ export class PrimeiraFase extends Fase{
         }
     }
 
+    //Animações
+
+    highlightColorirAngulo(angulo){
+        return new AnimacaoSequencial(colorirAngulo(this.pentagono.angles[0])
+                                    .setValorInicial(0xff0000)
+                                    .setValorFinal(0xffff00)
+                                    .setDuration(100),
+                                    colorirAngulo(this.pentagono.angles[0])
+                                    .setValorInicial(0xffff00)
+                                    .setValorFinal(0xff0000)
+                                    .setDuration(100))
+    }
+
+    mostrarGrausHighlightAngulos(poligono1,poligono2){
+    }
+
     //Adicionar equação 4 horas = 120 graus, onde graus e horas são variáveis
     //Adicionar possibilidade de resolver equação por meios algébricos
     //Adicionar menu de perguntas
     problemas = {
 
         0: {
-            satisfeito(fase){
+            satisfeito(){
 
-                return ;
+                return true;
             },
 
             consequencia(fase){
 
-               
+               fase.firstDialogue();
             }
         },
     }

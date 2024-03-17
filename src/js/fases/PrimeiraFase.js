@@ -8,6 +8,8 @@ import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/a
 import { colorirAngulo } from "../animacoes/colorirAngulo";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
 import { apagarObjeto } from "../animacoes/apagarObjeto";
+import { Divisao } from "../animacoes/divisao";
+import * as THREE from 'three'
 
 export class PrimeiraFase extends Fase{
 
@@ -163,7 +165,9 @@ export class PrimeiraFase extends Fase{
 
         primeiraLinha.animacoes.map(anim => anim.checkpoint = false)
 
-        this.animar(primeiraLinha)
+        const divisao = new Divisao(this.pentagono2.edges[0], this.pentagono.edges[0], new THREE.Vector3(1,0,0));
+
+        this.animar(new AnimacaoSequencial(primeiraLinha, divisao))
     }
 
     //Criação dos controles, input e output
@@ -237,9 +241,9 @@ export class PrimeiraFase extends Fase{
                                 .setDuration(120)
                                 .setCurva(x => {
 
-                                x = 1 - Math.abs(1 - x*2)
+                                    x = 1 - Math.abs(1 - x*2)
 
-                                return -(Math.cos(Math.PI * x) - 1) / 2;
+                                    return -(Math.cos(Math.PI * x) - 1) / 2;
                                 })
                                 .voltarAoInicio(false)
                                 .manterExecucao(false)

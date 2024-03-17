@@ -2,39 +2,30 @@ import * as THREE from 'three';
 import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from './animation';
 import { Edge } from '../objetos/edge';
 
-export class Divisao extends Animacao{
+export class Divisao extends AnimacaoSequencial{
 
-    constructor(lado1, lado2){
+    constructor(lado1, lado2, offsetPosicional = new THREE.Vector3(3,0,0)){
         super();
         this.dividendo = lado1;
         this.divisor = lado2;
+        this.offsetPosicional = offsetPosicional
         //Gambiarra, ajeitar depois
-        this.frames = 250;
+        this.frames = 400;
         this.frameCount = 90;
         this.delay = 90;
-    }
-
-    *getFrames(){
 
         //Posiciona primeiro os lados no canto direito, não faz nada ao terminar
         const posicionar  = this.posicionar().setDuration(this.frameCount/2).setDelay(this.delay/3);
         // Depois executa o algoritmo da divisão
         const dividir     = this.dividir();
 
-        // Quando dividido e o delay passar, termina a execução do posicionar
-        const animacao = new AnimacaoSequencial(posicionar, dividir);
-
-        animacao.chosen = true;
-
-        animacao.setDelay(this.delay);
-
-        yield* animacao.getFrames();
+        this.setAnimacoes([posicionar,dividir])
     }
 
     posicionar(){
 
       const posicaoInicial = this.dividendo.mesh.position.clone();
-      const posicaoFinal = new THREE.Vector3(3,0,0).add(posicaoInicial);
+      const posicaoFinal = this.offsetPosicional.clone().add(posicaoInicial);
       const mover = this.mover(this.dividendo, posicaoInicial, posicaoFinal);
 
       const posicaoInicial2 = this.divisor.mesh.position.clone();

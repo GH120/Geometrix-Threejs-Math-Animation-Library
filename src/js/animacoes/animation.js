@@ -176,15 +176,13 @@ export default class Animacao {
 
     recalculateFrames(){
 
-        console.log(this, this.calculateFrames, this.calculateFrames())
-
-        this.frames = this.calculateFrames();
+        this.frames = this._calculateFrames();
 
         return this;
     }
 
 
-    calculateFrames(){
+    _calculateFrames(){
 
         return this.frames;
     }
@@ -273,10 +271,18 @@ export class AnimacaoSimultanea extends Animacao{
         return this;
     }
 
+    recalculateFrames(){
+
+        this.animacoes.map(animacao => animacao.recalculateFrames())
+
+        this.frames = this._calculateFrames();
+
+        return this;
+    }
     
-    calculateFrames(){
+    _calculateFrames(){
         return  this.animacoes
-                    .map(animacao => animacao.calculateFrames() + animacao.delay)
+                    .map(animacao => animacao._calculateFrames() + animacao.delay)
                     .reduce((a,b) => (a>b)? a : b);
     }
 }
@@ -317,7 +323,7 @@ export class AnimacaoSequencial extends Animacao{
         const completedActions = [];
 
         for(const animacao of animacoes){
-            
+
             const action           = animacao.getFrames();
 
             this.subAnimacaoAtual = animacao;
@@ -334,11 +340,13 @@ export class AnimacaoSequencial extends Animacao{
 
             action.next();
 
-            //Quando terminada, adicionar as completadas
-            completedActions.push(action);
 
-            //Mantém a execução opcionalmente das animações completas
-            completedActions.map(completed => completed.next());
+
+            // // //Quando terminada, adicionar as completadas
+            // completedActions.push(action);
+
+            // //Mantém a execução opcionalmente das animações completas
+            // completedActions.map(completed => completed.next());
         }
 
         //Mantém a execução do frame final de todas as animações
@@ -382,7 +390,16 @@ export class AnimacaoSequencial extends Animacao{
         return this;
     }
 
-    calculateFrames(){
-        return this.animacoes.map(animacao => animacao.calculateFrames() + animacao.delay).reduce((a,b) => a+b,0);
+    recalculateFrames(){
+
+        this.animacoes.map(animacao => animacao.recalculateFrames())
+
+        this.frames = this._calculateFrames();
+
+        return this;
+    }
+
+    _calculateFrames(){
+        return this.animacoes.map(animacao => animacao._calculateFrames() + animacao.delay).reduce((a,b) => a+b,0);
     }
 }

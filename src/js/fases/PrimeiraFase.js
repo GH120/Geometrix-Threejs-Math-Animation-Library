@@ -61,7 +61,7 @@ export class PrimeiraFase extends Fase{
         this.pentagono2.raioVertice = 0.04;
         this.pentagono2.raioAngulo  = 0.2;
 
-        this.pentagono2.render().escala(0.6,1,0).translacao(2,-0.5,0)
+        this.pentagono2.render().escala(0.605,1.01,0).translacao(2,-0.5,0)
     }
 
     //Objetos temporários ou secundários
@@ -174,7 +174,7 @@ export class PrimeiraFase extends Fase{
 
                                 const lado2 = this.pentagono2.edges[index];
 
-                                return new Divisao(lado2,lado1).addToScene(this.scene);
+                                return new Divisao(lado2,lado1,null,new THREE.Vector3(4.5 + index*0.5,0,0)).addToScene(this.scene);
                              });
 
         const segundaLinha = new AnimacaoSimultanea(
@@ -220,14 +220,14 @@ export class PrimeiraFase extends Fase{
         super.update();
         super.update();
         super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
         
         // if(options.atualizar) triangle.update();
 

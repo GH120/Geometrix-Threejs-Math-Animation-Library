@@ -52,7 +52,7 @@ export class Edge extends Objeto{
     }
 
     get length(){
-        return (this.mesh)? this.mesh.geometry.parameters.height : 0;
+        return this.origem.clone().sub(this.destino).length();
     }
 
     get quaternion(){

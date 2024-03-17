@@ -1,31 +1,54 @@
 import * as THREE from 'three';
 import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from './animation';
 import { Edge } from '../objetos/edge';
+import { colorirAngulo } from './colorirAngulo';
 
-export class Divisao extends AnimacaoSequencial{
+export class Divisao extends Animacao{
 
-    constructor(lado1, lado2, offsetPosicional = new THREE.Vector3(3,0,0)){
+    constructor(lado1, lado2, offsetPosicional = new THREE.Vector3(3,0,0), posicaoFixa = null){
         super();
         this.dividendo = lado1;
         this.divisor = lado2;
-        this.offsetPosicional = offsetPosicional
+        this.offsetPosicional  = offsetPosicional;
+        this.posicaoFixa = posicaoFixa
         //Gambiarra, ajeitar depois
-        this.frames = 400;
+        this.frames = 250;
         this.frameCount = 90;
         this.delay = 90;
+    }
+
+    *getFrames(){
+
+        const colorir = new AnimacaoSimultanea(
+                        colorirAngulo(this.divisor)
+                        .setValorFinal(0xff0000)
+                        .setValorInicial(this.divisor.material.color)
+                        .setDuration(30), 
+                        colorirAngulo(this.dividendo)
+                        .setValorFinal(0x0000ff)
+                        .setValorInicial(this.dividendo.material.color)
+                        .setDuration(30)
+        )
+
 
         //Posiciona primeiro os lados no canto direito, não faz nada ao terminar
         const posicionar  = this.posicionar().setDuration(this.frameCount/2).setDelay(this.delay/3);
         // Depois executa o algoritmo da divisão
         const dividir     = this.dividir();
 
-        this.setAnimacoes([posicionar,dividir])
+
+        // Quando dividido e o delay passar, termina a execução do posicionar
+        const animacao = new AnimacaoSequencial(colorir, posicionar, dividir);
+
+        this.frames = animacao.frames + animacao.delay;
+
+        yield* animacao.getFrames();
     }
 
     posicionar(){
 
       const posicaoInicial = this.dividendo.mesh.position.clone();
-      const posicaoFinal = this.offsetPosicional.clone().add(posicaoInicial);
+      const posicaoFinal = (this.posicaoFixa)? this.posicaoFixa : this.offsetPosicional.add(posicaoInicial);
       const mover = this.mover(this.dividendo, posicaoInicial, posicaoFinal);
 
       const posicaoInicial2 = this.divisor.mesh.position.clone();
@@ -78,7 +101,14 @@ export class Divisao extends AnimacaoSequencial{
           const posicaoFinal = this.posicao1.clone()
                                .add(new THREE.Vector3(0,altura,0.005))
 
+          const DIVISAO = this;
+
           const mover =  this.mover(lado, posicaoInicial, posicaoFinal)
+                              //Gambiarra para copiar a cor
+                             .setUpdateFunction(function(position) {
+                                this.objeto.mesh.position.copy(position);
+                                this.objeto.mesh.material.color = DIVISAO.divisor.material.color
+                             })
                              .setDuration(this.frameCount)
                              .setOnStart(() => {this.scene.add(copia); copia.position.copy(posicaoInicial)})
                              .setOnTermino(() => this.scene.remove(copia)) //Quando terminar execução, deletar copia

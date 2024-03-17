@@ -21,7 +21,8 @@ export class Fase {
     
     constructor(){
 
-        const width = 10;
+        //TODO: Ajeitar proporções para ficar proporcional a tela
+        const width = 16;
         const height = 8;
 
         // === THREE.JS CODE START ===

@@ -165,7 +165,7 @@ export class PrimeiraFase extends Fase{
 
         primeiraLinha.animacoes.map(anim => anim.checkpoint = false)
 
-        const divisao = new Divisao(this.pentagono2.edges[0], this.pentagono.edges[0], new THREE.Vector3(1,0,0));
+        const divisao = new Divisao(this.pentagono2.edges[0], this.pentagono.edges[0], null, new THREE.Vector3(4,-1,0)).addToScene(this.scene);
 
         this.animar(new AnimacaoSequencial(primeiraLinha, divisao))
     }
@@ -201,7 +201,7 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-
+        
         // if(options.atualizar) triangle.update();
 
         const problema = this.problemas[this.progresso];

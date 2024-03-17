@@ -157,17 +157,34 @@ export class PrimeiraFase extends Fase{
 
         this.pentagono2.addToScene(this.scene);
 
-        const desenharPoligonos = new AnimacaoSimultanea(new DesenharPoligono(this.pentagono), new DesenharPoligono(this.pentagono2).filler(50))
+        const desenharPoligonos = new AnimacaoSimultanea(
+                                    new DesenharPoligono(this.pentagono), 
+                                    new DesenharPoligono(this.pentagono2).filler(50)
+                                  );
 
         const mostrarAngulos = this.mostrarGrausHighlightAngulos(this.pentagono,this.pentagono2);
 
-        const primeiraLinha = new AnimacaoSequencial(new AnimacaoSimultanea(animarDialogo[0], desenharPoligonos), mostrarAngulos)
+        const primeiraLinha = new AnimacaoSequencial(
+                                    new AnimacaoSimultanea(animarDialogo[0], desenharPoligonos), 
+                                    mostrarAngulos
+                              )
 
-        primeiraLinha.animacoes.map(anim => anim.checkpoint = false)
 
-        const divisao = new Divisao(this.pentagono2.edges[0], this.pentagono.edges[0], null, new THREE.Vector3(4,-1,0)).addToScene(this.scene);
+        const dividirLados = this.pentagono.edges.map((lado1,index) => {
 
-        this.animar(new AnimacaoSequencial(primeiraLinha, divisao))
+                                const lado2 = this.pentagono2.edges[index];
+
+                                return new Divisao(lado2,lado1).addToScene(this.scene);
+                             });
+
+        const segundaLinha = new AnimacaoSimultanea(
+                                animarDialogo[1],
+                                new AnimacaoSequencial().setAnimacoes(dividirLados).recalculateFrames()
+                            );
+
+        // const divisao = new Divisao(this.pentagono2.edges[0], this.pentagono.edges[0], null, new THREE.Vector3(4,-1,0)).addToScene(this.scene);
+
+        this.animar(new AnimacaoSequencial(primeiraLinha, segundaLinha))
     }
 
     //Criação dos controles, input e output
@@ -201,6 +218,16 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
         
         // if(options.atualizar) triangle.update();
 
@@ -220,11 +247,11 @@ export class PrimeiraFase extends Fase{
         return new AnimacaoSequencial(colorirAngulo(angulo)
                                     .setValorInicial(0xff0000)
                                     .setValorFinal(0xffff00)
-                                    .setDuration(60),
+                                    .setDuration(30),
                                     colorirAngulo(angulo)
                                     .setValorInicial(0xffff00)
                                     .setValorFinal(0xff0000)
-                                    .setDuration(60))
+                                    .setDuration(30))
     }
 
     mostrarGrausAparecendo(angle){
@@ -238,7 +265,7 @@ export class PrimeiraFase extends Fase{
                                 .setUpdateFunction((valor) => {
                                     mostrarAngulo.text.elemento.element.style.opacity = valor
                                 })
-                                .setDuration(120)
+                                .setDuration(60)
                                 .setCurva(x => {
 
                                     x = 1 - Math.abs(1 - x*2)

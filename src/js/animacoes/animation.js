@@ -173,6 +173,21 @@ export default class Animacao {
                                       this
                                      );
     }
+
+    recalculateFrames(){
+
+        console.log(this, this.calculateFrames, this.calculateFrames())
+
+        this.frames = this.calculateFrames();
+
+        return this;
+    }
+
+
+    calculateFrames(){
+
+        return this.frames;
+    }
 }
 
 export class AnimacaoSimultanea extends Animacao{
@@ -256,6 +271,13 @@ export class AnimacaoSimultanea extends Animacao{
         this.animacoes.map(animacao => animacao.setProgresso(progresso));
 
         return this;
+    }
+
+    
+    calculateFrames(){
+        return  this.animacoes
+                    .map(animacao => animacao.calculateFrames() + animacao.delay)
+                    .reduce((a,b) => (a>b)? a : b);
     }
 }
 
@@ -358,5 +380,9 @@ export class AnimacaoSequencial extends Animacao{
         this.animacoes[this.animacoes.length-1].setDelay(delay);
 
         return this;
+    }
+
+    calculateFrames(){
+        return this.animacoes.map(animacao => animacao.calculateFrames() + animacao.delay).reduce((a,b) => a+b,0);
     }
 }

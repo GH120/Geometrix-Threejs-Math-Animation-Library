@@ -12,7 +12,7 @@ export class Divisao extends Animacao{
         this.offsetPosicional  = offsetPosicional;
         this.posicaoFixa = posicaoFixa
         //Gambiarra, ajeitar depois
-        this.frames = 250;
+        this.frames = 400;
         this.frameCount = 90;
         this.delay = 90;
     }
@@ -38,11 +38,23 @@ export class Divisao extends Animacao{
 
 
         // Quando dividido e o delay passar, termina a execução do posicionar
-        const animacao = new AnimacaoSequencial(colorir, posicionar, dividir);
+        const animacao = new AnimacaoSequencial(colorir, posicionar, dividir).recalculateFrames();
 
-        this.frames = animacao.frames + animacao.delay;
+        this.frames = animacao.frames+animacao.delay;
 
         yield* animacao.getFrames();
+
+        if(this.voltar){
+
+            this.divisor.removeFromScene();
+            this.dividendo.removeFromScene();
+
+            this.divisor.render();
+            this.dividendo.render();
+
+            this.divisor.addToScene(this.scene);
+            this.dividendo.addToScene(this.scene);
+        }
     }
 
     posicionar(){

@@ -19,6 +19,8 @@ export class Divisao extends Animacao{
 
     onStart(){
 
+       if(!this.scene) throw new Error("Não passou a cena para desenhar animação, escreva divisao.addToScene(scene) com uma scene definida")
+
        const colorir = new AnimacaoSimultanea(
                 colorirAngulo(this.divisor)
                 .setValorFinal(0xff0000)

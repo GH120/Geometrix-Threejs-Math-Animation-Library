@@ -1,4 +1,4 @@
-import { Triangle } from "three";
+import { Triangle } from "../objetos/triangle"
 import { Fase } from "./fase";
 import { Poligono } from "../objetos/poligono";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
@@ -10,6 +10,7 @@ import { MostrarAngulo } from "../outputs/mostrarAngulo";
 import { apagarObjeto } from "../animacoes/apagarObjeto";
 import { Divisao } from "../animacoes/divisao";
 import * as THREE from 'three'
+import { ApagarPoligono, apagarPoligono } from "../animacoes/apagarPoligono";
 
 export class PrimeiraFase extends Fase{
 
@@ -41,13 +42,11 @@ export class PrimeiraFase extends Fase{
                             [pi   ,-pi*0.7,     0],
                             [-pi/2,-pi/2  ,     0], 
                             [-2   , 0     ,     0]
-                        ]);
-
-        this.pentagono.grossura    = 0.025
-        this.pentagono.raioVertice = 0.04;
-        this.pentagono.raioAngulo  = 0.2;
-
-        this.pentagono.render().escala(0.3,0.5,0).translacao(-1,-1,0)
+                        ])
+                        .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
+                        .render()
+                        .escala(0.3,0.5,0)
+                        .translacao(-1,-1,0)
 
         this.pentagono2  = new Poligono([
                             [0    ,   3   ,     0],
@@ -55,13 +54,32 @@ export class PrimeiraFase extends Fase{
                             [pi   ,-pi*0.7,     0],
                             [-pi/2,-pi/2  ,     0], 
                             [-2   , 0     ,     0]
-                        ]);
+                        ])
+                        .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
+                        .render()
+                        .escala(0.605,1.01,0)
+                        .translacao(2,-0.5,0);
 
-        this.pentagono2.grossura    = 0.025
-        this.pentagono2.raioVertice = 0.04;
-        this.pentagono2.raioAngulo  = 0.2;
+        this.triangulo = new Poligono([
+                            [-pi/2,-pi/2  ,     0], 
+                            [pi   ,   pi  ,     0],
+                            [pi   ,-pi*0.7,     0],
+                        ])
+                        .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
+                        .render()
+                        .escala(0.3,0.5,0)
+                        .translacao(-1,-1,0)
 
-        this.pentagono2.render().escala(0.605,1.01,0).translacao(2,-0.5,0)
+
+        this.triangulo2 = new Poligono([
+                              [-pi/2,-pi/2  ,     0],
+                              [pi   ,   pi  ,     0],
+                              [pi   ,-pi*0.7,     0],
+                          ])
+                          .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
+                          .render()
+                          .escala(0.605,1.01,0)
+                          .translacao(2,-0.5,0);
     }
 
     //Objetos temporários ou secundários
@@ -177,14 +195,41 @@ export class PrimeiraFase extends Fase{
                                 return new Divisao(lado2,lado1,null,new THREE.Vector3(4.5 + index*0.5,0,0)).addToScene(this.scene);
                              });
 
+        //Refinar adicionando contador abaixo da divisão
+        //Todos eles vão contar para 2
+        //Mostrar isso como a proporção de semelhança entre as duas figuras
         const segundaLinha = new AnimacaoSimultanea(
                                 animarDialogo[1],
                                 new AnimacaoSequencial().setAnimacoes(dividirLados).recalculateFrames()
                             );
 
+        const apagarPoligonos = new AnimacaoSimultanea(
+                                    new ApagarPoligono(this.pentagono), 
+                                    new ApagarPoligono(this.pentagono2)
+                                )
+
+        const aparecerTriangulos = new AnimacaoSimultanea(
+                                    new ApagarPoligono(this.triangulo).reverse(), 
+                                    new ApagarPoligono(this.triangulo2).reverse()
+                                )
+                                .setOnStart(() => {
+                                    this.triangulo.addToScene(this.scene);
+                                    this.triangulo2.addToScene(this.scene);
+                                })
+
+        console.log(aparecerTriangulos)
+
+        const terceiraLinha = new AnimacaoSimultanea(
+                                animarDialogo[2],
+                                apagarPoligonos,
+                                aparecerTriangulos
+                             );
+
+        const quartaLinha   = animarDialogo[3];
+
         // const divisao = new Divisao(this.pentagono2.edges[0], this.pentagono.edges[0], null, new THREE.Vector3(4,-1,0)).addToScene(this.scene);
 
-        this.animar(new AnimacaoSequencial(primeiraLinha, segundaLinha))
+        this.animar(new AnimacaoSequencial(primeiraLinha, segundaLinha, terceiraLinha, quartaLinha))
     }
 
     //Criação dos controles, input e output
@@ -220,14 +265,25 @@ export class PrimeiraFase extends Fase{
         super.update();
         super.update();
         super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
         
         // if(options.atualizar) triangle.update();
 

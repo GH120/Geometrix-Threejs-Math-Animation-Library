@@ -23,6 +23,15 @@ export class Poligono extends Objeto{
         this.angles = [];
     }
 
+    configuration(options){
+
+        this.grossura    = options.grossura;
+        this.raioVertice = options.raioVertice;
+        this.raioAngulo  = options.raioAngulo;
+
+        return this;
+    }
+
     // setupProporcoes(grossuraVertice, grossuraAresta, raioAngulo){
 
     //     this.sphereGeometry = new THREE.SphereGeometry(grossuraVertice);

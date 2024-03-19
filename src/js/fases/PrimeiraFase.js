@@ -76,7 +76,7 @@ export class PrimeiraFase extends Fase{
                               [pi   ,   pi  ,     0],
                               [pi   ,-pi*0.7,     0],
                           ])
-                          .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
+                          .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.6})
                           .render()
                           .escala(0.605,1.01,0)
                           .translacao(2,-0.5,0);
@@ -209,15 +209,13 @@ export class PrimeiraFase extends Fase{
                                 )
 
         const aparecerTriangulos = new AnimacaoSimultanea(
-                                    new ApagarPoligono(this.triangulo).reverse(), 
+                                    // new ApagarPoligono(this.triangulo).reverse(), 
                                     new ApagarPoligono(this.triangulo2).reverse()
                                 )
                                 .setOnStart(() => {
-                                    this.triangulo.addToScene(this.scene);
+                                    // this.triangulo.addToScene(this.scene);
                                     this.triangulo2.addToScene(this.scene);
                                 })
-
-        console.log(aparecerTriangulos)
 
         const terceiraLinha = new AnimacaoSimultanea(
                                 animarDialogo[2],
@@ -229,7 +227,89 @@ export class PrimeiraFase extends Fase{
 
         // const divisao = new Divisao(this.pentagono2.edges[0], this.pentagono.edges[0], null, new THREE.Vector3(4,-1,0)).addToScene(this.scene);
 
-        this.animar(new AnimacaoSequencial(primeiraLinha, segundaLinha, terceiraLinha, quartaLinha))
+
+        const animacao = new AnimacaoSequencial(
+                            primeiraLinha, 
+                            segundaLinha, 
+                            terceiraLinha, 
+                            quartaLinha
+                        )
+                        .setOnTermino(() => this.progresso = 2)
+
+        this.animar(animacao);
+    }
+
+    secondDialogue(){
+
+        const dialogo2 = [
+            "Usando a carta dos 180°, sabemos que os ângulos tem que somar 180°.",
+            "Logo, se temos dois ângulos, o terceiro é o que resta para chegar nos 180°."
+        ]
+
+        const animarDialogo = dialogo2.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)).setValorFinal(100));
+
+
+        const angulo1 = this.triangulo2.angles[0];
+        const angulo2 = this.triangulo2.angles[1];
+        const angulox = this.triangulo2.angles[2];
+
+        const highlightAngle1 = colorirAngulo(angulo1)
+                               .setValorInicial(0xff0000)
+                               .setValorFinal(0xaddd00)
+                               .setDuration(60)
+                               .setCurva(x => {
+                                return -(Math.cos(Math.PI * x) - 1) / 2;
+                               })
+
+        const highlightAngle2 = colorirAngulo(angulo2)
+                                .setValorInicial(angulo2.material.color)
+                                .setValorFinal(0xaddd00)
+                                .setDuration(60)
+                                .setCurva(x => {
+                                    return -(Math.cos(Math.PI * x) - 1) / 2;
+                                   })
+    
+
+        const highlightKnownAngles = new AnimacaoSimultanea(
+                                        highlightAngle1, 
+                                        highlightAngle2
+                                    );
+
+
+        const mostrarGraus = this.triangulo2.angles.map(angle => this.mostrarGrausAparecendo(angle)
+                                                                    .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+                                                                    .setOnTermino(() => null)
+                                                                    .setProgresso(0)
+                                                     )
+        
+        mostrarGraus[2].setOnStart(() => {
+            angulox.mostrarAngulo.update({dentro:true}); 
+            angulox.mostrarAngulo.text.elemento.element.textContent = "?"
+        })
+
+
+        const mostrarGrausDosAngulos = new AnimacaoSequencial(
+                                            highlightKnownAngles,
+                                            new AnimacaoSimultanea().setAnimacoes(mostrarGraus)
+                                        )
+
+        console.log("animação", mostrarGrausDosAngulos)
+
+        const primeiraLinha = new AnimacaoSimultanea(
+                                animarDialogo[0],
+                                mostrarGrausDosAngulos
+                            );
+
+        const segundaLinha  = new AnimacaoSimultanea(
+                                animarDialogo[1]
+                            )
+
+        const animacao = new AnimacaoSequencial(
+                            primeiraLinha,
+                            segundaLinha
+                        )
+
+        this.animar(animacao)
     }
 
     //Criação dos controles, input e output
@@ -263,27 +343,63 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
+
+        if(this.progresso<2){
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+        }
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
         
         // if(options.atualizar) triangle.update();
 
@@ -320,6 +436,7 @@ export class PrimeiraFase extends Fase{
                                 .setInterpolacao((a,b,c) => a*(1-c) + b*c)
                                 .setUpdateFunction((valor) => {
                                     mostrarAngulo.text.elemento.element.style.opacity = valor
+                                    console.log(mostrarAngulo.text.elemento.element.style.opacity)
                                 })
                                 .setDuration(60)
                                 .setCurva(x => {
@@ -331,6 +448,9 @@ export class PrimeiraFase extends Fase{
                                 .voltarAoInicio(false)
                                 .manterExecucao(false)
                                 .setOnTermino(() => mostrarAngulo.update({dentro:false}))
+                                .setOnStart(() => {
+                                    mostrarAngulo.update({dentro:true});
+                                })
 
         angle.mostrarAngulo = mostrarAngulo;
 
@@ -355,11 +475,7 @@ export class PrimeiraFase extends Fase{
                             this.highlightColorirAngulo(angle2),
                             this.mostrarGrausAparecendo(angle1),
                             this.mostrarGrausAparecendo(angle2)
-                        ).setOnStart(() => {
-
-                            angle1.mostrarAngulo.update({dentro:true});
-                            angle2.mostrarAngulo.update({dentro:true});
-                        })
+                        )
                     })
                 )
     }
@@ -378,6 +494,18 @@ export class PrimeiraFase extends Fase{
             consequencia(fase){
 
                fase.firstDialogue();
+            }
+        },
+
+        2: {
+            satisfeito(){
+
+                return true;
+            },
+
+            consequencia(fase){
+
+               fase.secondDialogue();
             }
         },
     }

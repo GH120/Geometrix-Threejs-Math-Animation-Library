@@ -15,6 +15,8 @@ export class Output{
         this._update(novoEstado); // função update privada
 
         this.notify(this.estado);
+
+        return this;
     }
 
     setUpdateFunction(update){

@@ -370,7 +370,7 @@ export class AnimacaoSequencial extends Animacao{
         return this;
     }
 
-    setDuration = function(frames){
+    setDurationAll(frames){
         this.animacoes.map(animacao => animacao.setDuration(frames));
         return this;
     }

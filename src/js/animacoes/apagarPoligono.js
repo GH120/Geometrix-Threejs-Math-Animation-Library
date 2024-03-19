@@ -25,7 +25,8 @@ export class ApagarPoligono extends AnimacaoSimultanea{
             ...poligono.vertices.map(vertex => apagarObjeto(vertex))  
         ])
 
-        this.setDuration(2000)
+        this.frames = 200;
+
     }
 
     setValorInicial(valor){

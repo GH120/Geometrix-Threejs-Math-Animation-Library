@@ -12,7 +12,7 @@ export class Divisao extends Animacao{
         this.offsetPosicional  = offsetPosicional;
         this.posicaoFixa = posicaoFixa
         //Gambiarra, ajeitar depois
-        this.frames = 1000;
+        this.frames = 500;
         this.frameCount = 90;
         this.delay = 60;
     }

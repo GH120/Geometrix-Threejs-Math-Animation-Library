@@ -492,6 +492,8 @@ export class PrimeiraFase extends Fase{
         const angle              = fase.informacao.anguloSelecionado;
         const copia              = fase.informacao.copiaDoAngulo;
         const verticeSelecionado = fase.informacao.verticeSelecionado;
+
+        angle.copiaDoAngulo = copia;
         
         //Output atualiza a copia
         const atualizarCopia = new Output().setUpdateFunction((estado) => {
@@ -902,7 +904,14 @@ export class PrimeiraFase extends Fase{
 
         function updateDegrees(){
 
-            fase.triangulo.angles.map(angle => angle.mostrarAngulo.update({dentro:true}));
+            for(const angle of fase.triangulo.angles){
+
+                const valor = angle.mostrarAngulo.text.elemento.element.textContent;
+
+                angle.mostrarAngulo.update({dentro:true});
+
+                if(valor == "?") angle.mostrarAngulo.text.elemento.element.textContent = valor;
+            }
         }
 
 
@@ -1035,7 +1044,13 @@ export class PrimeiraFase extends Fase{
 
     mostrarGrausAparecendo(angle){
 
-        const mostrarAngulo = new MostrarAngulo(angle).addToScene(this.scene);
+
+        if(!angle.mostrarAngulo){
+
+            angle.mostrarAngulo = new MostrarAngulo(angle).addToScene(this.scene);
+        }
+
+        const mostrarAngulo = angle.mostrarAngulo;
 
         const aparecerTexto = new Animacao()
                                 .setValorInicial(0)
@@ -1058,8 +1073,6 @@ export class PrimeiraFase extends Fase{
                                 .setOnStart(() => {
                                     mostrarAngulo.update({dentro:true});
                                 })
-
-        angle.mostrarAngulo = mostrarAngulo;
 
         return aparecerTexto;
 
@@ -1213,12 +1226,24 @@ export class PrimeiraFase extends Fase{
                                         .voltarAoInicio(false)
 
 
-        fase.animar(apagarTrianguloAnimacao);
+        const apagarGraus1 = this.mostrarGrausAparecendo(this.triangulo.angles[0]).reverse(true, true);
+        const apagarGraus2 = this.mostrarGrausAparecendo(this.triangulo.angles[1]).reverse(true, true);
 
 
-        const dialogo = ["Veja o ângulo resultante da soma dos ângulos do triângulo,",
-                         "Ele forma metade de um círculo",
-                        "Se um círculo tem 360°, então quantos graus tem metade de um círculo?"]
+        const mostrarGraus1 = this.mostrarGrausAparecendo(this.informacao.angulosInvisiveis[0]).setOnTermino(() => null);
+        const mostrarGraus2 = this.mostrarGrausAparecendo(this.informacao.angulosInvisiveis[1]).setOnTermino(() => null);
+
+        const apagarRedesenhar = new AnimacaoSimultanea(
+                                    apagarTrianguloAnimacao, 
+                                    apagarGraus1,
+                                    apagarGraus2,
+                                    mostrarGraus1,
+                                    mostrarGraus2
+                                )
+
+        const dialogo = ["A soma dos ângulos é metade de um círculo, 180°",
+                         "então se subtrairmos os ângulos conhecidos, descobriremos ?",
+                        "clique nos ângulos conhecidos e faça-os desaparecer"]
         
         //Clica automaticamente no vértice, desligando seu output e resetando o triângulo
         const desligarTracejado = () => fase.outputClickVertice.forEach(output => (output.ativado)? output.update({clicado:true}) : null);
@@ -1236,7 +1261,15 @@ export class PrimeiraFase extends Fase{
         
         const desenharCirculo = new DesenharMalha(circulo, fase.scene).setDuration(250);
 
-        const animacao = new AnimacaoSequencial(anim1,new AnimacaoSimultanea(anim2,desenharCirculo),anim3);
+        const animacao = new AnimacaoSequencial(
+                            apagarRedesenhar,
+                            anim1,
+                            new AnimacaoSimultanea(
+                                anim2,
+                                desenharCirculo
+                            ),
+                            anim3
+                        );
 
         animacao.animacoes.map(animacao => animacao.checkpoint = false);
         

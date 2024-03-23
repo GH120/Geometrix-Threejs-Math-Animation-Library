@@ -186,6 +186,20 @@ export default class Animacao {
 
         return this.frames;
     }
+
+    reverse(resetEndFunction, resetStartFunction){
+
+        const valorFinal   = this.valorFinal;
+        const valorInicial = this.valorInicial;
+
+        this.valorFinal = valorInicial;
+        this.valorInicial = valorFinal;
+
+        if(resetEndFunction) this.onTermino = () => null;
+        if(resetStartFunction) this.onStart = () => null;
+
+        return this;
+    }
 }
 
 export class AnimacaoSimultanea extends Animacao{

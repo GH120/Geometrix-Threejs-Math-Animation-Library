@@ -33,14 +33,15 @@ const LevelScreen = () => {
   // ====== INICIANDO FASE ========
   useEffect(() => {
     const fase = new fases[id];
-    const whiteboard = new Whiteboard();
+    // const whiteboard = new Whiteboard();
     
     // use ref as a mount point of the Three.js scene instead of the document.body
     refContainer.current && refContainer.current.appendChild(fase.renderer.domElement);
     refContainer.current && refContainer.current.appendChild(fase.labelRenderer.domElement)
     
-    whiteboard.start();
+    // whiteboard.start();
     fase.start(); //Começa o loop de animações
+
     
     setFase(fase);
     setWhiteboard(whiteboard);

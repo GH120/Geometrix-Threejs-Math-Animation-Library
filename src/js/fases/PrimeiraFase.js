@@ -344,6 +344,13 @@ export class PrimeiraFase extends Fase{
 
     }
 
+    createInputs2(){
+
+        const copias = this.triangulo.angles.map(angle => angle.copiaDoAngulo);
+
+        copias.forEach(copia => new Clickable(copia));
+    }
+
     createOutputs(){
         //Outputs
         this.outputClickVertice   = this.triangulo.vertices.map(vertex =>   this.criarTracejado(vertex))
@@ -545,6 +552,15 @@ export class PrimeiraFase extends Fase{
         const fase = this;
 
         fase.resetarInputs();
+    }
+
+    Configuracao5(){
+
+        this.createInputs2();
+
+        const angles = this.triangulo.angles;
+
+        this.outputSubtrairAngulos = angles.map(angle => this.deletarAngulo(angle))
     }
 
     //Agora é a configuração 1
@@ -985,6 +1001,35 @@ export class PrimeiraFase extends Fase{
         }
     }
 
+    deletarAngulo(angle){
+
+        const fase = this;
+
+        //Aceita um angulo, ao clicar apaga ele e decrementa o contador total
+
+        return new Output()
+               .setUpdateFunction(function(estadoNovo){
+
+                    if(estadoNovo.clicado){
+
+                        //Deleta o ângulo através de animação
+
+                        fase.animar(
+                            apagarObjeto(angle)
+                            .setOnTermino(decrementarContador)
+                        );
+                    }
+               })
+
+        //Funções auxiliares
+        function decrementarContador(){
+
+            angle.removeFromScene();
+
+            //Decrementa o total da equação
+        }
+    }
+
 
     update(){
         // this.atualizarOptions();
@@ -1273,7 +1318,7 @@ export class PrimeiraFase extends Fase{
 
         animacao.animacoes.map(animacao => animacao.checkpoint = false);
         
-        fase.animar(animacao)
+        fase.animar(animacao.setOnTermino(() => fase.configuracao5()))
         
     }
 }

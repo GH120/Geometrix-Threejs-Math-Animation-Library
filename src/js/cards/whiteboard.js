@@ -3,40 +3,24 @@ import * as THREE from 'three';
 //Obs: edit layout with google webtools later
 export class Whiteboard {
 
-    constructor(){
+    constructor(containerElement) {
+        this.containerElement = containerElement;
+        this.animacoes = [];
+        this.frames = [];
+        this.equationWindow = null; // Initialize as null
 
-        // this.camera = camera;
-        // this.scene  = scene;
-        // this.canvas = canvas;
-
-        this.animacoes  = [];
-        this.frames     = [];
-
-        //Consegue o elemento html da tela para criar o quadro em branco nele
-        try{
-            this.start();
-
-            this.initialized = true;
-        }
-        catch(e){
-
-        }
-
+        this.start();
     }
 
-    start(){
-
-        // linha abaixo: antigamente possuia um elemento ja criado
-        // this.equationWindow = document.getElementById("equationWindow");
-        
-        // agora o elemento está sendo criado na funcao start
-        this.equationWindow = document.createElement("div"); 
+    start() {
+        this.equationWindow = document.createElement("div");
         this.equationWindow.id = "equationWindow";
-        console.log(this.equationWindow);
 
         this.createEquationList();
-
         this.createThreejsCanvas();
+
+        // Append the equation window to the provided container element
+        this.containerElement.appendChild(this.equationWindow);
     }
 
     createEquationList(){
@@ -100,6 +84,7 @@ export class Whiteboard {
         animate();
         
         telaEquacao.appendChild(renderer.domElement);
+
     }
 
 

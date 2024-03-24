@@ -26,6 +26,8 @@ function Navbar(props) {
   const [EquationMenuOpen, setEquationMenuOpen] = useState(false);
   const navigator = useNavigate();
 
+  console.log(props)
+
   const settings = props.settings;
 
   const toggleFaseMenu = () => {
@@ -69,7 +71,7 @@ function Navbar(props) {
       </div>
 
       <div className={`navbar-links ${EquationMenuOpen ? 'open' : ''}`}>
-        <MenuEquacoes fase={settings.fase} hidden= {EquationMenuOpen}></MenuEquacoes>
+        <MenuEquacoes fase={settings.fase} whiteboard={settings.whiteboard} hidden= {EquationMenuOpen}></MenuEquacoes>
       </div>
 
       

@@ -38,6 +38,8 @@ export class Input{
     
         const hitbox = object.hitbox;
 
+        if(!object.hitbox) return null;
+
         const intersects = this.raycaster.intersectObject(hitbox);
     
         if (intersects.length > 0) {

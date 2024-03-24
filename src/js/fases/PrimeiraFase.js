@@ -416,7 +416,7 @@ export class PrimeiraFase extends Fase{
 
         animacao.animacoes.map(animacao => animacao.checkpoint = false);
         
-        fase.animar(animacao.setOnTermino(() => fase.configuracao5()))
+        fase.animar(animacao.setOnTermino(() => fase.Configuracao5()))
         
     }
 
@@ -646,11 +646,11 @@ export class PrimeiraFase extends Fase{
 
     Configuracao5(){
 
-        this.createInputs2();
+        // this.createInputs2();
 
-        const angles = this.triangulo.angles;
+        // const angles = this.triangulo.angles;
 
-        this.outputSubtrairAngulos = angles.map(angle => this.deletarAngulo(angle))
+        // this.outputSubtrairAngulos = angles.map(angle => this.deletarAngulo(angle))
     }
 
     //Agora é a configuração 1
@@ -724,15 +724,24 @@ export class PrimeiraFase extends Fase{
 
                             //Roda a animação de movimentar ângulo, é uma função auxiliar abaixo
                             //Move e gira a copia
-                            moverAnguloAnimacao(copia, estado.position.clone(), invisivel.getPosition());
+
+                            const posicaoVerticeInvisivel = invisivel.vertices[0].mesh.position.clone()
+
+                            const posicaoFinal = (angle.noventaGraus)? 
+                                                  posicaoVerticeInvisivel.add(angle.orientationVector.multiplyScalar(1.2)) :
+                                                  posicaoVerticeInvisivel
+
+
+                            copia.addToScene(fase.scene)
+                            moverAnguloAnimacao(copia, estado.position.clone(), posicaoFinal);
                             girarAngulo(copia);
 
                             //Retorna o ângulo a sua posição original
-                            moverAnguloAnimacao(angle, angle.getPosition(), angle.position);
+                            moverAnguloAnimacao(angle, angle.getPosition(), angle.getOriginalPosition());
                             
                             fase.cor = !fase.cor;
-                            animarMudarDeCor(copia);
-                            animarMudarDeCor(angle);
+                            // animarMudarDeCor(copia);
+                            // animarMudarDeCor(angle);
 
                             //Muda os outputs que o angulo aceita( não pode ser mais arrastado)
                             //Adiciona um output que atualiza a copia no arraste
@@ -742,10 +751,9 @@ export class PrimeiraFase extends Fase{
                         }
 
                         if (!estado.dragging) {
-                            angle.mesh.position.copy(angle.position);
+                            angle.mesh.position.copy(angle.getOriginalPosition());
                             
 
-                            if(angle.noventaGraus) angle.mesh.position.copy(angle.position.clone().sub(angle.vetor1.clone().lerp(angle.vetor2, 0.5).multiplyScalar(angle.angleRadius*Math.sqrt(2))))
                         }
 
                         estado.valido = false;
@@ -763,7 +771,7 @@ export class PrimeiraFase extends Fase{
             const moveAngulo = new Animacao()
                             .setValorInicial(origem)
                             .setValorFinal(destino)
-                            .setInterpolacao(new THREE.Vector3().lerpVectors)
+                            .setInterpolacao((a,b,c) => new THREE.Vector3().lerpVectors(a,b,c))
                             .setUpdateFunction(function(posicao){
                                     anguloInicial.mesh.position.copy(posicao)
                             })

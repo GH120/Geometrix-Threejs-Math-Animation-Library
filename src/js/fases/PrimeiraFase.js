@@ -263,32 +263,14 @@ export class PrimeiraFase extends Fase{
 
         const animarDialogo = dialogo2.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)).setValorFinal(100));
 
-
-        const angulo1 = this.triangulo.angles[0];
-        const angulo2 = this.triangulo.angles[1];
         const angulox = this.triangulo.angles[2];
 
-        const highlightAngle1 = colorirAngulo(angulo1)
-                               .setValorInicial(0xff0000)
-                               .setValorFinal(0xaddd00)
-                               .setDuration(60)
-                               .setCurva(x => {
-                                return -(Math.cos(Math.PI * x) - 1) / 2;
-                               })
-
-        const highlightAngle2 = colorirAngulo(angulo2)
-                                .setValorInicial(angulo2.material.color)
-                                .setValorFinal(0xaddd00)
-                                .setDuration(60)
-                                .setCurva(x => {
-                                    return -(Math.cos(Math.PI * x) - 1) / 2;
-                                   })
-    
-
-        const highlightKnownAngles = new AnimacaoSimultanea(
-                                        highlightAngle1, 
-                                        highlightAngle2
-                                    );
+        const highlightUnknownAngle =   colorirAngulo(angulox)
+                                        .setValorInicial(0xff0000)
+                                        .setValorFinal(0x9002a8)
+                                        .setDuration(200)
+                                        .setCurva(x =>  x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2)
+                                        .voltarAoInicio(false);
 
 
         const mostrarGraus = this.triangulo.angles.map(angle => this.mostrarGrausAparecendo(angle)
@@ -304,7 +286,7 @@ export class PrimeiraFase extends Fase{
 
 
         const mostrarGrausDosAngulos = new AnimacaoSequencial(
-                                            highlightKnownAngles,
+                                            highlightUnknownAngle,
                                             new AnimacaoSimultanea().setAnimacoes(mostrarGraus)
                                         )
 
@@ -328,6 +310,114 @@ export class PrimeiraFase extends Fase{
                         )
 
         this.animar(animacao.setOnTermino(() => this.progresso = 4))
+    }
+
+    animar180Graus(){
+
+
+        const fase = this;
+
+        const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : -1)
+                                               .filter(indice => indice != -1)[0];
+
+        const angulos = fase.triangulo.angles.filter(angulo => angulo.index != index)
+
+        const objetos = fase.triangulo.vertices.concat(fase.triangulo.edges).concat(angulos);
+
+        const dialogo = ["A soma dos ângulos é metade de um círculo, 180°",
+                         "então se subtrairmos os ângulos conhecidos, descobriremos ?",
+                        "clique nos ângulos conhecidos e faça-os desaparecer"]
+        
+        //Clica automaticamente no vértice, desligando seu output e resetando o triângulo
+        const desligarTracejado = () => fase.outputClickVertice.forEach(output => (output.ativado)? output.update({clicado:true}) : null);
+
+        const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0])).setDelay(200)
+        const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1])).setDelay(100)
+        const anim3 = new TextoAparecendo(fase.text.element)
+                          .setOnStart(() => fase.changeText(dialogo[2]))
+                          .setOnTermino(desligarTracejado)
+                          .setDelay(100)
+
+
+        const apagarTrianguloAnimacao = new Animacao()
+                                        .setValorInicial(1)
+                                        .setValorFinal(0)
+                                        .setInterpolacao((inicial,final,peso) => inicial*(1-peso) + final*peso)
+                                        .setUpdateFunction(function(valor){
+
+                                            objetos.map(objeto => objeto.mesh.material = new THREE.MeshBasicMaterial({color: objeto.material.color, transparent:true, opacity: valor}))
+                                        })
+                                        .setCurva(x => x < 0.5
+                                            ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
+                                            : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2)
+                                        .setDuration(200)
+                                        .voltarAoInicio(false)
+
+
+        const apagarGraus1 = this.mostrarGrausAparecendo(this.triangulo.angles[0]).reverse(true, true);
+        const apagarGraus2 = this.mostrarGrausAparecendo(this.triangulo.angles[1]).reverse(true, true);
+
+
+        const mostrarGraus1 = this.mostrarGrausAparecendo(this.informacao.angulosInvisiveis[0]).setOnTermino(() => null);
+        const mostrarGraus2 = this.mostrarGrausAparecendo(this.informacao.angulosInvisiveis[1]).setOnTermino(() => null);
+
+        const apagarRedesenhar = new AnimacaoSimultanea(
+                                    apagarTrianguloAnimacao, 
+                                    apagarGraus1,
+                                    apagarGraus2,
+                                    mostrarGraus1,
+                                    mostrarGraus2
+                                )
+                          
+        const vertice = fase.triangulo.vertices[index];
+        const pontoDoTracejado = fase.informacao.angulosInvisiveis[0].vertices[0];
+
+        const circulo = new Circle(vertice.getPosition(), 0.740,0.05);
+
+        const angulo180graus = new Angle();
+
+        angulo180graus.position = vertice.getPosition();
+        angulo180graus.vetor1 = vertice.getPosition().sub(pontoDoTracejado.getPosition());
+        angulo180graus.vetor2 = vertice.getPosition().add(pontoDoTracejado.getPosition());
+        angulo180graus.angle  = 180;
+
+        angulo180graus.vetor2.add(
+            angulo180graus.vetor1
+            .clone()
+            .crossVectors(
+                angulo180graus.vetor1.clone(), 
+                new THREE.Vector3(0,0,1)
+            )
+            .multiplyScalar(0.001)
+        );
+
+        angulo180graus.renderMalha();
+
+        console.log(angulo180graus, angulo180graus.vetor1.angleTo(angulo180graus.vetor2))
+        
+        const desenharCirculo = new DesenharMalha(circulo, fase.scene).setDuration(250);
+
+        const mostrar180Graus = apagarObjeto(angulo180graus)
+                                .setOnStart(() => angulo180graus.addToScene(this.scene))
+                                .reverse();
+
+        const animacao = new AnimacaoSequencial(
+                            apagarRedesenhar,
+                            anim1,
+                            new AnimacaoSimultanea(
+                                anim2,
+                                new AnimacaoSequencial(
+                                    desenharCirculo,
+                                    mostrar180Graus
+                                )
+                            ),
+                            anim3
+                        );
+
+        animacao.animacoes.map(animacao => animacao.checkpoint = false);
+        
+        fase.animar(animacao.setOnTermino(() => fase.configuracao5()))
+        
     }
 
     createInputs(){
@@ -1242,82 +1332,5 @@ export class PrimeiraFase extends Fase{
     //Animações dos problemas
      //Funções, outputs etc. usados nos problemas
 
-     animar180Graus(){
-
-
-        const fase = this;
-
-        const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : -1)
-                                               .filter(indice => indice != -1)[0];
-
-        const angulos = fase.triangulo.angles.filter(angulo => angulo.index != index)
-
-        const objetos = fase.triangulo.vertices.concat(fase.triangulo.edges).concat(angulos);
-
-
-        const apagarTrianguloAnimacao = new Animacao()
-                                        .setValorInicial(1)
-                                        .setValorFinal(0)
-                                        .setInterpolacao((inicial,final,peso) => inicial*(1-peso) + final*peso)
-                                        .setUpdateFunction(function(valor){
-
-                                            objetos.map(objeto => objeto.mesh.material = new THREE.MeshBasicMaterial({color: objeto.material.color, transparent:true, opacity: valor}))
-                                        })
-                                        .setCurva(x => x < 0.5
-                                            ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
-                                            : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2)
-                                        .setDuration(200)
-                                        .voltarAoInicio(false)
-
-
-        const apagarGraus1 = this.mostrarGrausAparecendo(this.triangulo.angles[0]).reverse(true, true);
-        const apagarGraus2 = this.mostrarGrausAparecendo(this.triangulo.angles[1]).reverse(true, true);
-
-
-        const mostrarGraus1 = this.mostrarGrausAparecendo(this.informacao.angulosInvisiveis[0]).setOnTermino(() => null);
-        const mostrarGraus2 = this.mostrarGrausAparecendo(this.informacao.angulosInvisiveis[1]).setOnTermino(() => null);
-
-        const apagarRedesenhar = new AnimacaoSimultanea(
-                                    apagarTrianguloAnimacao, 
-                                    apagarGraus1,
-                                    apagarGraus2,
-                                    mostrarGraus1,
-                                    mostrarGraus2
-                                )
-
-        const dialogo = ["A soma dos ângulos é metade de um círculo, 180°",
-                         "então se subtrairmos os ângulos conhecidos, descobriremos ?",
-                        "clique nos ângulos conhecidos e faça-os desaparecer"]
-        
-        //Clica automaticamente no vértice, desligando seu output e resetando o triângulo
-        const desligarTracejado = () => fase.outputClickVertice.forEach(output => (output.ativado)? output.update({clicado:true}) : null);
-
-        const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0])).setDelay(200)
-        const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1])).setDelay(100)
-        const anim3 = new TextoAparecendo(fase.text.element)
-                          .setOnStart(() => fase.changeText(dialogo[2]))
-                          .setOnTermino(desligarTracejado)
-                          .setDelay(100)
-                          
-        const vertice = fase.triangulo.vertices[index];
-
-        const circulo = new Circle(vertice.getPosition(), 0.740,0.05);
-        
-        const desenharCirculo = new DesenharMalha(circulo, fase.scene).setDuration(250);
-
-        const animacao = new AnimacaoSequencial(
-                            apagarRedesenhar,
-                            anim1,
-                            new AnimacaoSimultanea(
-                                anim2,
-                                desenharCirculo
-                            ),
-                            anim3
-                        );
-
-        animacao.animacoes.map(animacao => animacao.checkpoint = false);
-        
-        fase.animar(animacao.setOnTermino(() => fase.configuracao5()))
-        
-    }
+     
 }

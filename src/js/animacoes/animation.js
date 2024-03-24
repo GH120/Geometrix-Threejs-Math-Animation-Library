@@ -171,7 +171,8 @@ export default class Animacao {
                                       .setDuration(delay), 
 
                                       this
-                                     );
+                                     )
+                                     .setCheckpoint(false)
     }
 
     recalculateFrames(){
@@ -409,6 +410,15 @@ export class AnimacaoSequencial extends Animacao{
         this.animacoes.map(animacao => animacao.recalculateFrames())
 
         this.frames = this._calculateFrames();
+
+        return this;
+    }
+
+    setCheckpoint(trueOrFalse){
+
+        this.checkpoint = trueOrFalse;
+
+        this.animacoes.map(animacao => animacao.checkpoint = trueOrFalse);
 
         return this;
     }

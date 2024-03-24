@@ -1103,7 +1103,6 @@ export class PrimeiraFase extends Fase{
                                 .setInterpolacao((a,b,c) => a*(1-c) + b*c)
                                 .setUpdateFunction((valor) => {
                                     mostrarAngulo.text.elemento.element.style.opacity = valor
-                                    console.log(mostrarAngulo.text.elemento.element.style.opacity)
                                 })
                                 .setDuration(60)
                                 .setCurva(x => {

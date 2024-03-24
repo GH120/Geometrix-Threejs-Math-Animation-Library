@@ -232,7 +232,7 @@ export class AnimacaoSimultanea extends Animacao{
         this.frames =   animacoes.map(animacao => animacao.frames + animacao.delay)
                                  .reduce((maior,atual) => (maior > atual)? maior : atual, 0);
 
-        console.log(this.frames,this.delay)
+        // console.log(this.frames,this.delay)
 
         const actions = animacoes.map(animacao => animacao.getFrames());
 

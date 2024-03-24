@@ -96,13 +96,18 @@ export default class AnimationControler {
                             }
 
                             //Enter
-                            if(novoEstado.keyDown == 13 && this.estado.pause){
+                            if(novoEstado.keyDown == 13){
 
                                 this.estado.pause = false;
 
-                                const pausado = this.estado.pause;
+                                for(const animacao of fase.animacoes){
 
-                                fase.animacoes.map(animacao => animacao.pause = pausado);
+                                    animacao.pause = false;
+
+                                    const subAnimacaoAtual = animacao.subAnimacaoAtual;
+
+                                    if(subAnimacaoAtual) subAnimacaoAtual.checkpoint = false;
+                                }
 
                                 fase.scene.remove(fase.aviso);
                             }
@@ -162,8 +167,10 @@ export default class AnimationControler {
             aviso.element.appendChild(span);
         });
 
-        aviso.position.y = -2.5;
-        aviso.position.x = 4;
+        const dimensoes = this.fase.canvas.getBoundingClientRect();
+
+        aviso.position.y = this.fase.pixelToCoordinates(0.88 * dimensoes.right, 0.9317 * dimensoes.bottom).y;
+        aviso.position.x = this.fase.pixelToCoordinates(0.88 * dimensoes.right, 0.9317 * dimensoes.bottom).x;
 
         if(this.fase.aviso) this.fase.scene.remove(this.fase.aviso);
 

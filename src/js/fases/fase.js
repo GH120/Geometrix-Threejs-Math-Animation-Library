@@ -178,6 +178,7 @@ export class Fase {
         this.renderer = renderer;
         this.labelRenderer = labelRenderer;
         this.camera = camera;
+        this.canvas = renderer.domElement;
 
         window.addEventListener('resize', function() {
             camera.aspect = window.screen.width / window.innerHeight;
@@ -211,5 +212,37 @@ export class Fase {
         }
         animate();
     }
+
+    /**Transforma o pixel da tela em uma coordenada para o canvas, 
+     * útil para escrever textos quando a câmera constantemente muda de posição
+     * Ou quer ter certeza que vai aparecer em certo lugar idependente to tamanho do monitor**/
+    pixelToCoordinates(x,y){
+    
+        const raycaster = new THREE.Raycaster();
+    
+        raycaster.setFromCamera(this.normalizar(x,y), this.camera);
+        
+        const intersects = raycaster.intersectObject(new THREE.Mesh(
+        new THREE.PlaneGeometry(100,100),
+        new THREE.MeshBasicMaterial({color:0xffffff})
+        ));
+    
+        if (intersects.length > 0) {
+        // Update the object's position to the intersection point
+        return intersects[0].point;
+        }
+    
+    }
+    
+    normalizar(x, y) {
+
+        const canvas = this.canvas;
+
+        const rect = this.canvas.getBoundingClientRect();
+        const normalizedX = (x - rect.left) / canvas.width * 2 - 1;
+        const normalizedY = -(y - rect.top) / canvas.height * 2 + 1;
+        return new THREE.Vector2(normalizedX,normalizedY);
+    }
+
 
 }

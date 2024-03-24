@@ -135,6 +135,10 @@ export class Angle extends Objeto{
         vetores.map(v => v.setY(v.y - 1));
         vetores.map(v => v.multiplyScalar(raio*Math.sqrt(2)/2));
         vetores.map(v => v.applyMatrix4(rotacao));
+
+        const orientacao = this.orientationVector;
+
+        vetores.map(v => v.sub(orientacao));
         
         //Concatena os vetores que representam os pontos em um só array de eixos
         const posicoes = [].concat(...vetores.map(vetor => vetor.toArray()));
@@ -145,9 +149,7 @@ export class Angle extends Objeto{
 
         const mesh = new THREE.Mesh(geometry, this.material);
 
-        const vetor = this.vetor1.clone().lerp(this.vetor2, 0.5).multiplyScalar(raio*Math.sqrt(2));
-
-        const posicao = new THREE.Vector3(...this.position).sub(vetor);
+        const posicao = new THREE.Vector3(...this.position);
 
 
         mesh.position.copy(posicao)
@@ -179,17 +181,6 @@ export class Angle extends Objeto{
 
     copia(){
         return new Angle(this.vertices, this.index);
-    }
-
-    getOriginalPosition(){
-
-        if(!this.noventaGraus) return this.position;
-
-        const vetor = this.vetor1.clone().lerp(this.vetor2, 0.5).multiplyScalar(this.angleRadius*Math.sqrt(2));
-
-        const posicao = new THREE.Vector3(...this.position).sub(vetor);
-
-        return posicao;
     }
 
     addToScene(scene){

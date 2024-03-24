@@ -587,7 +587,7 @@ export class PrimeiraFase extends Fase{
         
 
         const angle              = fase.informacao.anguloSelecionado;
-        const copia              = fase.informacao.copiaDoAngulo;
+        let   copia              = fase.informacao.copiaDoAngulo;
         const verticeSelecionado = fase.informacao.verticeSelecionado;
 
         angle.copiaDoAngulo = copia;
@@ -597,6 +597,8 @@ export class PrimeiraFase extends Fase{
             if(estado.dragging){
 
                 console.log(atualizarCopia)
+
+                const previousPosition = copia.getPosition();
                 
                 copia.removeFromScene();
 
@@ -727,9 +729,7 @@ export class PrimeiraFase extends Fase{
 
                             const posicaoVerticeInvisivel = invisivel.vertices[0].mesh.position.clone()
 
-                            const posicaoFinal = (angle.noventaGraus)? 
-                                                  posicaoVerticeInvisivel.add(angle.orientationVector.multiplyScalar(1.2)) :
-                                                  posicaoVerticeInvisivel
+                            const posicaoFinal = posicaoVerticeInvisivel
 
 
                             copia.addToScene(fase.scene)
@@ -737,7 +737,7 @@ export class PrimeiraFase extends Fase{
                             girarAngulo(copia);
 
                             //Retorna o ângulo a sua posição original
-                            moverAnguloAnimacao(angle, angle.getPosition(), angle.getOriginalPosition());
+                            moverAnguloAnimacao(angle, angle.getPosition(), angle.position);
                             
                             fase.cor = !fase.cor;
                             // animarMudarDeCor(copia);
@@ -751,7 +751,7 @@ export class PrimeiraFase extends Fase{
                         }
 
                         if (!estado.dragging) {
-                            angle.mesh.position.copy(angle.getOriginalPosition());
+                            angle.mesh.position.copy(angle.position);
                             
 
                         }

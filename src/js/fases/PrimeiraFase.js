@@ -80,9 +80,9 @@ export class PrimeiraFase extends Fase{
 
 
         this.triangulo = new Poligono([
-                              [-pi/2,-pi/2  ,     0],
-                              [pi   ,   pi  ,     0],
-                              [pi   ,-pi*0.7,     0],
+                              [0,0,0],
+                              [3,0,0],
+                              [3,4,0]
                           ])
                           .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.6})
                           .render()
@@ -744,6 +744,8 @@ export class PrimeiraFase extends Fase{
                         if (!estado.dragging) {
                             angle.mesh.position.copy(angle.position);
                             
+
+                            if(angle.noventaGraus) angle.mesh.position.copy(angle.position.clone().sub(angle.vetor1.clone().lerp(angle.vetor2, 0.5).multiplyScalar(angle.angleRadius*Math.sqrt(2))))
                         }
 
                         estado.valido = false;
@@ -1124,6 +1126,11 @@ export class PrimeiraFase extends Fase{
     update(){
         // this.atualizarOptions();
 
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
         super.update();
 
         if(this.progresso<2){

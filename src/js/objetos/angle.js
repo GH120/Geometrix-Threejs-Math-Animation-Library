@@ -97,6 +97,8 @@ export class Angle extends Objeto{
 
         MalhaAngulo.position.copy(this.position)
 
+        this.noventaGraus = noventaGraus;
+
         this.mesh   = (noventaGraus)? MalhaReto : MalhaAngulo;
 
         this.hitbox =  MalhaAngulo;

@@ -80,11 +80,11 @@ export class PrimeiraFase extends Fase{
 
 
         this.triangulo = new Poligono([
-                              [0,0,0],
-                              [3,0,0],
-                              [3,4,0]
+                            [-pi/2,-pi/2  ,     0],
+                            [pi   ,   pi  ,     0],
+                            [pi   ,-pi*0.7,     0],
                           ])
-                          .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.6})
+                          .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.7})
                           .render()
                           .escala(0.605,1.01,0)
                           .translacao(2,-0.5,0);
@@ -370,38 +370,47 @@ export class PrimeiraFase extends Fase{
                                 )
                           
         const vertice = fase.triangulo.vertices[index];
-        const pontoDoTracejado = fase.informacao.angulosInvisiveis[0].vertices[0];
+        const sentidoTracejado = fase.informacao.sentido;
 
         const circulo = new Circle(vertice.getPosition(), 0.740,0.05);
 
-        const angulo180graus = new Angle();
+        const triangulo = new Triangle([
+            vertice.getPosition(),
+            vertice.getPosition().add(sentidoTracejado.normalize()),
+            vertice.getPosition().sub(sentidoTracejado.clone()
+                                                      .add(
+                                                                sentidoTracejado
+                                                                .clone()
+                                                                .crossVectors(
+                                                                    sentidoTracejado.clone(), 
+                                                                    new THREE.Vector3(0,0,-1)
+                                                            )
+                                                            .multiplyScalar(0.06)
+                                                       ).normalize()
+                                    )
+        ].map(position => position.toArray()));
 
-        angulo180graus.position = vertice.getPosition();
-        angulo180graus.vetor1 = vertice.getPosition().sub(pontoDoTracejado.getPosition());
-        angulo180graus.vetor2 = vertice.getPosition().add(pontoDoTracejado.getPosition());
-        angulo180graus.angle  = 180;
+        triangulo.render();      
+        
+        const angulo180graus = triangulo.angles[0];
 
-        angulo180graus.vetor2.add(
-            angulo180graus.vetor1
-            .clone()
-            .crossVectors(
-                angulo180graus.vetor1.clone(), 
-                new THREE.Vector3(0,0,1)
-            )
-            .multiplyScalar(0.001)
-        );
+        // const angulo180graus = new Angle(triangulo.vertices);
 
-        angulo180graus.renderMalha();
+        // angulo180graus.addToScene(this.scene)
 
-        angulo180graus.addToScene(this.scene);
+        // angulo180graus.chosen = true;
+
+        // angulo180graus.renderMalha();
+
+        // angulo180graus.addToScene(this.scene);
 
         // console.log(angulo180graus, angulo180graus.vetor1.angleTo(angulo180graus.vetor2))
         
         const desenharCirculo = new DesenharMalha(circulo, fase.scene).setDuration(250);
 
-        // const mostrar180Graus = apagarObjeto(angulo180graus)
-        //                         .setOnStart(() => angulo180graus.addToScene(this.scene))
-        //                         .reverse();
+        const mostrar180Graus = apagarObjeto(angulo180graus)
+                                .setOnStart(() => angulo180graus.addToScene(this.scene))
+                                .reverse();
 
         const animacao = new AnimacaoSequencial(
                             apagarRedesenhar,
@@ -410,7 +419,7 @@ export class PrimeiraFase extends Fase{
                                 anim2,
                                 new AnimacaoSequencial(
                                     desenharCirculo,
-                                    // mostrar180Graus
+                                    mostrar180Graus
                                 )
                             ),
                             anim3
@@ -906,6 +915,7 @@ export class PrimeiraFase extends Fase{
                             fase.Configuracao2({
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
+                                sentido:vetorTracejado1,
                                 angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
                             });
 
@@ -936,6 +946,7 @@ export class PrimeiraFase extends Fase{
                             fase.Configuracao2({
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
+                                sentido: vetorTracejado1,
                                 angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
                             })
 
@@ -1164,8 +1175,21 @@ export class PrimeiraFase extends Fase{
         super.update();
         super.update();
         super.update();
+        
 
         if(this.progresso<2){
+
+            super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+
         super.update();
         super.update();
         super.update();

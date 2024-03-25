@@ -70,6 +70,8 @@ export class Angle extends Objeto{
         //Numero de segmentos de triangulos a serem desenhados
         const segmentos = Math.round(this.angulo*180/Math.PI);
 
+        if(this.chosen) console.log(segmentos)
+
         for (let i = 0; i <= segmentos; i++) {
 
             const vetor = new THREE.Vector3(0,0,0);

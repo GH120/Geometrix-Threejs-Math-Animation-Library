@@ -358,8 +358,8 @@ export class PrimeiraFase extends Fase{
         const apagarGraus2 = this.mostrarGrausAparecendo(this.triangulo.angles[1]).reverse(true, true);
 
 
-        const mostrarGraus1 = this.mostrarGrausAparecendo(this.informacao.angulosInvisiveis[0]).setOnTermino(() => null);
-        const mostrarGraus2 = this.mostrarGrausAparecendo(this.informacao.angulosInvisiveis[1]).setOnTermino(() => null);
+        const mostrarGraus1 = this.mostrarGrausAparecendo(this.triangulo.angles[0].copiaDoAngulo, true).setOnTermino(() => null);
+        const mostrarGraus2 = this.mostrarGrausAparecendo(this.triangulo.angles[1].copiaDoAngulo, true).setOnTermino(() => null);
 
         const apagarRedesenhar = new AnimacaoSimultanea(
                                     apagarTrianguloAnimacao, 
@@ -393,13 +393,15 @@ export class PrimeiraFase extends Fase{
 
         angulo180graus.renderMalha();
 
-        console.log(angulo180graus, angulo180graus.vetor1.angleTo(angulo180graus.vetor2))
+        angulo180graus.addToScene(this.scene);
+
+        // console.log(angulo180graus, angulo180graus.vetor1.angleTo(angulo180graus.vetor2))
         
         const desenharCirculo = new DesenharMalha(circulo, fase.scene).setDuration(250);
 
-        const mostrar180Graus = apagarObjeto(angulo180graus)
-                                .setOnStart(() => angulo180graus.addToScene(this.scene))
-                                .reverse();
+        // const mostrar180Graus = apagarObjeto(angulo180graus)
+        //                         .setOnStart(() => angulo180graus.addToScene(this.scene))
+        //                         .reverse();
 
         const animacao = new AnimacaoSequencial(
                             apagarRedesenhar,
@@ -408,7 +410,7 @@ export class PrimeiraFase extends Fase{
                                 anim2,
                                 new AnimacaoSequencial(
                                     desenharCirculo,
-                                    mostrar180Graus
+                                    // mostrar180Graus
                                 )
                             ),
                             anim3
@@ -438,7 +440,7 @@ export class PrimeiraFase extends Fase{
 
         const copias = this.triangulo.angles.map(angle => angle.copiaDoAngulo);
 
-        copias.forEach(copia => new Clickable(copia));
+        copias.filter(x => x != undefined).forEach(copia => new Clickable(copia, this.camera));
     }
 
     createOutputs(){
@@ -447,7 +449,6 @@ export class PrimeiraFase extends Fase{
         this.outputDragAngle      = this.triangulo.angles.map(  angle =>    this.criarMovimentacaoDeAngulo(angle))
         this.outputEscolheuErrado = this.triangulo.angles.map(  angle =>    this.outputAnguloErrado(angle))
         this.outputMoverVertice   = this.triangulo.vertices.map(vertice => new MoverVertice(vertice));
-
     }
 
     
@@ -648,11 +649,20 @@ export class PrimeiraFase extends Fase{
 
     Configuracao5(){
 
-        // this.createInputs2();
+        this.createInputs2();
 
-        // const angles = this.triangulo.angles;
+        const copiasDosAngulos =  this.triangulo.angles
+                                                .map(   angle => angle.copiaDoAngulo)
+                                                .filter(copia => copia != undefined);
 
-        // this.outputSubtrairAngulos = angles.map(angle => this.deletarAngulo(angle))
+        for(const copia of copiasDosAngulos){
+
+            const outputDeletarAngulo = this.deletarAngulo(copia);
+
+            copia.clickable.addObserver(outputDeletarAngulo);
+
+            copia.updateHitboxPosition();
+        }
     }
 
     //Agora é a configuração 1
@@ -1110,14 +1120,13 @@ export class PrimeiraFase extends Fase{
         return new Output()
                .setUpdateFunction(function(estadoNovo){
 
+                    console.log(estadoNovo)
+
                     if(estadoNovo.clicado){
 
                         //Deleta o ângulo através de animação
 
-                        fase.animar(
-                            apagarObjeto(angle)
-                            .setOnTermino(decrementarContador)
-                        );
+                        animacaoDeletar();
                     }
                })
 
@@ -1127,6 +1136,21 @@ export class PrimeiraFase extends Fase{
             angle.removeFromScene();
 
             //Decrementa o total da equação
+        }
+
+        function animacaoDeletar(){
+
+            const animacao = new AnimacaoSimultanea(
+                                apagarObjeto(angle)
+                                .setOnTermino(decrementarContador),
+
+                                fase.mostrarGrausAparecendo(angle)
+                                .reverse()
+                                .setOnStart(() => null)
+                                .setOnTermino(() => angle.mostrarAngulo.update({dentro:false}))
+                            )
+
+            fase.animar(animacao);
         }
     }
 
@@ -1192,7 +1216,7 @@ export class PrimeiraFase extends Fase{
                                     .setDuration(30))
     }
 
-    mostrarGrausAparecendo(angle){
+    mostrarGrausAparecendo(angle, updateMostrarAnguloCadaFrame = false){
 
 
         if(!angle.mostrarAngulo){
@@ -1208,6 +1232,8 @@ export class PrimeiraFase extends Fase{
                                 .setInterpolacao((a,b,c) => a*(1-c) + b*c)
                                 .setUpdateFunction((valor) => {
                                     mostrarAngulo.text.elemento.element.style.opacity = valor
+
+                                    if(updateMostrarAnguloCadaFrame) mostrarAngulo.update({dentro:true});
                                 })
                                 .setDuration(60)
                                 .setCurva(x => {

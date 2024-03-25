@@ -197,4 +197,14 @@ export class Angle extends Objeto{
     get orientationVector(){
         return this.vetor1.clone().lerp(this.vetor2, 0.5).multiplyScalar(this.angleRadius*Math.sqrt(2));
     }
+
+    updateHitboxPosition(){
+
+        console.log(this.mesh.position)
+
+        this.hitbox.position.copy(this.mesh.position);
+        this.hitbox.quaternion.copy(this.mesh.quaternion);
+
+        return this;
+    }
 }

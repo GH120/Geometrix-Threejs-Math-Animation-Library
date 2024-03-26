@@ -21,6 +21,7 @@ import { Tracejado } from '../objetos/tracejado';
 import Circle from "../objetos/circle";
 import DesenharMalha from "../animacoes/desenharMalha";
 import MetalicSheen from "../animacoes/metalicSheen";
+import MoverTexto from "../animacoes/moverTexto";
 
 export class PrimeiraFase extends Fase{
 
@@ -1317,16 +1318,23 @@ export class PrimeiraFase extends Fase{
 
         const desaparecerGraus = new AnimacaoSimultanea().setAnimacoes(angulos.map(angulo => this.mostrarGrausDesaparecendo(angulo).setOnTermino(() => null)))
 
+        const moverTexto = new MoverTexto()
+                              .setOnStart(function(){ 
+                                    this.setText(angulo180graus.mostrarAngulo.text.elemento)
+                               })
+
         return new AnimacaoSequencial(
                     mostrar180Graus, 
                     new AnimacaoSequencial(
                         new AnimacaoSimultanea(
                             new AnimacaoSequencial(
                                 desaparecerGraus, 
-                                this.mostrarGrausAparecendo(angulo180graus).setDuration(200)
+                                this.mostrarGrausAparecendo(angulo180graus,false,false).setDuration(100)
                             ),
                             brilharMetalico
-                        ), 
+                        ),
+                        moverTexto
+                        ,
                         new AnimacaoSimultanea().setAnimacoes([...angulos.map(angulo => this.mostrarGrausAparecendo(angulo,false,false).setOnStart(() => null)), apagar180Graus])
                     ),
                 );

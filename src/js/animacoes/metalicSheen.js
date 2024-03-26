@@ -28,8 +28,6 @@ export default class MetalicSheen extends Animacao{
         this.setInterpolacao((a,b,c) => a*(1-c) + b*c); //Interpolação normal
         this.setUpdateFunction((time) => {
 
-            console.log(time)
-
             this.material.uniforms.time.value = time;
         })
         

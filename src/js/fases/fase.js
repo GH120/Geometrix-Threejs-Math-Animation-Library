@@ -247,10 +247,7 @@ export class Fase {
 
     htmlToWorld(elemento){
 
-        const {x,y} = this.getTranslatedPositionRelativeToDocument(elemento);
-
-
-        console.log(x,y)
+        const retangulo = elemento.getBoundingClientRect();
 
         const ponto = this.pixelToCoordinates(x, y );
 

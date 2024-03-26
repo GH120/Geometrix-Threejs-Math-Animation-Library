@@ -1376,13 +1376,13 @@ export class PrimeiraFase extends Fase{
         const spline2 = [
             new THREE.Vector3(3,1,0),
             new THREE.Vector3(4,2,0),
-            new THREE.Vector3(2,2,0)
+            // new THREE.Vector3(2,2,0)
         ]
 
         const spline3 = [
             new THREE.Vector3(3,1,0),
             new THREE.Vector3(4,2,0),
-            new THREE.Vector3(0.5,2,0)
+            // new THREE.Vector3(0.5,2,0)
         ]
 
         const mover1 = moverTexto(angulos[0]);
@@ -1420,12 +1420,52 @@ export class PrimeiraFase extends Fase{
 
             fase.scene.add(novoElemento);
 
+            for(const node of equacao.nodes){
+
+                node.comeco = equacao.element.textContent.indexOf(node.element.innerText);
+            }
+
+            console.log(equacao.nodes)
+
+            const getPosition = (subelemento) => {
+                const deslocamento = calcularDeslocamento(equacao,subelemento);
+
+                const posicao = novoElemento.position.clone().add(deslocamento)
+
+                return posicao;
+            }
+
+            mover1.setSpline([
+                mover1.elementoTexto.position.clone(),
+                ...spline1,
+                getPosition(x)
+            ])
+
+            mover2.setSpline([
+                mover2.elementoTexto.position.clone(),
+                ...spline2,
+                getPosition(y)
+
+            ])
+
+            mover3.setSpline([
+                mover3.elementoTexto.position.clone(),
+                ...spline3,
+                getPosition(z)
+
+
+            ])
+        }
+
+
+        function calcularDeslocamento(equacao, subequacao){
+
             const tamanho      = equacao.element.textContent.length;
-            const deslocamento = equacao.left.element.textContent.length;
+            const deslocamento = subequacao.comeco + subequacao.element.innerText.length/2;
 
             var canvas = document.createElement('canvas');
             var context = canvas.getContext('2d');
-            context.font = 'Bold 18px Arial'
+            context.font = 'Bold 18px Courier New, monospace'
 
             const width = context.measureText(equacao.element.textContent).width;
 
@@ -1433,25 +1473,7 @@ export class PrimeiraFase extends Fase{
 
             const point = fase.pixelToCoordinates(fase.width/2 + offset,0);
 
-
-            const posicao = novoElemento.position.clone().add(new THREE.Vector3(point.x,0,0));
-
-            mover1.setSpline([
-                mover1.elementoTexto.position.clone(),
-                ...spline1,
-                posicao
-            ])
-
-            mover2.setSpline([
-                mover2.elementoTexto.position.clone(),
-                ...spline2,
-            ])
-
-            mover3.setSpline([
-                mover3.elementoTexto.position.clone(),
-                ...spline3,
-
-            ])
+            return new THREE.Vector3(point.x,0,0);
         }
 
     }

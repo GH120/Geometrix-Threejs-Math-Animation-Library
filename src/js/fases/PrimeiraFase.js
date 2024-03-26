@@ -1318,10 +1318,19 @@ export class PrimeiraFase extends Fase{
 
         const desaparecerGraus = new AnimacaoSimultanea().setAnimacoes(angulos.map(angulo => this.mostrarGrausDesaparecendo(angulo).setOnTermino(() => null)))
 
-        const moverTexto = new MoverTexto()
-                              .setOnStart(function(){ 
-                                    this.setText(angulo180graus.mostrarAngulo.text.elemento)
-                               })
+        // const moverTexto = new MoverTexto()
+        //                       .setOnStart(function(){ 
+                                
+        //                             const elementoCSS2 = angulo180graus.mostrarAngulo.text.elemento;
+
+        //                             this.setText(elementoCSS2)
+        //                             this.setSpline([
+        //                                 elementoCSS2.position.clone(),
+        //                                 new THREE.Vector3(5,1,0),
+        //                                 new THREE.Vector3(3,3,0),
+        //                                 new THREE.Vector3(2.8,3.5,0)
+        //                             ])
+        //                        })
 
         return new AnimacaoSequencial(
                     mostrar180Graus, 
@@ -1329,12 +1338,10 @@ export class PrimeiraFase extends Fase{
                         new AnimacaoSimultanea(
                             new AnimacaoSequencial(
                                 desaparecerGraus, 
-                                this.mostrarGrausAparecendo(angulo180graus,false,false).setDuration(100)
+                                this.mostrarGrausAparecendo(angulo180graus).setDuration(200)
                             ),
                             brilharMetalico
                         ),
-                        moverTexto
-                        ,
                         new AnimacaoSimultanea().setAnimacoes([...angulos.map(angulo => this.mostrarGrausAparecendo(angulo,false,false).setOnStart(() => null)), apagar180Graus])
                     ),
                 );

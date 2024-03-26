@@ -26,8 +26,12 @@ export default class MoverTexto extends Animacao{
         this.setInterpolacao((a,b,c) => a*(1-c) + b*c);
 
         this.setUpdateFunction((tempo) =>{
-            this.elementoTexto.position.copy(this.spline.getPointAt(tempo%1));
+            this.elementoTexto.position.copy(this.spline.getPointAt(tempo));
         })
+
+        this.voltarAoInicio(false);
+
+        this.setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
     }
 
     setSpline( splinePoints){

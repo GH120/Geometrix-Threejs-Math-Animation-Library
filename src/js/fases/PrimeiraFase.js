@@ -1318,19 +1318,15 @@ export class PrimeiraFase extends Fase{
 
         const desaparecerGraus = new AnimacaoSimultanea().setAnimacoes(angulos.map(angulo => this.mostrarGrausDesaparecendo(angulo).setOnTermino(() => null)))
 
-        // const moverTexto = new MoverTexto()
-        //                       .setOnStart(function(){ 
-                                
-        //                             const elementoCSS2 = angulo180graus.mostrarAngulo.text.elemento;
-
-        //                             this.setText(elementoCSS2)
-        //                             this.setSpline([
-        //                                 elementoCSS2.position.clone(),
-        //                                 new THREE.Vector3(5,1,0),
-        //                                 new THREE.Vector3(3,3,0),
-        //                                 new THREE.Vector3(2.8,3.5,0)
-        //                             ])
-        //                        })
+        const reaparecerGraus  =  new AnimacaoSimultanea()
+                                  .setAnimacoes([
+                                                    ...angulos
+                                                    .map(angulo => this.mostrarGrausAparecendo(angulo,false,false)
+                                                                              .setOnStart(() => null)
+                                                    ), 
+                                                    apagar180Graus
+                                                ]);
+                        
 
         return new AnimacaoSequencial(
                     mostrar180Graus, 
@@ -1342,9 +1338,51 @@ export class PrimeiraFase extends Fase{
                             ),
                             brilharMetalico
                         ),
-                        new AnimacaoSimultanea().setAnimacoes([...angulos.map(angulo => this.mostrarGrausAparecendo(angulo,false,false).setOnStart(() => null)), apagar180Graus])
+                        reaparecerGraus,
+                        this.moverGrausParaPosicaoEquacao(angulos)
                     ),
                 );
+
+    }
+
+    moverGrausParaPosicaoEquacao(angulos){
+
+        const moverTexto = (angulo,spline) => new MoverTexto()
+                                        .setOnStart(function(){ 
+                                            
+                                                const elementoCSS2 = angulo.mostrarAngulo.text.elemento;
+
+                                                this.setText(elementoCSS2)
+                                                this.setSpline([
+                                                    elementoCSS2.position.clone(),
+                                                    ...spline
+                                                ])
+                                        })
+                                        .voltarAoInicio(true)
+
+        const spline1 = [
+            new THREE.Vector3(3,1,0),
+            new THREE.Vector3(4,2,0),
+            new THREE.Vector3(3.5,2,0)
+        ]
+
+        const spline2 = [
+            new THREE.Vector3(3,1,0),
+            new THREE.Vector3(4,2,0),
+            new THREE.Vector3(2,2,0)
+        ]
+
+        const spline3 = [
+            new THREE.Vector3(3,1,0),
+            new THREE.Vector3(4,2,0),
+            new THREE.Vector3(0.5,2,0)
+        ]
+
+        return new AnimacaoSimultanea(
+                    moverTexto(angulos[0], spline1),
+                    moverTexto(angulos[1], spline2),
+                    moverTexto(angulos[2], spline3)
+               );
 
     }
 

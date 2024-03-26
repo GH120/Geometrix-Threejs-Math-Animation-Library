@@ -1138,6 +1138,12 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
         
         
 
@@ -1342,43 +1348,29 @@ export class PrimeiraFase extends Fase{
                         reaparecerGraus,
                         this.moverGrausParaPosicaoEquacao(angulos)
                     ),
-                ).setOnTermino(() => {
-                    const valores = angulos.map( angulo => angulo.mostrarAngulo.text.elemento);
-
-                    const equacao = new Equality(
-                                        new Addition(
-                                            new Addition(
-                                                new Variable(valores[0]),
-                                                new Value(valores[1])
-                                            ),
-                                            new Value(valores[2])
-                                        )
-                                    )
-
-                    console.log(equacao, new Value(valores[1]))
-                });
+                )
 
     }
 
     moverGrausParaPosicaoEquacao(angulos){
 
-        const moverTexto = (angulo,spline) => new MoverTexto()
-                                        .setOnStart(function(){ 
-                                            
-                                                const elementoCSS2 = angulo.mostrarAngulo.text.elemento;
+        const fase = this;
 
-                                                this.setText(elementoCSS2)
-                                                this.setSpline([
-                                                    elementoCSS2.position.clone(),
-                                                    ...spline
-                                                ])
-                                        })
-                                        .voltarAoInicio(true)
+        const moverTexto = (angulo) => {
+                                        const mover = new MoverTexto().voltarAoInicio(true)
+                                        
+                                        
+                                        const elementoCSS2 = angulo.mostrarAngulo.text.elemento;
+
+                                        mover.setText(elementoCSS2)
+
+                                        return mover;
+                                    }
 
         const spline1 = [
             new THREE.Vector3(3,1,0),
             new THREE.Vector3(4,2,0),
-            new THREE.Vector3(3.5,2,0)
+            // new THREE.Vector3(3.5,2,0)
         ]
 
         const spline2 = [
@@ -1393,11 +1385,67 @@ export class PrimeiraFase extends Fase{
             new THREE.Vector3(0.5,2,0)
         ]
 
+        const mover1 = moverTexto(angulos[0]);
+        const mover2 = moverTexto(angulos[1]);
+        const mover3 = moverTexto(angulos[2]);
+
         return new AnimacaoSimultanea(
-                    moverTexto(angulos[0], spline1),
-                    moverTexto(angulos[1], spline2),
-                    moverTexto(angulos[2], spline3)
-               );
+                    mover1,
+                    mover2,
+                    mover3
+               )
+               .setOnStart(criarEquacao);
+
+        function criarEquacao(){
+            const valores = angulos.map( angulo => angulo.mostrarAngulo.text.elemento.element.textContent);
+
+            const x = new Variable(valores[0]);
+            const y = new Value(valores[1]);
+            const z = new Value(valores[2]);
+
+            const equacao = new Equality(
+                                new Addition(
+                                    new Addition(
+                                        x,
+                                        y
+                                    ),
+                                    z
+                                ),
+                                new Variable("180°")
+                            )
+
+            const novoElemento = new CSS2DObject(equacao.html);
+
+            novoElemento.position.copy(new THREE.Vector3(0,0,0));
+
+            fase.scene.add(novoElemento);
+
+            const tamanho      = equacao.element.textContent.length;
+            const deslocamento = equacao.left.element.textContent.length;
+
+            console.log(tamanho, deslocamento)
+            
+
+
+            const posicao = novoElemento.position;
+
+            mover1.setSpline([
+                mover1.elementoTexto.position.clone(),
+                ...spline1,
+                posicao
+            ])
+
+            mover2.setSpline([
+                mover2.elementoTexto.position.clone(),
+                ...spline2,
+            ])
+
+            mover3.setSpline([
+                mover3.elementoTexto.position.clone(),
+                ...spline3,
+
+            ])
+        }
 
     }
 

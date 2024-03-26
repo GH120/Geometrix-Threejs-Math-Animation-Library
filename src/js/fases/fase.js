@@ -213,6 +213,50 @@ export class Fase {
         animate();
     }
 
+    getTranslatedPositionRelativeToDocument(element) {
+        let x = 0;
+        let y = 0;
+        let currentElement = element;
+
+        // Traverse up the DOM tree to accumulate transformations
+        while (currentElement) {
+            const rect = currentElement.getBoundingClientRect();
+            const style = window.getComputedStyle(currentElement);
+
+            console.log(!!style.transform,currentElement.style,currentElement.style.transform);
+
+            if(style.transform){
+
+                const translateX = parseFloat(style.transform.match(/translate\((-*\s*[0-9]*px?,-*.*[0-9]*px?)\)/)[0]);
+                const translateY = parseFloat(style.transform.match(/translate\((-*\s*[0-9]*px?,-*.*[0-9]*px?)\)/)[1]);
+
+                console.log(translateX, style.transform.match(/translate\((-*\s*[0-9]*px?,-*.*[0-9]*px?)\)/))
+
+                const transformOriginX = parseFloat(style.transformOrigin.split(" ")[0]);
+                const transformOriginY = parseFloat(style.transformOrigin.split(" ")[1]);
+
+            }
+
+            if(!currentElement.parentElement && !!style.transform) continue;
+
+            currentElement = currentElement.parentElement;
+        }
+
+        return { x, y };
+    }
+
+    htmlToWorld(elemento){
+
+        const {x,y} = this.getTranslatedPositionRelativeToDocument(elemento);
+
+
+        console.log(x,y)
+
+        const ponto = this.pixelToCoordinates(x, y );
+
+        return new THREE.Vector3(ponto.x, ponto.y, 0.0);
+    }
+
     /**Transforma o pixel da tela em uma coordenada para o canvas, 
      * útil para escrever textos quando a câmera constantemente muda de posição
      * Ou quer ter certeza que vai aparecer em certo lugar idependente to tamanho do monitor**/

@@ -1423,11 +1423,18 @@ export class PrimeiraFase extends Fase{
             const tamanho      = equacao.element.textContent.length;
             const deslocamento = equacao.left.element.textContent.length;
 
-            console.log(tamanho, deslocamento)
-            
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            context.font = 'Bold 18px Arial'
+
+            const width = context.measureText(equacao.element.textContent).width;
+
+            const offset = (deslocamento/tamanho - 0.5)*width;
+
+            const point = fase.pixelToCoordinates(fase.width/2 + offset,0);
 
 
-            const posicao = novoElemento.position;
+            const posicao = novoElemento.position.clone().add(new THREE.Vector3(point.x,0,0));
 
             mover1.setSpline([
                 mover1.elementoTexto.position.clone(),

@@ -20,6 +20,7 @@ import {Hoverable} from '../inputs/hoverable';
 import { Tracejado } from '../objetos/tracejado';
 import Circle from "../objetos/circle";
 import DesenharMalha from "../animacoes/desenharMalha";
+import MetalicSheen from "../animacoes/metalicSheen";
 
 export class PrimeiraFase extends Fase{
 
@@ -368,60 +369,28 @@ export class PrimeiraFase extends Fase{
                                     mostrarGraus1,
                                     mostrarGraus2
                                 )
-                          
+
         const vertice = fase.triangulo.vertices[index];
-        const sentidoTracejado = fase.informacao.sentido;
 
         const circulo = new Circle(vertice.getPosition(), 0.740,0.05);
-
-        const triangulo = new Triangle([
-            vertice.getPosition(),
-            vertice.getPosition().add(sentidoTracejado.normalize()),
-            vertice.getPosition().sub(sentidoTracejado.clone()
-                                                      .add(
-                                                                sentidoTracejado
-                                                                .clone()
-                                                                .crossVectors(
-                                                                    sentidoTracejado.clone(), 
-                                                                    new THREE.Vector3(0,0,-1)
-                                                            )
-                                                            .multiplyScalar(0.06)
-                                                       ).normalize()
-                                    )
-        ].map(position => position.toArray()));
-
-        triangulo.render();      
-        
-        const angulo180graus = triangulo.angles[0];
-
-        // const angulo180graus = new Angle(triangulo.vertices);
-
-        // angulo180graus.addToScene(this.scene)
-
-        // angulo180graus.chosen = true;
-
-        // angulo180graus.renderMalha();
-
-        // angulo180graus.addToScene(this.scene);
-
-        // console.log(angulo180graus, angulo180graus.vetor1.angleTo(angulo180graus.vetor2))
         
         const desenharCirculo = new DesenharMalha(circulo, fase.scene).setDuration(250);
 
-        const mostrar180Graus = apagarObjeto(angulo180graus)
-                                .setOnStart(() => angulo180graus.addToScene(this.scene))
-                                .reverse();
+        const apagarCirculo   = apagarObjeto(circulo);
+
+        const mostrar180Graus = this.mostrarEApagar180Graus(vertice);
 
         const animacao = new AnimacaoSequencial(
                             apagarRedesenhar,
-                            anim1,
                             new AnimacaoSimultanea(
-                                anim2,
+                                anim1,
                                 new AnimacaoSequencial(
                                     desenharCirculo,
-                                    mostrar180Graus
+                                    mostrar180Graus,
+                                    apagarCirculo
                                 )
                             ),
+                            anim2,
                             anim3
                         );
 
@@ -1170,14 +1139,10 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
+        
         
 
-        if(this.progresso<2){
+        if(this.progresso<4){
 
             super.update();
         super.update();
@@ -1297,6 +1262,46 @@ export class PrimeiraFase extends Fase{
                         )
                     })
                 )
+    }
+
+    mostrarEApagar180Graus(vertice){
+
+        const fase = this;
+
+        const sentidoTracejado = fase.informacao.sentido;
+        
+        //Gambiarra, ao invés de criar só o ângulo, cria o triângulo dele e o extrai posteriormente
+        const triangulo = new Triangle([
+            vertice.getPosition(),
+            vertice.getPosition().add(sentidoTracejado.normalize()),
+            vertice.getPosition().sub(sentidoTracejado.clone()
+                                                      .add(
+                                                                sentidoTracejado
+                                                                .clone()
+                                                                .crossVectors(
+                                                                    sentidoTracejado.clone(), 
+                                                                    new THREE.Vector3(0,0,-1)
+                                                            )
+                                                            .multiplyScalar(0.06)
+                                                       ).normalize()
+                                    )
+        ].map(position => position.toArray()))
+
+        triangulo.render();      
+        
+        const angulo180graus = triangulo.angles[0];
+
+        const mostrar180Graus = apagarObjeto(angulo180graus)
+        .setOnStart(() => angulo180graus.addToScene(this.scene))
+        .reverse();
+
+        const apagar180Graus  = apagarObjeto(angulo180graus)
+        .setOnTermino(() => angulo180graus.removeFromScene())
+
+        const brilharMetalico = new MetalicSheen(angulo180graus);
+
+        return new AnimacaoSequencial(mostrar180Graus, brilharMetalico, apagar180Graus);
+
     }
 
     //Adicionar equação 4 horas = 120 graus, onde graus e horas são variáveis

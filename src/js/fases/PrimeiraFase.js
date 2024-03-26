@@ -22,6 +22,7 @@ import Circle from "../objetos/circle";
 import DesenharMalha from "../animacoes/desenharMalha";
 import MetalicSheen from "../animacoes/metalicSheen";
 import MoverTexto from "../animacoes/moverTexto";
+import { Addition, Equality, Value, Variable } from "../equations/expressions";
 
 export class PrimeiraFase extends Fase{
 
@@ -1341,7 +1342,21 @@ export class PrimeiraFase extends Fase{
                         reaparecerGraus,
                         this.moverGrausParaPosicaoEquacao(angulos)
                     ),
-                );
+                ).setOnTermino(() => {
+                    const valores = angulos.map( angulo => angulo.mostrarAngulo.text.elemento);
+
+                    const equacao = new Equality(
+                                        new Addition(
+                                            new Addition(
+                                                new Variable(valores[0]),
+                                                new Value(valores[1])
+                                            ),
+                                            new Value(valores[2])
+                                        )
+                                    )
+
+                    console.log(equacao, new Value(valores[1]))
+                });
 
     }
 

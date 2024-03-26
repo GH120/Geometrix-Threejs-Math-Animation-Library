@@ -22,7 +22,7 @@ export default class MetalicSheen extends Animacao{
             console.log(objeto.mesh, "detalhe")
         })
 
-        this.frames = 100;
+        this.frames = 150;
         this.setValorInicial(0);
         this.setValorFinal(2);
         this.setInterpolacao((a,b,c) => a*(1-c) + b*c); //Interpolação normal

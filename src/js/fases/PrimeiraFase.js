@@ -1124,10 +1124,7 @@ export class PrimeiraFase extends Fase{
                                 apagarObjeto(angle)
                                 .setOnTermino(decrementarContador),
 
-                                fase.mostrarGrausAparecendo(angle)
-                                .reverse()
-                                .setOnStart(() => null)
-                                .setOnTermino(() => angle.mostrarAngulo.update({dentro:false}))
+                                fase.mostrarGrausDesaparecendo(angle)
                             )
 
             fase.animar(animacao);
@@ -1205,7 +1202,7 @@ export class PrimeiraFase extends Fase{
                                     .setDuration(30))
     }
 
-    mostrarGrausAparecendo(angle, updateMostrarAnguloCadaFrame = false){
+    mostrarGrausAparecendo(angle, updateMostrarAnguloCadaFrame = false, mostrarEdesaparecer=true){
 
 
         if(!angle.mostrarAngulo){
@@ -1238,8 +1235,21 @@ export class PrimeiraFase extends Fase{
                                     mostrarAngulo.update({dentro:true});
                                 })
 
+        if(!mostrarEdesaparecer){
+            aparecerTexto.setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+            aparecerTexto.setOnTermino(() => null)
+        }
+
         return aparecerTexto;
 
+    }
+
+    mostrarGrausDesaparecendo(angle){
+        return  this.mostrarGrausAparecendo(angle)
+                    .reverse()
+                    .voltarAoInicio(false)
+                    .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+                    .setOnStart(() => null)
     }
 
     mostrarGrausHighlightAngulos(poligono1,poligono2){
@@ -1291,6 +1301,9 @@ export class PrimeiraFase extends Fase{
         
         const angulo180graus = triangulo.angles[0];
 
+        angulo180graus.angulo = Math.PI;
+        angulo180graus.mesh.position.z = 0.05
+
         const mostrar180Graus = apagarObjeto(angulo180graus)
         .setOnStart(() => angulo180graus.addToScene(this.scene))
         .reverse();
@@ -1300,7 +1313,23 @@ export class PrimeiraFase extends Fase{
 
         const brilharMetalico = new MetalicSheen(angulo180graus);
 
-        return new AnimacaoSequencial(mostrar180Graus, brilharMetalico, apagar180Graus);
+        const angulos = this.triangulo.angles.map(angle => (angle.copiaDoAngulo)? angle.copiaDoAngulo : angle);
+
+        const desaparecerGraus = new AnimacaoSimultanea().setAnimacoes(angulos.map(angulo => this.mostrarGrausDesaparecendo(angulo).setOnTermino(() => null)))
+
+        return new AnimacaoSequencial(
+                    mostrar180Graus, 
+                    new AnimacaoSequencial(
+                        new AnimacaoSimultanea(
+                            new AnimacaoSequencial(
+                                desaparecerGraus, 
+                                this.mostrarGrausAparecendo(angulo180graus).setDuration(200)
+                            ),
+                            brilharMetalico
+                        ), 
+                        new AnimacaoSimultanea().setAnimacoes([...angulos.map(angulo => this.mostrarGrausAparecendo(angulo,false,false).setOnStart(() => null)), apagar180Graus])
+                    ),
+                );
 
     }
 

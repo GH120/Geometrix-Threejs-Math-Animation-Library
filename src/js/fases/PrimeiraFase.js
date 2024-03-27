@@ -23,6 +23,7 @@ import DesenharMalha from "../animacoes/desenharMalha";
 import MetalicSheen from "../animacoes/metalicSheen";
 import MoverTexto from "../animacoes/moverTexto";
 import { Addition, Equality, Value, Variable } from "../equations/expressions";
+import MostrarTexto from "../animacoes/MostrarTexto";
 
 export class PrimeiraFase extends Fase{
 
@@ -1138,12 +1139,12 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
         
         
 
@@ -1405,10 +1406,9 @@ export class PrimeiraFase extends Fase{
                 .setOnStart(criarEquacao)
                 .setOnTermino(() => {
 
-                        console.log("TEMRNIO")
                         fase.scene.add(novoElemento);
 
-                        fase.animar(new TextoAparecendo(novoElemento).setDuration(10000));
+                        fase.animar(new MostrarTexto(novoElemento).setValorFinal(300).setProgresso(0));
                 }))
 
         function criarEquacao(){

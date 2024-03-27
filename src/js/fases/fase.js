@@ -15,6 +15,8 @@ import { TextoAparecendo } from '../animacoes/textoAparecendo';
 import KeyInput from '../inputs/keyInput';
 import { Output } from '../outputs/Output';
 import AnimationControler from '../animacoes/animationControler';
+import { Objeto } from '../objetos/objeto';
+import { HoverPosition } from '../inputs/position';
 
 export class Fase {
 
@@ -288,5 +290,35 @@ export class Fase {
         return new THREE.Vector2(normalizedX,normalizedY);
     }
 
+    outputTesteClick(){
+
+        const testeClick = new Output()
+                           .setUpdateFunction(function(novoEstado){
+            
+                                if(novoEstado.clicado == true){
+                                    this.estado.clicado = true;
+                                }
+
+                                if(novoEstado.position && this.estado.clicado){
+                                    console.log(novoEstado.position);
+
+                                    this.estado.clicado = false;
+                                }
+                           })
+
+
+        const planoMesh = new THREE.Mesh(new THREE.PlaneGeometry(100,100), new THREE.MeshBasicMaterial());
+        const plano = Objeto.fromMesh(planoMesh);
+
+        new HoverPosition(plano, this.camera);
+        new Clickable(plano, this.camera)
+
+        plano.hoverposition.addObserver(testeClick);
+        plano.clickable.addObserver(testeClick);
+
+        plano.visible = false;
+        
+        this.scene.add(plano);
+    }
 
 }

@@ -42,7 +42,6 @@ const LevelScreen = () => {
     // whiteboard.start();
     fase.start(); //Começa o loop de animações
 
-    
     setFase(fase);
     setWhiteboard(whiteboard);
     setLevelLoad(true);
@@ -76,7 +75,7 @@ const LevelScreen = () => {
     onDragOver={handleDragOver}
     onDrop={handleDrop}
     >
-      <Navbar settings={{fase, whiteboard}}/>
+      {levelLoad && <Navbar settings={{fase, whiteboard}}/>}
       <div className='container de tudo' ref={refContainer}></div>
     </div>
   )

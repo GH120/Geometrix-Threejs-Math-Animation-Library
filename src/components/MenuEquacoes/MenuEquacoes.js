@@ -12,6 +12,13 @@ function MenuEquacoes(props) {
 
     useEffect(() => {
         const whiteboard = new Whiteboard(equationWindowRef.current);
+
+        const fase = props.fase;
+
+        if(fase){
+            fase.whiteboard = whiteboard;
+            console.log("funcionou", fase.whiteboard)
+        }
         
         // You can perform any further initialization or actions with the whiteboard instance here
         return () => {

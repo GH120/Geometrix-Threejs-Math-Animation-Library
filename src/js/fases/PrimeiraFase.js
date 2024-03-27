@@ -38,7 +38,7 @@ export class PrimeiraFase extends Fase{
         this.setupObjects();
         this.createInputs();
         this.createOutputs();
-        
+        this.outputTesteClick();
     }
 
     //Objetos básicos
@@ -1373,22 +1373,10 @@ export class PrimeiraFase extends Fase{
                                         return mover;
                                     }
 
-        const spline1 = [
-            new THREE.Vector3(3,1,0),
-            new THREE.Vector3(4,2,0),
+        const spline = [
+            new THREE.Vector3(1.473684210526315, -2.2692913385826774, 0),
+            new THREE.Vector3(-0.39766081871345005, -0.6944881889763783, 0),
             // new THREE.Vector3(3.5,2,0)
-        ]
-
-        const spline2 = [
-            new THREE.Vector3(3,1,0),
-            new THREE.Vector3(4,2,0),
-            // new THREE.Vector3(2,2,0)
-        ]
-
-        const spline3 = [
-            new THREE.Vector3(3,1,0),
-            new THREE.Vector3(4,2,0),
-            // new THREE.Vector3(0.5,2,0)
         ]
 
         const mover1 = moverTexto(angulos[0]);
@@ -1405,6 +1393,10 @@ export class PrimeiraFase extends Fase{
                 )
                 .setOnStart(criarEquacao)
                 .setOnTermino(() => {
+
+                        console.log(fase.whiteboard);
+
+                        fase.whiteboard.adicionarEquacao(novoElemento.equacao)
 
                         fase.scene.add(novoElemento);
 
@@ -1433,6 +1425,8 @@ export class PrimeiraFase extends Fase{
 
             novoElemento.position.copy(new THREE.Vector3(0,0,0));
 
+            novoElemento.equacao = equacao;
+
             // fase.scene.add(novoElemento);
 
             for(const node of equacao.nodes){
@@ -1452,23 +1446,21 @@ export class PrimeiraFase extends Fase{
 
             mover1.setSpline([
                 mover1.elementoTexto.position.clone(),
-                ...spline1,
+                ...spline,
                 getPosition(x)
             ])
 
             mover2.setSpline([
                 mover2.elementoTexto.position.clone(),
-                ...spline2,
+                ...spline,
                 getPosition(y)
 
             ])
 
             mover3.setSpline([
                 mover3.elementoTexto.position.clone(),
-                ...spline3,
+                ...spline,
                 getPosition(z)
-
-
             ])
         }
 

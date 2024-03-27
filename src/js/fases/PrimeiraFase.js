@@ -1356,6 +1356,11 @@ export class PrimeiraFase extends Fase{
 
         const fase = this;
 
+        angulos.forEach(angulo => {
+            angulo.mostrarAngulo.text.elemento.element.style.fontFamily = "Courier New, monospace";
+            angulo.mostrarAngulo.text.elemento.element.style.fontSize   = "18px";
+        })
+
         const moverTexto = (angulo) => {
                                         const mover = new MoverTexto().voltarAoInicio(true)
                                         
@@ -1389,12 +1394,22 @@ export class PrimeiraFase extends Fase{
         const mover2 = moverTexto(angulos[1]);
         const mover3 = moverTexto(angulos[2]);
 
+        var novoElemento = null;
+
         return new AnimacaoSimultanea(
-                    mover1,
-                    mover2,
-                    mover3
-               )
-               .setOnStart(criarEquacao);
+                new AnimacaoSimultanea(
+                        mover1,
+                        mover2,
+                        mover3
+                )
+                .setOnStart(criarEquacao)
+                .setOnTermino(() => {
+
+                        console.log("TEMRNIO")
+                        fase.scene.add(novoElemento);
+
+                        fase.animar(new TextoAparecendo(novoElemento).setDuration(10000));
+                }))
 
         function criarEquacao(){
             const valores = angulos.map( angulo => angulo.mostrarAngulo.text.elemento.element.textContent);
@@ -1414,11 +1429,11 @@ export class PrimeiraFase extends Fase{
                                 new Variable("180°")
                             )
 
-            const novoElemento = new CSS2DObject(equacao.html);
+            novoElemento = new CSS2DObject(equacao.html);
 
             novoElemento.position.copy(new THREE.Vector3(0,0,0));
 
-            fase.scene.add(novoElemento);
+            // fase.scene.add(novoElemento);
 
             for(const node of equacao.nodes){
 
@@ -1465,15 +1480,24 @@ export class PrimeiraFase extends Fase{
 
             var canvas = document.createElement('canvas');
             var context = canvas.getContext('2d');
-            context.font = 'Bold 18px Courier New, monospace'
+            context.font = '18px Courier New, monospace'
 
-            const width = context.measureText(equacao.element.textContent).width;
+            console.log(context.measureText(equacao.element.textContent))
+
+            const medidas = context.measureText(equacao.element.textContent)
+
+            const width = medidas.width;
+
+            const height = medidas.actualBoundingBoxAscent;
 
             const offset = (deslocamento/tamanho - 0.5)*width;
 
-            const point = fase.pixelToCoordinates(fase.width/2 + offset,0);
+            const point = fase.pixelToCoordinates(fase.width/2 + offset, fase.height/2 - 18); //18 é o tamanho da fonte em pixeis
 
-            return new THREE.Vector3(point.x,0,0);
+            console.log(point)
+
+            //VERIFICAR BUGS, MODIFICAR CENTRO DA CÂMERA PROVAVELMENTE É DESVIO
+            return new THREE.Vector3(point.x,point.y - 1, 0); // por algum motivo o y é 1 se for metade da altura
         }
 
     }

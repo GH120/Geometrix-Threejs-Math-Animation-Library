@@ -88,7 +88,12 @@ export class Operations{
       
         options.id = "options"
 
-        options.classList.add('button-9', 'hidden');
+        options.classList.add('button-9');
+
+        options.style.position = 'absolute'
+
+        options.style.top = '540%'
+        options.style.left = '20%'
       
         options.textContent = "opções";
 

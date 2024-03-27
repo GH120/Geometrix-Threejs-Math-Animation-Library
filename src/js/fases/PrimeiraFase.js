@@ -24,6 +24,7 @@ import MetalicSheen from "../animacoes/metalicSheen";
 import MoverTexto from "../animacoes/moverTexto";
 import { Addition, Equality, Value, Variable } from "../equations/expressions";
 import MostrarTexto from "../animacoes/MostrarTexto";
+import { Operations } from "../equations/operations";
 
 export class PrimeiraFase extends Fase{
 
@@ -39,6 +40,8 @@ export class PrimeiraFase extends Fase{
         this.createInputs();
         this.createOutputs();
         this.outputTesteClick();
+
+        this.operadores = new Operations(null,this);
     }
 
     //Objetos básicos
@@ -1429,12 +1432,14 @@ export class PrimeiraFase extends Fase{
 
             // fase.scene.add(novoElemento);
 
+            fase.equacao = equacao;
+
+            fase.operadores.expression = equacao;
+
             for(const node of equacao.nodes){
 
                 node.comeco = equacao.element.textContent.indexOf(node.element.innerText);
             }
-
-            console.log(equacao.nodes)
 
             const getPosition = (subelemento) => {
                 const deslocamento = calcularDeslocamento(equacao,subelemento);
@@ -1586,6 +1591,13 @@ export class PrimeiraFase extends Fase{
         this.scene.add(cPointLabel);
 
         return cPointLabel;
+    }
+
+    appendOperadoresAJanelaEquacao(equationWindow){
+        
+        const selecionador = this.operadores.getOptions();
+
+        equationWindow.appendChild(selecionador);
     }
 
 

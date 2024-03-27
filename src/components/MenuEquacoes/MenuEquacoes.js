@@ -18,6 +18,8 @@ function MenuEquacoes(props) {
         if(fase){
             fase.whiteboard = whiteboard;
             console.log("funcionou", fase.whiteboard)
+
+            fase.appendOperadoresAJanelaEquacao(equationWindowRef.current);
         }
         
         // You can perform any further initialization or actions with the whiteboard instance here

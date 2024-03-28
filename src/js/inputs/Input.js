@@ -19,10 +19,17 @@ export class Input{
     //Retorna se o evento intersectou o objeto
     intersectouObjeto(event, object){
 
+        if (!document.getElementById('MEUCANVAS')) return;
+
+        var width = document.getElementById('MEUCANVAS').offsetWidth;
+        var height = document.getElementById('MEUCANVAS').offsetHeight;
+
         // Calculate the mouse position in normalized device coordinates (-1 to +1)
         const mouse = new THREE.Vector2(
-          (event.clientX / window.innerWidth) * 2 - 1,
-          -(event.clientY / window.innerHeight) * 2 + 1
+          // (event.clientX / window.innerWidth) * 2 - 1,
+          // -(event.clientY / window.innerHeight) * 2 + 1
+          (event.clientX / width) * 2 - 1,
+          -(event.clientY / height) * 2 + 1
         );
         
     
@@ -30,6 +37,8 @@ export class Input{
         this.raycaster.setFromCamera(mouse, this.camera);
     
         const hitbox = object.hitbox;
+
+        if(!object.hitbox) return null;
 
         const intersects = this.raycaster.intersectObject(hitbox);
     

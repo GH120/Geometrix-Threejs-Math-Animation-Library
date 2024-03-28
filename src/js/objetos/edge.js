@@ -13,7 +13,7 @@ export class Edge extends Objeto{
         this.material = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.grossura = 0.05;
 
-        if(origem && destino) this.render();
+        this.render();
     }
 
     render(){
@@ -52,7 +52,7 @@ export class Edge extends Objeto{
     }
 
     get length(){
-        return (this.mesh)? this.mesh.geometry.parameters.height : 0;
+        return this.origem.clone().sub(this.destino).length();
     }
 
     get quaternion(){

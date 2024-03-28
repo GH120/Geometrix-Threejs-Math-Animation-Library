@@ -41,8 +41,6 @@ export class Angle extends Objeto{
         let vetor1 = this.position.clone().sub(this.seguinte).normalize();
         let vetor2 = this.position.clone().sub(this.anterior).normalize();
 
-        console.log(vetor1,vetor2)
-
         //Se estiverem no sentido horário, inverter sua ordem
         const sentidoHorario = new THREE.Vector3(0,0,0).crossVectors(vetor1, vetor2).dot(new THREE.Vector3(0,0,1)) > 0;
 
@@ -72,6 +70,8 @@ export class Angle extends Objeto{
         //Numero de segmentos de triangulos a serem desenhados
         const segmentos = Math.round(this.angulo*180/Math.PI);
 
+        if(this.chosen) console.log(segmentos)
+
         for (let i = 0; i <= segmentos; i++) {
 
             const vetor = new THREE.Vector3(0,0,0);
@@ -98,6 +98,8 @@ export class Angle extends Objeto{
         const noventaGraus = Math.round(this.angulo*180/Math.PI) == 90;
 
         MalhaAngulo.position.copy(this.position)
+
+        this.noventaGraus = noventaGraus;
 
         this.mesh   = (noventaGraus)? MalhaReto : MalhaAngulo;
 
@@ -133,8 +135,12 @@ export class Angle extends Objeto{
         const rotacao = new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,-1,0), this.vetor2));
 
         vetores.map(v => v.setY(v.y - 1));
-        vetores.map(v => v.multiplyScalar(raio*0.7));
+        vetores.map(v => v.multiplyScalar(raio*Math.sqrt(2)/2));
         vetores.map(v => v.applyMatrix4(rotacao));
+
+        const orientacao = this.orientationVector;
+
+        vetores.map(v => v.sub(orientacao));
         
         //Concatena os vetores que representam os pontos em um só array de eixos
         const posicoes = [].concat(...vetores.map(vetor => vetor.toArray()));
@@ -145,30 +151,26 @@ export class Angle extends Objeto{
 
         const mesh = new THREE.Mesh(geometry, this.material);
 
-        const vetor = this.vetor1.clone().lerp(this.vetor2, 0.5).multiplyScalar(raio*Math.sqrt(2));
+        const posicao = new THREE.Vector3(...this.position);
 
-        const posicao = new THREE.Vector3(...this.position).sub(vetor);
 
-        const group = new THREE.Group();
-
-        group.add(mesh);
-
-        group.position.copy(posicao)
+        mesh.position.copy(posicao)
 
         // mesh.lookAt(new THREE.Vector3(-1,-1,0))
 
-        return group;
+        return mesh;
     }
     
     update(){
 
         const scene = this.scene;
 
+        scene.remove(this.hitbox);
         scene.remove(this.mesh);
 
         this.render();
 
-        scene.add(this.mesh);
+        this.addToScene(this.scene);
     }
 
     get degrees(){
@@ -180,7 +182,31 @@ export class Angle extends Objeto{
     }
 
     copia(){
-        console.log(this.index)
         return new Angle(this.vertices, this.index);
+    }
+
+    addToScene(scene){
+
+        super.addToScene(scene);
+
+        if(this.noventaGraus){
+            
+            this.hitbox.visible = false;
+            scene.add(this.hitbox)
+        }
+    }
+
+    get orientationVector(){
+        return this.vetor1.clone().lerp(this.vetor2, 0.5).multiplyScalar(this.angleRadius*Math.sqrt(2));
+    }
+
+    updateHitboxPosition(){
+
+        console.log(this.mesh.position)
+
+        this.hitbox.position.copy(this.mesh.position);
+        this.hitbox.quaternion.copy(this.mesh.quaternion);
+
+        return this;
     }
 }

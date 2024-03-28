@@ -1,40 +1,79 @@
 import * as THREE from 'three';
 import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from './animation';
 import { Edge } from '../objetos/edge';
+import { colorirAngulo } from './colorirAngulo';
 
 export class Divisao extends Animacao{
 
-    constructor(lado1, lado2){
+    constructor(lado1, lado2, offsetPosicional = new THREE.Vector3(3,0,0), posicaoFixa = null){
         super();
         this.dividendo = lado1;
         this.divisor = lado2;
+        this.offsetPosicional  = offsetPosicional;
+        this.posicaoFixa = posicaoFixa
         //Gambiarra, ajeitar depois
-        this.frames = 250;
+        this.frames = 500;
         this.frameCount = 90;
-        this.delay = 90;
+        this.delay = 60;
+    }
+
+    onStart(){
+
+       if(!this.scene) throw new Error("Não passou a cena para desenhar animação, escreva divisao.addToScene(scene) com uma scene definida")
+
+       const colorir = new AnimacaoSimultanea(
+                colorirAngulo(this.divisor)
+                .setValorFinal(0xff0000)
+                .setValorInicial(this.divisor.material.color)
+                .setDuration(30), 
+                colorirAngulo(this.dividendo)
+                .setValorFinal(0x0000ff)
+                .setValorInicial(this.dividendo.material.color)
+                .setDuration(30)
+        )
+
+
+        //Posiciona primeiro os lados no canto direito, não faz nada ao terminar
+        const posicionar  = this.posicionar().setDuration(Math.round(this.frameCount/2)).setDelay(Math.round(this.delay/3));
+        // Depois executa o algoritmo da divisão
+        const dividir     = this.dividir();
+
+
+        // Quando dividido e o delay passar, termina a execução do posicionar
+        this.animacao = new AnimacaoSequencial(colorir, posicionar, dividir).recalculateFrames();
+
+        this.frames = this.animacao.frames + 100;
     }
 
     *getFrames(){
 
-        //Posiciona primeiro os lados no canto direito, não faz nada ao terminar
-        const posicionar  = this.posicionar().setDuration(this.frameCount/2).setDelay(this.delay/3);
-        // Depois executa o algoritmo da divisão
-        const dividir     = this.dividir();
+        this.onStart();
 
-        // Quando dividido e o delay passar, termina a execução do posicionar
-        const animacao = new AnimacaoSequencial(posicionar, dividir);
+        yield* this.animacao.getFrames();
 
-        animacao.chosen = true;
+        for(let i=0; i < this.delay; i++){
+          yield null;
+        }
 
-        animacao.setDelay(this.delay);
+        if(this.voltar){
 
-        yield* animacao.getFrames();
+            this.divisor.removeFromScene();
+            this.dividendo.removeFromScene();
+
+            this.divisor.render();
+            this.dividendo.render();
+
+            this.divisor.addToScene(this.scene);
+            this.dividendo.addToScene(this.scene);
+        }
+
+        this.onTermino();
     }
 
     posicionar(){
 
       const posicaoInicial = this.dividendo.mesh.position.clone();
-      const posicaoFinal = new THREE.Vector3(3,0,0).add(posicaoInicial);
+      const posicaoFinal = (this.posicaoFixa)? this.posicaoFixa.clone() : this.offsetPosicional.add(posicaoInicial);
       const mover = this.mover(this.dividendo, posicaoInicial, posicaoFinal);
 
       const posicaoInicial2 = this.divisor.mesh.position.clone();
@@ -87,15 +126,18 @@ export class Divisao extends Animacao{
           const posicaoFinal = this.posicao1.clone()
                                .add(new THREE.Vector3(0,altura,0.005))
 
+          const DIVISAO = this;
+
           const mover =  this.mover(lado, posicaoInicial, posicaoFinal)
+                              //Gambiarra para copiar a cor
+                             .setUpdateFunction(function(position) {
+                                this.objeto.mesh.position.copy(position);
+                                this.objeto.mesh.material.color = DIVISAO.divisor.material.color
+                             })
                              .setDuration(this.frameCount)
                              .setOnStart(() => {this.scene.add(copia); copia.position.copy(posicaoInicial)})
-                             .setOnTermino(() => this.scene.remove(copia)) //Quando terminar execução, deletar copia
+                            //  .setOnTermino(() => this.scene.remove(copia)) //Quando terminar execução, deletar copia
 
-          mover.chosen = true;
-
-          console.log(mover)
-          
           const direcao = new THREE.Vector3().subVectors(posicaoFinal, posicaoInicial);
           const angulo  = new THREE.Vector3(-1,0,0).angleTo(direcao);
           const rotacao = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), angulo/10);
@@ -106,15 +148,19 @@ export class Divisao extends Animacao{
           const giro1 =  this.girar(lado, quaternionInicial, quaternionFinal).setDuration(this.frameCount/2);
           const giro2 =  this.girar(lado, quaternionFinal, quaternionInicial).setDuration(this.frameCount/2);
 
-          const girar =  new AnimacaoSequencial(giro1,giro2);
+          //Manter execução funciona para não travar, não sei porque funcionou, investigar depois
+          const girar =  new AnimacaoSequencial(giro1,giro2).manterExecucaoTodos(true);
 
           const divisao = new AnimacaoSimultanea(mover,girar);
 
+          divisao.onEnd = () => this.scene.remove(copia);
+
           dividir.push(divisao);
         }
-        const anim = new AnimacaoSequencial(...dividir);
-
-        anim.chosen = true;
+        const anim = new AnimacaoSequencial(...dividir)
+                        .setOnTermino(() => dividir.map(divisao => divisao.onEnd()))
+                        .setDelay(30)
+                        .manterExecucaoTodos(true)
 
         return anim;
     }
@@ -146,11 +192,12 @@ export class Divisao extends Animacao{
                 .setValorInicial(quaternionInicial)
                 .setValorFinal(quaternionFinal)
                 .setInterpolacao(function(inicial,final,peso){
+
                   return new THREE.Quaternion().slerpQuaternions(inicial,final,curva(peso));
                 })
                 .setUpdateFunction(function(quaternion){
                   this.objeto.mesh.quaternion.copy(quaternion);
-                });
+                })
     }
 
     addToScene(scene){

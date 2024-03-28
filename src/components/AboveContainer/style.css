@@ -1,0 +1,6 @@
+.componenteSobreCanvas {
+    position: absolute;
+    z-index: 2; /* Certifique-se de que o z-index seja maior do que o do canvas */
+    margin: 0;
+    padding: 0;
+}

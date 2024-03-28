@@ -45,13 +45,13 @@ class Expression{
         }
     }
 
-    update(){
+    update(window){
 
-        const window = document.getElementById("equationWindow");
+        console.log(window.children,window.children[0])
 
-        window.removeChild(this.element);
+        window.children[0].removeChild(this.element);
 
-        window.appendChild(this.html);
+        window.children[0].appendChild(this.html);
     }
 
     get copy(){

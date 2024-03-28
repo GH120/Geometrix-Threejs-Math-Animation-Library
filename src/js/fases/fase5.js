@@ -22,12 +22,35 @@ import { Angle } from '../objetos/angle';
 import { Output } from '../outputs/Output';
 import Circle from '../objetos/circle';
 import DesenharMalha from '../animacoes/desenharMalha';
+import Estado from './estado';
 
 export class Fase5  extends Fase{
 
     constructor(){
 
         super();
+
+        this.setupObjects();
+        this.createInputs();
+        this.createOutputs();
+        this.setupTextBox();
+        this.Configuracao1(); //É uma versão generalizada do ligar Input ao Output
+
+        this.aceitaControleDeAnimacao = true;
+
+        this.informacao = {}
+
+    }
+
+    resetObjects(){
+        this.objetos.map(objeto => objeto.removeFromScene());
+
+        this.objetos = [];
+    }
+
+    setupObjects(){
+
+        this.resetObjects();
 
         this.triangulo = new Triangle([
             [-1,-1,0],
@@ -37,17 +60,7 @@ export class Fase5  extends Fase{
         .render()
         .addToScene(this.scene);
 
-
-        this.trigonometria = [];
-
-        this.createInputs();
-        this.createOutputs();
-        this.setupTextBox();
-        this.Configuracao1(); //É uma versão generalizada do ligar Input ao Output
-
-        this.informacao = {}
-
-        this.levelDesign();
+        this.objetos.push(this.triangulo);
     }
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
@@ -59,7 +72,7 @@ export class Fase5  extends Fase{
 
         const anim1 = this.firstAnim(dialogo);
 
-        this.animar(new AnimacaoSequencial(anim1));
+        this.animar(new AnimacaoSequencial(anim1).setNome("dialogo"));
 
     }
 
@@ -265,7 +278,7 @@ export class Fase5  extends Fase{
 
                 copia.render().addToScene(fase.scene)
 
-                copia.mesh.position.copy(vertice.mesh.position)
+                copia.mesh.position.copy(verticeSelecionado.mesh.position)
 
                 copia.mesh.quaternion.copy(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI))
             }
@@ -801,7 +814,7 @@ export class Fase5  extends Fase{
 
     update(){
 
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        super.update();
 
         if(!this.progresso) this.progresso = "start";
 
@@ -812,12 +825,30 @@ export class Fase5  extends Fase{
             problemaAtual.consequencia(this);
 
             this.progresso = problemaAtual.proximo(this);
+
+            // const proximoProblema = this.problemas[this.progresso];
+
+            // console.log(proximoProblema, "proximo")
+
+            // proximoProblema.estado.informacao = this.informacao;
         }
     }
 
     problemas = {
 
-        start:{
+        start: {
+            satisfeito: () => true,
+
+            consequencia: (fase) => {
+                fase.levelDesign();
+            },
+
+            proximo: () => "first",
+
+            estado: new Estado(this, "setupObjects", null, "start", {})
+        },
+
+        first:{
             satisfeito: (fase) => true,
 
             consequencia: (fase) =>{
@@ -829,7 +860,9 @@ export class Fase5  extends Fase{
                 fase.clicouPrimeiroVertice  = fase.primeiroClick();   
             },
 
-            proximo: (fase) => "clicouVertice"
+            proximo: (fase) => "clicouVertice",
+
+            // estado: new Estado(this, "setupObjects", "Configuracao1", "first", {})
 
         },
 
@@ -838,7 +871,9 @@ export class Fase5  extends Fase{
 
             consequencia: (fase) => null,
 
-            proximo: (fase) => "arrastouVertice"
+            proximo: (fase) => "arrastouVertice",
+
+            // estado: new Estado(this, "setupObjects", "Configuracao2", "clicouVertice", {})
         },
 
         arrastouVertice: {
@@ -863,7 +898,9 @@ export class Fase5  extends Fase{
 
             },
 
-            proximo: (fase) => 180
+            proximo: (fase) => 180,
+
+            // estado: new Estado(this, "setupObjects", "Configuracao2", "arrastouVertice", {})
         },
 
         180: {
@@ -878,11 +915,15 @@ export class Fase5  extends Fase{
 
             },
 
-            proximo: (fase) => "finalizado"
+            proximo: (fase) => "finalizado",
+
+            // estado: new Estado(this, "setupObjects", "Configuracao3", "180", {})
         },
 
         finalizado:{
-            satisfeito: () => false
+            satisfeito: () => false,
+
+            // estado: new Estado(this, "setupObjects", null, "finalizado", {})
         }
     }
 

@@ -47,7 +47,9 @@ class Expression{
 
     update(window){
 
-        console.log(window.children,window.children[0])
+        console.log(window)
+        console.log(window.children)
+        console.log(window.children[0])
 
         window.children[0].removeChild(this.element);
 

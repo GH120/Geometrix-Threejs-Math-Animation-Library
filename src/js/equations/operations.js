@@ -1,3 +1,4 @@
+import MostrarTexto from "../animacoes/MostrarTexto";
 import { Distributividade } from "../animacoes/distributividade";
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
@@ -161,18 +162,13 @@ export class Operations{
 
                     this.programa.animar(action);
 
-                    action.onStart(() => this.animando = true)
-
                     action.setOnTermino(() => {
-                        if(!this.animando){
 
-                            const equationWindow = this.selector.parentNode.children[0];
+                        const equationWindow = this.selector.parentNode.children[0];
 
-                            this.expression.update(equationWindow);
-                            this.eliminarZero(result);
-                            this.chooseOption(nome);
-                        }
-                        return this.animando = false;
+                        this.expression.update(equationWindow);
+                        this.eliminarZero(result);
+                        this.chooseOption(nome);
                     });
 
                     html.classList.remove("selectable");
@@ -187,17 +183,19 @@ export class Operations{
     //Consertar a eliminação da opção escolhida
     eliminarZero(result, nome) {
 
-        // if(result.type == "value" && result.value == 0 && result.father != "equation"){
+        const equationWindow = this.selector.parentNode.children[0];
 
-        //     result.father.substitute(result.sibling)
+        if(result.type == "value" && result.value == 0 && result.father != "equation"){
 
-        //     const fadeOut = new TextoAparecendo(result.father.element)
-        //                         .setValorInicial(10)
-        //                         .setValorFinal(-2)
-        //                         .setOnTermino(() => this.expression.update());
+            result.father.substitute(result.sibling)
 
-        //     this.programa.animar(fadeOut);
-        // }
+            const fadeOut = new TextoAparecendo(result.father.element)
+                                .setValorInicial(10)
+                                .setValorFinal(-2)
+                                .setOnTermino(() => this.expression.update(equationWindow));
+
+            this.programa.animar(fadeOut);
+        }
     }
 
     get operations(){
@@ -236,7 +234,7 @@ export class Operations{
                     return expression.type != "addition" && isFree(expression);
                 },
 
-                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
+                action: (expression) => new MostrarTexto(expression).setValorInicial(10).setValorFinal(-10), //Consertar
 
                 result: (expression) => {
 

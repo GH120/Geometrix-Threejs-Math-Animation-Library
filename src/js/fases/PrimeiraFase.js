@@ -1142,12 +1142,22 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
         
         
 
@@ -1415,7 +1425,7 @@ export class PrimeiraFase extends Fase{
                                     ),
                                     z
                                 ),
-                                new Variable("180°")
+                                new Value("180°")
                             )
 
             novoElemento = new CSS2DObject(equacao.html);

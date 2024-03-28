@@ -7,7 +7,7 @@ import './style.css';
 
 class Somar {
 
-    constructor(equation, expression){
+    constructor(expression){
         
         this.expression = expression;
         this.escopo = this.obterEscopo(expression);
@@ -16,7 +16,10 @@ class Somar {
     }
     //Check if scope is not empty, like -1x
     static requirement(expression){                                         //Alterar esse daqui, eliminar apenas variable multiplication ou escopos vazios
-        return expression.father && expression.father.type != "equality" && expression.father.type != "multiplication" && expression.type != "addition";
+        return expression.father && 
+               expression.father.type != "equality" && 
+               expression.father.type != "multiplication" && 
+               expression.type != "addition";
     }
 
     somaValida(termo2){
@@ -362,17 +365,33 @@ export class Operations{
                 result: (expression) => new VariableMultiplication(expression.left, expression.right)
             },
             somar: {
-                requirement: (expression) => { console.log(expression, Somar.requirement(expression));return Somar.requirement(expression)},
+                requirement: function Simple(expression){
 
-                action: (expression) => new TextoAparecendo(expression.element).setValorInicial(1).setValorFinal(0),
+                    console.log(expression);
+                    console.log(expression.type)
+                    if(expression.type == "addition"){
+                        
+                    console.log(expression.right.type)
+                    console.log(expression.left.type)
+                    }
+                    
+                    const valido =  expression.type  == "addition" &&
+                                    (expression.right.type == "value" || Simple(expression.right)) &&
+                                    (expression.left.type  == "value" || Simple(expression.left))
+
+                    return valido
+                },
+
+                action: (expression) => new MostrarTexto(expression),
 
                 result: expression => {
 
-                    const soma = new Somar(this.expression, expression);
+                    const esquerda = parseFloat(expression.left.value);
+                    const direita  = parseFloat(expression.right.value);
 
-                    this.expression.nodes.map(node => console.log(soma.somaValida(node), node));
 
-                    return expression;
+
+                    return new Value(esquerda, direita)
                 }
             }
 

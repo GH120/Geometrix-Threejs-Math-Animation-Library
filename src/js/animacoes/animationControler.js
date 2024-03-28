@@ -128,6 +128,9 @@ export default class AnimationControler {
 
             if(!isSequential) continue;
 
+            //Algum bug desconhecido...
+            if(!animacao.subAnimacaoAtual) continue;
+
             const hasCheckPoint = animacao.subAnimacaoAtual.checkpoint;
 
             const lastFrame = animacao.subAnimacaoAtual.frame == animacao.subAnimacaoAtual.frames;

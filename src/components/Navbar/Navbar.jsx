@@ -71,7 +71,7 @@ function Navbar(props) {
       </div>
 
       <div className={`navbar-links ${EquationMenuOpen ? 'open' : ''}`}>
-        <MenuEquacoes fase={settings.fase} whiteboard={settings.whiteboard} hidden= {EquationMenuOpen}></MenuEquacoes>
+        <MenuEquacoes fase={settings.fase} whiteboard={settings.whiteboard} hidden= {EquationMenuOpen} ativar = {setEquationMenuOpen}></MenuEquacoes>
       </div>
 
       

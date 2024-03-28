@@ -1142,12 +1142,12 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
         
         
 
@@ -1492,16 +1492,21 @@ export class PrimeiraFase extends Fase{
         }
 
         function mostrarEquacaoEMoverParaWhiteboard(){
-             console.log(fase.whiteboard);
 
             fase.whiteboard.adicionarEquacao(novoElemento.equacao)
 
+            //Consertar depois, está debaixo da whiteboard
+            // novoElemento.element.style.zIndex = 10000;
+
             fase.scene.add(novoElemento);
+
+
+            // console.log(novoElemento)
 
             
             const spline = [
-                new THREE.Vector3(1.473684210526315, -2.2692913385826774, 0),
-                new THREE.Vector3(-0.39766081871345005, -0.6944881889763783, 0),
+                new THREE.Vector3(-2, -0.3937007874015752, 0),
+                new THREE.Vector3(-4.432748538011696,  0.36771653543307, 0),
                 // new THREE.Vector3(3.5,2,0)
             ]
 
@@ -1522,13 +1527,40 @@ export class PrimeiraFase extends Fase{
                                                     angulos[2].mostrarAngulo.text.elemento.element.textContent = '?';
                                               })
 
+            const moverEquacaoParaDiv = new MoverTexto(novoElemento)
+                                        .setOnStart(function(){
+                                            const equacaoDiv   = fase.whiteboard.equationList.children[0];
+
+                                            const dimensoes    = equacaoDiv.getBoundingClientRect();
+
+                                            const posicaoFinal = fase.pixelToCoordinates((dimensoes.right + dimensoes.left)/2, (dimensoes.top + dimensoes.bottom)/2)
+
+                                            this.setSpline([
+                                                novoElemento.position.clone(),
+                                                ...spline,
+                                                posicaoFinal
+                                            ])
+
+                                            // fase.whiteboard.equationList.children[0].style.display = "none"
+                                            
+
+                                        })
+                                        .setOnTermino(() =>{
+                                            fase.scene.remove(novoElemento);
+                                            // fase.whiteboard.equationList.children[0].style.display = "block"
+                                            fase.whiteboard.ativar(true);
+                                        })
+
 
             const animacao = new AnimacaoSequencial(
                                 mostrarTexto, 
-                                voltarAngulosAnimacao
+                                voltarAngulosAnimacao,
+                                moverEquacaoParaDiv
                             )
 
-            fase.animar(mostrarTexto);
+            animacao.setCheckpoint(false);
+
+            fase.animar(animacao);
         }
 
     }

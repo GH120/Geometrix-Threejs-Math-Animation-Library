@@ -11,7 +11,9 @@ function MenuEquacoes(props) {
   const equationWindowRef = useRef(null);
 
     useEffect(() => {
-        const whiteboard = new Whiteboard(equationWindowRef.current);
+        const whiteboard  = new Whiteboard(equationWindowRef.current);
+
+        whiteboard.ativar = props.ativar;
 
         const fase = props.fase;
 

@@ -20,8 +20,6 @@ export default class MostrarTexto extends Animacao{
 
     update(comprimentoApagado){
 
-        console.log(comprimentoApagado)
-
         this.objeto.element.style.clipPath = `xywh(0% 0px ${comprimentoApagado}px 100% round 0% 0)`
 
     }

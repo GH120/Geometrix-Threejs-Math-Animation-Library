@@ -319,6 +319,19 @@ export class PrimeiraFase extends Fase{
         this.animar(animacao.setOnTermino(() => this.progresso = 4))
     }
 
+    dialogo3(){
+        const dialogo5 = [
+            "Como acabou de ver, dois ângulos determinam um terceiro no triângulo",
+            "E com três ângulos temos um único tipo de triângulo",
+            "Agora use a carta de proporcionalidade para ver o que isso significa"
+        ]
+
+        const animarDialogo = dialogo5.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)).setValorFinal(100));
+
+
+        return new AnimacaoSequencial().setAnimacoes(animarDialogo);
+    }
+
     animar180Graus(){
 
 
@@ -1106,34 +1119,45 @@ export class PrimeiraFase extends Fase{
         return new Output()
                .setUpdateFunction(function(estadoNovo){
 
-                    console.log(estadoNovo)
-
+                    //Ver se não consegue ser deletado mais de uma vez
                     if(estadoNovo.clicado){
 
                         //Deleta o ângulo através de animação
 
                         animacaoDeletar();
+
+                        console.log(fase.informacao.angulosDeletados)
                     }
                })
 
         //Funções auxiliares
-        function decrementarContador(){
+        function incrementarContador(){
 
             angle.removeFromScene();
 
-            //Decrementa o total da equação
+            //Incrementa quantidade de ângulos deletados
+            if(!fase.informacao.angulosDeletados) {
+                fase.informacao.angulosDeletados = 0;
+            }
+
+            fase.informacao.angulosDeletados++;
+                
+
         }
 
         function animacaoDeletar(){
 
             const animacao = new AnimacaoSimultanea(
                                 apagarObjeto(angle)
-                                .setOnTermino(decrementarContador),
+                                .setOnTermino(incrementarContador),
 
                                 fase.mostrarGrausDesaparecendo(angle)
                             )
                             .setOnStart(() =>{
 
+
+                                //REFATORAR DEPOIS
+                                //TORNAR MÉTODO DE OPERADORES E CHAMAR AQUI
                                 const angulosEquacoes = fase.informacao.equacao.angulos;
 
                                 const expression = angulosEquacoes.filter(angulo => parseInt(angulo.element.textContent) == Math.round(angle.degrees))[0];
@@ -1236,6 +1260,8 @@ export class PrimeiraFase extends Fase{
             this.progresso++;
 
             if(problema.proximo) this.progresso = problema.proximo(this);
+
+            console.log(this.progresso, "Progresso")
         }
     }
 
@@ -1664,9 +1690,21 @@ export class PrimeiraFase extends Fase{
 
             },
 
-            proximo: (fase) => "finalizado",
+            proximo: (fase) => 5,
 
             // estado: new Estado(this, "setupObjects", "Configuracao3", "180", {})
+        },
+
+        5: {
+            satisfeito(fase){
+                console.log(fase.informacao.angulosDeletados)
+                return fase.informacao.angulosDeletados == 2;
+            },
+
+            consequencia(fase){
+                
+                fase.animar(fase.dialogo3());
+            },
         }
     }
 

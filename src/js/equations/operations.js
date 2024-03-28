@@ -2,7 +2,7 @@ import { Distributividade } from "../animacoes/distributividade";
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
 import { Addition, Minus, Multiplication, Parenthesis, Square, Value, VariableMultiplication } from "./expressions";
-
+import './style.css';
 
 class Somar {
 
@@ -86,16 +86,19 @@ export class Operations{
     createSelector(){
         const options = document.createElement("select");
       
-        options.id = "options"
+        options.id = "options";
 
         options.classList.add('button-9');
 
-        options.style.position = 'absolute'
+        options.style.position = 'absolute';
 
-        options.style.top = '540%'
-        options.style.left = '20%'
+        options.style.top = '600px';
+        options.style.left = '340px';
+        options.style.zIndex = 1000;
       
         options.textContent = "opções";
+
+        this.selector = options;
 
         return options;
     }
@@ -126,6 +129,8 @@ export class Operations{
     }
 
     chooseOption(nome, recursion=true){
+
+        console.log(this.expression)
 
         const isBasicOperation = this.basicOperations.filter(name => name == nome).length;
 
@@ -160,7 +165,10 @@ export class Operations{
 
                     action.setOnTermino(() => {
                         if(!this.animando){
-                            this.expression.update();
+
+                            const equationWindow = this.selector.parentNode.children[0];
+
+                            this.expression.update(equationWindow);
                             this.eliminarZero(result);
                             this.chooseOption(nome);
                         }

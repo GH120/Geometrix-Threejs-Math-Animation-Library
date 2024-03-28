@@ -1142,16 +1142,16 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
         
         
 
-        if(this.progresso<4){
+        if(this.progresso<10){
 
             super.update();
         super.update();
@@ -1395,16 +1395,10 @@ export class PrimeiraFase extends Fase{
                         mover3
                 )
                 .setOnStart(criarEquacao)
-                .setOnTermino(() => {
+                .setOnTermino(mostrarEquacaoEMoverParaWhiteboard))
 
-                        console.log(fase.whiteboard);
 
-                        fase.whiteboard.adicionarEquacao(novoElemento.equacao)
-
-                        fase.scene.add(novoElemento);
-
-                        fase.animar(new MostrarTexto(novoElemento).setValorFinal(300).setProgresso(0));
-                }))
+        //Funções auxiliares
 
         function criarEquacao(){
             const valores = angulos.map( angulo => angulo.mostrarAngulo.text.elemento.element.textContent);
@@ -1495,6 +1489,46 @@ export class PrimeiraFase extends Fase{
 
             //VERIFICAR BUGS, MODIFICAR CENTRO DA CÂMERA PROVAVELMENTE É DESVIO
             return new THREE.Vector3(point.x,point.y - 1, 0); // por algum motivo o y é 1 se for metade da altura
+        }
+
+        function mostrarEquacaoEMoverParaWhiteboard(){
+             console.log(fase.whiteboard);
+
+            fase.whiteboard.adicionarEquacao(novoElemento.equacao)
+
+            fase.scene.add(novoElemento);
+
+            
+            const spline = [
+                new THREE.Vector3(1.473684210526315, -2.2692913385826774, 0),
+                new THREE.Vector3(-0.39766081871345005, -0.6944881889763783, 0),
+                // new THREE.Vector3(3.5,2,0)
+            ]
+
+
+            const mostrarTexto = new MostrarTexto(novoElemento)
+                                    .setValorFinal(300)
+                                    .setProgresso(0);
+
+            const voltarAngulos = angulos.map(angulo => fase.mostrarGrausAparecendo(angulo,false,false))
+
+            const voltarAngulosAnimacao = new AnimacaoSimultanea()
+                                              .setAnimacoes(voltarAngulos)
+                                              .setOnStart(() =>{
+
+                                                    angulos.map(angulo => angulo.mostrarAngulo.update({dentro:true}));
+
+                                                    //Mudar se tornar escolha de ângulo geral
+                                                    angulos[2].mostrarAngulo.text.elemento.element.textContent = '?';
+                                              })
+
+
+            const animacao = new AnimacaoSequencial(
+                                mostrarTexto, 
+                                voltarAngulosAnimacao
+                            )
+
+            fase.animar(mostrarTexto);
         }
 
     }

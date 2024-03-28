@@ -1132,6 +1132,34 @@ export class PrimeiraFase extends Fase{
 
                                 fase.mostrarGrausDesaparecendo(angle)
                             )
+                            .setOnStart(() =>{
+
+                                const angulosEquacoes = fase.informacao.equacao.angulos;
+
+                                const expression = angulosEquacoes.filter(angulo => parseInt(angulo.element.textContent) == Math.round(angle.degrees))[0];
+
+                                const operadores  = fase.operadores;
+
+                                const mudarDeLado = operadores.operations.subtraction;
+
+                                const action = mudarDeLado.action(expression);
+
+                                const result = mudarDeLado.result(expression);
+
+                                expression.substitute(result);
+
+                                fase.animar(action);
+
+                                action.setOnTermino(() => {
+
+                                    const equationWindow = operadores.selector.parentNode.children[0];
+                                    console.log(equationWindow);
+                                    console.log(equationWindow.children[0])
+
+                                    operadores.expression.update(equationWindow);
+                                    operadores.eliminarZero(result);
+                                });
+                            })
 
             fase.animar(animacao);
         }
@@ -1428,11 +1456,15 @@ export class PrimeiraFase extends Fase{
                                 new Value("180°")
                             )
 
+            fase.informacao.equacao = {equacao:equacao, angulos:[x,y,z]}
+
             novoElemento = new CSS2DObject(equacao.html);
 
             novoElemento.position.copy(new THREE.Vector3(0,0,0));
 
             novoElemento.equacao = equacao;
+
+            
 
             // fase.scene.add(novoElemento);
 

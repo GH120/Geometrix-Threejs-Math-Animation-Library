@@ -187,17 +187,17 @@ export class Operations{
     //Consertar a eliminação da opção escolhida
     eliminarZero(result, nome) {
 
-        if(result.type == "value" && result.value == 0 && result.father != "equation"){
+        // if(result.type == "value" && result.value == 0 && result.father != "equation"){
 
-            result.father.substitute(result.sibling)
+        //     result.father.substitute(result.sibling)
 
-            const fadeOut = new TextoAparecendo(result.father.element)
-                                .setValorInicial(10)
-                                .setValorFinal(-2)
-                                .setOnTermino(() => this.expression.update());
+        //     const fadeOut = new TextoAparecendo(result.father.element)
+        //                         .setValorInicial(10)
+        //                         .setValorFinal(-2)
+        //                         .setOnTermino(() => this.expression.update());
 
-            this.programa.animar(fadeOut);
-        }
+        //     this.programa.animar(fadeOut);
+        // }
     }
 
     get operations(){
@@ -224,12 +224,17 @@ export class Operations{
 
             subtraction: {
 
-                requirement: function isFree(expression, index = 0){
-                    if(!expression.father) return false;
-                    if(expression.father.type == "addition") return isFree(expression.father, index+1);
-                    if(expression.type == "addition" && index == 0) return false;
-                    if(expression.father.type == "equality") return true;
-                } ,
+                requirement: function valida(expression){
+
+                    function isFree(expression, index = 0){
+                        if(!expression.father) return false;
+                        if(expression.father.type == "addition") return isFree(expression.father, index+1);
+                        if(expression.type == "addition" && index == 0) return false;
+                        if(expression.father.type == "equality") return true;
+                    }
+
+                    return expression.type != "addition" && isFree(expression);
+                },
 
                 action: (expression) => new TextoAparecendo(expression.element).setValorInicial(10).setValorFinal(-10),
 

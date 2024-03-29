@@ -64,7 +64,10 @@ export class Poligono extends Objeto{
         });
 
         //Gambiarra enquanto não transforma o vértice em um objeto
-        this.vertices = esferas.map(vertice => Objeto.fromMesh(vertice));
+        this.vertices = esferas.map(vertice => Objeto.fromMesh(vertice))
+
+        this.vertices.forEach((vertice, index) => vertice.index = index);
+
 
         // console.log(this.vertices)
 

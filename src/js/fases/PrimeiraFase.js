@@ -322,14 +322,44 @@ export class PrimeiraFase extends Fase{
     dialogo3(){
         const dialogo5 = [
             "Como acabou de ver, dois ângulos determinam um terceiro no triângulo",
-            "E com três ângulos temos um único tipo de triângulo",
-            "Agora use a carta de proporcionalidade para ver o que isso significa"
+            "Para que isso serve? bem, suponha que temos dois triângulos", // Desenha os triângulos
+            "Se todos seus ângulos forem iguais, um é apenas o outro só que maior", //Mostra a escala e pede para arrastar,
+            "São SEMELHANTES, e tem proporções entre si",
+            "e só precisamos de dois ângulos, pois como vimos o terceiro é determinado por eles", //highlight dos dois ângulos em cada triângulo
+            "mas temos outras maneiras de ver se eles são SEMELHANTES"
         ]
 
         const animarDialogo = dialogo5.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)).setValorFinal(100));
 
 
-        return new AnimacaoSequencial().setAnimacoes(animarDialogo);
+        //Cleanup da cena antiga
+        const triangulo = this.triangulo;  
+        
+        const verticeSelecionado = this.informacao.verticeSelecionado;
+
+        const anguloSelecionado = triangulo.angles[verticeSelecionado.index];
+
+        const apagarAngulo  = apagarObjeto(anguloSelecionado);
+
+        const apagarMostrarAngulo = this.mostrarGrausDesaparecendo(anguloSelecionado);
+
+        const apagarTracejado = () => {
+
+            const criarTracejado = this.informacao.criarTracejadoSelecionado;
+
+            criarTracejado.update({clicado:true});
+
+            triangulo.removeFromScene(this.scene)
+
+            criarTracejado.removeInputs();
+        }   
+
+        const cleanupLeftovers = new AnimacaoSimultanea(apagarAngulo, apagarMostrarAngulo)
+                                .setOnTermino(apagarTracejado);
+
+        const primeiraLinha = new AnimacaoSimultanea(cleanupLeftovers, animarDialogo[0])
+
+        return new AnimacaoSequencial(primeiraLinha, animarDialogo[1],animarDialogo[2]);
     }
 
     animar180Graus(){
@@ -1194,26 +1224,26 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
         
         
 
-        if(this.progresso<10){
+        if(this.progresso != 6){
 
             super.update();
         super.update();

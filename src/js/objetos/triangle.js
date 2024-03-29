@@ -146,7 +146,13 @@ export class Triangle extends Objeto{
     }
 
     get centro(){
-        return this.vertices.map(vertice => vertice.position.clone())
+
+        if(!this.vertices) 
+            return  this.positions.map(position => new THREE.Vector3().fromArray(position))
+                        .reduce((a,b) => a.add(b), new THREE.Vector3(0,0,0))
+                        .multiplyScalar(1/3)
+
+        return this.vertices.map(vertice => vertice.getPosition())
                             .reduce((a,b) => a.add(b), new THREE.Vector3(0,0,0))
                             .multiplyScalar(1/3);
     }
@@ -173,6 +179,7 @@ export class Triangle extends Objeto{
 
         const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:0x000000}));
 
+        this.hitbox = mesh;
 
         return mesh;
     }

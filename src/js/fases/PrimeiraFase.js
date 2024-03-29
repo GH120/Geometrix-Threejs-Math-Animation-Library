@@ -99,6 +99,16 @@ export class PrimeiraFase extends Fase{
 
     //Objetos temporários ou secundários
     setupObjects2(){
+
+        const vertexPositions = this.triangulo.vertices.map(vertice => vertice.getPosition().toArray());
+
+        this.triangulo2 = new Poligono(vertexPositions)
+                          .escala(0.5,0.5,0.5)
+                          .translacao(-3,0,0);
+
+        console.log(this.triangulo2.positions)
+
+        this.triangulo2.render();
     }
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
@@ -359,7 +369,35 @@ export class PrimeiraFase extends Fase{
 
         const primeiraLinha = new AnimacaoSimultanea(cleanupLeftovers, animarDialogo[0])
 
-        return new AnimacaoSequencial(primeiraLinha, animarDialogo[1],animarDialogo[2]);
+
+
+        const desenharTriangulos = new AnimacaoSimultanea(
+            new ApagarPoligono(this.triangulo)
+            .reverse()
+            .setOnTermino(() => false)
+            .setOnStart(() => this.triangulo.addToScene(this.scene)),
+
+            new ApagarPoligono(this.triangulo2)
+            .reverse()
+            .setOnTermino(() => false)
+            .setOnStart(() => this.triangulo2.addToScene(this.scene))
+        )
+
+        const segundaLinha = new AnimacaoSimultanea(desenharTriangulos, animarDialogo[1])
+
+
+        const escalarTriangulo2 = this.animacaoEscalarTriangulo2()
+
+        const terceiraLinha = new AnimacaoSimultanea(escalarTriangulo2, animarDialogo[2]);
+
+        return new AnimacaoSequencial(
+            primeiraLinha, 
+            segundaLinha,
+            terceiraLinha,
+            animarDialogo[3],
+            animarDialogo[4],
+            animarDialogo[5]
+        );
     }
 
     animar180Graus(){
@@ -634,6 +672,8 @@ export class PrimeiraFase extends Fase{
 
                 copia = angle.copia();
 
+                angle.copiaDoAngulo = copia;
+
                 copia.material = material;
 
                 copia.render().addToScene(fase.scene)
@@ -677,6 +717,7 @@ export class PrimeiraFase extends Fase{
     Configuracao5(){
 
         this.createInputs2();
+        this.setupObjects2();
 
         const copiasDosAngulos =  this.triangulo.angles
                                                 .map(   angle => angle.copiaDoAngulo)
@@ -1219,6 +1260,27 @@ export class PrimeiraFase extends Fase{
         }
     }
 
+    //Muito complexo, melhor não
+    // moverTriangulo(triangle1,triangle2){
+
+    //     triangle1.getHitbox();
+
+    //     const moverTriangulo = new Output()
+    //                            .setUpdateFunction(function(estadoNovo){
+
+    //                                 const centro1 = triangle1.centro;
+
+    //                                 const centro2 = triangle2.centro;
+
+    //                                 if(estadoNovo.dragging){
+
+    //                                     const posicao = estadoNovo.position;
+
+    //                                     const deslocamento = 
+    //                                 }
+    //                            })
+    // }
+
 
     update(){
         // this.atualizarOptions();
@@ -1660,6 +1722,54 @@ export class PrimeiraFase extends Fase{
 
             fase.animar(animacao);
         }
+
+    }
+
+    animacaoEscalarTriangulo2(){
+
+        const fase = this;
+
+        let positions;
+        let deslocamento;
+        let scaleDiference;
+
+
+        return new Animacao()
+               .setValorFinal(1)
+               .setValorInicial(0)
+               .setInterpolacao((a,b,c) => a*(1-c) + b*c)
+               .setUpdateFunction(function(tempo){
+
+                    const triangulo2 = fase.triangulo2;
+
+                    const scale = (scaleDiference - 1) * (1-tempo) + 1
+
+                    const fatorDeslocamento = deslocamento.clone().multiplyScalar(1 - tempo).toArray()
+
+                    triangulo2.positions = positions.map(p => new THREE.Vector3().fromArray(p).toArray())
+
+                    // console.log(positions, fatorDeslocamento, triangulo2.positions)
+
+                    triangulo2.removeFromScene();
+
+                    triangulo2.render();
+
+                    triangulo2.addToScene(fase.scene);
+               })
+               .setDuration(300)
+               .voltarAoInicio(false)
+               .setOnStart(() => {
+
+                    const triangulo1 = this.triangulo1;
+                    const triangulo2 = this.triangulo2;
+
+                    positions      = triangulo1.positions.map(p => p.map(e => e*0.5));
+                    deslocamento   = triangulo1.centro.sub(triangulo2.centro);
+                    scaleDiference = 2;
+
+                    console.log(positions,triangulo1.positions,deslocamento,scaleDiference)
+
+               })
 
     }
 

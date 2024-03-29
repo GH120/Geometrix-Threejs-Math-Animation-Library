@@ -244,9 +244,17 @@ export class Poligono extends Objeto{
     }
 
     get centro(){
-        return this.vertices.map(vertice => vertice.position.clone())
+
+        if(!this.vertices) 
+            return  this.positions.map(position => new THREE.Vector3().fromArray(position))
+                        .reduce((a,b) => a.add(b), new THREE.Vector3(0,0,0))
+                        .multiplyScalar(1/3)
+
+        console.log(this.vertices)
+
+        return this.vertices.map(vertice => vertice.getPosition())
                             .reduce((a,b) => a.add(b), new THREE.Vector3(0,0,0))
-                            .multiplyScalar(1/3);
+                            .multiplyScalar(1/this.numeroVertices);
     }
 
     get raio(){

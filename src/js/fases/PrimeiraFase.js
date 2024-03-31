@@ -33,7 +33,7 @@ export class PrimeiraFase extends Fase{
         super();
 
         this.setupTextBox();
-        this.changeText("")
+        this.changeText("");
 
         this.progresso = 0;
         this.setupObjects();
@@ -48,8 +48,6 @@ export class PrimeiraFase extends Fase{
     setupObjects(){
 
         const pi = Math.PI;
-
-        this.triangulo1 = new Triangle([[-2,0,0], [3,0,0], [1,3,0]]);
 
         this.pentagono  = new Poligono([
                             [0    ,   3   ,     0],
@@ -103,6 +101,7 @@ export class PrimeiraFase extends Fase{
         const vertexPositions = this.triangulo.vertices.map(vertice => vertice.getPosition().toArray());
 
         this.triangulo2 = new Poligono(vertexPositions)
+                          .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
                           .escala(0.5,0.5,0.5)
                           .translacao(-3,0,0);
 
@@ -1385,6 +1384,7 @@ export class PrimeiraFase extends Fase{
                                 .setValorFinal(1)
                                 .setInterpolacao((a,b,c) => a*(1-c) + b*c)
                                 .setUpdateFunction((valor) => {
+
                                     mostrarAngulo.text.elemento.element.style.opacity = valor
 
                                     if(updateMostrarAnguloCadaFrame) mostrarAngulo.update({dentro:true});
@@ -1732,21 +1732,31 @@ export class PrimeiraFase extends Fase{
         let positions;
         let deslocamento;
         let scaleDiference;
+        let escala;
 
 
         return new Animacao()
-               .setValorFinal(1)
-               .setValorInicial(0)
+               .setValorFinal(0)
+               .setValorInicial(1)
                .setInterpolacao((a,b,c) => a*(1-c) + b*c)
                .setUpdateFunction(function(tempo){
+
+                    console.log(fase.triangulo1)
+
+                    positions  = fase.triangulo.vertices.map(vertice => vertice.getPosition().multiplyScalar(0.5).toArray());
 
                     const triangulo2 = fase.triangulo2;
 
                     const scale = (scaleDiference - 1) * (1-tempo) + 1
 
-                    const fatorDeslocamento = deslocamento.clone().multiplyScalar(1 - tempo).toArray()
+                    const fatorDeslocamento = deslocamento.clone().multiplyScalar(0 - tempo)
 
-                    triangulo2.positions = positions.map(p => new THREE.Vector3().fromArray(p).toArray())
+                    triangulo2.positions = positions.map(p => new THREE.Vector3()
+                                                                  .fromArray(p)
+                                                                  .multiplyScalar(scale)
+                                                                  .add(fatorDeslocamento)
+                                                                  .toArray()
+                                                        )
 
                     // console.log(positions, fatorDeslocamento, triangulo2.positions)
 
@@ -1756,19 +1766,29 @@ export class PrimeiraFase extends Fase{
 
                     triangulo2.addToScene(fase.scene);
                })
-               .setDuration(300)
-               .voltarAoInicio(false)
+               .setDuration(200)
                .setOnStart(() => {
 
-                    const triangulo1 = this.triangulo1;
+                    const triangulo1 = this.triangulo;
                     const triangulo2 = this.triangulo2;
 
-                    positions      = triangulo1.positions.map(p => p.map(e => e*0.5));
+                    escala = fase.createTextBox("escala = ");
+
+                    
+
                     deslocamento   = triangulo1.centro.sub(triangulo2.centro);
                     scaleDiference = 2;
 
                     console.log(positions,triangulo1.positions,deslocamento,scaleDiference)
 
+               })
+               .setCurva((x) => {
+                    const c1 = 1.70158;
+                    const c2 = c1 * 1.525;
+                    
+                    return x < 0.5
+                    ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+                    : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
                })
 
     }
@@ -1846,37 +1866,6 @@ export class PrimeiraFase extends Fase{
                 fase.animar(fase.dialogo3());
             },
         }
-    }
-
-    //Cria a equação da regra de 3, útil para os problemas
-    createEquationBox(equation, position){
-
-        const container = document.createElement('p');
-        container.style.fontSize = "25px";
-        container.style.fontFamily = "Courier New, monospace";
-        container.style.fontWeight = 500;
-        container.style.display = 'inline-block';
-
-        // Split the text into individual characters
-        const characters = equation.split('');
-
-        // Create spans for each character and apply the fading effect
-        characters.forEach((character,index) => {
-            const span = document.createElement('span');
-            span.textContent = character;
-            container.appendChild(span);
-        });
-
-        // Create the CSS2DObject using the container
-        const cPointLabel = new CSS2DObject(container);       
-
-        cPointLabel.position.x = position[0];
-        cPointLabel.position.y = position[1];
-        cPointLabel.position.z = position[2];
-
-        this.scene.add(cPointLabel);
-
-        return cPointLabel;
     }
 
     appendOperadoresAJanelaEquacao(equationWindow){

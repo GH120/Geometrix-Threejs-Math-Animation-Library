@@ -101,6 +101,69 @@ export class Fase {
         this.changeText("Crie um triangulo equilatero");
     }
 
+    //Cria a equação da regra de 3, útil para os problemas
+    createTextBox(text, position=[0,0,0]){
+
+        const container = document.createElement('p');
+        container.style.fontSize = "25px";
+        container.style.fontFamily = "Courier New, monospace";
+        container.style.fontWeight = 500;
+        container.style.display = 'inline-block';
+
+        // Split the text into individual characters
+        const characters = text.split('');
+
+        // Create spans for each character and apply the fading effect
+        characters.forEach((character,index) => {
+            const span = document.createElement('span');
+            span.textContent = character;
+            container.appendChild(span);
+        });
+
+        // Create the CSS2DObject using the container
+        const cPointLabel = new CSS2DObject(container);       
+
+        cPointLabel.position.x = position[0];
+        cPointLabel.position.y = position[1];
+        cPointLabel.position.z = position[2];
+
+        this.scene.add(cPointLabel);
+
+        return cPointLabel;
+    }
+
+    //Cria a equação da regra de 3, útil para os problemas
+    createEquationBox(equation, position){
+
+        const container = document.createElement('p');
+        container.style.fontSize = "25px";
+        container.style.fontFamily = "Courier New, monospace";
+        container.style.fontWeight = 500;
+        container.style.display = 'inline-block';
+
+        // Split the text into individual characters
+        const characters = equation.split('');
+
+        // Create spans for each character and apply the fading effect
+        characters.forEach((character,index) => {
+            const span = document.createElement('span');
+            span.textContent = character;
+            container.appendChild(span);
+        });
+
+        // Create the CSS2DObject using the container
+        const cPointLabel = new CSS2DObject(container);       
+
+        cPointLabel.position.x = position[0];
+        cPointLabel.position.y = position[1];
+        cPointLabel.position.z = position[2];
+
+        this.scene.add(cPointLabel);
+
+        return cPointLabel;
+    }
+
+    
     //Muda o conteúdo da caixa de texto
     changeText(texto){
 

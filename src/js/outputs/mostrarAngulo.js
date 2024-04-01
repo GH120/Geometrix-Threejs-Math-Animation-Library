@@ -17,7 +17,12 @@ export class MostrarAngulo extends Output{
         const p = document.createElement('p');
         p.style.fontFamily = "'Latin Modern Math', 'Computer Modern', serif";
         p.textContent = "teste";
-        const cPointLabel = new CSS2DObject(p);
+
+        const wrapper = document.createElement("div");
+
+        wrapper.addChild(p);
+
+        const cPointLabel = new CSS2DObject(wrapper);
 
         this.text = {elemento:cPointLabel, on:false}
 
@@ -33,6 +38,7 @@ export class MostrarAngulo extends Output{
             const angulo = this.angulo;
 
             elemento.element.textContent = `${(angulo.degrees).toFixed()}°`;
+            elemento.element.style.transform = "rotate(-45deg)"
 
             const vetor = new THREE.Vector3(0,0,0)
                         .lerpVectors(angulo.vetor2,     angulo.vetor1,      0.5)

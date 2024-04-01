@@ -10,6 +10,7 @@ import { Fase7 } from '../../js/fases/fase7';
 import { Whiteboard } from '../../js/cards/whiteboard';
 import Navbar from '../../components/Navbar/Navbar';
 import { PrimeiraFase } from '../../js/fases/PrimeiraFase';
+import { MathJaxBaseContext, MathJaxContext } from 'better-react-mathjax';
 
 const fases = {
   '1' : Fase1,
@@ -70,14 +71,17 @@ const LevelScreen = () => {
   };
 
   return (
-    <div
-    className="App"
-    onDragOver={handleDragOver}
-    onDrop={handleDrop}
-    >
-      {levelLoad && <Navbar settings={{fase, whiteboard}}/>}
-      <div className='container de tudo' ref={refContainer}></div>
-    </div>
+    <MathJaxContext>
+      <div
+      className="App"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      >
+        {levelLoad && <Navbar settings={{fase, whiteboard}}/>}
+        <div className='container de tudo' ref={refContainer}></div>
+      </div>
+
+    </MathJaxContext>
   )
 }
 

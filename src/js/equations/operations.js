@@ -96,11 +96,16 @@ export class Operations{
 
         options.style.position = 'absolute';
 
-        options.style.top = '600px';
-        options.style.left = '340px';
+        options.style.top = '380px';
+        options.style.left = '25%';
         options.style.zIndex = 1000;
-      
+
         options.textContent = "opções";
+
+        options.style.transition = 'all 0.3s ease';
+        options.style.transformOrigin = 'top';
+        options.style.transform = 'scaleY(1)';
+        options.style.opacity = '1';
 
         this.selector = options;
 
@@ -115,7 +120,6 @@ export class Operations{
             let texto = document.createElement("option");
           
             texto.textContent = content
-
             texto.value = tag;
 
             options.append(texto);

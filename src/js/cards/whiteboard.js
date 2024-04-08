@@ -47,7 +47,7 @@ export class Whiteboard {
         const telaEquacao = this.equationWindow;
 
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xffffff);
+        scene.background = new THREE.TextureLoader().load("https://media.istockphoto.com/id/589091614/pt/foto/old-school-chalkboard.jpg?s=612x612&w=0&k=20&c=XnoybTZeqWwWKAFSAP0--Yg82q_iPPL3MaZPosnH9X4=");
         // const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2+1, height / - 2 +1, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });

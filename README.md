@@ -2,7 +2,9 @@
 
 # Introdução: 
 
-Esse projeto é uma implementação de animações e features interativas para imersão e resolução de problemas de matemática usando Threejs e React. Como inspiração tivemos o canal 3blue1brown e sua biblioteca de animações em Python.
+Esse projeto é uma implementação de animações e features interativas para imersão e resolução de problemas de matemática usando Threejs e React. Como inspiração tivemos o canal 3blue1brown e sua biblioteca de animações em Python. 
+
+Abaixo um exemplo do que é possível fazer com essas ferramentas:
 
 https://github.com/GH120/Geometrix-Threejs-Math-Animation-Library/assets/90730714/b1c8318a-7186-4960-9d12-dc35166c05be
 

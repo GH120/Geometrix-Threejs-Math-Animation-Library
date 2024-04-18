@@ -26,6 +26,12 @@ import { Addition, Equality, Value, Variable } from "../equations/expressions";
 import MostrarTexto from "../animacoes/MostrarTexto";
 import { Operations } from "../equations/operations";
 
+import { mathjax } from 'mathjax-full/js/mathjax.js';
+import { TeX } from 'mathjax-full/js/input/tex.js';
+import { SVG } from 'mathjax-full/js/output/svg.js';
+import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor.js';
+import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
+
 export class PrimeiraFase extends Fase{
 
     constructor(){
@@ -42,10 +48,14 @@ export class PrimeiraFase extends Fase{
         this.outputTesteClick();
 
         this.operadores = new Operations(null,this);
+
     }
 
     //Objetos básicos
     setupObjects(){
+
+        console.log(mathjax,"Mathjax")
+        
 
         const pi = Math.PI;
 
@@ -732,29 +742,7 @@ export class PrimeiraFase extends Fase{
         }
     }
 
-    //Agora é a configuração 1
-    // ligarInputAoOutput(){
-
-    //     const vertices = this.triangulo.vertices;
-    //     const angles   = this.triangulo.angles;
-
-    //     //Liga o vertice.clickable input ao output
-    //     for (let i = 0; i < 3; ++i) {
-
-    //         const vertice = vertices[i];
-
-    //         vertice.clickable.addObserver(this.outputClickVertice[i])
-    //     }
-
-    //     //Liga o angulo.draggable ao output do draggable
-    //     for (let i = 0; i < 3; ++i) {
-
-    //         const angulo = angles[i];
-
-    //         angulo.draggable.addObserver(this.outputDragAngle[i]);
-    //     }
-    // }
-
+   
 
     //Outputs abaixo
     criarMovimentacaoDeAngulo = (angle) => {
@@ -1260,26 +1248,6 @@ export class PrimeiraFase extends Fase{
     }
 
     //Muito complexo, melhor não
-    // moverTriangulo(triangle1,triangle2){
-
-    //     triangle1.getHitbox();
-
-    //     const moverTriangulo = new Output()
-    //                            .setUpdateFunction(function(estadoNovo){
-
-    //                                 const centro1 = triangle1.centro;
-
-    //                                 const centro2 = triangle2.centro;
-
-    //                                 if(estadoNovo.dragging){
-
-    //                                     const posicao = estadoNovo.position;
-
-    //                                     const deslocamento = 
-    //                                 }
-    //                            })
-    // }
-
 
     update(){
         // this.atualizarOptions();
@@ -1772,7 +1740,39 @@ export class PrimeiraFase extends Fase{
                     const triangulo1 = this.triangulo;
                     const triangulo2 = this.triangulo2;
 
-                    escala = fase.createTextBox("escala = ");
+                    
+                    const inputTex = 'Persamaan $c = \\pm\\sqrt{a^2 + b^2}';
+
+                    const adaptor = liteAdaptor();
+                    RegisterHTMLHandler(adaptor);
+
+                    const tex = new TeX();
+                    const svg = new SVG();
+                    const html = mathjax.document('', { InputJax: tex, OutputJax: svg });
+
+                    // Mode inline
+                    const nodeInline = html.convert(inputTex, { display: false });
+                    const svgCodeInline = adaptor.outerHTML(nodeInline);
+
+
+                    // Mode display
+                    const nodeDisplay = html.convert(inputTex, { display: true });
+                    const svgCodeDisplay = adaptor.outerHTML(nodeDisplay);
+
+
+                    const elementoDiv = document.createElement("div");
+
+                    elementoDiv.innerHTML = adaptor.innerHTML(nodeInline);
+
+                    const objeto = new CSS2DObject(elementoDiv);
+
+
+                    
+                    fase.scene.add(objeto);
+
+                    escala = objeto;
+
+                    console.log(escala);
 
                     
 

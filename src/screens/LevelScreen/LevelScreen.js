@@ -70,14 +70,15 @@ const LevelScreen = () => {
   };
 
   return (
-    <div
-    className="App"
-    onDragOver={handleDragOver}
-    onDrop={handleDrop}
-    >
-      {levelLoad && <Navbar settings={{fase, whiteboard}}/>}
-      <div className='container de tudo' ref={refContainer}></div>
-    </div>
+      <div
+      className="App"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      >
+        {levelLoad && <Navbar settings={{fase, whiteboard}}/>}
+        <div className='container de tudo' ref={refContainer}></div>
+      </div>
+
   )
 }
 

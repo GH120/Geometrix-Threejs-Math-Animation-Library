@@ -26,12 +26,6 @@ import { Addition, Equality, Value, Variable } from "../equations/expressions";
 import MostrarTexto from "../animacoes/MostrarTexto";
 import { Operations } from "../equations/operations";
 
-import { mathjax } from 'mathjax-full/js/mathjax.js';
-import { TeX } from 'mathjax-full/js/input/tex.js';
-import { SVG } from 'mathjax-full/js/output/svg.js';
-import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor.js';
-import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
-
 export class PrimeiraFase extends Fase{
 
     constructor(){
@@ -45,6 +39,12 @@ export class PrimeiraFase extends Fase{
         this.setupObjects();
         this.createInputs();
         this.createOutputs();
+
+        const mathjaxEquation = this.createMathJaxTextBox("x^n + y^n = z^n ")
+
+                    
+                    this.scene.add(mathjaxEquation);
+
         this.outputTesteClick();
 
         this.operadores = new Operations(null,this);
@@ -54,8 +54,6 @@ export class PrimeiraFase extends Fase{
     //Objetos básicos
     setupObjects(){
 
-        console.log(mathjax,"Mathjax")
-        
 
         const pi = Math.PI;
 
@@ -1741,36 +1739,13 @@ export class PrimeiraFase extends Fase{
                     const triangulo2 = this.triangulo2;
 
                     
-                    const inputTex = 'Persamaan $c = \\pm\\sqrt{a^2 + b^2}';
-
-                    const adaptor = liteAdaptor();
-                    RegisterHTMLHandler(adaptor);
-
-                    const tex = new TeX();
-                    const svg = new SVG();
-                    const html = mathjax.document('', { InputJax: tex, OutputJax: svg });
-
-                    // Mode inline
-                    const nodeInline = html.convert(inputTex, { display: false });
-                    const svgCodeInline = adaptor.outerHTML(nodeInline);
-
-
-                    // Mode display
-                    const nodeDisplay = html.convert(inputTex, { display: true });
-                    const svgCodeDisplay = adaptor.outerHTML(nodeDisplay);
-
-
-                    const elementoDiv = document.createElement("div");
-
-                    elementoDiv.innerHTML = adaptor.innerHTML(nodeInline);
-
-                    const objeto = new CSS2DObject(elementoDiv);
-
+                    
+                    const mathjaxEquation = fase.createMathJaxTextBox("x^n + y^n = z^n ")
 
                     
-                    fase.scene.add(objeto);
+                    fase.scene.add(mathjaxEquation);
 
-                    escala = objeto;
+                    escala = mathjaxEquation;
 
                     console.log(escala);
 

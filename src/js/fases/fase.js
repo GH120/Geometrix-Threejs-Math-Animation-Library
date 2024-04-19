@@ -23,8 +23,7 @@ import { TeX } from 'mathjax-full/js/input/tex.js';
 import { SVG } from 'mathjax-full/js/output/svg.js';
 import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor.js';
 import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
-import { CHTMLFontData } from 'mathjax-full/js/output/common/FontData.js';
-import { texFont } from 'mathjax-full/js/output/svg/fonts/tex.js';
+import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages'
 
 export class Fase {
 
@@ -177,40 +176,34 @@ export class Fase {
         const adaptor = liteAdaptor();
         RegisterHTMLHandler(adaptor);
 
-        const tex = new TeX({
-            packages: ['base', 'ams'],
-            fontURL: texFont,
-            inlineMath: [['$', '$']],
-            displayMath: [['$$', '$$']],
-            processEscapes: true,
-            fontSize: 18 // Adjust font size as needed
-        });
+        const tex = new TeX({ packages: AllPackages });
         const svg = new SVG();
         const html = mathjax.document('', { InputJax: tex, OutputJax: svg });
 
-        // Mode inline
-        const nodeInline = html.convert(inputTex, { display: false });
-        const svgCodeInline = adaptor.outerHTML(nodeInline);
-
-
-        // Mode display
-        const nodeDisplay = html.convert(inputTex, { display: true });
-        const svgCodeDisplay = adaptor.outerHTML(nodeDisplay);
-
         const elementoDiv = document.createElement("div");
-
-        elementoDiv.innerHTML = adaptor.innerHTML(nodeDisplay);
-
-        elementoDiv.children[0].style.width = "10em";
-        elementoDiv.children[0].style.height= "10em";
-
         const cPointLabel = new CSS2DObject(elementoDiv);
 
         cPointLabel.position.x = position[0];
         cPointLabel.position.y = position[1];
         cPointLabel.position.z = position[2];
 
-        return cPointLabel;
+        // Função auxiliar para mudar texto renderizado pelo mathjax dinamicamente
+        cPointLabel.mudarTexto = function(text, fontsize=10){
+
+            //Cria o html e coloca ele dentro do div
+            const display = html.convert(text, { display: true });
+
+            elementoDiv.innerHTML = adaptor.innerHTML(display);
+
+            //Configura tamanho da fonte
+            elementoDiv.children[0].style.width  = `${fontsize*text.length/10}em`;
+            elementoDiv.children[0].style.height = `${fontsize*text.length/10}em`;
+            elementoDiv.children[0].style.color  = 'black';
+
+            return cPointLabel;
+        }
+
+        return cPointLabel.mudarTexto(inputTex);
     }
 
     

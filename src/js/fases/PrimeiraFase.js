@@ -40,10 +40,9 @@ export class PrimeiraFase extends Fase{
         this.createInputs();
         this.createOutputs();
 
-        const mathjaxEquation = this.createMathJaxTextBox("x^n + y^n = z^n ")
+        this.scene.add(this.tooltip1); //Equação a ser mostrada;
 
-                    
-                    this.scene.add(mathjaxEquation);
+        this.tooltip1.mudarTexto("x", 10);
 
         this.outputTesteClick();
 
@@ -101,6 +100,8 @@ export class PrimeiraFase extends Fase{
                           .render()
                           .escala(0.605,1.01,0)
                           .translacao(2,-0.5,0);
+
+        this.tooltip1 = this.createMathJaxTextBox("", [4,0,0])
     }
 
     //Objetos temporários ou secundários
@@ -216,6 +217,16 @@ export class PrimeiraFase extends Fase{
                                   );
 
         const mostrarAngulos = this.mostrarGrausHighlightAngulos(this.pentagono,this.pentagono2);
+
+        //Modifica a equação mostrada ao lado toda vez que iniciar um novo mostrarAngulo
+        mostrarAngulos.animacoes.forEach((mostrarAngulo,index) => mostrarAngulo.setOnStart(() =>{
+
+            if(!this.tooltip1.parent) this.scene.add(this.tooltip1); //Equação a ser mostrada;
+
+            this.tooltip1.mudarTexto("{\\color{red} x} + {\\color{blue} y}", 3);
+
+            this.tooltip1.position.copy(new THREE.Vector3(6,0,0))
+        }))
 
         const primeiraLinha = new AnimacaoSequencial(
                                     new AnimacaoSimultanea(animarDialogo[0], desenharPoligonos), 
@@ -1270,7 +1281,7 @@ export class PrimeiraFase extends Fase{
         
         
 
-        if(this.progresso != 6){
+        if(false){
 
             super.update();
         super.update();
@@ -1707,7 +1718,6 @@ export class PrimeiraFase extends Fase{
                .setInterpolacao((a,b,c) => a*(1-c) + b*c)
                .setUpdateFunction(function(tempo){
 
-                    console.log(fase.triangulo1)
 
                     positions  = fase.triangulo.vertices.map(vertice => vertice.getPosition().multiplyScalar(0.5).toArray());
 
@@ -1731,6 +1741,9 @@ export class PrimeiraFase extends Fase{
                     triangulo2.render();
 
                     triangulo2.addToScene(fase.scene);
+
+                    escala.mudarTexto(`escala = ${Math.round(scale*1000)/1000}`)
+
                })
                .setDuration(200)
                .setOnStart(() => {
@@ -1740,7 +1753,7 @@ export class PrimeiraFase extends Fase{
 
                     
                     
-                    const mathjaxEquation = fase.createMathJaxTextBox("x^n + y^n = z^n ")
+                    const mathjaxEquation = fase.createMathJaxTextBox("escala = ");
 
                     
                     fase.scene.add(mathjaxEquation);

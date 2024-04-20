@@ -40,10 +40,6 @@ export class PrimeiraFase extends Fase{
         this.createInputs();
         this.createOutputs();
 
-        this.scene.add(this.tooltip1); //Equação a ser mostrada;
-
-        this.tooltip1.mudarTexto("x", 10);
-
         this.outputTesteClick();
 
         this.operadores = new Operations(null,this);
@@ -200,6 +196,10 @@ export class PrimeiraFase extends Fase{
             "também são os mais fáceis de ver se são semelhantes."
         ]
 
+        this.pentagono.addToScene(this.scene);
+
+        this.pentagono2.addToScene(this.scene);
+
         //Desenhar um polígono pequeno, desenhar outro polígono maior
         //highlight dos ângulos respectivos em cada triângulo
         //highlight dos lados 
@@ -207,26 +207,12 @@ export class PrimeiraFase extends Fase{
 
         const animarDialogo = dialogo1.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)).setValorFinal(100));
 
-        this.pentagono.addToScene(this.scene);
-
-        this.pentagono2.addToScene(this.scene);
-
         const desenharPoligonos = new AnimacaoSimultanea(
                                     new DesenharPoligono(this.pentagono), 
                                     new DesenharPoligono(this.pentagono2).filler(50)
                                   );
 
         const mostrarAngulos = this.mostrarGrausHighlightAngulos(this.pentagono,this.pentagono2);
-
-        //Modifica a equação mostrada ao lado toda vez que iniciar um novo mostrarAngulo
-        mostrarAngulos.animacoes.forEach((mostrarAngulo,index) => mostrarAngulo.setOnStart(() =>{
-
-            if(!this.tooltip1.parent) this.scene.add(this.tooltip1); //Equação a ser mostrada;
-
-            this.tooltip1.mudarTexto("{\\color{red} x} + {\\color{blue} y}", 3);
-
-            this.tooltip1.position.copy(new THREE.Vector3(6,0,0))
-        }))
 
         const primeiraLinha = new AnimacaoSequencial(
                                     new AnimacaoSimultanea(animarDialogo[0], desenharPoligonos), 
@@ -281,6 +267,32 @@ export class PrimeiraFase extends Fase{
                             quartaLinha
                         )
                         .setOnTermino(() => this.progresso = 2)
+
+        
+         //Modifica a equação mostrada ao lado toda vez que iniciar um novo mostrarAngulo
+         mostrarAngulos.animacoes.forEach((mostrarAngulo,index) => mostrarAngulo.setOnStart(() =>{
+
+            const valorDoAngulo = Math.round(this.pentagono.angles[index].degrees);
+
+            const caixaDeTextoMathjax = this.createMathJaxTextBox("", [-4,2,0])
+
+            caixaDeTextoMathjax.mudarTexto(
+                `Ângulo~ {\\color{red}${index + 1}} ~   do ~P1 = 
+                 Ângulo~ {\\color{blue} ${index + 1}} ~ do~ P2 = 
+                 {\\color{purple} ${valorDoAngulo}°} `,
+                 3
+            )
+
+
+            const animacao  = this.moverEquacao({
+                                elementoCSS2: caixaDeTextoMathjax,
+                                duration1:10,
+                                duration2:100,
+                                middleDelay:50
+                              })
+
+            this.animar(animacao)
+        }))
 
         this.animar(animacao);
     }
@@ -1338,12 +1350,13 @@ export class PrimeiraFase extends Fase{
     highlightColorirAngulo(angulo){
         return new AnimacaoSequencial(colorirAngulo(angulo)
                                     .setValorInicial(0xff0000)
-                                    .setValorFinal(0xffff00)
-                                    .setDuration(30),
+                                    .setValorFinal(0xaa00aa)
+                                    .setDuration(20)
+                                    .setDelay(40),
                                     colorirAngulo(angulo)
-                                    .setValorInicial(0xffff00)
+                                    .setValorInicial(0xaa00aa)
                                     .setValorFinal(0xff0000)
-                                    .setDuration(30))
+                                    .setDuration(20))
     }
 
     mostrarGrausAparecendo(angle, updateMostrarAnguloCadaFrame = false, mostrarEdesaparecer=true){
@@ -1412,8 +1425,8 @@ export class PrimeiraFase extends Fase{
                         return new AnimacaoSimultanea(
                             this.highlightColorirAngulo(angle1), 
                             this.highlightColorirAngulo(angle2),
-                            this.mostrarGrausAparecendo(angle1),
-                            this.mostrarGrausAparecendo(angle2)
+                            this.mostrarGrausAparecendo(angle1).setDuration(80),
+                            this.mostrarGrausAparecendo(angle2).setDuration(80)
                         )
                     })
                 )
@@ -1700,6 +1713,90 @@ export class PrimeiraFase extends Fase{
             fase.animar(animacao);
         }
 
+    }
+
+    moverEquacao(configs){
+
+        let {elementoCSS2, equacao, spline, duration1, duration2, delayDoMeio} = configs;
+
+        if(!spline){
+            spline = [
+                new THREE.Vector3(1.473684210526315, -2.2692913385826774, 0),
+                new THREE.Vector3(-0.39766081871345005, -0.6944881889763783, 0),
+            ]
+        }
+
+        if(!equacao){
+            equacao = {html: elementoCSS2.element}
+        }
+
+        if(!duration1){
+            duration1 = 50
+        }
+
+        if(!duration2){
+            duration2 = 50;
+        }
+
+        if(!delayDoMeio){
+            delayDoMeio = 0;
+        }
+
+        const fase = this;
+
+
+        fase.whiteboard.adicionarEquacao(equacao)
+
+        //Consertar depois, está debaixo da whiteboard
+        // novoElemento.element.style.zIndex = 10000;
+
+        fase.scene.add(elementoCSS2);
+
+
+        const mostrarTexto = new MostrarTexto(elementoCSS2)
+                                .setValorFinal(300)
+                                .setProgresso(0)
+                                .setDelay(delayDoMeio)
+                                .setDuration(duration1)
+
+        
+
+        const moverEquacaoParaDiv = new MoverTexto(elementoCSS2)
+                                    .setOnStart(function(){
+                                        const equacaoDiv   = fase.whiteboard.equationList.children[0];
+
+                                        const dimensoes    = equacaoDiv.getBoundingClientRect();
+
+                                        const posicaoFinal = fase.pixelToCoordinates((dimensoes.right + dimensoes.left)/2, (dimensoes.top + dimensoes.bottom)/2)
+
+                                        this.setSpline([
+                                            elementoCSS2.position.clone(),
+                                            ...spline,
+                                            posicaoFinal
+                                        ])
+
+                                        // fase.whiteboard.equationList.children[0].style.display = "none"
+                                        
+
+                                    })
+                                    .setOnTermino(() =>{
+                                        fase.scene.remove(elementoCSS2);
+                                        // fase.whiteboard.equationList.children[0].style.display = "block"
+                                        fase.whiteboard.ativar(true);
+                                    })
+                                    .setDuration(duration2)
+
+
+        const animacao = new AnimacaoSequencial( 
+                            mostrarTexto, 
+                            moverEquacaoParaDiv
+                        )
+
+        animacao.setCheckpoint(false);
+
+        return animacao
+
+        
     }
 
     animacaoEscalarTriangulo2(){

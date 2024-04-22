@@ -74,6 +74,11 @@ export default class Animacao {
         return this;
     }
 
+    setCheckpoint(trueOrFalse){
+        this.checkpoint = trueOrFalse;
+        return this;
+    }
+
     onStart(){
         return null;
     }

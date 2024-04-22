@@ -96,7 +96,7 @@ export class Operations{
 
         options.style.position = 'absolute';
 
-        options.style.top = '380px';
+        options.style.top = '600px';
         options.style.left = '25%';
         options.style.zIndex = 1000;
 

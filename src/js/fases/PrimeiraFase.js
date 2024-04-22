@@ -36,13 +36,15 @@ export class PrimeiraFase extends Fase{
         this.changeText("");
 
         this.progresso = 0;
+        this.textBoxes = {};
+        this.operadores = new Operations(null,this);
+
         this.setupObjects();
         this.createInputs();
         this.createOutputs();
 
         this.outputTesteClick();
 
-        this.operadores = new Operations(null,this);
 
     }
 
@@ -97,7 +99,8 @@ export class PrimeiraFase extends Fase{
                           .escala(0.605,1.01,0)
                           .translacao(2,-0.5,0);
 
-        this.tooltip1 = this.createMathJaxTextBox("", [4,0,0])
+        this.textBoxes.primeiroDialogo = [];
+
     }
 
     //Objetos temporários ou secundários
@@ -189,8 +192,11 @@ export class PrimeiraFase extends Fase{
 
     firstDialogue(){
 
+        const fase = this;
+
+
         const dialogo1 = [
-            "Vimos que dois poligonos são semelhantes quando seus ângulos são congruentes(iguais  overtext )",
+            "Vimos que dois poligonos são semelhantes quando seus ângulos são congruentes",
             "e seus respectivos lados são proporcionais.", 
             "Como os triângulos são os polígonos mais simples,",
             "também são os mais fáceis de ver se são semelhantes."
@@ -259,14 +265,21 @@ export class PrimeiraFase extends Fase{
 
         // const divisao = new Divisao(this.pentagono2.edges[0], this.pentagono.edges[0], null, new THREE.Vector3(4,-1,0)).addToScene(this.scene);
 
+        const gambiarraDeletarEquacoes = new Animacao()
+                                        .setInterpolacao(() => null)
+                                        .setUpdateFunction(() => null)
+                                        .setDuration(300)
+                                        .setOnStart(deletarCaixasDeTexto)
+                                        .setCheckpoint(false)
 
         const animacao = new AnimacaoSequencial(
-                            primeiraLinha, 
+                            primeiraLinha,
+                            gambiarraDeletarEquacoes, 
                             segundaLinha, 
                             terceiraLinha, 
                             quartaLinha
                         )
-                        .setOnTermino(() => this.progresso = 2)
+                        .setOnTermino(() => fase.progresso = 2)
 
         
          //Modifica a equação mostrada ao lado toda vez que iniciar um novo mostrarAngulo
@@ -274,27 +287,75 @@ export class PrimeiraFase extends Fase{
 
             const valorDoAngulo = Math.round(this.pentagono.angles[index].degrees);
 
-            const caixaDeTextoMathjax = this.createMathJaxTextBox("", [-4,2,0])
+            const caixaDeTextoMathjax = this.createMathJaxTextBox("", [-5,2 - 0.5*index,0])
 
             caixaDeTextoMathjax.mudarTexto(
                 `Ângulo~ {\\color{red}${index + 1}} ~   do ~P1 = 
                  Ângulo~ {\\color{blue} ${index + 1}} ~ do~ P2 = 
                  {\\color{purple} ${valorDoAngulo}°} `,
-                 3
+                 2
             )
 
-
-            const animacao  = this.moverEquacao({
-                                elementoCSS2: caixaDeTextoMathjax,
-                                duration1:10,
-                                duration2:100,
-                                middleDelay:50
-                              })
+            const animacao  = new MostrarTexto(caixaDeTextoMathjax)
+                                .setValorFinal(300)
+                                .setProgresso(0)
+                                .setDelay(50)
+                                .setDuration(200)
+                                .setValorFinal(3000)
+                                .setOnStart(() => fase.scene.add(caixaDeTextoMathjax))
 
             this.animar(animacao)
+
+            //Adiciona as textboxes ativas da fase
+            this.textBoxes.primeiroDialogo.push(caixaDeTextoMathjax);
         }))
 
         this.animar(animacao);
+
+
+        
+        function deletarCaixasDeTexto(){
+
+
+            const apagarCSS2 = (texto) => new Animacao()
+                                        .setValorInicial(1)
+                                        .setValorFinal(0)
+                                        .setInterpolacao((a,b,c) => a*(1-c) + b*c)
+                                        .setUpdateFunction(function(valor){
+                                            texto.element.style.opacity = valor;
+
+                                            console.log(valor, texto.element.style.opacity)
+                                        })
+                                        .voltarAoInicio(false)
+                                        .setOnTermino(() => fase.scene.remove(texto))
+                                        .setDuration(30)
+
+            const apagarCaixasDeTexto = fase.textBoxes.primeiroDialogo
+                                                      .map(caixa => apagarCSS2(caixa));
+
+            const animacaoApagar = new AnimacaoSimultanea().setAnimacoes(apagarCaixasDeTexto);
+
+            const todosOsAngulosIguais = fase.createMathJaxTextBox("", [-4,1,0])
+
+            todosOsAngulosIguais.mudarTexto(
+                `~{\\color{red}~Todos~Ângulos~ do ~P1} = 
+                ~{\\color{blue}~Todos~Ângulos~ do~ P2}`,
+                 3
+            )
+
+            const adicionarTotal = fase.moverEquacao({
+                                    elementoCSS2: todosOsAngulosIguais,
+                                    duration1: 300,
+                                    delayDoMeio: 50
+                                })
+
+            const animacao = new AnimacaoSequencial(
+                                animacaoApagar.setCheckpoint(false), 
+                                adicionarTotal.setCheckpoint(false)
+                            )
+
+            fase.animar(animacao);
+        }
     }
 
     secondDialogue(){
@@ -1727,7 +1788,12 @@ export class PrimeiraFase extends Fase{
         }
 
         if(!equacao){
-            equacao = {html: elementoCSS2.element}
+
+            const novoElemento = document.createElement("div");
+            
+            novoElemento.innerHTML = elementoCSS2.element.innerHTML;
+
+            equacao = {html: novoElemento}
         }
 
         if(!duration1){
@@ -1758,6 +1824,7 @@ export class PrimeiraFase extends Fase{
                                 .setProgresso(0)
                                 .setDelay(delayDoMeio)
                                 .setDuration(duration1)
+                                .setValorFinal(3000)
 
         
 
@@ -1789,7 +1856,7 @@ export class PrimeiraFase extends Fase{
 
         const animacao = new AnimacaoSequencial( 
                             mostrarTexto, 
-                            moverEquacaoParaDiv
+                            // moverEquacaoParaDiv
                         )
 
         animacao.setCheckpoint(false);
@@ -1877,6 +1944,68 @@ export class PrimeiraFase extends Fase{
                })
 
     }
+
+    //Fazer depois
+    // animacaoMesclarEquacoes(equacoesCSS2Mathjax, equacaoCentralCSS2){
+        
+
+    //     const centro  = equacaoCentralCSS2.position.clone();
+
+    //     const moverEquacoes = equacoesCSS2Mathjax.map(equacao => {
+
+    //         const spline = criarSplineAleatoriamente(equacao.position.clone(), centro);
+            
+    //         return new MoverTexto(equacao, spline);
+    //     })
+
+    //     const animacao = new AnimacaoSequencial().setDuration(300);
+
+    //     return animacao.setOnStart(() => animacao.setAnimacoes())
+
+
+    //     //Mover isso depois para o moverTexto, deve ser um método que lida com splines nulas
+    //     function criarSplineAleatoriamente(posicaoInicial, posicaoFinal){
+
+    //         const vetor = new THREE.Vector3().subVectors(posicaoFinal, posicaoInicial);
+
+    //         const perpendicular = new THREE.Vector3().crossVectors(vetor, new THREE.Vector3(0,0,1));
+
+    //         const posicao1 = vetor.copy()
+    //                               .multiplyScalar(Math.random() * 1/2)
+    //                               .add(
+    //                                 perpendicular
+    //                                 .copy()
+    //                                 .multiplyScalar(Math.random() ** 4)
+    //                               )
+    //                               .add(
+    //                                 posicaoInicial
+    //                               )
+
+
+    //         const posicao2 = posicao1.copy()
+    //                                 .multiplyScalar(Math.random()* 1/2)
+    //                                 .add(
+    //                                     perpendicular
+    //                                     .copy()
+    //                                     .multiplyScalar(Math.random() ** 4)
+    //                                 )
+    //                                 .add(
+    //                                     posicaoInicial
+    //                                 )
+            
+
+    //         return [
+    //             posicaoInicial, 
+    //             posicao1,
+    //             posicao2,
+    //             posicaoFinal
+    //         ].map(vetor => vetor.toArray());
+            
+    //     }
+
+    // }
+
+
 
     //Adicionar equação 4 horas = 120 graus, onde graus e horas são variáveis
     //Adicionar possibilidade de resolver equação por meios algébricos

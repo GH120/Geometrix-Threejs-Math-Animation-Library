@@ -45,7 +45,6 @@ export class PrimeiraFase extends Fase{
 
         this.outputTesteClick();
 
-
     }
 
     //Objetos básicos
@@ -271,11 +270,13 @@ export class PrimeiraFase extends Fase{
                                         .setDuration(300)
                                         .setOnStart(deletarCaixasDeTexto)
                                         .setCheckpoint(false)
+                                        .setDelay(100)
+                                        .setOnTermino(() => fase.whiteboard.ativar(false))
 
         const animacao = new AnimacaoSequencial(
                             primeiraLinha,
                             gambiarraDeletarEquacoes, 
-                            segundaLinha, 
+                            segundaLinha.filler(30), 
                             terceiraLinha, 
                             quartaLinha
                         )
@@ -345,13 +346,18 @@ export class PrimeiraFase extends Fase{
 
             const adicionarTotal = fase.moverEquacao({
                                     elementoCSS2: todosOsAngulosIguais,
-                                    duration1: 300,
-                                    delayDoMeio: 50
+                                    duration1: 100,
+                                    delayDoMeio: 80,
                                 })
+                                
+            const apagarTotal = apagarCSS2(todosOsAngulosIguais)
+                                .setDuration(50)
+                                .setOnTermino(() => fase.whiteboard.ativar(true));
 
             const animacao = new AnimacaoSequencial(
                                 animacaoApagar.setCheckpoint(false), 
-                                adicionarTotal.setCheckpoint(false)
+                                adicionarTotal.setCheckpoint(false),
+                                apagarTotal.setCheckpoint(false)
                             )
 
             fase.animar(animacao);
@@ -1790,8 +1796,17 @@ export class PrimeiraFase extends Fase{
         if(!equacao){
 
             const novoElemento = document.createElement("div");
-            
+
             novoElemento.innerHTML = elementoCSS2.element.innerHTML;
+
+            novoElemento.style.width = '400px'; // Set width to 200 pixels
+            novoElemento.style.height = '40px'; // Set height to 150 pixels
+            novoElemento.style.top = '10px'; // Set top position to 50 pixels from the top of the parent element
+
+            novoElemento.style.position = 'relative';
+
+            novoElemento.children[0].style.width = '400px';
+            novoElemento.children[0].style.height = 'auto';
 
             equacao = {html: novoElemento}
         }

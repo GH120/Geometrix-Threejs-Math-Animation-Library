@@ -97,8 +97,9 @@ export class Operations{
         options.style.position = 'absolute';
 
         options.style.top = '600px';
-        options.style.left = '25%';
+        options.style.left = '0%';
         options.style.zIndex = 1000;
+        options.style.visibility = 'hidden'; // enquanto não refatoramos, tornar escondida
 
         options.textContent = "opções";
 

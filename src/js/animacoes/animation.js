@@ -432,3 +432,14 @@ export class AnimacaoSequencial extends Animacao{
         return this.animacoes.map(animacao => animacao._calculateFrames() + animacao.delay).reduce((a,b) => a+b,0);
     }
 }
+
+/** Caso seja necessário inicializar a animação só quando começar sua execução
+ *  Efetivamente é como se rodasse tudo no start de uma função
+ */
+export const animacaoIndependente = (funcao,duracao=300, delay=0) =>  new Animacao()
+                                                                .setInterpolacao(() => null)
+                                                                .setUpdateFunction(() => null)
+                                                                .setDuration(duracao)
+                                                                .setOnStart(funcao)
+                                                                .setCheckpoint(false)
+                                                                .setDelay(100)

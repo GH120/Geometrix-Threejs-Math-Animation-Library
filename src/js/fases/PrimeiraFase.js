@@ -4,7 +4,7 @@ import { Poligono } from "../objetos/poligono";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import DesenharPoligono from "../animacoes/DesenharPoligono";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
-import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/animation";
+import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente } from "../animacoes/animation";
 import { colorirAngulo } from "../animacoes/colorirAngulo";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
 import { apagarObjeto } from "../animacoes/apagarObjeto";
@@ -190,20 +190,40 @@ export class PrimeiraFase extends Fase{
         ]
     }
 
-    firstDialogue(){
+    aula1(){
 
         const fase = this;
 
 
+        //Extende o diálogo e divide em vários subproblemas
         const dialogo1 = [
             "Vimos que dois poligonos são semelhantes quando seus ângulos são congruentes",
             "e seus respectivos lados são proporcionais.", 
+            //Juntando esses angulos iguais e lados proporcionais,
+            //Temos semelhança, ou seja, razão entre os dois
+            //Vamos testar isso?
+            //Verifique se os polígonos são semelhantes
             "Como os triângulos são os polígonos mais simples,",
             "também são os mais fáceis de ver se são semelhantes."
         ]
 
-        this.pentagono.addToScene(this.scene);
+        const equacoes = {
+            ladosIguais: ` {\\color{purple} RAZÃO = 
+                            \\frac {{\\color{blue}Lado~Poligono~2}}
+                            {{\\color{red} Lado~Poligono~1}}= \\Large{2}}`,
 
+            angulosIguais: `~{\\color{red}~Todos~Ângulos~ do ~P1} = 
+                            ~{\\color{blue}~Todos~Ângulos~ do~ P2}`,
+
+            compararAngulos: (index, valorDoAngulo) => 
+                            `Ângulo~ {\\color{red}${index + 1}} ~   do ~P1 = 
+                            Ângulo~ {\\color{blue} ${index + 1}} ~ do~ P2 = 
+                            {\\color{purple} ${valorDoAngulo}°} `,
+            
+            
+        }
+
+        this.pentagono.addToScene(this.scene);
         this.pentagono2.addToScene(this.scene);
 
         //Desenhar um polígono pequeno, desenhar outro polígono maior
@@ -232,22 +252,18 @@ export class PrimeiraFase extends Fase{
 
                                 const posicaoDivisao = new THREE.Vector3(4.5 + index*0.1,0,0);
 
-                                return new AnimacaoSimultanea(
+                                const mostrarEquacao = fase.animacaoEscreverRazao(index,lado1,lado2,posicaoDivisao);
 
+                                return new AnimacaoSimultanea(
                                         new Divisao(
                                             lado2,
                                             lado1,
                                             null,
                                             posicaoDivisao
                                         )
-                                        .addToScene(this.scene)
-                                    )
-                                    .setOnStart(
-                                        () => this.animar(
-                                            this.animacaoEscreverRazao(index, lado1, lado2, posicaoDivisao)
-                                        )
-                                    )
-                                        
+                                        .addToScene(this.scene),
+                                        mostrarEquacao
+                                    )              
                              });
 
         //Refinar adicionando contador abaixo da divisão
@@ -263,41 +279,18 @@ export class PrimeiraFase extends Fase{
                                     new ApagarPoligono(this.pentagono2)
                                 )
 
-        const aparecerTriangulos = new AnimacaoSimultanea(
-                                    // new ApagarPoligono(this.triangulo).reverse(), 
-                                    new ApagarPoligono(this.triangulo).reverse()
-                                )
-                                .setOnStart(() => {
-                                    // this.triangulo.addToScene(this.scene);
-                                    this.triangulo.addToScene(this.scene);
-                                })
-
-        const terceiraLinha = new AnimacaoSimultanea(
-                                animarDialogo[2],
-                                apagarPoligonos,
-                                aparecerTriangulos
-                             );
-
-        const quartaLinha   = animarDialogo[3];
-
         // const divisao = new Divisao(this.pentagono2.edges[0], this.pentagono.edges[0], null, new THREE.Vector3(4,-1,0)).addToScene(this.scene);
 
-        const animacaoIndependente = (funcao) =>  new Animacao()
-                                                    .setInterpolacao(() => null)
-                                                    .setUpdateFunction(() => null)
-                                                    .setDuration(300)
-                                                    .setOnStart(funcao)
-                                                    .setCheckpoint(false)
-                                                    .setDelay(100)
-                                                    .setOnTermino(() => fase.whiteboard.ativar(false))
+        //Cada um desses limpa as equações da tela e coloca a equação resultante
+        const TodosOsAngulosIguais = fase.animacaoEquacoesVirandoUmaSo("primeiroDialogo", equacoes.angulosIguais, 3);
+        const TodosOsLadosIguais   = fase.animacaoEquacoesVirandoUmaSo("mostrarRazaoLados", equacoes.ladosIguais, 1);
 
         const animacao = new AnimacaoSequencial(
                             primeiraLinha,
-                            animacaoIndependente(mostrarTodosAngulosIguais), 
-                            segundaLinha.filler(30),
-                            animacaoIndependente(mostrarTodosLadosIguais), 
-                            terceiraLinha.filler(30), 
-                            quartaLinha
+                            TodosOsAngulosIguais,
+                            segundaLinha.filler(100),
+                            TodosOsLadosIguais,
+                            apagarPoligonos
                         )
                         .setOnTermino(() => fase.progresso = 2)
 
@@ -309,12 +302,7 @@ export class PrimeiraFase extends Fase{
 
             const caixaDeTextoMathjax = this.createMathJaxTextBox("", [-5,2 - 0.5*index,0])
 
-            caixaDeTextoMathjax.mudarTexto(
-                `Ângulo~ {\\color{red}${index + 1}} ~   do ~P1 = 
-                 Ângulo~ {\\color{blue} ${index + 1}} ~ do~ P2 = 
-                 {\\color{purple} ${valorDoAngulo}°} `,
-                 2
-            )
+            caixaDeTextoMathjax.mudarTexto(equacoes.compararAngulos(index,valorDoAngulo), 2)
 
             const animacao  = new MostrarTexto(caixaDeTextoMathjax)
                                 .setValorFinal(300)
@@ -331,86 +319,26 @@ export class PrimeiraFase extends Fase{
         }))
 
         this.animar(animacao);
+    }
 
+    aula2(){
 
-        
-        function mostrarTodosAngulosIguais(){
+        // const aparecerTriangulos = new AnimacaoSimultanea(
+        //     // new ApagarPoligono(this.triangulo).reverse(), 
+        //     new ApagarPoligono(this.triangulo).reverse()
+        // )
+        // .setOnStart(() => {
+        //     // this.triangulo.addToScene(this.scene);
+        //     this.triangulo.addToScene(this.scene);
+        // })
 
+        // const terceiraLinha = new AnimacaoSimultanea(
+        //         animarDialogo[2],
+        //         apagarPoligonos,
+        //         aparecerTriangulos
+        //     );
 
-            const apagarCaixasDeTexto = fase.textBoxes.primeiroDialogo
-                                                      .map(caixa => apagarCSS2(caixa, fase.scene));
-
-            const animacaoApagar = new AnimacaoSimultanea().setAnimacoes(apagarCaixasDeTexto);
-
-            const todosOsAngulosIguais = fase.createMathJaxTextBox("", [-4,1,0])
-
-            todosOsAngulosIguais.mudarTexto(
-                `~{\\color{red}~Todos~Ângulos~ do ~P1} = 
-                ~{\\color{blue}~Todos~Ângulos~ do~ P2}`,
-                 3
-            )
-
-            const adicionarTotal = fase.moverEquacao({
-                                    elementoCSS2: todosOsAngulosIguais,
-                                    duration1: 100,
-                                    duration2: 80,
-                                    spline: [
-                                        new THREE.Vector3(-4.05, 0.8, 0),
-                                        new THREE.Vector3(-3.95, 0, 0),
-                                    ],
-                                    delayDoMeio: 50,
-                                })
-                                
-            const apagarTotal = apagarCSS2(todosOsAngulosIguais, fase.scene)
-                                .setDuration(50)
-
-            const animacao = new AnimacaoSequencial(
-                                animacaoApagar.setCheckpoint(false), 
-                                adicionarTotal.setCheckpoint(false),
-                                apagarTotal.setCheckpoint(false)
-                            )
-
-            fase.animar(animacao);
-        }
-
-        function mostrarTodosLadosIguais(){
-
-            const apagarCaixasDeTexto = fase.textBoxes.mostrarRazaoLados
-                                                      .map(caixa => apagarCSS2(caixa, fase.scene));
-
-            const animacaoApagar = new AnimacaoSimultanea().setAnimacoes(apagarCaixasDeTexto);
-
-            const todosOsLadosIguais = fase.createMathJaxTextBox("", [-4,1,0])
-
-            todosOsLadosIguais.mudarTexto(
-                ` {\\color{purple} RAZÃO = 
-                \\frac {{\\color{blue}Lado~Poligono~2}}
-                {{\\color{red} Lado~Poligono~1}}= \\Large{2}}`,
-                1
-            )
-
-            const adicionarTotal = fase.moverEquacao({
-                                    elementoCSS2: todosOsLadosIguais,
-                                    duration1: 100,
-                                    duration2: 80,
-                                    spline: [
-                                        new THREE.Vector3(-4.05, 0.8, 0),
-                                        new THREE.Vector3(-3.95, 0, 0),
-                                    ],
-                                    delayDoMeio: 50,
-                                })
-                                
-            const apagarTotal = apagarCSS2(todosOsLadosIguais, fase.scene)
-                                .setDuration(50)
-
-            const animacao = new AnimacaoSequencial(
-                                animacaoApagar.setCheckpoint(false), 
-                                adicionarTotal.setCheckpoint(false),
-                                apagarTotal.setCheckpoint(false)
-                            )
-
-            fase.animar(animacao);
-        }
+        // const quartaLinha   = animarDialogo[3];
     }
 
     secondDialogue(){
@@ -2009,88 +1937,143 @@ export class PrimeiraFase extends Fase{
 
     }
 
+    //ANIMAÇÃO ASSINCRONA (processa os dados de entrada apenas em sua execução)
     animacaoEscreverRazao(index, lado1, lado2, offset = new THREE.Vector3(0,0,0)){
 
-        const caixaDeTextoMathjax = this.createMathJaxTextBox("", offset.clone().add(new THREE.Vector3(1.72,0,0)).toArray())
+        const fase = this;
 
-        //Animação que mostra inicialmente a equação aparecendo
-        const mostrarEquacao  = new MostrarTexto(caixaDeTextoMathjax)
-                                .setValorFinal(300)
-                                .setProgresso(0)
-                                .setDelay(50)
-                                .setDuration(200)
-                                .setValorFinal(3000)
-                                .setOnStart(() => {
+        function escreverRazao(){
 
-                                    const comprimento1 = Math.floor(lado1.length*100)/100;
-                                    const comprimento2 = Math.round(lado2.length*100)/100;
+            const caixaDeTextoMathjax = fase.createMathJaxTextBox("", offset.clone().add(new THREE.Vector3(1.8,0,0)).toArray())
 
-                                    caixaDeTextoMathjax.mudarTexto(
-                                        ` {\\color{purple} RAZÃO = 
-                                            \\frac {{\\color{blue}Lado~ ${index + 1}}}
-                                            {{\\color{red} Lado~ ${index + 1}}}  = 
-                                            \\frac {{\\color{blue}${comprimento2}}}
-                                            {{\\color{red}${comprimento1}}} = \\large{2}}`,
-                                            0.4
-                                    )
+            //Animação que mostra inicialmente a equação aparecendo
+            const mostrarEquacao  = new MostrarTexto(caixaDeTextoMathjax)
+                                    .setValorFinal(300)
+                                    .setProgresso(0)
+                                    .setDelay(50)
+                                    .setDuration(200)
+                                    .setValorFinal(3000)
+                                    .setOnStart(() => {
 
-                                    this.scene.add(caixaDeTextoMathjax)
+                                        const comprimento1 = Math.floor(lado1.length*100)/100;
+                                        const comprimento2 = Math.round(lado2.length*100)/100;
+
+                                        caixaDeTextoMathjax.mudarTexto(
+                                            ` {\\color{purple} RAZÃO = 
+                                                \\frac {{\\color{blue}Lado~ ${index + 1}}}
+                                                {{\\color{red} Lado~ ${index + 1}}}  = 
+                                                \\frac {{\\color{blue}${comprimento2}}}
+                                                {{\\color{red}${comprimento1}}} = \\large{2}}`,
+                                                0.4
+                                        )
+
+                                        fase.scene.add(caixaDeTextoMathjax)
+                                    })
+
+            //Move para o canto esquerdo a equação depois de terminada animação principal
+            const moverEquacao = new MoverTexto(caixaDeTextoMathjax)
+                                    .setOnStart(function(){
+
+
+
+                                        this.setSpline([
+                                            caixaDeTextoMathjax.position.clone(),
+                                            new THREE.Vector3(0, -3.5, 0),
+                                            new THREE.Vector3(-3, -2, 0),
+                                            new THREE.Vector3(-5, 1 - 0.5*index, 0)
+                                        ])
+
+                                        // fase.whiteboard.equationList.children[0].style.display = "none"
+                                        
+
+                                    })
+                                    .setDuration(200)
+
+            //Chaves matemáticas que cobrem os dois lados
+            const chaves = new Bracket(
+                -0.2, 
+                offset.clone()
+                .add(
+                    new THREE.Vector3(0.5,lado2.length/2,0)
+                ),
+                offset.clone()
+                .add(
+                    new THREE.Vector3(0.5,-lado2.length/2,0)
+                ),
+                )
+
+            chaves.scene = fase.scene;
+
+            const desenharChave = chaves.animacao()
+
+
+            const animacao = new AnimacaoSequencial(
+                                new AnimacaoSimultanea(
+                                    mostrarEquacao.filler(30),
+                                    desenharChave.setDelay(30)
+                                ),
+                                moverEquacao
+                            )
+                            .filler(75)
+                            .setCheckpoint(false);
+
+            
+            //Adiciona essa caixa de texto as caixas de texto ativas
+            if(!fase.textBoxes.mostrarRazaoLados) fase.textBoxes.mostrarRazaoLados = [];
+
+            fase.textBoxes.mostrarRazaoLados.push(caixaDeTextoMathjax);
+
+            
+            fase.animar(animacao)
+        }
+
+        return animacaoIndependente(escreverRazao);
+    }
+
+    //ANIMAÇÃO ASSINCRONA (processa os dados de entrada apenas em sua execução)
+    animacaoEquacoesVirandoUmaSo(nomeCaixasDeTexto, texto, tamanhoDaFonte){
+
+        const fase = this;
+
+        function equacoesVirandoUmaSo(){
+
+            const caixasDeTexto = fase.textBoxes[nomeCaixasDeTexto];
+
+            const apagarCaixasDeTexto = new AnimacaoSimultanea()
+                                        .setAnimacoes(
+                                            caixasDeTexto.map(caixa => apagarCSS2(caixa, fase.scene))
+                                        );
+
+            const todosOsLadosIguais = fase.createMathJaxTextBox("", [-4,1,0])
+
+            todosOsLadosIguais.mudarTexto(texto, tamanhoDaFonte);
+
+            const adicionarTotal = fase.moverEquacao({
+                                    elementoCSS2: todosOsLadosIguais,
+                                    duration1: 100,
+                                    duration2: 80,
+                                    spline: [
+                                        new THREE.Vector3(-4.05, 0.8, 0),
+                                        new THREE.Vector3(-3.95, 0, 0),
+                                    ],
+                                    delayDoMeio: 50,
                                 })
+                                
+            const apagarTotal = apagarCSS2(todosOsLadosIguais, fase.scene)
+                                .setDuration(50)
 
-        //Move para o canto esquerdo a equação depois de terminada animação principal
-        const moverEquacao = new MoverTexto(caixaDeTextoMathjax)
-                                .setOnStart(function(){
+            const animacao = new AnimacaoSequencial(
+                                apagarCaixasDeTexto.setCheckpoint(false), 
+                                adicionarTotal.setCheckpoint(false),
+                                apagarTotal.setCheckpoint(false)
+                            )
+                            .setOnTermino(() => fase.whiteboard.ativar(false))
 
-
-
-                                    this.setSpline([
-                                        caixaDeTextoMathjax.position.clone(),
-                                        new THREE.Vector3(0, -3.5, 0),
-                                        new THREE.Vector3(-3, -2, 0),
-                                        new THREE.Vector3(-5, 1 - 0.5*index, 0)
-                                    ])
-
-                                    // fase.whiteboard.equationList.children[0].style.display = "none"
-                                    
-
-                                })
-                                .setDuration(200)
-
-        //Chaves matemáticas que cobrem os dois lados
-        const chaves = new Bracket(
-            -0.2, 
-            offset.clone()
-            .add(
-                new THREE.Vector3(0.5,lado2.length/2,0)
-            ),
-            offset.clone()
-            .add(
-                new THREE.Vector3(0.5,-lado2.length/2,0)
-            ),
-            )
-
-        chaves.scene = this.scene;
-
-        const desenharChave = chaves.animacao()
+            fase.animar(animacao);
+        }
 
 
-        const animacao = new AnimacaoSequencial(
-                            new AnimacaoSimultanea(
-                                mostrarEquacao.filler(30),
-                                desenharChave.setDelay(30)
-                            ),
-                            moverEquacao
-                        )
-                        .filler(75)
-                        .setCheckpoint(false);
-
-        
-        //Adiciona essa caixa de texto as caixas de texto ativas
-        if(!this.textBoxes.mostrarRazaoLados) this.textBoxes.mostrarRazaoLados = [];
-
-        this.textBoxes.mostrarRazaoLados.push(caixaDeTextoMathjax);
-
-        return animacao;
+        return animacaoIndependente(equacoesVirandoUmaSo);
     }
 
     //Fazer depois
@@ -2168,7 +2151,7 @@ export class PrimeiraFase extends Fase{
 
             consequencia(fase){
 
-               fase.firstDialogue();
+               fase.aula1();
             }
         },
 

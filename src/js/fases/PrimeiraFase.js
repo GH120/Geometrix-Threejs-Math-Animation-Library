@@ -25,6 +25,7 @@ import MoverTexto from "../animacoes/moverTexto";
 import { Addition, Equality, Value, Variable } from "../equations/expressions";
 import MostrarTexto from "../animacoes/MostrarTexto";
 import { Operations } from "../equations/operations";
+import Bracket from "../objetos/bracket";
 
 export class PrimeiraFase extends Fase{
 
@@ -229,7 +230,20 @@ export class PrimeiraFase extends Fase{
 
                                 const lado2 = this.pentagono2.edges[index];
 
-                                return new Divisao(lado2,lado1,null,new THREE.Vector3(4.5 + index*0.5,0,0)).addToScene(this.scene);
+                                const posicaoDivisao = new THREE.Vector3(4.5 + index*0.5,0,0);
+
+                                return new AnimacaoSimultanea(
+
+                                        new Divisao(
+                                            lado2,
+                                            lado1,
+                                            null,
+                                            posicaoDivisao
+                                        )
+                                        .addToScene(this.scene)
+                                    )
+                                    .setOnStart(() => this.animar(this.animacaoDesenharChaves(lado2, posicaoDivisao)))
+                                        
                              });
 
         //Refinar adicionando contador abaixo da divisão
@@ -347,12 +361,16 @@ export class PrimeiraFase extends Fase{
             const adicionarTotal = fase.moverEquacao({
                                     elementoCSS2: todosOsAngulosIguais,
                                     duration1: 100,
-                                    delayDoMeio: 80,
+                                    duration2: 80,
+                                    spline: [
+                                        new THREE.Vector3(-4.05, 0.8, 0),
+                                        new THREE.Vector3(-3.95, 0, 0),
+                                    ],
+                                    delayDoMeio: 50,
                                 })
                                 
             const apagarTotal = apagarCSS2(todosOsAngulosIguais)
                                 .setDuration(50)
-                                .setOnTermino(() => fase.whiteboard.ativar(true));
 
             const animacao = new AnimacaoSequencial(
                                 animacaoApagar.setCheckpoint(false), 
@@ -1341,10 +1359,10 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
         // super.update();
         // super.update();
         // super.update();
@@ -1871,7 +1889,7 @@ export class PrimeiraFase extends Fase{
 
         const animacao = new AnimacaoSequencial( 
                             mostrarTexto, 
-                            // moverEquacaoParaDiv
+                            moverEquacaoParaDiv
                         )
 
         animacao.setCheckpoint(false);
@@ -1958,6 +1976,28 @@ export class PrimeiraFase extends Fase{
                     : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
                })
 
+    }
+
+    animacaoDesenharChaves(lado, offset = new THREE.Vector3(0,0,0)){
+
+        
+        const chaves = new Bracket(
+            -0.2, 
+            offset.clone()
+            .add(
+                new THREE.Vector3(0.5,lado.length/2,0)
+            ),
+            offset.clone()
+            .add(
+                new THREE.Vector3(0.5,-lado.length/2,0)
+            ),
+            )
+
+        chaves.scene = this.scene;
+
+        return chaves.animacao()
+                     .setDelay(200)
+                     .setOnTermino(() => console.log(this.scene.children))
     }
 
     //Fazer depois

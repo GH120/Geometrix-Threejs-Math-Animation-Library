@@ -9,8 +9,13 @@ export default class Bracket extends Objeto{
 
       super();
 
-      ponto1 = new THREE.Vector3(...ponto1);
-      ponto2 = new THREE.Vector3(...ponto2);
+      const ponto1Array = ponto1[0];
+      const ponto2Array = ponto2[0];
+
+      if(ponto1Array) ponto1 = new THREE.Vector3(...ponto1);
+      if(ponto2Array) ponto2 = new THREE.Vector3(...ponto2);
+
+      console.log(ponto1,ponto2)
 
       this.largura = ponto1.clone().sub(ponto2).length()*0.5;
 
@@ -106,6 +111,7 @@ export default class Bracket extends Objeto{
                     new DesenharMalha(linhaCima, this.scene)
               )
               .setOnTermino(() => this.scene.remove(this.mesh))
+              .setCheckpoint(false)
 
   }
 

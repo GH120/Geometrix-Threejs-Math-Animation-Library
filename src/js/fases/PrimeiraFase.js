@@ -39,7 +39,6 @@ export class PrimeiraFase extends Fase{
 
         this.progresso = 0;
         this.textBoxes = {};
-        this.operadores = new Operations(null,this);
 
         this.setupObjects();
         this.createInputs();
@@ -1351,11 +1350,11 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
         // super.update();
         // super.update();
         // super.update();
@@ -1988,7 +1987,6 @@ export class PrimeiraFase extends Fase{
         chaves.scene = this.scene;
 
         const desenharChave = chaves.animacao()
-                                    .setDelay(200);
 
         const caixaDeTextoMathjax = this.createMathJaxTextBox("", offset.clone().add(new THREE.Vector3(1.65,0,0)).toArray())
 
@@ -2178,13 +2176,6 @@ export class PrimeiraFase extends Fase{
                 fase.animar(fase.dialogo3());
             },
         }
-    }
-
-    appendOperadoresAJanelaEquacao(equationWindow){
-        
-        const selecionador = this.operadores.getOptions();
-
-        equationWindow.appendChild(selecionador);
     }
 
 

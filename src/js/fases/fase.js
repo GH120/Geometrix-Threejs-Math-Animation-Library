@@ -24,6 +24,7 @@ import { SVG } from 'mathjax-full/js/output/svg.js';
 import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor.js';
 import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
 import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages'
+import { Operations } from '../equations/operations';
 
 export class Fase {
 
@@ -73,6 +74,8 @@ export class Fase {
         this.animacoes = [];
         this.objetos = [];
         this.animationControler = new AnimationControler(null,this,null,null,null);
+        this.operadores = new Operations(null,this);
+
     }
     
 
@@ -426,5 +429,13 @@ export class Fase {
         
         this.scene.add(plano);
     }
+
+    appendOperadoresAJanelaEquacao(equationWindow){
+        
+        const selecionador = this.operadores.getOptions();
+
+        equationWindow.appendChild(selecionador);
+    }
+
 
 }

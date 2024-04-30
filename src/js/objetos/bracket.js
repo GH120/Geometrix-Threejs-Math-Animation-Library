@@ -110,7 +110,10 @@ export default class Bracket extends Objeto{
                     new DesenharMalha(linhaBaixo,this.scene).reverse(),
                     new DesenharMalha(linhaCima, this.scene)
               )
-              .setOnTermino(() => this.scene.remove(this.mesh))
+              .setOnTermino(() =>{
+                console.log(this.scene.remove(linhaCima));
+                console.log(this.scene.remove(linhaBaixo));
+              })
               .setCheckpoint(false)
 
   }

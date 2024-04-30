@@ -26,6 +26,7 @@ import { Addition, Equality, Value, Variable } from "../equations/expressions";
 import MostrarTexto from "../animacoes/MostrarTexto";
 import { Operations } from "../equations/operations";
 import Bracket from "../objetos/bracket";
+import {apagarCSS2} from "../animacoes/apagarCSS2";
 
 export class PrimeiraFase extends Fase{
 
@@ -230,7 +231,7 @@ export class PrimeiraFase extends Fase{
 
                                 const lado2 = this.pentagono2.edges[index];
 
-                                const posicaoDivisao = new THREE.Vector3(4.5 + index*0.5,0,0);
+                                const posicaoDivisao = new THREE.Vector3(4.5 + index*0.1,0,0);
 
                                 return new AnimacaoSimultanea(
 
@@ -242,7 +243,11 @@ export class PrimeiraFase extends Fase{
                                         )
                                         .addToScene(this.scene)
                                     )
-                                    .setOnStart(() => this.animar(this.animacaoDesenharChaves(lado2, posicaoDivisao)))
+                                    .setOnStart(
+                                        () => this.animar(
+                                            this.animacaoEscreverRazao(index, lado1, lado2, posicaoDivisao)
+                                        )
+                                    )
                                         
                              });
 
@@ -332,21 +337,8 @@ export class PrimeiraFase extends Fase{
         function deletarCaixasDeTexto(){
 
 
-            const apagarCSS2 = (texto) => new Animacao()
-                                        .setValorInicial(1)
-                                        .setValorFinal(0)
-                                        .setInterpolacao((a,b,c) => a*(1-c) + b*c)
-                                        .setUpdateFunction(function(valor){
-                                            texto.element.style.opacity = valor;
-
-                                            console.log(valor, texto.element.style.opacity)
-                                        })
-                                        .voltarAoInicio(false)
-                                        .setOnTermino(() => fase.scene.remove(texto))
-                                        .setDuration(30)
-
             const apagarCaixasDeTexto = fase.textBoxes.primeiroDialogo
-                                                      .map(caixa => apagarCSS2(caixa));
+                                                      .map(caixa => apagarCSS2(caixa, fase.scene));
 
             const animacaoApagar = new AnimacaoSimultanea().setAnimacoes(apagarCaixasDeTexto);
 
@@ -369,7 +361,7 @@ export class PrimeiraFase extends Fase{
                                     delayDoMeio: 50,
                                 })
                                 
-            const apagarTotal = apagarCSS2(todosOsAngulosIguais)
+            const apagarTotal = apagarCSS2(todosOsAngulosIguais, fase.scene)
                                 .setDuration(50)
 
             const animacao = new AnimacaoSequencial(
@@ -1359,10 +1351,10 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
         // super.update();
         // super.update();
         // super.update();
@@ -1978,26 +1970,77 @@ export class PrimeiraFase extends Fase{
 
     }
 
-    animacaoDesenharChaves(lado, offset = new THREE.Vector3(0,0,0)){
+    animacaoEscreverRazao(index, lado1, lado2, offset = new THREE.Vector3(0,0,0)){
 
         
         const chaves = new Bracket(
             -0.2, 
             offset.clone()
             .add(
-                new THREE.Vector3(0.5,lado.length/2,0)
+                new THREE.Vector3(0.5,lado2.length/2,0)
             ),
             offset.clone()
             .add(
-                new THREE.Vector3(0.5,-lado.length/2,0)
+                new THREE.Vector3(0.5,-lado2.length/2,0)
             ),
             )
 
         chaves.scene = this.scene;
 
-        return chaves.animacao()
-                     .setDelay(200)
-                     .setOnTermino(() => console.log(this.scene.children))
+        const desenharChave = chaves.animacao()
+                                    .setDelay(200);
+
+        const caixaDeTextoMathjax = this.createMathJaxTextBox("", offset.clone().add(new THREE.Vector3(1.6,0,0)).toArray())
+
+        const mostrarEquacao  = new MostrarTexto(caixaDeTextoMathjax)
+                            .setValorFinal(300)
+                            .setProgresso(0)
+                            .setDelay(50)
+                            .setDuration(200)
+                            .setValorFinal(3000)
+                            .setOnStart(() => {
+
+                                const comprimento1 = Math.round(lado1.length*100)/100;
+                                const comprimento2 = Math.round(lado2.length*100)/100;
+
+                                caixaDeTextoMathjax.mudarTexto(
+                                    ` {\\color{purple} RAZÃO = 
+                                        \\frac {{\\color{red}Lado~ ${index + 1}}}
+                                         {{\\color{blue} Lado~ ${index + 1}}}  = 
+                                         \\frac {{\\color{red}${comprimento2}}}
+                                         {{\\color{blue}${comprimento1}}} = 2}`,
+                                        0.4
+                                )
+
+                                this.scene.add(caixaDeTextoMathjax)
+                            })
+
+
+        const moverEquacao = new MoverTexto(caixaDeTextoMathjax)
+                                .setOnStart(function(){
+
+
+
+                                    this.setSpline([
+                                        caixaDeTextoMathjax.position.clone(),
+                                        new THREE.Vector3(0, -5, 0),
+                                        new THREE.Vector3(-2, -3, 0),
+                                        new THREE.Vector3(-5, 1 - 0.5*index, 0)
+                                    ])
+
+                                    // fase.whiteboard.equationList.children[0].style.display = "none"
+                                    
+
+                                })
+                                .setDuration(200)
+
+
+        const animacao = new AnimacaoSimultanea(
+            mostrarEquacao,
+            desenharChave
+        )
+
+        return new AnimacaoSequencial(animacao,moverEquacao);
     }
 
     //Fazer depois

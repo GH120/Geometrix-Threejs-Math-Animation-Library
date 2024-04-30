@@ -37,6 +37,8 @@ export default class MoverTexto extends Animacao{
     setSpline( splinePoints){
 
         this.spline = new THREE.CatmullRomCurve3(splinePoints);
+
+        return this;
     }
 
     setText(elementoTexto){

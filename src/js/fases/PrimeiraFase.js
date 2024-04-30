@@ -248,32 +248,14 @@ export class PrimeiraFase extends Fase{
                               )
 
 
-        const dividirLados = this.pentagono.edges.map((lado1,index) => {
-
-                                const lado2 = this.pentagono2.edges[index];
-
-                                const posicaoDivisao = new THREE.Vector3(4.5 + index*0.1,0,0);
-
-                                const mostrarEquacao = fase.animacaoEscreverRazao(index,lado1,lado2,posicaoDivisao);
-
-                                return new AnimacaoSimultanea(
-                                        new Divisao(
-                                            lado2,
-                                            lado1,
-                                            null,
-                                            posicaoDivisao
-                                        )
-                                        .addToScene(this.scene),
-                                        mostrarEquacao
-                                    )              
-                             });
+        const dividirLados = this.animacaoDividirLadosIguais(this.pentagono, this.pentagono2);
 
         //Refinar adicionando contador abaixo da divisão
         //Todos eles vão contar para 2
         //Mostrar isso como a proporção de semelhança entre as duas figuras
         const segundaLinha = new AnimacaoSimultanea(
                                 animarDialogo[1],
-                                new AnimacaoSequencial().setAnimacoes(dividirLados).recalculateFrames()
+                                dividirLados
                             );
 
         const apagarPoligonos = new AnimacaoSimultanea(
@@ -1458,6 +1440,33 @@ export class PrimeiraFase extends Fase{
                 .setCheckpoint(false)
     }
 
+    animacaoDividirLadosIguais(poligono1, poligono2){
+
+        const fase = this;
+
+        const dividirLados = poligono1.edges.map((lado1,index) => {
+
+            const lado2 = poligono2.edges[index];
+
+            const posicaoDivisao = new THREE.Vector3(4.5 + index*0.1,0,0);
+
+            const mostrarEquacao = fase.animacaoEscreverRazao(index,lado1,lado2,posicaoDivisao);
+
+            return new AnimacaoSimultanea(
+                    new Divisao(
+                        lado2,
+                        lado1,
+                        null,
+                        posicaoDivisao
+                    )
+                    .addToScene(this.scene),
+                    mostrarEquacao
+                )              
+         });
+
+         return new AnimacaoSequencial().setAnimacoes(dividirLados)
+    }
+
     mostrarEApagar180Graus(vertice){
 
         const fase = this;
@@ -2043,7 +2052,7 @@ export class PrimeiraFase extends Fase{
     }
 
     //ANIMAÇÃO ASSINCRONA (processa os dados de entrada apenas em sua execução)
-    animacaoEquacoesVirandoUmaSo(nomeCaixasDeTexto, texto, tamanhoDaFonte){
+    animacaoEquacoesVirandoUmaSo(nomeCaixasDeTexto, texto, tamanhoDaFonte, posicaoTexto=[-4,1,0]){
 
         const fase = this;
 
@@ -2057,7 +2066,7 @@ export class PrimeiraFase extends Fase{
                                             caixasDeTexto.map(caixa => apagarCSS2(caixa, fase.scene))
                                         );
 
-            const todosOsLadosIguais = fase.createMathJaxTextBox("", [-4,1,0])
+            const todosOsLadosIguais = fase.createMathJaxTextBox("", posicaoTexto)
 
             todosOsLadosIguais.mudarTexto(texto, tamanhoDaFonte);
 

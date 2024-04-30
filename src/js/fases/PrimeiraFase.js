@@ -384,8 +384,8 @@ export class PrimeiraFase extends Fase{
 
             todosOsLadosIguais.mudarTexto(
                 ` {\\color{purple} RAZÃO = 
-                \\frac {{\\color{red}Lado~Poligono~1}}
-                {{\\color{blue} Lado~Poligono~2}}= \\Large{2}}`,
+                \\frac {{\\color{blue}Lado~Poligono~2}}
+                {{\\color{red} Lado~Poligono~1}}= \\Large{2}}`,
                 1
             )
 
@@ -1390,11 +1390,11 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
         // super.update();
         // super.update();
         // super.update();
@@ -2011,7 +2011,7 @@ export class PrimeiraFase extends Fase{
 
     animacaoEscreverRazao(index, lado1, lado2, offset = new THREE.Vector3(0,0,0)){
 
-        const caixaDeTextoMathjax = this.createMathJaxTextBox("", offset.clone().add(new THREE.Vector3(1.65,0,0)).toArray())
+        const caixaDeTextoMathjax = this.createMathJaxTextBox("", offset.clone().add(new THREE.Vector3(1.72,0,0)).toArray())
 
         //Animação que mostra inicialmente a equação aparecendo
         const mostrarEquacao  = new MostrarTexto(caixaDeTextoMathjax)
@@ -2027,10 +2027,10 @@ export class PrimeiraFase extends Fase{
 
                                     caixaDeTextoMathjax.mudarTexto(
                                         ` {\\color{purple} RAZÃO = 
-                                            \\frac {{\\color{red}Lado~ ${index + 1}}}
-                                            {{\\color{blue} Lado~ ${index + 1}}}  = 
-                                            \\frac {{\\color{red}${comprimento2}}}
-                                            {{\\color{blue}${comprimento1}}} = \\large{2}}`,
+                                            \\frac {{\\color{blue}Lado~ ${index + 1}}}
+                                            {{\\color{red} Lado~ ${index + 1}}}  = 
+                                            \\frac {{\\color{blue}${comprimento2}}}
+                                            {{\\color{red}${comprimento1}}} = \\large{2}}`,
                                             0.4
                                     )
 
@@ -2076,11 +2076,12 @@ export class PrimeiraFase extends Fase{
 
         const animacao = new AnimacaoSequencial(
                             new AnimacaoSimultanea(
-                                mostrarEquacao,
-                                desenharChave
+                                mostrarEquacao.filler(30),
+                                desenharChave.setDelay(30)
                             ),
                             moverEquacao
                         )
+                        .filler(75)
                         .setCheckpoint(false);
 
         

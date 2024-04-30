@@ -122,7 +122,7 @@ export default class Animacao {
         this.onDelay();
 
         //Parte do delay
-        for(let frame = this.frames; frame < this.frames + this.delay; frame++){
+        for(let frame = this.frames; frame <= this.frames + this.delay; frame++){
 
             this.frame = frame;
 
@@ -208,6 +208,7 @@ export default class Animacao {
     }
 }
 
+//BUG A CONSERTAR: MANTER EXECUÇÃO TODOS
 export class AnimacaoSimultanea extends Animacao{
 
     //** Aceita um spread de animações do tipo (anim1,anim2,anim3), MAS NÃO UMA LISTA [anim1,anim2,anim3] */
@@ -215,7 +216,7 @@ export class AnimacaoSimultanea extends Animacao{
         super();
 
         this.animacoes = animacoes;
-        this.frames = animacoes.map(animacao => animacao.frames).reduce((maior, atual) => (maior > atual)? maior : atual,0);
+        this.frames = animacoes.map(animacao => animacao.frames + animacao.delay).reduce((maior, atual) => (maior > atual)? maior : atual,0);
 
         //Todas as animações vão manter sua execução até o termino dessa
         //Revisar isso depois
@@ -318,7 +319,7 @@ export class AnimacaoSequencial extends Animacao{
         this.animacoes = animacoes;
 
         this.frames = animacoes.map(animacao => animacao.frames + animacao.delay)
-                               .reduce((acumulado, atual) => acumulado + atual, 0);
+                               .reduce((acumulado, atual) => acumulado + atual, 0) + 1;
 
         // this.manterExecucaoTodos(false);
     }
@@ -349,18 +350,22 @@ export class AnimacaoSequencial extends Animacao{
             this.subAnimacaoAtual = animacao;
 
             //Retorna um por um os frames da animação atual
-            for(let i = 0; i <= animacao.frames + animacao.delay; i++){
+            for(let i = 0; i < animacao.frames + animacao.delay; i++){
 
                 this.frame++;
 
                 while (this.pause) yield this.frame;
 
                 yield action.next();
+
+                if(this.nome == "SELECIONADO") console.log(i, animacao.frames + animacao.delay)
             }
 
+            //Com dois desses por algum motivo funciona
+            action.next();
             action.next();
 
-
+            if(this.nome == "SELECIONADO") console.log("sucesso")
 
             // // //Quando terminada, adicionar as completadas
             // completedActions.push(action);
@@ -368,6 +373,9 @@ export class AnimacaoSequencial extends Animacao{
             // //Mantém a execução opcionalmente das animações completas
             // completedActions.map(completed => completed.next());
         }
+
+        if(this.nome == "SELECIONADO") console.log("sucesso2")
+        
 
         //Mantém a execução do frame final de todas as animações
         while(this.manter){
@@ -380,6 +388,7 @@ export class AnimacaoSequencial extends Animacao{
         completedActions.map(action => action.next());
 
         this.onTermino();
+
     }
 
     //** Quando for colocar uma lista de animações [anim1,anim2,anim3,anim4...] ao invés de um spread */

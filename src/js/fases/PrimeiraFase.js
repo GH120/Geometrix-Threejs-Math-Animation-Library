@@ -238,7 +238,9 @@ export class PrimeiraFase extends Fase{
                                     new DesenharPoligono(this.pentagono2).filler(50)
                                   );
 
-        const mostrarAngulos = this.mostrarGrausHighlightAngulos(this.pentagono,this.pentagono2);
+        //Mostra os Angulos iguais em cada poligono
+        //Escreve equação de igualdade do ângulo ao mesmo tempo
+        const mostrarAngulos = this.animacaoColorirAngulosIguais(this.pentagono,this.pentagono2, equacoes);
 
         const primeiraLinha = new AnimacaoSequencial(
                                     new AnimacaoSimultanea(animarDialogo[0], desenharPoligonos), 
@@ -279,8 +281,6 @@ export class PrimeiraFase extends Fase{
                                     new ApagarPoligono(this.pentagono2)
                                 )
 
-        // const divisao = new Divisao(this.pentagono2.edges[0], this.pentagono.edges[0], null, new THREE.Vector3(4,-1,0)).addToScene(this.scene);
-
         //Cada um desses limpa as equações da tela e coloca a equação resultante
         const TodosOsAngulosIguais = fase.animacaoEquacoesVirandoUmaSo("primeiroDialogo", equacoes.angulosIguais, 3);
         const TodosOsLadosIguais   = fase.animacaoEquacoesVirandoUmaSo("mostrarRazaoLados", equacoes.ladosIguais, 1);
@@ -293,30 +293,6 @@ export class PrimeiraFase extends Fase{
                             apagarPoligonos
                         )
                         .setOnTermino(() => fase.progresso = 2)
-
-        
-         //Modifica a equação mostrada ao lado toda vez que iniciar um novo mostrarAngulo
-         mostrarAngulos.animacoes.forEach((mostrarAngulo,index) => mostrarAngulo.setOnStart(() =>{
-
-            const valorDoAngulo = Math.round(this.pentagono.angles[index].degrees);
-
-            const caixaDeTextoMathjax = this.createMathJaxTextBox("", [-5,2 - 0.5*index,0])
-
-            caixaDeTextoMathjax.mudarTexto(equacoes.compararAngulos(index,valorDoAngulo), 2)
-
-            const animacao  = new MostrarTexto(caixaDeTextoMathjax)
-                                .setValorFinal(300)
-                                .setProgresso(0)
-                                .setDelay(50)
-                                .setDuration(200)
-                                .setValorFinal(3000)
-                                .setOnStart(() => fase.scene.add(caixaDeTextoMathjax))
-
-            this.animar(animacao)
-
-            //Adiciona as textboxes ativas da fase
-            this.textBoxes.primeiroDialogo.push(caixaDeTextoMathjax);
-        }))
 
         this.animar(animacao);
     }
@@ -1318,9 +1294,9 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        // super.update();
-        // super.update();
-        // super.update();
+        super.update();
+        super.update();
+        super.update();
         // super.update();
         // super.update();
         // super.update();
@@ -1396,11 +1372,13 @@ export class PrimeiraFase extends Fase{
                                     .setValorInicial(0xff0000)
                                     .setValorFinal(0xaa00aa)
                                     .setDuration(20)
-                                    .setDelay(40),
+                                    .setDelay(40)
+                                    .voltarAoInicio(false),
                                     colorirAngulo(angulo)
                                     .setValorInicial(0xaa00aa)
                                     .setValorFinal(0xff0000)
                                     .setDuration(20))
+                                    .voltarAoInicio(false)
     }
 
     mostrarGrausAparecendo(angle, updateMostrarAnguloCadaFrame = false, mostrarEdesaparecer=true){
@@ -1454,10 +1432,11 @@ export class PrimeiraFase extends Fase{
                     .setOnStart(() => null)
     }
 
-    mostrarGrausHighlightAngulos(poligono1,poligono2){
+    animacaoColorirAngulosIguais(poligono1,poligono2, equacoes){
 
         //Uma série de animações sequenciais
         //Onde para cada angulo do polígono1, um angulo do polígono 2 também sofre highlight ao mesmo tempo
+        //Escreve a equação de igualdade dos dois ângulos na esquerda
         return new AnimacaoSequencial()
                .setAnimacoes(
                     poligono1.angles
@@ -1470,10 +1449,13 @@ export class PrimeiraFase extends Fase{
                             this.highlightColorirAngulo(angle1), 
                             this.highlightColorirAngulo(angle2),
                             this.mostrarGrausAparecendo(angle1).setDuration(80),
-                            this.mostrarGrausAparecendo(angle2).setDuration(80)
+                            this.mostrarGrausAparecendo(angle2).setDuration(80),
+                            this.animacaoEscreverIgualdadeAngulos(equacoes, index) //Escreve a equação de igualdade
                         )
+                        .manterExecucaoTodos(false)
                     })
                 )
+                .setCheckpoint(false)
     }
 
     mostrarEApagar180Graus(vertice){
@@ -1938,6 +1920,36 @@ export class PrimeiraFase extends Fase{
     }
 
     //ANIMAÇÃO ASSINCRONA (processa os dados de entrada apenas em sua execução)
+    animacaoEscreverIgualdadeAngulos(equacoes, index){
+
+        const fase = this;
+
+        function escreverMedidaAngulo(){
+
+            const valorDoAngulo = Math.round(fase.pentagono.angles[index].degrees);
+    
+            const caixaDeTextoMathjax = fase.createMathJaxTextBox("", [-5,2 - 0.5*index,0])
+    
+            caixaDeTextoMathjax.mudarTexto(equacoes.compararAngulos(index,valorDoAngulo), 2)
+    
+            const escreverEquacao  = new MostrarTexto(caixaDeTextoMathjax)
+                                    .setValorFinal(300)
+                                    .setProgresso(0)
+                                    .setDelay(50)
+                                    .setDuration(100)
+                                    .setValorFinal(1000)
+                                    .setOnStart(() => fase.scene.add(caixaDeTextoMathjax))
+    
+            //Adiciona as textboxes ativas da fase
+            fase.textBoxes.primeiroDialogo.push(caixaDeTextoMathjax);
+
+            fase.animar(escreverEquacao)
+        }
+
+        return animacaoIndependente(escreverMedidaAngulo, 0);
+    }
+
+    //ANIMAÇÃO ASSINCRONA (processa os dados de entrada apenas em sua execução)
     animacaoEscreverRazao(index, lado1, lado2, offset = new THREE.Vector3(0,0,0)){
 
         const fase = this;
@@ -2039,6 +2051,7 @@ export class PrimeiraFase extends Fase{
 
             const caixasDeTexto = fase.textBoxes[nomeCaixasDeTexto];
 
+
             const apagarCaixasDeTexto = new AnimacaoSimultanea()
                                         .setAnimacoes(
                                             caixasDeTexto.map(caixa => apagarCSS2(caixa, fase.scene))
@@ -2067,6 +2080,8 @@ export class PrimeiraFase extends Fase{
                                 adicionarTotal.setCheckpoint(false),
                                 apagarTotal.setCheckpoint(false)
                             )
+                            .setNome("SELECIONADO")
+                            .setCheckpoint(false)
                             .setOnTermino(() => fase.whiteboard.ativar(false))
 
             fase.animar(animacao);

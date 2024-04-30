@@ -8,6 +8,7 @@ export const colorirAngulo = (angulo) =>    new Animacao(angulo)
                                                 .setValorFinal(0x0f00ff)
                                                 .setDuration(300)
                                                 .setInterpolacao(function (color1, color2, weight) {
+
                                                     const r1 = (color1 >> 16) & 0xff;
                                                     const g1 = (color1 >> 8) & 0xff;
                                                     const b1 = color1 & 0xff;
@@ -25,4 +26,5 @@ export const colorirAngulo = (angulo) =>    new Animacao(angulo)
                                                 .setUpdateFunction(function(valor){
                                                     this.objeto.material = new THREE.MeshBasicMaterial({color:valor});
                                                     this.objeto.update();
+
                                                 });

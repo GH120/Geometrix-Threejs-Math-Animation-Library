@@ -1990,7 +1990,7 @@ export class PrimeiraFase extends Fase{
         const desenharChave = chaves.animacao()
                                     .setDelay(200);
 
-        const caixaDeTextoMathjax = this.createMathJaxTextBox("", offset.clone().add(new THREE.Vector3(1.6,0,0)).toArray())
+        const caixaDeTextoMathjax = this.createMathJaxTextBox("", offset.clone().add(new THREE.Vector3(1.65,0,0)).toArray())
 
         const mostrarEquacao  = new MostrarTexto(caixaDeTextoMathjax)
                             .setValorFinal(300)
@@ -2000,7 +2000,7 @@ export class PrimeiraFase extends Fase{
                             .setValorFinal(3000)
                             .setOnStart(() => {
 
-                                const comprimento1 = Math.round(lado1.length*100)/100;
+                                const comprimento1 = Math.floor(lado1.length*100)/100;
                                 const comprimento2 = Math.round(lado2.length*100)/100;
 
                                 caixaDeTextoMathjax.mudarTexto(
@@ -2008,7 +2008,7 @@ export class PrimeiraFase extends Fase{
                                         \\frac {{\\color{red}Lado~ ${index + 1}}}
                                          {{\\color{blue} Lado~ ${index + 1}}}  = 
                                          \\frac {{\\color{red}${comprimento2}}}
-                                         {{\\color{blue}${comprimento1}}} = 2}`,
+                                         {{\\color{blue}${comprimento1}}} = \\large{2}}`,
                                         0.4
                                 )
 
@@ -2023,8 +2023,8 @@ export class PrimeiraFase extends Fase{
 
                                     this.setSpline([
                                         caixaDeTextoMathjax.position.clone(),
-                                        new THREE.Vector3(0, -5, 0),
-                                        new THREE.Vector3(-2, -3, 0),
+                                        new THREE.Vector3(0, -3.5, 0),
+                                        new THREE.Vector3(-3, -2, 0),
                                         new THREE.Vector3(-5, 1 - 0.5*index, 0)
                                     ])
 
@@ -2040,7 +2040,7 @@ export class PrimeiraFase extends Fase{
             desenharChave
         )
 
-        return new AnimacaoSequencial(animacao,moverEquacao);
+        return new AnimacaoSequencial(animacao,moverEquacao).setCheckpoint(false);
     }
 
     //Fazer depois

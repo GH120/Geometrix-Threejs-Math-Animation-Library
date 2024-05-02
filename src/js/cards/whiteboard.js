@@ -79,6 +79,7 @@ export class Whiteboard {
         this.camera         = camera;
         this.renderer       = renderer;
         this.labelRenderer  = labelRenderer;
+        this.canvas         = renderer.domElement;
 
         
 
@@ -190,4 +191,33 @@ export class Whiteboard {
 
         return this;
     }
+
+    pixelToCoordinates(x,y){
+    
+        const raycaster = new THREE.Raycaster();
+    
+        raycaster.setFromCamera(this.normalizar(x,y), this.camera);
+        
+        const intersects = raycaster.intersectObject(new THREE.Mesh(
+        new THREE.PlaneGeometry(100,100),
+        new THREE.MeshBasicMaterial({color:0xffffff})
+        ));
+    
+        if (intersects.length > 0) {
+        // Update the object's position to the intersection point
+        return intersects[0].point;
+        }
+    
+    }
+    
+    normalizar(x, y) {
+
+        const canvas = this.canvas;
+
+        const rect = this.canvas.getBoundingClientRect();
+        const normalizedX = (x - rect.left) / canvas.width * 2 - 1;
+        const normalizedY = -(y - rect.top) / canvas.height * 2 + 1;
+        return new THREE.Vector2(normalizedX,normalizedY);
+    }
+
 }

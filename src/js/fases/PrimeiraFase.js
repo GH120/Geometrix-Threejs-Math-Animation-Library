@@ -27,6 +27,7 @@ import MostrarTexto from "../animacoes/MostrarTexto";
 import { Operations } from "../equations/operations";
 import Bracket from "../objetos/bracket";
 import {apagarCSS2} from "../animacoes/apagarCSS2";
+import ElementoCSS2D from "../objetos/elementocss2d";
 
 export class PrimeiraFase extends Fase{
 
@@ -266,8 +267,11 @@ export class PrimeiraFase extends Fase{
                                     const equacao1 = fase.whiteboard.equacoes[0];
                                     const equacao2 = fase.whiteboard.equacoes[1];
 
-                                    const objeto1  = {mesh: equacao1, hitbox: equacao1}
-                                    const objeto2  = {mesh: equacao2, hitbox: equacao2}
+                                    const objeto1 = new ElementoCSS2D(equacao1, fase.whiteboard);
+                                    const objeto2 = new ElementoCSS2D(equacao2, fase.whiteboard);
+
+                                    // const objeto1  = {mesh: equacao1, hitbox: equacao1}
+                                    // const objeto2  = {mesh: equacao2, hitbox: equacao2}
     
                                     new Draggable(objeto1,fase.whiteboard.camera);
                                     new Hoverable(objeto2,fase.whiteboard.camera);

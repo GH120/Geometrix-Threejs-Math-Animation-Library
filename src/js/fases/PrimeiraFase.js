@@ -1275,11 +1275,11 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
+        super.update();
         // super.update();
         // super.update();
         // super.update();
@@ -1713,7 +1713,7 @@ export class PrimeiraFase extends Fase{
 
             const moverEquacaoParaDiv = new MoverTexto(novoElemento)
                                         .setOnStart(function(){
-                                            const equacaoDiv   = fase.whiteboard.equationList.children[0];
+                                            const equacaoDiv   = fase.whiteboard.equacoes.slice(-1)[0].element;
 
                                             const dimensoes    = equacaoDiv.getBoundingClientRect();
 
@@ -1812,7 +1812,7 @@ export class PrimeiraFase extends Fase{
 
         const moverEquacaoParaDiv = new MoverTexto(elementoCSS2)
                                     .setOnStart(function(){
-                                        const equacaoDiv   = fase.whiteboard.equationList.children[0];
+                                        const equacaoDiv   = fase.whiteboard.equacoes[0].element;
 
                                         const dimensoes    = equacaoDiv.getBoundingClientRect();
 

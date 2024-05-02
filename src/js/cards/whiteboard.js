@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 //Obs: edit layout with google webtools later
 export class Whiteboard {
@@ -8,6 +9,7 @@ export class Whiteboard {
         this.animacoes = [];
         this.frames = [];
         this.equationWindow = null; // Initialize as null
+        this.equacoes = []
 
         this.start();
     }
@@ -41,8 +43,8 @@ export class Whiteboard {
 
     createThreejsCanvas(){
 
-        const width = 10;
-        const height = 8;
+        const width = 5;
+        const height = 4;
 
         const telaEquacao = this.equationWindow;
 
@@ -65,9 +67,18 @@ export class Whiteboard {
         renderer.domElement.style.borderRight = "2px solid black";
         renderer.domElement.style.borderTopRightRadius = "15px";
 
-        this.scene    = scene;
-        this.camera   = camera;
-        this.renderer = renderer;
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth * 0.4, window.innerHeight * 0.4);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.bottom = '0px';
+        labelRenderer.domElement.hidden = false;
+        labelRenderer.domElement.id = "dialogoEquacao"
+        labelRenderer.domElement.zindex = 10000;
+
+        this.scene          = scene;
+        this.camera         = camera;
+        this.renderer       = renderer;
+        this.labelRenderer  = labelRenderer;
 
         
 
@@ -79,6 +90,9 @@ export class Whiteboard {
         
             // Render the scene
             renderer.render(scene, camera);
+
+            // Render the labels
+            labelRenderer.render(scene,camera);
         }
 
         animate();
@@ -91,13 +105,22 @@ export class Whiteboard {
     //adiciona a equacao
     adicionarEquacao(equacao){
 
-        const ListaEquacoes = this.equationList;
+        const ListaEquacoes = this.equacoes;
 
         const htmlElement = equacao.html;
 
         htmlElement.style.zIndex = 2000;
 
-        ListaEquacoes.appendChild(htmlElement);
+        const elementoCSS2 = new CSS2DObject(htmlElement);
+
+        //Atualiza a posição para não ter equações em cima das outras
+        const position = new THREE.Vector3(-0.5, 2-ListaEquacoes.length*1, 0);
+
+        elementoCSS2.position.copy(position);
+
+        this.scene.add(elementoCSS2);
+
+        ListaEquacoes.push(elementoCSS2);
     }
 
     addWhiteBoard(equationWindow){

@@ -13,6 +13,8 @@ function MenuEquacoes(props) {
     useEffect(() => {
         const whiteboard  = new Whiteboard(equationWindowRef.current);
 
+        equationWindowRef.current && equationWindowRef.current.children[0].appendChild(whiteboard.labelRenderer.domElement)
+
         whiteboard.ativar = props.ativar;
 
         const fase = props.fase;

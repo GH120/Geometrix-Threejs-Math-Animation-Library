@@ -358,14 +358,12 @@ export class AnimacaoSequencial extends Animacao{
 
                 yield action.next();
 
-                if(this.nome == "SELECIONADO") console.log(i, animacao.frames + animacao.delay)
             }
 
             //Com dois desses por algum motivo funciona
             action.next();
             action.next();
 
-            if(this.nome == "SELECIONADO") console.log("sucesso")
 
             // // //Quando terminada, adicionar as completadas
             // completedActions.push(action);

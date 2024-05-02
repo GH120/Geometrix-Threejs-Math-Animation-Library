@@ -255,12 +255,31 @@ export class PrimeiraFase extends Fase{
         const segundaLinha = new AnimacaoSimultanea(
                                 animarDialogo[1],
                                 dividirLados
-                            );
+                            )
 
         const apagarPoligonos = new AnimacaoSimultanea(
                                     new ApagarPoligono(this.pentagono), 
                                     new ApagarPoligono(this.pentagono2)
                                 )
+                                .setOnStart(() => {
+                                
+                                    const equacao1 = fase.whiteboard.equacoes[0];
+                                    const equacao2 = fase.whiteboard.equacoes[1];
+
+                                    const objeto1  = {mesh: equacao1, hitbox: equacao1}
+                                    const objeto2  = {mesh: equacao2, hitbox: equacao2}
+    
+                                    new Draggable(objeto1,fase.whiteboard.camera);
+                                    new Hoverable(objeto2,fase.whiteboard.camera);
+                                    new Hoverable(objeto1,fase.whiteboard.camera);
+    
+                                    const output = fase.juntarEquacoes()
+                                                       .addInputs(
+                                                            objeto1.draggable,
+                                                            objeto1.hoverable, 
+                                                            objeto2.hoverable
+                                                        );
+                                })
 
         //Cada um desses limpa as equações da tela e coloca a equação resultante
         const TodosOsAngulosIguais = fase.animacaoEquacoesVirandoUmaSo("primeiroDialogo", equacoes.angulosIguais, 3);
@@ -1269,6 +1288,87 @@ export class PrimeiraFase extends Fase{
         }
     }
 
+    juntarEquacoes(){
+
+        //Inputs: Arrastar da equação movida e dentro da equação alvo
+        return new Output()
+               .setUpdateFunction(function(novoEstado){
+
+                    //O Estado de execução do output
+                    const estado = this.estado;
+
+                    const equacaoMovida = this.observers[0];
+
+                    console.log(novoEstado)
+
+                    //Verifica se está dentro da equação movida
+                    if(novoEstado.alvo == equacaoMovida){
+                        if(novoEstado.dentro == true){
+
+                            alert("YESSS")
+                            estado.dentro = true;
+                        }
+                    }
+
+                    // else{
+
+                    //     //Verifica se a equação movida está sobre alguma equação alvo
+                    //     if(novoEstado.dentro == true){
+                    //         estado.valido = true;
+                    //         estado.equacaoSelecionada = novoEstado.alvo;
+                    //     }
+                    //     if(novoEstado.dentro == false){
+                    //         estado.valido = false;
+                    //         estado.equacaoSelecionada = null;
+                    //     }
+                    // }
+
+                    // //Condição de começo da execução
+                    // if( estado.dentro && estado.dragging == false && novoEstado.dragging == true){ 
+                    //     estado.dragging      = novoEstado.dragging;
+                    //     estado.equacaoMovida = novoEstado.alvo;
+                    //     estado.ultimaPosicao = novoEstado.alvo.mesh.position.clone();
+                    // }
+
+                    // //Condição de execução
+                    // if(estado.dragging == true){
+                        
+                    //     equacaoMovida.mesh.position.copy(novoEstado.position);
+                    // }
+
+                    // //Condição de termino da execução
+                    // if(novoEstado.dragging == false){
+
+                    //     estado.dragging = false;
+
+                    //     //Ambas as equações, a movida por arraste e a que o cursor está acima
+                    //     const equacaoMovida      = estado.equacaoMovida;
+                    //     const equacaoSelecionada = estado.equacaoSelecionada;
+
+                    //     //Evaluate
+                    //     if(estado.valido) juntarEquacoes(equacaoMovida, equacaoSelecionada);
+                    //     else              voltarAoInicio(estado); 
+                    // }
+
+                    
+               });
+
+        //Funções auxiliares
+        function juntarEquacoes(){
+            alert("YEEEEEEEEESSSSSSS");
+        }
+
+        function voltarAoInicio(estado){
+            alert("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+
+            const ultimaPosicao = estado.ultimaPosicao;
+
+            const equacaoMovida = estado.equacaoMovida;
+
+            equacaoMovida.mesh.position.clone(ultimaPosicao);
+        }
+    }
+
     //Muito complexo, melhor não
 
     update(){
@@ -1294,7 +1394,7 @@ export class PrimeiraFase extends Fase{
         
         
 
-        if(false){
+        if(true){
 
             super.update();
         super.update();

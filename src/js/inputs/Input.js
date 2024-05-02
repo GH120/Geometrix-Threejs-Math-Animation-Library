@@ -52,6 +52,9 @@ export class Input{
 
       //Implementação do observable
       notify(estado){
+
+        estado.alvo = this.object;
+        
         for(const observer of this.observers) if(observer) observer.update(estado);
       }
     

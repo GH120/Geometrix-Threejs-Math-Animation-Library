@@ -69,4 +69,13 @@ export class Output{
         return this;
     }
 
+    addInputs(...inputs){
+
+        for(const input of inputs){
+            input.addObserver(this);
+        }
+
+        return this;
+    }
+
 }

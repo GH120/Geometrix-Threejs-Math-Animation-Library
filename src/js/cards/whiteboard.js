@@ -121,6 +121,8 @@ export class Whiteboard {
         this.scene.add(elementoCSS2);
 
         ListaEquacoes.push(elementoCSS2);
+
+        return elementoCSS2;
     }
 
     addWhiteBoard(equationWindow){

@@ -45,7 +45,6 @@ export class PrimeiraFase extends Fase{
         this.createOutputs();
 
         this.outputTesteClick();
-
     }
 
     //Objetos básicos
@@ -75,7 +74,7 @@ export class PrimeiraFase extends Fase{
                         ])
                         .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
                         .render()
-                        .escala(0.605,1.01,0)
+                        .escala(0.6005,1.002,0)
                         .translacao(2,-0.5,0);
 
         this.triangulo2 = new Poligono([
@@ -199,8 +198,8 @@ export class PrimeiraFase extends Fase{
         const dialogo1 = [
             "Vimos que dois poligonos são semelhantes quando seus ângulos são congruentes",
             "e seus respectivos lados são proporcionais.", 
-            //Juntando esses angulos iguais e lados proporcionais,
-            //Temos semelhança, ou seja, razão entre os dois
+            "Juntando esses angulos iguais e lados proporcionais",
+            "Temos semelhança",
             //Vamos testar isso?
             //Verifique se os polígonos são semelhantes
             "Como os triângulos são os polígonos mais simples,",
@@ -1276,9 +1275,9 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        super.update();
-        super.update();
-        super.update();
+        // super.update();
+        // super.update();
+        // super.update();
         // super.update();
         // super.update();
         // super.update();

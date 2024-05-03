@@ -47,6 +47,8 @@ export class PrimeiraFase extends Fase{
 
         this.outputTesteClick();
 
+        this.debug = true;
+
         //A fazer:
         //Debugar problema da hitbox do angulo deletada -> Consertado
         //Mudar dialogo para comportar novas funcionalidades
@@ -119,7 +121,7 @@ export class PrimeiraFase extends Fase{
                               .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
                               .render()
                               .escala(0.2,0.2,0.2)
-                              .translacao(0, 0, 0)
+                              .translacao(-2, 1.5, 0)
 
 
         this.paralelogramo2 = new Poligono([
@@ -131,7 +133,7 @@ export class PrimeiraFase extends Fase{
                               .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.7})
                               .render()
                               .escala(0.6,0.6,0.6)
-                              .translacao(0,0,0)
+                              .translacao(-4,-2,0)
 
     }
 
@@ -376,6 +378,17 @@ export class PrimeiraFase extends Fase{
             "Só que dessa vez, vamos fazer juntos",
             "Verifique se os paralelogramos ABCD e XYZW são semelhantes"
         ]
+
+        //A Fazer:
+        //Adicionar mostrarAngulo nos dois paralelogramos
+        //Criar um handler que mostra o tamanho de um certo segmento de reta
+        //Criar um handler que mostra o nome de um vértice
+        //Criar propriedade paralelogramo => lados paralelos => DA = CB e AB = DC 
+        //Criar propriedade paralelogramo => angulos iguais dos lados paralelos
+        //Criar interação obter razão de dois lados 
+        //Com todas as razões => juntar para formar todos os lados proporcionais
+        //Todos os lados proporcionais junta com angulos iguais para gerar semelhança
+        //Criar propriedades negativas (não semelhança)?
 
         const animarDialogo = dialogo2.map(texto => new TextoAparecendo(fase.text.element)
                                                         .setOnStart(() => fase.changeText(texto))
@@ -1524,7 +1537,7 @@ export class PrimeiraFase extends Fase{
         
         
 
-        if(false){
+        if(this.debug){
 
             super.update();
         super.update();

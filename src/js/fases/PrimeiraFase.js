@@ -51,6 +51,7 @@ export class PrimeiraFase extends Fase{
         //Debugar problema da hitbox do angulo deletada -> Consertado
         //Mudar dialogo para comportar novas funcionalidades
         //Generalizar a parte de juntar equações
+        //Transformar todo array em vetor do threejs, muito propício a falha 
     }
 
     //Objetos básicos
@@ -105,6 +106,32 @@ export class PrimeiraFase extends Fase{
                           .translacao(2,-0.5,0);
 
         this.textBoxes.primeiroDialogo = [];
+
+        const offsetx = Math.cos(pi*70/180)*4;
+        const offsety = Math.sin(pi*70/180)*4;
+
+        this.paralelogramo1 = new Poligono([
+                                [0,0,0],
+                                [offsetx, offsety,0],
+                                [10+offsetx, offsety,0],
+                                [10,0,0]
+                              ])
+                              .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
+                              .render()
+                              .escala(0.2,0.2,0.2)
+                              .translacao(0, 0, 0)
+
+
+        this.paralelogramo2 = new Poligono([
+                                [0,0,0],
+                                [offsetx, offsety,0],
+                                [10+offsetx, offsety,0],
+                                [10,0,0]
+                              ])
+                              .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.7})
+                              .render()
+                              .escala(0.6,0.6,0.6)
+                              .translacao(0,0,0)
 
     }
 
@@ -206,10 +233,9 @@ export class PrimeiraFase extends Fase{
             "e seus respectivos lados são proporcionais.", 
             "Junte angulos iguais e lados proporcionais no menu de equações",
             "Basta arrastar uma equação para ficar em cima da outra",
-            // "Vamos testar isso"?
-            //Verifique se os polígonos são semelhantes
-            "Como os triângulos são os polígonos mais simples,",
-            "também são os mais fáceis de ver se são semelhantes."
+            // //Verifique se os polígonos são semelhantes
+            // "Como os triângulos são os polígonos mais simples,",
+            // "também são os mais fáceis de ver se são semelhantes."
         ]
 
         //Todas as equações em latex usadas nessa aula
@@ -229,19 +255,15 @@ export class PrimeiraFase extends Fase{
             semelhanca: `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
         }
 
-        this.pentagono.addToScene(this.scene);
-        this.pentagono2.addToScene(this.scene);
-
         //Desenhar um polígono pequeno, desenhar outro polígono maior
         //highlight dos ângulos respectivos em cada triângulo
         //highlight dos lados 
-        //Apaga polígonos e desenha o triângulo
 
         const animarDialogo = dialogo1.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)).setValorFinal(100));
 
         const desenharPoligonos = new AnimacaoSimultanea(
-                                    new DesenharPoligono(this.pentagono), 
-                                    new DesenharPoligono(this.pentagono2).filler(50)
+                                    new DesenharPoligono(this.pentagono,  fase.scene), 
+                                    new DesenharPoligono(this.pentagono2, fase.scene).filler(50)
                                   );
 
         //Mostra os Angulos iguais em cada poligono
@@ -282,7 +304,6 @@ export class PrimeiraFase extends Fase{
                             terceiraLinha,
                             quartaLinha
                         )
-                        // .setOnTermino(() => fase.progresso = 2)
 
         this.animar(animacao);
 
@@ -312,6 +333,7 @@ export class PrimeiraFase extends Fase{
                                 );
         }
 
+        //Junta equações e muda o progresso para aula2
         function juntarEquacoes(equacaoMovida, equacaoSelecionada){
 
             //Fade out das duas equações, remoção delas da whiteboard
@@ -338,6 +360,7 @@ export class PrimeiraFase extends Fase{
                                 fadeOutEquacao2,
                                 fadeInEquacaoNova
                             )
+                            .setOnTermino(() => fase.progresso = 2)
 
             fase.animar(animacao);
         }
@@ -345,10 +368,57 @@ export class PrimeiraFase extends Fase{
 
     aula2(){
 
-        // const apagarPoligonos = new AnimacaoSimultanea(
-        //     new ApagarPoligono(this.pentagono), 
-        //     new ApagarPoligono(this.pentagono2)
-        // )
+        const fase = this;
+
+        const dialogo2 = [
+            "Com essas duas propriedades temos semelhança",
+            "Vamos testar para outro exemplo?",
+            "Só que dessa vez, vamos fazer juntos",
+            "Verifique se os paralelogramos ABCD e XYZW são semelhantes"
+        ]
+
+        const animarDialogo = dialogo2.map(texto => new TextoAparecendo(fase.text.element)
+                                                        .setOnStart(() => fase.changeText(texto))
+                                                        .setValorFinal(100)
+                                        );
+
+        const apagarPoligonos = new AnimacaoSimultanea(
+                                    new ApagarPoligono(fase.pentagono), 
+                                    new ApagarPoligono(fase.pentagono2)
+                                )
+                                .setOnStart(() => fase.whiteboard.ativar(false));
+        
+        const primeiraLinha = animarDialogo[0];
+
+        const segundaLinha  = new AnimacaoSimultanea(
+                                animarDialogo[1],
+                                apagarPoligonos
+                            );
+
+        const terceiraLinha = animarDialogo[2];
+
+
+        const desenharPoligonos = new AnimacaoSimultanea(
+                                    new DesenharPoligono(fase.paralelogramo1,fase.scene), 
+                                    new DesenharPoligono(fase.paralelogramo2,fase.scene).filler(50)
+                                );
+
+        const quartaLinha   = new AnimacaoSimultanea(
+                                desenharPoligonos,
+                                animarDialogo[3]
+                            );
+
+        const animacao = new AnimacaoSequencial(
+                            primeiraLinha,
+                            segundaLinha,
+                            terceiraLinha,
+                            quartaLinha
+                        );
+
+        fase.animar(animacao);
+    }
+
+    secondDialogue(){
 
         // const aparecerTriangulos = new AnimacaoSimultanea(
         //     // new ApagarPoligono(this.triangulo).reverse(), 
@@ -366,9 +436,6 @@ export class PrimeiraFase extends Fase{
         //     );
 
         // const quartaLinha   = animarDialogo[3];
-    }
-
-    secondDialogue(){
 
         const dialogo2 = [
             "Precisamos que os ângulos sejam iguais e os lados proporcionais para termos semelhança",
@@ -2349,7 +2416,7 @@ export class PrimeiraFase extends Fase{
 
             consequencia(fase){
 
-               fase.secondDialogue();
+               fase.aula2();
             }
         },
 

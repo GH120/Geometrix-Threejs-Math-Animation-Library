@@ -5,9 +5,10 @@ import { apagarObjeto } from "./apagarObjeto";
 import DesenharMalha from "./desenharMalha";
 import MostrarTracejado from "./mostrarTracejado";
 
+//**Adiciona a fase automaticamente ao realizar animação de desenhar o polígono */
 export default class DesenharPoligono extends AnimacaoSequencial{
 
-    constructor(poligono, aparecerGraus=true){
+    constructor(poligono, scene, aparecerGraus=true){
         super();
 
         const fadeInVertices = poligono.vertices.map((vertex,index) => apagarObjeto(vertex)
@@ -18,20 +19,28 @@ export default class DesenharPoligono extends AnimacaoSequencial{
                                                                .filler(30 + 5*index)
                                                     )
 
-        const drawEdges =  poligono.edges.map((aresta, index) => new MostrarTracejado(aresta, aresta.mesh.parent).setProgresso(0))
+        const drawEdges =  poligono.edges.map((aresta, index) => new MostrarTracejado(aresta, scene))
 
-        const drawAngles = poligono.angles.map((angle,index) => PopInAngles(angle).filler(index*20))
+        const drawAngles = poligono.angles.map((angle,index) => PopInAngles(angle,scene).filler(index*20))
 
         //Fazer depois
         // const showDegrees = poligono.angles.map(angle => this.mostrarAngulo(angle));
 
         // const grausDosAngulos = new AnimacaoSimultanea().setAnimacoes(showDegrees);
 
-        const desenharAngulos = new AnimacaoSimultanea().setAnimacoes(drawAngles)
+        //Adiciona a cena antes de criar os vertices, 
+        //seta o comprimento das arestas para 0, para animação seguinte de desenhar arestas
+        const funcaoSetup = () => {
+            poligono.addToScene(scene);
+            drawEdges.map(desenharAresta => desenharAresta.setProgresso(0));
+            drawAngles.map(desenharAngulo => desenharAngulo.setProgresso(0));
+        }
+
+        const desenharAngulos = new AnimacaoSimultanea().setAnimacoes(drawAngles);
 
         const desenharArestas = new AnimacaoSimultanea().setAnimacoes(drawEdges);
 
-        const desenharVertices = new AnimacaoSimultanea().setAnimacoes(fadeInVertices);
+        const desenharVertices = new AnimacaoSimultanea().setAnimacoes(fadeInVertices).setOnStart(funcaoSetup)
 
         
         this.setAnimacoes([desenharVertices, desenharArestas, desenharAngulos]);

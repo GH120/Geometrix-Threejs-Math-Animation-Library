@@ -22,11 +22,17 @@ export class Input{
 
         if (!document.getElementById('MEUCANVAS')) return;
 
-        var width = document.getElementById('MEUCANVAS').offsetWidth;
-        var height = document.getElementById('MEUCANVAS').offsetHeight;
+        let width = document.getElementById('MEUCANVAS').offsetWidth;
+        let height = document.getElementById('MEUCANVAS').offsetHeight;
 
-        var x = (event.clientX / width);
-        var y = (event.clientY / height)
+        let x = (event.clientX / width);
+        let y = (event.clientY / height);
+
+        // Calculate the mouse position in normalized device coordinates (-1 to +1)
+        let mouse = new THREE.Vector2(
+          x * 2 - 1,
+         -y * 2 + 1
+       );
 
         //Refatorar Depois, ao invés de receber câmera só recebe o container( fase ou whiteboard)
         if(this.container){
@@ -35,13 +41,10 @@ export class Input{
 
           x = position.x;
           y = position.y;
-        }
 
-        // Calculate the mouse position in normalized device coordinates (-1 to +1)
-        const mouse = new THREE.Vector2(
-           x * 2 - 1,
-          -y * 2 + 1
-        );
+          // Calculate the mouse position in normalized device coordinates (-1 to +1)
+          mouse = new THREE.Vector2(x,y);
+        }
         
     
         // Raycast to determine the intersection point between the mouse and the object's plane
@@ -53,8 +56,6 @@ export class Input{
 
         const intersects = this.raycaster.intersectObject(hitbox);
 
-        if(this.selected) console.log(x,y)
-    
         if (intersects.length > 0) {
           // Update the object's position to the intersection point
           return intersects[0];

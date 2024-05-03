@@ -1303,12 +1303,10 @@ export class PrimeiraFase extends Fase{
                     //O Estado de execução do output
                     const estado = this.estado;
 
-                    console.log(estado)
 
                     //Verifica se está dentro da equação movida
                     if(novoEstado.alvo == equacaoMovida){
                         if(novoEstado.dentro == true){
-
                             estado.dentro = true;
                         }
                         if(novoEstado.dentro == false){
@@ -1329,29 +1327,27 @@ export class PrimeiraFase extends Fase{
                         }
                     }
 
-                    if(novoEstado.dragging){
-                        alert("arrasta pra cima")
-                    }
+
+                    // if(novoEstado.dragging){
+                    //     alert("arrasta pra cima")
+                    // }
 
                     //Condição de começo da execução
-                    if( estado.dentro && novoEstado.dragging == true){ 
-                        alert("arrastando")
+                    if( 
+                        estado.dentro       == true  && 
+                        !estado.dragging             &&  //Também aceita estado.dragging indefinido
+                        novoEstado.dragging == true
+                    ){ 
                         estado.dragging      = novoEstado.dragging;
                         estado.equacaoMovida = novoEstado.alvo;
                         estado.ultimaPosicao = novoEstado.alvo.mesh.position.clone();
-                        estado.dentro = false;
                     }
 
-                    //Condição de execução
-                    if(estado.dragging == true){
-                        
-                        equacaoMovida.mesh.position.copy(novoEstado.position);
-                        console.log(equacaoMovida.mesh.position);
-                        alert(equacaoMovida.mesh.position.x)
-                    }
-
-                    //Condição de termino da execução
-                    if(novoEstado.dragging == false && estado.dragging == true){
+                     // //Condição de termino da execução
+                    if(
+                        estado.dragging     == true  &&
+                        novoEstado.dragging == false 
+                    ){
 
                         estado.dragging = false;
 
@@ -1362,6 +1358,14 @@ export class PrimeiraFase extends Fase{
                         //Evaluate
                         if(estado.valido) juntarEquacoes(equacaoMovida, equacaoSelecionada);
                         else              voltarAoInicio(estado); 
+                    }
+
+                    //Condição de execução
+                    if(estado.dragging == true && novoEstado.position){
+                        
+                        console.log(novoEstado.position)
+                        equacaoMovida.mesh.position.copy(novoEstado.position);
+                        // alert(equacaoMovida.mesh.position.x)
                     }
 
                     
@@ -1379,7 +1383,7 @@ export class PrimeiraFase extends Fase{
 
             const equacaoMovida = estado.equacaoMovida;
 
-            equacaoMovida.mesh.position.clone(ultimaPosicao);
+            equacaoMovida.mesh.position.copy(ultimaPosicao);
         }
     }
 

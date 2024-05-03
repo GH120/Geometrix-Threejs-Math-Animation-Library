@@ -46,6 +46,11 @@ export class PrimeiraFase extends Fase{
         this.createOutputs();
 
         this.outputTesteClick();
+
+        //A fazer:
+        //Debugar problema da hitbox do angulo deletada -> Consertado
+        //Mudar dialogo para comportar novas funcionalidades
+        //Generalizar a parte de juntar equações
     }
 
     //Objetos básicos
@@ -258,11 +263,10 @@ export class PrimeiraFase extends Fase{
                                 dividirLados
                             )
 
-        const apagarPoligonos = new AnimacaoSimultanea(
-                                    new ApagarPoligono(this.pentagono), 
-                                    new ApagarPoligono(this.pentagono2)
-                                )
-                                .setOnStart(criarEquacoes)
+        const terceiraLinha = animarDialogo[2]
+                              .setOnStart(criarEquacoes);
+
+        const quartaLinha   = animarDialogo[3];
 
         //Cada um desses limpa as equações da tela e coloca a equação resultante
         const TodosOsAngulosIguais = fase.animacaoEquacoesVirandoUmaSo("primeiroDialogo", equacoes.angulosIguais, 3);
@@ -273,9 +277,10 @@ export class PrimeiraFase extends Fase{
                             TodosOsAngulosIguais,
                             segundaLinha.filler(100),
                             TodosOsLadosIguais,
-                            apagarPoligonos
+                            terceiraLinha,
+                            quartaLinha
                         )
-                        .setOnTermino(() => fase.progresso = 2)
+                        // .setOnTermino(() => fase.progresso = 2)
 
         this.animar(animacao);
 
@@ -329,6 +334,11 @@ export class PrimeiraFase extends Fase{
     }
 
     aula2(){
+
+        // const apagarPoligonos = new AnimacaoSimultanea(
+        //     new ApagarPoligono(this.pentagono), 
+        //     new ApagarPoligono(this.pentagono2)
+        // )
 
         // const aparecerTriangulos = new AnimacaoSimultanea(
         //     // new ApagarPoligono(this.triangulo).reverse(), 

@@ -175,7 +175,7 @@ export class Fase {
     }
 
     //Cria elementos css2d que renderizam MathJax a partir de um texto input
-    createMathJaxTextBox(inputTex,position=[0,0,0]){
+    createMathJaxTextBox(inputTex,position=[0,0,0], tamanhoDaFonte=10){
 
         const adaptor = liteAdaptor();
         RegisterHTMLHandler(adaptor);
@@ -207,7 +207,7 @@ export class Fase {
             return cPointLabel;
         }
 
-        return cPointLabel.mudarTexto(inputTex);
+        return cPointLabel.mudarTexto(inputTex, tamanhoDaFonte);
     }
 
     

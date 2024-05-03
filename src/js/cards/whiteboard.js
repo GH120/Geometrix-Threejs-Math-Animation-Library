@@ -128,6 +128,13 @@ export class Whiteboard {
         return elementoCSS2;
     }
 
+    removerEquacao(equacao){
+
+        this.equacoes = this.equacoes.filter(equation => equation != equacao);
+
+        return this;
+    }
+
     addWhiteBoard(equationWindow){
         
         const rect = equationWindow.getBoundingClientRect();

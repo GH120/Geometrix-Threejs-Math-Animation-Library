@@ -220,7 +220,7 @@ export class PrimeiraFase extends Fase{
                             Ângulo~ {\\color{blue} ${index + 1}} ~ do~ P2 = 
                             {\\color{purple} ${valorDoAngulo}°} `,
             
-            
+            semelhanca: `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
         }
 
         this.pentagono.addToScene(this.scene);
@@ -262,30 +262,7 @@ export class PrimeiraFase extends Fase{
                                     new ApagarPoligono(this.pentagono), 
                                     new ApagarPoligono(this.pentagono2)
                                 )
-                                .setOnStart(() => {
-                                
-                                    const equacao1 = fase.whiteboard.equacoes[0];
-                                    const equacao2 = fase.whiteboard.equacoes[1];
-
-                                    const objeto1 = new ElementoCSS2D(equacao1, fase.whiteboard);
-                                    const objeto2 = new ElementoCSS2D(equacao2, fase.whiteboard);
-
-                                    // const objeto1  = {mesh: equacao1, hitbox: equacao1}
-                                    // const objeto2  = {mesh: equacao2, hitbox: equacao2}
-    
-                                    new Draggable(objeto1,fase.whiteboard.camera, fase.whiteboard);
-                                    new Hoverable(objeto2,fase.whiteboard.camera, fase.whiteboard);
-                                    new Hoverable(objeto1,fase.whiteboard.camera, fase.whiteboard);
-
-                                    objeto1.hoverable.selected = true
-    
-                                    const output = fase.juntarEquacoes(objeto1)
-                                                       .addInputs(
-                                                            objeto1.draggable,
-                                                            objeto2.hoverable,
-                                                            objeto1.hoverable
-                                                        );
-                                })
+                                .setOnStart(criarEquacoes)
 
         //Cada um desses limpa as equações da tela e coloca a equação resultante
         const TodosOsAngulosIguais = fase.animacaoEquacoesVirandoUmaSo("primeiroDialogo", equacoes.angulosIguais, 3);
@@ -301,6 +278,54 @@ export class PrimeiraFase extends Fase{
                         .setOnTermino(() => fase.progresso = 2)
 
         this.animar(animacao);
+
+
+        function criarEquacoes() {
+
+            const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
+            const equacao2 = new ElementoCSS2D(fase.whiteboard.equacoes[1], fase.whiteboard);
+
+            new Draggable(equacao1,fase.whiteboard.camera, fase.whiteboard);
+            new Hoverable(equacao2,fase.whiteboard.camera, fase.whiteboard);
+            new Hoverable(equacao1,fase.whiteboard.camera, fase.whiteboard);
+
+            const controle = fase.juntarEquacoes(equacao1, juntarEquacoes)
+                                 .addInputs(
+                                    equacao1.draggable,
+                                    equacao2.hoverable,
+                                    equacao1.hoverable
+                                 );
+        }
+
+        function juntarEquacoes(equacaoMovida, equacaoSelecionada){
+
+            //Fade out das duas equações, remoção delas da whiteboard
+
+            const fadeOutEquacao1 = apagarCSS2(equacaoMovida.texto     , fase.whiteboard.scene).setDuration(3000);
+            const fadeOutEquacao2 = apagarCSS2(equacaoSelecionada.texto, fase.whiteboard.scene).setDuration(3000);
+
+            //Fade in da equação nova, adiciona ela na whiteboard
+
+            const equacaoNova = fase.createMathJaxTextBox(equacoes.semelhanca, [0,1,0], 6);
+
+            const fadeInEquacaoNova = apagarCSS2(equacaoNova, fase.whiteboard.scene)
+                                      .reverse()
+                                      .setOnStart  (() => fase.whiteboard.adicionarEquacao({html:equacaoNova.element}))
+                                      .setOnTermino(() => null)
+                                      .setDuration(3000)
+
+            fase.whiteboard.removerEquacao(equacaoMovida.texto);
+            fase.whiteboard.removerEquacao(equacaoSelecionada.texto);
+
+
+            const animacao = new AnimacaoSimultanea(
+                                fadeOutEquacao1,
+                                fadeOutEquacao2,
+                                fadeInEquacaoNova
+                            )
+
+            fase.animar(animacao);
+        }
     }
 
     aula2(){
@@ -1294,7 +1319,7 @@ export class PrimeiraFase extends Fase{
         }
     }
 
-    juntarEquacoes(equacaoMovida){
+    juntarEquacoes(equacaoMovida, juntarEquacoes){
 
         //Inputs: Arrastar da equação movida e dentro da equação alvo
         return new Output()
@@ -1372,9 +1397,9 @@ export class PrimeiraFase extends Fase{
                });
 
         //Funções auxiliares
-        function juntarEquacoes(){
-            alert("YEEEEEEEEESSSSSSS");
-        }
+        // function juntarEquacoes(){
+        //     alert("YEEEEEEEEESSSSSSS");
+        // }
 
         function voltarAoInicio(estado){
             alert("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");

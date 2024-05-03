@@ -43,7 +43,7 @@ export default class ElementoCSS2D extends Objeto{
 
         const plano = new THREE.Mesh(
                         new THREE.PlaneGeometry(largura,altura), 
-                        new THREE.MeshBasicMaterial({visible:true, color:0xfff000})
+                        new THREE.MeshBasicMaterial({visible:false})
                     );
 
         plano.position.copy(posicao);

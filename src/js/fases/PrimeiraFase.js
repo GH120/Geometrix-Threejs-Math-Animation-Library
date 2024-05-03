@@ -265,7 +265,7 @@ export class PrimeiraFase extends Fase{
                             )
 
         const terceiraLinha = new AnimacaoSequencial(animarDialogo[2])
-                              .setOnStart(criarEquacoes)
+                              .setOnStart(criarControleJuntarEquacoes)
                               .setOnTermino(() => fase.whiteboard.ativar(true));
 
         const quartaLinha   = animarDialogo[3];
@@ -287,21 +287,29 @@ export class PrimeiraFase extends Fase{
         this.animar(animacao);
 
 
-        function criarEquacoes() {
+        function criarControleJuntarEquacoes() {
 
             const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
             const equacao2 = new ElementoCSS2D(fase.whiteboard.equacoes[1], fase.whiteboard);
 
+            new Draggable(equacao2,fase.whiteboard.camera, fase.whiteboard);
             new Draggable(equacao1,fase.whiteboard.camera, fase.whiteboard);
             new Hoverable(equacao2,fase.whiteboard.camera, fase.whiteboard);
             new Hoverable(equacao1,fase.whiteboard.camera, fase.whiteboard);
 
-            const controle = fase.juntarEquacoes(equacao1, juntarEquacoes)
+            const controle1 = fase.juntarEquacoes(equacao1, juntarEquacoes)
                                  .addInputs(
                                     equacao1.draggable,
                                     equacao2.hoverable,
                                     equacao1.hoverable
                                  );
+
+            const controle2 = fase.juntarEquacoes(equacao2, juntarEquacoes)
+                                  .addInputs(
+                                    equacao2.draggable,
+                                    equacao1.hoverable,
+                                    equacao2.hoverable
+                                );
         }
 
         function juntarEquacoes(equacaoMovida, equacaoSelecionada){
@@ -1414,7 +1422,7 @@ export class PrimeiraFase extends Fase{
         // }
 
         function voltarAoInicio(estado){
-            alert("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+            // alert("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
 
             const ultimaPosicao = estado.ultimaPosicao;
 

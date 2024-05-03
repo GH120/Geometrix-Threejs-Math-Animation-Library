@@ -28,6 +28,7 @@ import { Operations } from "../equations/operations";
 import Bracket from "../objetos/bracket";
 import {apagarCSS2} from "../animacoes/apagarCSS2";
 import ElementoCSS2D from "../objetos/elementocss2d";
+import MostrarValorAresta from "../outputs/mostrarValorAresta";
 
 export class PrimeiraFase extends Fase{
 
@@ -130,7 +131,7 @@ export class PrimeiraFase extends Fase{
                                 [10+offsetx, offsety,0],
                                 [10,0,0]
                               ])
-                              .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.7})
+                              .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.3})
                               .render()
                               .escala(0.6,0.6,0.6)
                               .translacao(-4,-2,0)
@@ -379,6 +380,12 @@ export class PrimeiraFase extends Fase{
             "Verifique se os paralelogramos ABCD e XYZW são semelhantes"
         ]
 
+        const unidadeMedida = {
+            razao: this.paralelogramo1.edges[0].length, //Razão utilizada para calcular medidas 
+
+            cm: (medida) => `${Math.round(medida * unidadeMedida.razao)}cm`
+        }
+
         //A Fazer:
         //Adicionar mostrarAngulo nos dois paralelogramos
         //Criar um handler que mostra o tamanho de um certo segmento de reta
@@ -419,7 +426,7 @@ export class PrimeiraFase extends Fase{
         const quartaLinha   = new AnimacaoSimultanea(
                                 desenharPoligonos,
                                 animarDialogo[3]
-                            );
+                            ).setOnStart(() => fase.Configuracao6({unidadeMedida: unidadeMedida}))
 
         const animacao = new AnimacaoSequencial(
                             primeiraLinha,
@@ -914,6 +921,23 @@ export class PrimeiraFase extends Fase{
         }
     }
 
+    Configuracao6(informacao){
+
+        const fase = this;
+
+        fase.informacao = {...fase.informacao, ...informacao};
+
+        const unidadeMedida = fase.informacao.unidadeMedida;
+
+        const lados = fase.paralelogramo1.edges.concat(fase.paralelogramo2.edges);
+
+        fase.mostrarValorDosLados = lados.map(lado => new MostrarValorAresta(lado, 0, unidadeMedida.cm));
+
+        //Torna todos eles visíveis
+        fase.mostrarValorDosLados.map(mostrarValor => mostrarValor.addToScene(fase.scene));
+
+        fase.mostrarValorDosLados.map(mostrarValor => mostrarValor.update());
+    }
    
 
     //Outputs abaixo

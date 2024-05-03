@@ -204,14 +204,15 @@ export class PrimeiraFase extends Fase{
         const dialogo1 = [
             "Vimos que dois poligonos são semelhantes quando seus ângulos são congruentes",
             "e seus respectivos lados são proporcionais.", 
-            "Juntando esses angulos iguais e lados proporcionais",
-            "Temos semelhança",
-            //Vamos testar isso?
+            "Junte angulos iguais e lados proporcionais no menu de equações",
+            "Basta arrastar uma equação para ficar em cima da outra",
+            // "Vamos testar isso"?
             //Verifique se os polígonos são semelhantes
             "Como os triângulos são os polígonos mais simples,",
             "também são os mais fáceis de ver se são semelhantes."
         ]
 
+        //Todas as equações em latex usadas nessa aula
         const equacoes = {
             ladosIguais: ` {\\color{purple} RAZÃO = 
                             \\frac {{\\color{blue}Lado~Poligono~2}}
@@ -263,8 +264,9 @@ export class PrimeiraFase extends Fase{
                                 dividirLados
                             )
 
-        const terceiraLinha = animarDialogo[2]
-                              .setOnStart(criarEquacoes);
+        const terceiraLinha = new AnimacaoSequencial(animarDialogo[2])
+                              .setOnStart(criarEquacoes)
+                              .setOnTermino(() => fase.whiteboard.ativar(true));
 
         const quartaLinha   = animarDialogo[3];
 
@@ -306,8 +308,8 @@ export class PrimeiraFase extends Fase{
 
             //Fade out das duas equações, remoção delas da whiteboard
 
-            const fadeOutEquacao1 = apagarCSS2(equacaoMovida.texto     , fase.whiteboard.scene).setDuration(3000);
-            const fadeOutEquacao2 = apagarCSS2(equacaoSelecionada.texto, fase.whiteboard.scene).setDuration(3000);
+            const fadeOutEquacao1 = apagarCSS2(equacaoMovida.texto     , fase.whiteboard.scene).setDuration(100);
+            const fadeOutEquacao2 = apagarCSS2(equacaoSelecionada.texto, fase.whiteboard.scene).setDuration(100);
 
             //Fade in da equação nova, adiciona ela na whiteboard
 
@@ -317,7 +319,7 @@ export class PrimeiraFase extends Fase{
                                       .reverse()
                                       .setOnStart  (() => fase.whiteboard.adicionarEquacao({html:equacaoNova.element}))
                                       .setOnTermino(() => null)
-                                      .setDuration(3000)
+                                      .setDuration(100)
 
             fase.whiteboard.removerEquacao(equacaoMovida.texto);
             fase.whiteboard.removerEquacao(equacaoSelecionada.texto);
@@ -1428,11 +1430,11 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
+        // super.update();
         // super.update();
         // super.update();
         // super.update();
@@ -1447,7 +1449,7 @@ export class PrimeiraFase extends Fase{
         
         
 
-        if(true){
+        if(false){
 
             super.update();
         super.update();

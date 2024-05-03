@@ -7,6 +7,7 @@ export default class ElementoCSS2D extends Objeto{
         super();
 
         this.texto     = textoCSS2D;
+        this.mesh      = textoCSS2D;
         this.container = container; //Fase ou whiteboard que vai conter esse objeto
 
         this.tamanhoHitbox = new THREE.Vector3(1.05, 1.3, 0) //Constante aumenta tamanho da hitbox
@@ -42,7 +43,7 @@ export default class ElementoCSS2D extends Objeto{
 
         const plano = new THREE.Mesh(
                         new THREE.PlaneGeometry(largura,altura), 
-                        new THREE.MeshBasicMaterial({visible:false})
+                        new THREE.MeshBasicMaterial({visible:true, color:0xfff000})
                     );
 
         plano.position.copy(posicao);

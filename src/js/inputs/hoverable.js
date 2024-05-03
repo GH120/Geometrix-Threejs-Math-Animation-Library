@@ -3,9 +3,9 @@ import { Input } from './Input';
 
 export class Hoverable extends Input {
 
-  constructor(object, camera) {
+  constructor(object, camera,container) {
 
-    super(object,camera);
+    super(object,camera,container);
 
     this.onMouseMove = this.onMouseMove.bind(this);
 

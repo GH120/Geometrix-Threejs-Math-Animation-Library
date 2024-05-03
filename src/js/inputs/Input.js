@@ -3,10 +3,11 @@ import * as THREE from 'three'
 //É o input do usuário, pode ser ligado a um Input no handler
 export class Input{
 
-    constructor(object, camera){
+    constructor(object, camera, container=null){
 
         this.object     = object;
         this.camera     = camera;
+        this.container  = container; //Refatorar depois
         this.observers  = [];
         this.raycaster  = new THREE.Raycaster();
 
@@ -24,12 +25,22 @@ export class Input{
         var width = document.getElementById('MEUCANVAS').offsetWidth;
         var height = document.getElementById('MEUCANVAS').offsetHeight;
 
+        var x = (event.clientX / width);
+        var y = (event.clientY / height)
+
+        //Refatorar Depois, ao invés de receber câmera só recebe o container( fase ou whiteboard)
+        if(this.container){
+
+          const position = this.container.normalizar(event.clientX, event.clientY);
+
+          x = position.x;
+          y = position.y;
+        }
+
         // Calculate the mouse position in normalized device coordinates (-1 to +1)
         const mouse = new THREE.Vector2(
-          // (event.clientX / window.innerWidth) * 2 - 1,
-          // -(event.clientY / window.innerHeight) * 2 + 1
-          (event.clientX / width) * 2 - 1,
-          -(event.clientY / height) * 2 + 1
+           x * 2 - 1,
+          -y * 2 + 1
         );
         
     
@@ -41,6 +52,8 @@ export class Input{
         if(!object.hitbox) return null;
 
         const intersects = this.raycaster.intersectObject(hitbox);
+
+        if(this.selected) console.log(x,y)
     
         if (intersects.length > 0) {
           // Update the object's position to the intersection point

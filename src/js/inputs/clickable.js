@@ -3,8 +3,8 @@ import { Input } from './Input';
 
 export class Clickable extends Input{
 
-  constructor(object,camera) {
-    super(object,camera);
+  constructor(object,camera,container) {
+    super(object,camera, container);
     
     this.dragging = false;
 

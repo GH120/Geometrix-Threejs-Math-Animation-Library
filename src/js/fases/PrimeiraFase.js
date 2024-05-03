@@ -273,15 +273,17 @@ export class PrimeiraFase extends Fase{
                                     // const objeto1  = {mesh: equacao1, hitbox: equacao1}
                                     // const objeto2  = {mesh: equacao2, hitbox: equacao2}
     
-                                    new Draggable(objeto1,fase.whiteboard.camera);
-                                    new Hoverable(objeto2,fase.whiteboard.camera);
-                                    new Hoverable(objeto1,fase.whiteboard.camera);
+                                    new Draggable(objeto1,fase.whiteboard.camera, fase.whiteboard);
+                                    new Hoverable(objeto2,fase.whiteboard.camera, fase.whiteboard);
+                                    new Hoverable(objeto1,fase.whiteboard.camera, fase.whiteboard);
+
+                                    objeto1.hoverable.selected = true
     
-                                    const output = fase.juntarEquacoes()
+                                    const output = fase.juntarEquacoes(objeto1)
                                                        .addInputs(
                                                             objeto1.draggable,
-                                                            objeto1.hoverable, 
-                                                            objeto2.hoverable
+                                                            objeto2.hoverable,
+                                                            objeto1.hoverable
                                                         );
                                 })
 
@@ -1292,7 +1294,7 @@ export class PrimeiraFase extends Fase{
         }
     }
 
-    juntarEquacoes(){
+    juntarEquacoes(equacaoMovida){
 
         //Inputs: Arrastar da equação movida e dentro da equação alvo
         return new Output()
@@ -1301,58 +1303,66 @@ export class PrimeiraFase extends Fase{
                     //O Estado de execução do output
                     const estado = this.estado;
 
-                    const equacaoMovida = this.observers[0];
-
-                    console.log(novoEstado)
+                    console.log(estado)
 
                     //Verifica se está dentro da equação movida
                     if(novoEstado.alvo == equacaoMovida){
                         if(novoEstado.dentro == true){
 
-                            alert("YESSS")
                             estado.dentro = true;
+                        }
+                        if(novoEstado.dentro == false){
+                            estado.dentro = false;
                         }
                     }
 
-                    // else{
+                    else{
 
-                    //     //Verifica se a equação movida está sobre alguma equação alvo
-                    //     if(novoEstado.dentro == true){
-                    //         estado.valido = true;
-                    //         estado.equacaoSelecionada = novoEstado.alvo;
-                    //     }
-                    //     if(novoEstado.dentro == false){
-                    //         estado.valido = false;
-                    //         estado.equacaoSelecionada = null;
-                    //     }
-                    // }
+                        //Verifica se a equação movida está sobre alguma equação alvo
+                        if(novoEstado.dentro == true){
+                            estado.valido = true;
+                            estado.equacaoSelecionada = novoEstado.alvo;
+                        }
+                        if(novoEstado.dentro == false){
+                            estado.valido = false;
+                            estado.equacaoSelecionada = null;
+                        }
+                    }
 
-                    // //Condição de começo da execução
-                    // if( estado.dentro && estado.dragging == false && novoEstado.dragging == true){ 
-                    //     estado.dragging      = novoEstado.dragging;
-                    //     estado.equacaoMovida = novoEstado.alvo;
-                    //     estado.ultimaPosicao = novoEstado.alvo.mesh.position.clone();
-                    // }
+                    if(novoEstado.dragging){
+                        alert("arrasta pra cima")
+                    }
 
-                    // //Condição de execução
-                    // if(estado.dragging == true){
+                    //Condição de começo da execução
+                    if( estado.dentro && novoEstado.dragging == true){ 
+                        alert("arrastando")
+                        estado.dragging      = novoEstado.dragging;
+                        estado.equacaoMovida = novoEstado.alvo;
+                        estado.ultimaPosicao = novoEstado.alvo.mesh.position.clone();
+                        estado.dentro = false;
+                    }
+
+                    //Condição de execução
+                    if(estado.dragging == true){
                         
-                    //     equacaoMovida.mesh.position.copy(novoEstado.position);
-                    // }
+                        equacaoMovida.mesh.position.copy(novoEstado.position);
+                        console.log(equacaoMovida.mesh.position);
+                        alert(equacaoMovida.mesh.position.x)
+                    }
 
-                    // //Condição de termino da execução
-                    // if(novoEstado.dragging == false){
+                    //Condição de termino da execução
+                    if(novoEstado.dragging == false && estado.dragging == true){
 
-                    //     estado.dragging = false;
+                        estado.dragging = false;
 
-                    //     //Ambas as equações, a movida por arraste e a que o cursor está acima
-                    //     const equacaoMovida      = estado.equacaoMovida;
-                    //     const equacaoSelecionada = estado.equacaoSelecionada;
+                        //Ambas as equações, a movida por arraste e a que o cursor está acima
+                        const equacaoMovida      = estado.equacaoMovida;
+                        const equacaoSelecionada = estado.equacaoSelecionada;
 
-                    //     //Evaluate
-                    //     if(estado.valido) juntarEquacoes(equacaoMovida, equacaoSelecionada);
-                    //     else              voltarAoInicio(estado); 
-                    // }
+                        //Evaluate
+                        if(estado.valido) juntarEquacoes(equacaoMovida, equacaoSelecionada);
+                        else              voltarAoInicio(estado); 
+                    }
 
                     
                });

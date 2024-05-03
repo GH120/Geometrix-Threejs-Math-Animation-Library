@@ -75,6 +75,7 @@ export class Fase {
         this.objetos = [];
         this.animationControler = new AnimationControler(null,this,null,null,null);
         this.operadores = new Operations(null,this);
+        this.dimensoes  = {width: width, height: height}
 
     }
     

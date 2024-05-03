@@ -80,6 +80,8 @@ export class Whiteboard {
         this.renderer       = renderer;
         this.labelRenderer  = labelRenderer;
         this.canvas         = renderer.domElement;
+        this.dimensoes      = {width: width, height: height}
+
 
         
 

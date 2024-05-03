@@ -3,8 +3,8 @@ import { Input } from './Input';
 
 export class Draggable extends Input{
 
-  constructor(object,camera) {
-    super(object,camera);
+  constructor(object,camera, container) {
+    super(object,camera, container);
 
     const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(100,100),

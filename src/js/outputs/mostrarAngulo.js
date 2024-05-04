@@ -65,6 +65,8 @@ export class MostrarAngulo extends Output{
 
         const scene = this.scene;
 
+        if(!this.scene) throw Error("Faltou setar a cena com o .addToScene(scene)")
+
         scene.remove(this.text.elemento)
 
         this.onHover(this.estado.dentro);

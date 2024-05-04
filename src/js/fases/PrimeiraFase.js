@@ -382,15 +382,15 @@ export class PrimeiraFase extends Fase{
         ]
 
         const unidadeMedida = {
-            razao: this.paralelogramo1.edges[0].length, //Razão utilizada para calcular medidas 
+            razao: 4*1/this.paralelogramo1.edges[0].length, //Razão utilizada para calcular medidas 
 
             cm: (medida) => `${Math.round(medida * unidadeMedida.razao)}cm`
         }
 
         //A Fazer:
         //Adicionar mostrarAngulo nos dois paralelogramos
-        //Criar um handler que mostra o tamanho de um certo segmento de reta
-        //Criar um handler que mostra o nome de um vértice
+        //Criar um handler que mostra o tamanho de um certo segmento de reta -> feito
+        //Criar um handler que mostra o nome de um vértice -> feito
         //Criar propriedade paralelogramo => lados paralelos => DA = CB e AB = DC 
         //Criar propriedade paralelogramo => angulos iguais dos lados paralelos
         //Criar interação obter razão de dois lados 
@@ -428,6 +428,7 @@ export class PrimeiraFase extends Fase{
                                 desenharPoligonos,
                                 animarDialogo[3]
                             ).setOnStart(() => fase.Configuracao6({unidadeMedida: unidadeMedida}))
+                            .setOnTermino(() => fase.mostrarAngulosParalelogramos.forEach(output => output.update({dentro:true})))
 
         const animacao = new AnimacaoSequencial(
                             primeiraLinha,
@@ -954,6 +955,10 @@ export class PrimeiraFase extends Fase{
 
         fase.mostrarNomeDosVertices.forEach(mostrarNome => mostrarNome.update());
 
+        const mostrarAngulo1 = new MostrarAngulo(fase.paralelogramo1.angles[1]).addToScene(fase.scene);
+        const mostrarAngulo2 = new MostrarAngulo(fase.paralelogramo2.angles[0]).addToScene(fase.scene);
+
+        fase.mostrarAngulosParalelogramos = [mostrarAngulo1, mostrarAngulo2];
     }
    
 

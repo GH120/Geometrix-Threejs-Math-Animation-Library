@@ -8,31 +8,41 @@ import * as THREE from 'three';
 import { Output } from './Output';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
 
-export default class MostrarValorAresta extends Output{
+export default class MostrarNomeVertice extends Output{
 
-    constructor(aresta, valor, unidadeMedida){
+    constructor(poligono, vertice, nome){
         super();
 
-        this.aresta  = aresta;
-        this.valor   = valor;
-        this.unidadeMedida = unidadeMedida; //função do tipo (valor : float) => texto : string
+        this.poligono = poligono;
+        this.vertice  = vertice;
+        this.indice   = this.poligono.vertices.indexOf(vertice);
+        this.nome     = nome;
 
-        this.texto = this.createMathJaxTextBox("null", [0,0,0]); 
-        this.distanciaTextoAresta = 0.2
-        this.tamanhoDaFonte       = 5;
+        this.texto = this.createMathJaxTextBox(nome, [0,0,0]); 
+        this.distanciaTextoVertice = 0.32
+        this.tamanhoDaFonte        = 10;
     }
 
     calcularPosicaoTexto(){
 
-        const position      = this.aresta.getPosition();
+        const indice          = this.indice;
+        const numeroVertices  = this.poligono.vertices.length
+        const proximoVizinho  = (indice +1) % numeroVertices;
+        const vizinhoAnterior = (indice + numeroVertices - 1) % numeroVertices;
+
+        const vizinho1 = this.poligono.vertices[proximoVizinho];
+        const vizinho2 = this.poligono.vertices[vizinhoAnterior];
+
+        const position      = this.vertice.getPosition();
 
         //Verificar se antihorário ou horário depois
-        const direcaoAresta    = new THREE.Vector3().subVectors(position, this.aresta.origem);
-        const direcaoParalela  = new THREE.Vector3().crossVectors(direcaoAresta, new THREE.Vector3(0,0,-1));
+        const direcaoVizinhos    = new THREE.Vector3().subVectors(vizinho2.getPosition(), vizinho1.getPosition());
 
-        const distanciaTextoAresta = direcaoParalela.normalize().multiplyScalar(this.distanciaTextoAresta);
+        const direcaoPerpendicular  = new THREE.Vector3().crossVectors(direcaoVizinhos, new THREE.Vector3(0,0,1));
 
-        position.add(distanciaTextoAresta);
+        const distanciaTextovertice = direcaoPerpendicular.normalize().multiplyScalar(this.distanciaTextoVertice);
+
+        position.add(distanciaTextovertice);
 
         this.texto.position.copy(position);
     }
@@ -43,9 +53,7 @@ export default class MostrarValorAresta extends Output{
 
         this.calcularPosicaoTexto();
 
-        const valorEmFormaDeTexto = this.unidadeMedida(this.aresta.length);
-
-        this.texto.mudarTexto(valorEmFormaDeTexto, this.tamanhoDaFonte);
+        this.texto.mudarTexto(this.nome, this.tamanhoDaFonte);
     }
 
     addToScene(scene){
@@ -90,5 +98,4 @@ export default class MostrarValorAresta extends Output{
 
         return cPointLabel.mudarTexto(inputTex, tamanhoDaFonte);
     }
-
 }

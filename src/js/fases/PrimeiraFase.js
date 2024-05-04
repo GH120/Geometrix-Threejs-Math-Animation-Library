@@ -29,6 +29,7 @@ import Bracket from "../objetos/bracket";
 import {apagarCSS2} from "../animacoes/apagarCSS2";
 import ElementoCSS2D from "../objetos/elementocss2d";
 import MostrarValorAresta from "../outputs/mostrarValorAresta";
+import MostrarNomeVertice from "../outputs/mostrarNomeVertice";
 
 export class PrimeiraFase extends Fase{
 
@@ -934,9 +935,25 @@ export class PrimeiraFase extends Fase{
         fase.mostrarValorDosLados = lados.map(lado => new MostrarValorAresta(lado, 0, unidadeMedida.cm));
 
         //Torna todos eles visíveis
-        fase.mostrarValorDosLados.map(mostrarValor => mostrarValor.addToScene(fase.scene));
+        fase.mostrarValorDosLados.forEach(mostrarValor => mostrarValor.addToScene(fase.scene));
 
-        fase.mostrarValorDosLados.map(mostrarValor => mostrarValor.update());
+        //Atualiza suas posições
+        fase.mostrarValorDosLados.forEach(mostrarValor => mostrarValor.update());
+
+        const vertices = fase.paralelogramo1.vertices.concat(fase.paralelogramo2.vertices);
+
+        const nomes    = ["A", "B", "C", "D", "X", "Y", "Z", "W"]
+
+        fase.mostrarNomeDosVertices = vertices.map((vertice, indice) => new MostrarNomeVertice(
+                                                                        (indice < 4)? fase.paralelogramo1 : fase.paralelogramo2 ,
+                                                                        vertice, 
+                                                                        nomes[indice]
+                                                                    ))
+        
+        fase.mostrarNomeDosVertices.forEach(mostrarNome => mostrarNome.addToScene(fase.scene));
+
+        fase.mostrarNomeDosVertices.forEach(mostrarNome => mostrarNome.update());
+
     }
    
 

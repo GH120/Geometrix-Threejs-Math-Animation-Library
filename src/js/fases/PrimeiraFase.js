@@ -49,7 +49,7 @@ export class PrimeiraFase extends Fase{
 
         this.outputTesteClick();
 
-        this.debug = true;
+        this.debug = false;
 
         //A fazer:
         //Debugar problema da hitbox do angulo deletada -> Consertado

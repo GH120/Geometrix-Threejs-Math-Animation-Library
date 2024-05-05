@@ -51,43 +51,9 @@ export class LadoParalogramo {
 
     process(){
 
-        const triangulo = this.trianguloSelecionado;
-
-        const a = triangulo.edges.reduce((a,b) => (a.length > b.length? a : b))
-        const b = triangulo.edges.filter(aresta => aresta != this.a)[0];
-        const c = triangulo.edges.filter(aresta => aresta != this.a)[1];
-
-        console.log("lados", a,b,c, triangulo)
-
-        if(!a.valor || !b.valor || !c.valor) throw new Error("Lados do triângulo não tem valores, tente outra fase")
-
-        const equation = new Equality(
-                            new Addition(
-                                new Square(c.valor), 
-                                new Square(b.valor)
-                            ), 
-                            new Square(a.valor)
-                        )
-
-        // const aparecerEquacao = new TextoAparecendo(equation.element);
-        
-
-        // aparecerEquacao.setDuration(100);
-        // aparecerEquacao.valorInicial(-2);
-        // aparecerEquacao.valorFinal(3);
-
-        this.whiteboard.adicionarEquacao(equation);
-        
-        this.whiteboard.animar( 
-                new TextoAparecendo(equation.element)
-                .setValorInicial(-5)
-                .setValorFinal(1)
-                .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
-        );
-
-        this.a = a;
-        this.b = b;
-        this.c = c;
+        // Criar novo output para selecionar lado e arrastar ele
+        // Retorna uma equação de igualdade dos lados
+        // Mudar texto da caixa de diálogos para ensinar jogador
     }
 
     criarVerificadorDeHover(triangulo, scene, camera){
@@ -95,11 +61,11 @@ export class LadoParalogramo {
         const carta = this;
 
         const verificador = new Output()
-                            .setUpdateFunction(function(estado){
+                            .setUpdateFunction(function(novoEstado){
 
                                 const trianguloRenderizado = triangulo.renderedInScene();
 
-                                this.estado.valido = estado.dentro && trianguloRenderizado;
+                                this.estado.valido = novoEstado.dentro && trianguloRenderizado;
 
                                 carta.trianguloSelecionado = triangulo;
 
@@ -109,5 +75,85 @@ export class LadoParalogramo {
         this.outputs.push(verificador);
 
         this.verificadorDeHover = verificador; 
+    }
+
+    criarMoverLados(lado, ladoOposto){
+
+        //Criar um suboutput para verificar se sobrevoa sobre um elemento?
+
+        const carta = this;
+
+        const moverLados = new Output()
+                           .setUpdateFunction(function(novoEstado){
+
+                                const estado = this.estado;
+
+                                //Tratar seleção do lado principal
+                                //Transformar em suboutput?
+                                if(novoEstado.alvo == lado){
+
+                                    if(novoEstado.dentro){
+                                        estado.mouseSobreLadoPrincipal = true;
+                                    }
+                                    
+                                    if(novoEstado.dentro == false){
+                                        estado.mouseSobreLadoPrincipal = false;
+                                    }
+                                }
+                                
+                                if(estado.mouseSobreLadoPrincipal && novoEstado.dragging && !estado.arrastando){
+
+                                    estado.arrastando    = true;
+                                    estado.ultimaPosicao = lado.getPosition();
+                                }
+
+                                //Arrastar lado principal
+                                if(estado.arrastando && novoEstado.dragging){
+                                    
+                                    lado.mesh.position.copy(novoEstado.position);
+                                }
+
+                                //Fim do arraste
+
+                                if(estado.arrastando && novoEstado.dragging == false){
+                                    
+                                    estado.verificar  = true;
+                                }
+
+                                //Verificar se está dentro do lado paralelo
+
+                                if(novoEstado.alvo == ladoOposto){
+                                        
+                                    if(novoEstado.dentro){
+                                        estado.ladoOpostoSelecionado = true;
+                                    }
+
+                                    if(estado.dentro == false){
+                                        estado.ladoOpostoSelecionado = false;
+                                    }
+                                }
+
+                                if(estado.verificar){
+
+                                    if(estado.ladoOpostoSelecionado == true){
+                                        carta.criarEquacao();
+                                    }
+
+                                    if(estado.ladoOpostoSelecionado == false){
+                                        carta.voltarAoInicio();
+                                    }
+                                }
+
+                                //Se sim, retornar a equação
+                           });
+    }
+
+
+    voltarAoInicio(){
+        alert("Falhou");
+    }
+
+    criarEquacao(){
+        alert("Sucesso");
     }
 }

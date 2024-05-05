@@ -38,15 +38,30 @@ export class MostrarAngulo extends Output{
             const angulo = this.angulo;
 
             elemento.element.textContent = `${(angulo.degrees).toFixed()}°`;
-            elemento.element.style.transform = "rotate(-45deg)"
 
             const vetor = new THREE.Vector3(0,0,0)
                         .lerpVectors(angulo.vetor2,     angulo.vetor1,      0.5)
                         .normalize()
-                        .multiplyScalar(1.5*angulo.angleRadius)
+                        .multiplyScalar(2*angulo.angleRadius)
                         .applyMatrix4(new THREE.Matrix4().extractRotation(angulo.mesh.matrixWorld));
 
             const position = this.angulo.mesh.position.clone();
+
+            if(this.fase){
+
+                const razao = elemento.element.textContent.length/4;
+
+                const retangulo = {top:0, bottom:18, left: 0, right: 29.81 * razao};
+
+                const ponto1 = this.fase.pixelToCoordinates(retangulo.top, retangulo.right);
+                const ponto2 = this.fase.pixelToCoordinates(retangulo.bottom, retangulo.left);
+
+                const dimensoesTexto = ponto1.clone().sub(ponto2);
+
+                console.log(dimensoesTexto)
+
+                position.sub(dimensoesTexto.multiplyScalar(0.5))
+            }
 
             const newPosition = position.sub(vetor)
 
@@ -67,16 +82,22 @@ export class MostrarAngulo extends Output{
 
         if(!this.scene) throw Error("Faltou setar a cena com o .addToScene(scene)")
 
-        scene.remove(this.text.elemento)
+        // scene.remove(this.text.elemento)
+
+        if(this.estado.dentro)
+            scene.add(this.text.elemento)
 
         this.onHover(this.estado.dentro);
-
-        if(this.text.on)
-            scene.add(this.text.elemento)
     }
 
     addToScene(scene){
         this.scene = scene;
+        return this;
+    }
+
+    addToFase(fase){
+        this.fase = fase;
+        this.scene = fase.scene;
         return this;
     }
 }

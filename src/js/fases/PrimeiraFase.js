@@ -1656,7 +1656,7 @@ export class PrimeiraFase extends Fase{
 
         if(!angle.mostrarAngulo){
 
-            angle.mostrarAngulo = new MostrarAngulo(angle).addToScene(this.scene);
+            angle.mostrarAngulo = new MostrarAngulo(angle).addToFase(this);
         }
 
         const mostrarAngulo = angle.mostrarAngulo;

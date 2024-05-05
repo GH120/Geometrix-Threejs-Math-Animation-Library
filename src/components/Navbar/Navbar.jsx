@@ -26,9 +26,13 @@ function Navbar(props) {
   const [EquationMenuOpen, setEquationMenuOpen] = useState(false);
   const navigator = useNavigate();
 
-  console.log(props)
-
   const settings = props.settings;
+
+  //Coloca os settings para a fase poder usar os comandos de abrir e fechar a navbar
+  //Olhar depois se isso não causa problemas com o garbage collector
+  useEffect(() => {
+    settings.fase.settings = settings;
+  }, [])
 
   const toggleFaseMenu = () => {
     setFaseMenuOpen(!FaseMenuOpen);
@@ -41,6 +45,8 @@ function Navbar(props) {
   const toggleEquationMenu = () => {
     setEquationMenuOpen(!EquationMenuOpen);
   };
+
+  settings.ativarMenuCartas = (ativo) => setCardsMenuOpen(ativo);
 
   settings.toggleEquationMenu = toggleEquationMenu;
 

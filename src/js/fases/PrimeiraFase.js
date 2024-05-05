@@ -50,6 +50,7 @@ export class PrimeiraFase extends Fase{
         this.outputTesteClick();
 
         this.debug = true;
+        this.debugProblem = 3;
 
         //A fazer:
         //Debugar problema da hitbox do angulo deletada -> Consertado
@@ -379,7 +380,8 @@ export class PrimeiraFase extends Fase{
             "Com essas duas propriedades temos semelhança",
             "Vamos testar para outro exemplo?",
             "Só que dessa vez, vamos fazer juntos",
-            "Verifique se os paralelogramos ABCD e XYZW são semelhantes"
+            "Verifique se os paralelogramos ABCD e XYZW são semelhantes",
+            "Para isso, as cartas a seguir são úteis, basta arrastá-las para as figuras"
         ]
 
         const unidadeMedida = {
@@ -392,14 +394,14 @@ export class PrimeiraFase extends Fase{
         //Adicionar mostrarAngulo nos dois paralelogramos
         //Criar um handler que mostra o tamanho de um certo segmento de reta -> feito
         //Criar um handler que mostra o nome de um vértice -> feito
-        //Criar propriedade paralelogramo => lados paralelos => DA = CB e AB = DC 
-        //Criar propriedade paralelogramo => angulos iguais dos lados paralelos
+        //Criar propriedade paralelogramo => lados paralelos => DA = CB e AB = DC  -> fazendo
+        //Criar propriedade paralelogramo => angulos iguais dos lados paralelos 
         //Criar interação obter razão de dois lados 
         //Com todas as razões => juntar para formar todos os lados proporcionais
         //Todos os lados proporcionais junta com angulos iguais para gerar semelhança
         //Criar propriedades negativas (não semelhança)?
 
-        const animarDialogo = dialogo2.map(texto => new TextoAparecendo(fase.text.element)
+        const dialogosAnimados = dialogo2.map(texto => new TextoAparecendo(fase.text.element)
                                                         .setOnStart(() => fase.changeText(texto))
                                                         .setValorFinal(100)
                                         );
@@ -410,14 +412,14 @@ export class PrimeiraFase extends Fase{
                                 )
                                 .setOnStart(() => fase.whiteboard.ativar(false));
         
-        const primeiraLinha = animarDialogo[0];
+        const primeiraLinha = dialogosAnimados[0];
 
         const segundaLinha  = new AnimacaoSimultanea(
-                                animarDialogo[1],
+                                dialogosAnimados[1],
                                 apagarPoligonos
                             );
 
-        const terceiraLinha = animarDialogo[2];
+        const terceiraLinha = dialogosAnimados[2];
 
 
         const desenharPoligonos = new AnimacaoSimultanea(
@@ -425,17 +427,35 @@ export class PrimeiraFase extends Fase{
                                     new DesenharPoligono(fase.paralelogramo2,fase.scene).filler(50)
                                 );
 
+        const mostrarInformacoes = animacaoIndependente(() => {
+
+            const mostrarNomeVertices = new AnimacaoSimultanea()
+                                    .setAnimacoes(fase.mostrarNomeDosVertices.map(mostrar => mostrar.animacao()));
+
+            const mostrarValorArestas = new AnimacaoSimultanea()
+                                    .setAnimacoes(fase.mostrarValorDosLados.map(mostrar => mostrar.animacao()));
+
+            fase.animar(mostrarNomeVertices);
+            fase.animar(mostrarValorArestas);
+
+        }, 50, 10);
+
         const quartaLinha   = new AnimacaoSimultanea(
                                 desenharPoligonos,
-                                animarDialogo[3]
+                                mostrarInformacoes,
+                                dialogosAnimados[3]
                             ).setOnStart(() => fase.Configuracao6({unidadeMedida: unidadeMedida}))
                             .setOnTermino(() => fase.mostrarAngulosParalelogramos.forEach(output => output.update({dentro:true})))
+
+
+        const quintaLinha = dialogosAnimados[4].setOnStart(() => fase.settings.ativarMenuCartas(true));
 
         const animacao = new AnimacaoSequencial(
                             primeiraLinha,
                             segundaLinha,
                             terceiraLinha,
-                            quartaLinha
+                            quartaLinha,
+                            quintaLinha
                         );
 
         fase.animar(animacao);
@@ -947,9 +967,6 @@ export class PrimeiraFase extends Fase{
         //Torna todos eles visíveis
         fase.mostrarValorDosLados.forEach(mostrarValor => mostrarValor.addToScene(fase.scene));
 
-        //Atualiza suas posições
-        fase.mostrarValorDosLados.forEach(mostrarValor => mostrarValor.update());
-
         const vertices = fase.paralelogramo1.vertices.concat(fase.paralelogramo2.vertices);
 
 
@@ -960,8 +977,6 @@ export class PrimeiraFase extends Fase{
                                                                     ))
         
         fase.mostrarNomeDosVertices.forEach(mostrarNome => mostrarNome.addToScene(fase.scene));
-
-        fase.mostrarNomeDosVertices.forEach(mostrarNome => mostrarNome.update());
 
         const mostrarAngulo1 = new MostrarAngulo(fase.paralelogramo1.angles[1]).addToScene(fase.scene);
         const mostrarAngulo2 = new MostrarAngulo(fase.paralelogramo2.angles[0]).addToScene(fase.scene);
@@ -1572,59 +1587,43 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        // super.update();
-        
+
         
 
-        if(this.debug){
+        if(this.debug && this.debugProblem > this.progresso){
 
             super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
 
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
-        super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
         }
         
         // if(options.atualizar) triangle.update();

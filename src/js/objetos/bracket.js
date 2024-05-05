@@ -5,7 +5,7 @@ import { Objeto } from './objeto';
 
 export default class Bracket extends Objeto{
 
-  constructor(altura=0.2, ponto1=[3,0,0], ponto2=[3,3,0]){
+  constructor(altura=0.2, ponto1=[3,0,0], ponto2=[3,3,0], offset){
 
       super();
 
@@ -15,7 +15,14 @@ export default class Bracket extends Objeto{
       if(ponto1Array) ponto1 = new THREE.Vector3(...ponto1);
       if(ponto2Array) ponto2 = new THREE.Vector3(...ponto2);
 
-      console.log(ponto1,ponto2)
+      if(offset){
+        ponto1.sub(offset);
+        ponto2.sub(offset);
+      }
+
+      console.log(ponto1,ponto2);
+
+      this.position = new THREE.Vector3().lerpVectors(ponto1,ponto2);
 
       this.largura = ponto1.clone().sub(ponto2).length()*0.5;
 
@@ -118,6 +125,7 @@ export default class Bracket extends Objeto{
 
   }
 
+  //** Muda pontos 1 e 2 para renderizar a malha de novo */
   setOrigemDestino(origem,destino){
 
       origem  = new THREE.Vector3(...origem);
@@ -133,16 +141,12 @@ export default class Bracket extends Objeto{
       return this;
   }
 
-  mostrarLinha(edge){
+  static fromAresta(edge, altura, offset){
 
-    this.ponto1 = edge.origem;
-    this.ponto2 = edge.destino;
+    const ponto1 = edge.origem;
+    const ponto2 = edge.destino;
 
-    this.largura = this.ponto1.clone().sub(this.ponto2).length()*0.5;
-
-    this.calculateMatrix(this.ponto1,this.ponto2);
-
-    this.renderMalha()
+    return new Bracket(altura, ponto1, ponto2, offset);
   }
 
   addToScene(scene){

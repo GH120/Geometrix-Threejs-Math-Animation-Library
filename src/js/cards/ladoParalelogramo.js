@@ -1,3 +1,5 @@
+import { AnimacaoSimultanea } from "../animacoes/animation";
+import { apagarCSS2 } from "../animacoes/apagarCSS2";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
 import { Addition, Equality, Square, Value } from "../equations/expressions";
 import { Draggable } from "../inputs/draggable";
@@ -24,34 +26,34 @@ export class LadoParalogramo {
     //Torna eles hoverable e adiciona um output quando estiverem em cima
     trigger(fase){
 
-        const triangulos = fase.objetos;
+        const paralelogramos = fase.objetos;
 
         this.fase = fase;
 
-        for(const triangulo of triangulos){
+        for(const paralelogramo of paralelogramos){
 
             //Por algum motivo, precisa sempre criar novos outputs
 
-            if(!triangulo.hoverable){
-                new Hoverable(triangulo, fase.camera);
+            if(!paralelogramo.hoverable){
+                new Hoverable(paralelogramo, fase.camera);
             }
 
             // if(!this.verificadorDeHover)
-                this.criarVerificadorDeHover(triangulo, fase.scene, fase.camera);
+                this.criarVerificadorDeHover(paralelogramo, fase.scene, fase.camera);
         }
     }
     
     accept(){
 
-        const trianguloValido    = this.outputs.filter(output => output.estado.valido);
+        const paralelogramoValido    = this.outputs.filter(output => output.estado.valido);
 
-        const trianguloRetangulo = trianguloValido.length;
+        const paralelogramoRetangulo = paralelogramoValido.length;
 
-        alert(`Triangulo ${(trianguloValido.length)? "encontrado" : "não encontrado"}`);
+        alert(`paralelogramo ${(paralelogramoValido.length)? "encontrado" : "não encontrado"}`);
 
-        alert(`Triangulo ${trianguloRetangulo? "retângulo: ACEITO" : "não retângulo: REJEITADO"}`);
+        alert(`paralelogramo ${paralelogramoRetangulo? "retângulo: ACEITO" : "não retângulo: REJEITADO"}`);
 
-        return trianguloRetangulo;
+        return paralelogramoRetangulo;
     }
 
     process(){
@@ -60,30 +62,30 @@ export class LadoParalogramo {
 
         const fase = this.fase;
 
-        const paralelogramo = fase.paralelogramo2;
+        const paralelogramo = this.paralelogramoSelecionado;
 
         fase.animar(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"))
 
-        this.criarMoverLados(paralelogramo.edges[0], paralelogramo.edges[2]);
+        this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
         // Retorna uma equação de igualdade dos lados
         // Mudar texto da caixa de diálogos para ensinar jogador
     }
 
-    criarVerificadorDeHover(triangulo, scene, camera){
+    criarVerificadorDeHover(paralelogramo, scene, camera){
 
         const carta = this;
 
         const verificador = new Output()
                             .setUpdateFunction(function(novoEstado){
 
-                                const trianguloRenderizado = triangulo.renderedInScene();
+                                const paralelogramoRenderizado = paralelogramo.renderedInScene();
 
-                                this.estado.valido = novoEstado.dentro && trianguloRenderizado;
+                                this.estado.valido = novoEstado.dentro && paralelogramoRenderizado;
 
-                                carta.trianguloSelecionado = triangulo;
+                                carta.paralelogramoSelecionado = paralelogramo;
 
                             })
-                            .addInputs(triangulo.hoverable);
+                            .addInputs(paralelogramo.hoverable);
 
         this.outputs.push(verificador);
 
@@ -234,17 +236,41 @@ export class LadoParalogramo {
 
         lado.update();
 
-        this.animacaoCriarEquacao(ladoOposto);
+        const direcao = deslocamento.clone().normalize();
+
+        this.animacaoCriarEquacao(lado, ladoOposto, direcao.multiplyScalar(0.7));
     }
 
-    animacaoCriarEquacao(ladoOposto){
+    animacaoCriarEquacao(lado, ladoOposto, direcao){
 
         const fase = this.fase;
 
-        const bracket = new Bracket(0.2, ladoOposto.origem.toArray(), ladoOposto.destino.toArray()).addToScene(fase.scene);
+        const bracket = Bracket.fromAresta(ladoOposto, -0.2, direcao)
+                               .addToScene(fase.scene);
 
-        // const igualdade = fase.createMathJaxTextBox(ladoOposto.value.name + "=" + lado.value.name, ladoOposto.position.toArray(), 3);
+        const igualdade = fase.createMathJaxTextBox(ladoOposto.variable.name + "=" + lado.variable.name, ladoOposto.getPosition().toArray(), 3);
 
-        // fase.animar(bracket.animacao());
+        //Tornar texto na animação de bracket um método do bracket
+        const posicaoIgualdade = bracket.position;
+
+        const desenharChaves = bracket.animacao();
+
+        fase.scene.add(igualdade)
+
+        const mostrarIgualdade = apagarCSS2(igualdade).reverse()
+                                .setOnTermino(() => null)
+                                .setOnStart(() => {
+                                    fase.scene.add(igualdade);
+                                    igualdade.position.copy(posicaoIgualdade)
+                                })
+
+        const animacao = new AnimacaoSimultanea(
+                            desenharChaves,
+                            mostrarIgualdade
+                        );
+
+        fase.animar(animacao);
+
+        
     }
 }

@@ -7,6 +7,7 @@ import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages';
 import * as THREE from 'three';
 import { Output } from './Output';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
+import { apagarCSS2 } from '../animacoes/apagarCSS2';
 
 export default class MostrarValorAresta extends Output{
 
@@ -60,7 +61,7 @@ export default class MostrarValorAresta extends Output{
     addToScene(scene){
         this.scene = scene;
 
-        this.scene.add(this.texto);
+        // this.scene.add(this.texto);
 
         return this;
     }
@@ -100,4 +101,10 @@ export default class MostrarValorAresta extends Output{
         return cPointLabel.mudarTexto(inputTex, tamanhoDaFonte);
     }
 
+    animacao(){
+
+        return apagarCSS2(this.texto).reverse()
+                                     .setOnTermino(() => null)
+                                     .setOnStart(() => this.update({dentro: true}))
+    }
 }

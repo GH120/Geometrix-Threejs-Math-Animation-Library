@@ -7,10 +7,6 @@ function Carta(props) {
 
     let carta;
 
-    useEffect(() => {
-        console.log('current: ', componenteRef.current)
-    }, [])
-
     const handleDragStart = (e) => {
         e.dataTransfer.setData('text/plain', ''); // Define um dado de arraste, que é necessário para ativar o arraste.
 
@@ -39,7 +35,8 @@ function Carta(props) {
             //Se sim, processa
             carta.process();
 
-            settings.toggleEquationMenu(); //Abre o menu de equações
+            settings.ativarMenuCartas(false); //Fecha o menu de cartas
+
         }
 
         //Espera 100ms antes de verificar se a carta está dentro

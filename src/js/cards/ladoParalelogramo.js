@@ -1,7 +1,9 @@
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
 import { Addition, Equality, Square, Value } from "../equations/expressions";
+import { Draggable } from "../inputs/draggable";
 import { Hoverable } from "../inputs/hoverable";
 import { Output } from "../outputs/Output";
+import * as THREE from 'three';
 
 export class LadoParalogramo {
 
@@ -22,6 +24,8 @@ export class LadoParalogramo {
     trigger(fase){
 
         const triangulos = fase.objetos;
+
+        this.fase = fase;
 
         for(const triangulo of triangulos){
 
@@ -52,6 +56,12 @@ export class LadoParalogramo {
     process(){
 
         // Criar novo output para selecionar lado e arrastar ele
+
+        const fase = this.fase;
+
+        const paralelogramo = fase.paralelogramo2;
+
+        this.criarMoverLados(paralelogramo.edges[0], paralelogramo.edges[2])
         // Retorna uma equação de igualdade dos lados
         // Mudar texto da caixa de diálogos para ensinar jogador
     }
@@ -83,6 +93,13 @@ export class LadoParalogramo {
 
         const carta = this;
 
+        if(this.criadoMoverLados) return;
+
+        new Draggable(lado, this.fase.camera);
+        new Hoverable(lado, this.fase.camera);
+        new Hoverable(ladoOposto, this.fase.camera);
+
+
         const moverLados = new Output()
                            .setUpdateFunction(function(novoEstado){
 
@@ -105,12 +122,27 @@ export class LadoParalogramo {
 
                                     estado.arrastando    = true;
                                     estado.ultimaPosicao = lado.getPosition();
+                                    estado.direcao = ladoOposto.getPosition().sub(lado.getPosition()).normalize();
+
                                 }
 
                                 //Arrastar lado principal
                                 if(estado.arrastando && novoEstado.dragging){
-                                    
-                                    lado.mesh.position.copy(novoEstado.position);
+
+                                    const distanciaPercorrida = novoEstado.position
+                                                                          .sub(lado.getPosition())
+                                                                          .dot(estado.direcao);
+
+                                    const deslocamento = estado.direcao.clone()
+                                                                       .multiplyScalar(distanciaPercorrida)
+
+                                    //Criar uma função para atualizar posição?
+                                    //Como os lados tem uma rotação de 90°, precisam ser atualizados quando mudada a posição
+
+                                    lado.origem.add(deslocamento);
+                                    lado.destino.add(deslocamento);
+
+                                    lado.update();
                                 }
 
                                 //Fim do arraste
@@ -137,15 +169,27 @@ export class LadoParalogramo {
 
                                     if(estado.ladoOpostoSelecionado == true){
                                         carta.criarEquacao();
+                                        estado.verificar = false;
                                     }
 
                                     if(estado.ladoOpostoSelecionado == false){
                                         carta.voltarAoInicio();
+                                        estado.verificar = false;
                                     }
                                 }
 
                                 //Se sim, retornar a equação
-                           });
+                           })
+                           .addInputs(
+                                lado.draggable, 
+                                lado.hoverable,
+                                ladoOposto.hoverable
+                            );
+
+        alert("Criado output")
+
+        this.criadoMoverLados = true;
+
     }
 
 

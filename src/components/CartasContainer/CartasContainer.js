@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Carta from '../Carta/Carta';
 import './style.css'
 import CartaPythagoras from '../Carta/CartaPythagoras';
+import CartaLadoParalelogramo from '../Carta/CartaLadoParalelogramo';
 
 function CartasContainer(props) {
   const [cartaEmFrente, setCartaEmFrente] = useState(null);
@@ -28,7 +29,7 @@ function CartasContainer(props) {
             onMouseEnter={() => handleMouseEnter(index)}
             onMouseLeave={handleMouseLeave}
           >
-            <CartaPythagoras valor={carta.valor} naipe={carta.naipe} settings={settings} />
+            <CartaLadoParalelogramo valor={carta.valor} naipe={carta.naipe} settings={settings} />
           </div>
         ))}
       </div>

@@ -260,4 +260,28 @@ export class Poligono extends Objeto{
     get raio(){
         return this.vertices[0].position.clone().sub(this.centro).length();
     }
+
+    get hitbox(){
+
+        if(this._hitbox) return this._hitbox;
+
+
+        // 2. Define the points of the polygon
+        const points = this.positions.map(positions => new THREE.Vector2(positions[0], positions[1]))
+
+        // 3. Create the shape using the points
+        const shape = new THREE.Shape(points);
+
+        // 4. Create the geometry from the shape
+        const geometry = new THREE.ShapeGeometry(shape);
+
+        // 5. Create a mesh with a basic material
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide });
+        const polygonMesh = new THREE.Mesh(geometry, material);
+
+
+        this._hitbox = polygonMesh;
+
+        return this._hitbox;
+    }
 }

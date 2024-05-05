@@ -49,7 +49,7 @@ export class PrimeiraFase extends Fase{
 
         this.outputTesteClick();
 
-        this.debug = false;
+        this.debug = true;
 
         //A fazer:
         //Debugar problema da hitbox do angulo deletada -> Consertado
@@ -137,6 +137,7 @@ export class PrimeiraFase extends Fase{
                               .escala(0.6,0.6,0.6)
                               .translacao(-4,-2,0)
 
+        this.objetos = [this.paralelogramo1, this.paralelogramo2];
     }
 
     //Objetos temporários ou secundários

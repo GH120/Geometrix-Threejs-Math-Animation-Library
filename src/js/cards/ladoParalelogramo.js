@@ -25,9 +25,14 @@ export class LadoParalogramo {
 
         for(const triangulo of triangulos){
 
-            new Hoverable(triangulo, fase.camera);
+            //Por algum motivo, precisa sempre criar novos outputs
 
-            this.verificarHover(triangulo, fase.scene, fase.camera);
+            if(!triangulo.hoverable){
+                new Hoverable(triangulo, fase.camera);
+            }
+
+            // if(!this.verificadorDeHover)
+                this.criarVerificadorDeHover(triangulo, fase.scene, fase.camera);
         }
     }
     
@@ -85,23 +90,24 @@ export class LadoParalogramo {
         this.c = c;
     }
 
-    verificarHover(triangulo, scene, camera){
+    criarVerificadorDeHover(triangulo, scene, camera){
 
         const carta = this;
 
         const verificador = new Output()
                             .setUpdateFunction(function(estado){
 
-                                this.estado.valido = estado.dentro;
+                                const trianguloRenderizado = triangulo.renderedInScene();
 
-                                console.log("sim", this.estado)
+                                this.estado.valido = estado.dentro && trianguloRenderizado;
 
                                 carta.trianguloSelecionado = triangulo;
 
                             })
+                            .addInputs(triangulo.hoverable);
 
-        triangulo.hoverable.addObserver(verificador);
+        this.outputs.push(verificador);
 
-        this.outputs.push(verificador)
+        this.verificadorDeHover = verificador; 
     }
 }

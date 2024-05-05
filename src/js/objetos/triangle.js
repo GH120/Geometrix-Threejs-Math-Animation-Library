@@ -145,6 +145,16 @@ export class Triangle extends Objeto{
         return true;
     }
 
+    renderedInScene(){
+
+        const renderizouVertices = this.vertices && this.vertices[0];
+
+        const verticesNaCena     = this.vertices.filter(vertice => vertice.parent == this.scene).length == this.numeroVertices
+
+        return renderizouVertices && verticesNaCena;
+    }
+
+
     get centro(){
 
         if(!this.vertices) 

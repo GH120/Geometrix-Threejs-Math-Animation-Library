@@ -243,6 +243,15 @@ export class Poligono extends Objeto{
         return true;
     }
 
+    renderedInScene(){
+
+        const renderizouVertices = this.vertices && this.vertices[0];
+
+        const verticesNaCena     = this.vertices.filter(vertice => vertice.mesh.parent).length == this.numeroVertices
+
+        return renderizouVertices && verticesNaCena;
+    }
+
     get centro(){
 
         if(!this.vertices) 

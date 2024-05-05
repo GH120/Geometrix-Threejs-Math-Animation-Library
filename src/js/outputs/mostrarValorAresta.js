@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import { Output } from './Output';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { apagarCSS2 } from '../animacoes/apagarCSS2';
+import MostrarTexto from '../animacoes/MostrarTexto';
 
 export default class MostrarValorAresta extends Output{
 
@@ -103,8 +104,9 @@ export default class MostrarValorAresta extends Output{
 
     animacao(){
 
-        return apagarCSS2(this.texto).reverse()
-                                     .setOnTermino(() => null)
-                                     .setOnStart(() => this.update())
+        return new MostrarTexto(this.texto)
+                .setDuration(30)
+                .setValorFinal(100)
+                .setOnStart(() => this.update())
     }
 }

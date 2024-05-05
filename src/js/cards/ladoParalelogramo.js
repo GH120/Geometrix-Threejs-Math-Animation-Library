@@ -1,9 +1,11 @@
 import { AnimacaoSimultanea } from "../animacoes/animation";
 import { apagarCSS2 } from "../animacoes/apagarCSS2";
+import { colorirAngulo } from "../animacoes/colorirAngulo";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
 import { Addition, Equality, Square, Value } from "../equations/expressions";
 import { Draggable } from "../inputs/draggable";
 import { Hoverable } from "../inputs/hoverable";
+import { HoverPosition } from "../inputs/position";
 import Bracket from "../objetos/bracket";
 import { Output } from "../outputs/Output";
 import * as THREE from 'three';
@@ -66,10 +68,15 @@ export class LadoParalogramo {
 
         fase.animar(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"))
 
+        this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xd3d3d3);
         this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
         // Retorna uma equação de igualdade dos lados
         // Mudar texto da caixa de diálogos para ensinar jogador
     }
+
+
+
+    //OUTPUTS
 
     criarVerificadorDeHover(paralelogramo, scene, camera){
 
@@ -203,6 +210,76 @@ export class LadoParalogramo {
                                 ladoOposto.hoverable
                             )
 
+    }
+
+    criarColorirArestaSelecionada(aresta, corFinal, distanciaDeHover=1){
+
+        const fase = this.fase;
+
+        const corInicial = aresta.material.color;
+
+        new HoverPosition(aresta, fase.camera);
+
+        const colorir = new Output()
+                        .setUpdateFunction(function(novoEstado){
+
+                            const estado = this.estado;
+                            
+                            const foco1 = aresta.origem.clone();
+                            const foco2 = aresta.destino.clone();
+
+                            const posicaoMouse = novoEstado.position;
+
+                            //Círculo
+                            // const distanciaDoMouse = posicao.clone().sub(posicaoMouse).length();
+
+                            //Elipse
+                            const distanciaEntreEixos = new THREE.Vector3().subVectors(foco1, foco2).length();
+
+                            const semieixo = distanciaEntreEixos + distanciaDeHover * 2;
+
+                            const distanciaDoMouse = posicaoMouse.clone().sub(foco1).length() + posicaoMouse.clone().sub(foco2).length(); 
+
+                            estado.dentroDaElipse = distanciaDoMouse < semieixo;
+                           
+                            if(estado.dentroDaElipse && !estado.ativado){
+                                estado.ativado = true;
+                            }
+
+                            if(estado.ativado && !estado.colorir){
+                                estado.colorirAresta = animarColorirAresta();
+                                estado.colorir = true;
+
+                                fase.animar(estado.colorirAresta);
+                            }
+
+                            if(!estado.dentroDaElipse && estado.ativado){
+                                estado.ativado = false;
+                                estado.colorir = false;
+                                estado.colorirAresta.stop = true;
+
+                                estado.colorirAresta = animarColorirAresta().reverse();
+
+                                fase.animar(estado.colorirAresta);
+                            }
+                        })
+                        .setEstadoInicial({
+                            ativado:false,
+                            colorir:false,
+                            colorirAresta: null,
+                            dentroDaElipse: false,
+                        })
+                        .addInputs(aresta.hoverposition)
+
+        function animarColorirAresta(){
+            
+            const animacao = colorirAngulo(aresta)
+                            .setValorInicial(corInicial)
+                            .setValorFinal(corFinal)
+                            .voltarAoInicio(true);
+
+            return animacao;
+        }
     }
 
 

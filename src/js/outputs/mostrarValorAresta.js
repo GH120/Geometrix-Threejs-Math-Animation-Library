@@ -28,7 +28,7 @@ export default class MostrarValorAresta extends Output{
         const position      = this.aresta.getPosition();
 
         //Verificar se antihorário ou horário depois
-        const direcaoAresta    = new THREE.Vector3().subVectors(position, this.aresta.origem);
+        const direcaoAresta    = new THREE.Vector3().subVectors(position, this.aresta.origem.clone());
         const direcaoParalela  = new THREE.Vector3().crossVectors(direcaoAresta, new THREE.Vector3(0,0,-1));
 
         const distanciaTextoAresta = direcaoParalela.normalize().multiplyScalar(this.distanciaTextoAresta);
@@ -105,6 +105,6 @@ export default class MostrarValorAresta extends Output{
 
         return apagarCSS2(this.texto).reverse()
                                      .setOnTermino(() => null)
-                                     .setOnStart(() => this.update({dentro: true}))
+                                     .setOnStart(() => this.update())
     }
 }

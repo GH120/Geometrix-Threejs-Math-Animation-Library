@@ -7,8 +7,8 @@ export class Tracejado extends Objeto{
 
         super();
 
-        this.origem  = origem;
-        this.destino = destino;
+        this.origem  = origem.clone();
+        this.destino = destino.clone();
         this.largura = largura;
         this.altura  = altura;
         this.spacing = spacingRatio;

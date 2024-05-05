@@ -7,8 +7,8 @@ export class Edge extends Objeto{
 
         super();
 
-        this.origem = origem;
-        this.destino = destino;
+        this.origem = origem.clone();
+        this.destino = destino.clone();
 
         this.material = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.grossura = 0.05;

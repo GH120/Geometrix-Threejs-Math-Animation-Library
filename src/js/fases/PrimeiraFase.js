@@ -385,9 +385,9 @@ export class PrimeiraFase extends Fase{
         ]
 
         const unidadeMedida = {
-            razao: 4*1/this.paralelogramo1.edges[0].length, //Razão utilizada para calcular medidas 
+            razao: () => 4*1/this.paralelogramo1.edges[0].length, //Razão utilizada para calcular medidas 
 
-            cm: (medida) => `${Math.round(medida * unidadeMedida.razao)}cm`
+            cm: (medida) => `${Math.round(medida * unidadeMedida.razao())}cm`
         }
 
         //A Fazer:
@@ -436,19 +436,21 @@ export class PrimeiraFase extends Fase{
                                     .setAnimacoes(fase.mostrarValorDosLados.map(mostrar => mostrar.animacao()));
 
             fase.animar(mostrarNomeVertices);
-            fase.animar(mostrarValorArestas);
+            fase.animar(mostrarValorArestas.filler(20));
 
-        }, 50, 10);
+        }, 60, 0);
 
         const quartaLinha   = new AnimacaoSimultanea(
-                                desenharPoligonos,
-                                mostrarInformacoes,
+                                new AnimacaoSequencial(
+                                    desenharPoligonos,
+                                    mostrarInformacoes
+                                ),
                                 dialogosAnimados[3]
                             ).setOnStart(() => fase.Configuracao6({unidadeMedida: unidadeMedida}))
                             .setOnTermino(() => fase.mostrarAngulosParalelogramos.forEach(output => output.update({dentro:true})))
 
 
-        const quintaLinha = dialogosAnimados[4].setOnStart(() => fase.settings.ativarMenuCartas(true));
+        const quintaLinha = new AnimacaoSequencial(dialogosAnimados[4]).setOnStart(() => fase.settings.ativarMenuCartas(true));
 
         const animacao = new AnimacaoSequencial(
                             primeiraLinha,

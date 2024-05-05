@@ -1,6 +1,7 @@
 import { Tracejado } from "../objetos/tracejado";
 import Animacao from "./animation";
 
+//** NÃO É SEGURO, ALTERA O TRACEJADO ENQUANTO FAZ A ANIMAÇÃO */
 export default class MostrarTracejado extends Animacao{
 
     constructor(tracejado, scene){

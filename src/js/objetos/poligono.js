@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {Angle} from './angle';
 import {Edge} from './edge.js';
 import { Objeto } from './objeto';
+import { Variable } from '../equations/expressions';
 
 
 export class Poligono extends Objeto{
@@ -146,6 +147,22 @@ export class Poligono extends Objeto{
         this.angles.map(  angle  => scene.remove(angle.mesh));
 
         return this;
+    }
+
+    //**Cria variáveis para os vértices */
+    nomearVertices(...nomes){
+
+        this.vertices.forEach((vertice, indice) => {
+
+            vertice.variable = new Variable(nomes[indice]);
+        })
+
+        this.edges.forEach((aresta, indice) => {
+
+            const proximo = (indice + 1) % nomes.length;
+
+            aresta.variable = new Variable(nomes[indice].concat(nomes[proximo]));
+        })
     }
 
     update(){

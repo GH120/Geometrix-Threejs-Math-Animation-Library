@@ -930,6 +930,14 @@ export class PrimeiraFase extends Fase{
 
         fase.informacao = {...fase.informacao, ...informacao};
 
+        fase.paralelogramo1.nomearVertices("A", "B", "C", "D");
+        fase.paralelogramo2.nomearVertices("X", "Y", "Z", "W");
+
+        fase.paralelogramo1.edges[2].variable.assignValue(new Value(4));
+        fase.paralelogramo1.edges[3].variable.assignValue(new Value(10));
+        fase.paralelogramo2.edges[2].variable.assignValue(new Value(12));
+        fase.paralelogramo2.edges[3].variable.assignValue(new Value(30));
+
         const unidadeMedida = fase.informacao.unidadeMedida;
 
         const lados = fase.paralelogramo1.edges.concat(fase.paralelogramo2.edges);
@@ -944,12 +952,11 @@ export class PrimeiraFase extends Fase{
 
         const vertices = fase.paralelogramo1.vertices.concat(fase.paralelogramo2.vertices);
 
-        const nomes    = ["A", "B", "C", "D", "X", "Y", "Z", "W"]
 
         fase.mostrarNomeDosVertices = vertices.map((vertice, indice) => new MostrarNomeVertice(
                                                                         (indice < 4)? fase.paralelogramo1 : fase.paralelogramo2 ,
                                                                         vertice, 
-                                                                        nomes[indice]
+                                                                        vertice.variable.name
                                                                     ))
         
         fase.mostrarNomeDosVertices.forEach(mostrarNome => mostrarNome.addToScene(fase.scene));

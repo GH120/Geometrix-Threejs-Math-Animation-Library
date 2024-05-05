@@ -99,6 +99,7 @@ export class Variable extends Expression{
         this.type = "variable";
         this.name = name;
         this.content = name;
+        this.value = null;
     }
 
     get html() {
@@ -111,6 +112,11 @@ export class Variable extends Expression{
         span.expression = this;
 
         return span;
+    }
+
+    assignValue(value){
+        this.value = value;
+        return this;
     }
 
     changeVariable(value, name){

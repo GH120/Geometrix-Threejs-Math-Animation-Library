@@ -2,6 +2,7 @@ import { TextoAparecendo } from "../animacoes/textoAparecendo";
 import { Addition, Equality, Square, Value } from "../equations/expressions";
 import { Draggable } from "../inputs/draggable";
 import { Hoverable } from "../inputs/hoverable";
+import Bracket from "../objetos/bracket";
 import { Output } from "../outputs/Output";
 import * as THREE from 'three';
 
@@ -97,6 +98,8 @@ export class LadoParalogramo {
 
         if(this.criadoMoverLados) return;
 
+        this.criadoMoverLados = true;
+
         new Draggable(lado, this.fase.camera);
         new Hoverable(lado, this.fase.camera);
         new Hoverable(ladoOposto, this.fase.camera);
@@ -170,12 +173,16 @@ export class LadoParalogramo {
                                 if(estado.verificar){
 
                                     if(estado.ladoOpostoSelecionado == true){
-                                        carta.criarEquacao();
+
+                                        carta.criarEquacao(lado, ladoOposto, estado.ultimaPosicao);
+
                                         estado.verificar = false;
                                     }
 
                                     if(!estado.ladoOpostoSelecionado){
+
                                         carta.voltarAoInicio(lado, estado.ultimaPosicao);
+
                                         estado.verificar = false;
                                     }
                                 }
@@ -193,8 +200,6 @@ export class LadoParalogramo {
                                 lado.hoverable,
                                 ladoOposto.hoverable
                             )
-
-        this.criadoMoverLados = true;
 
     }
 
@@ -219,11 +224,27 @@ export class LadoParalogramo {
         fase.animar(dialogo);
     }
 
-    criarEquacao(){
+    criarEquacao(lado, ladoOposto, ultimaPosicao){
         alert("Sucesso");
+
+        const deslocamento = ultimaPosicao.clone().sub(lado.origem);
+
+        lado.origem.add(deslocamento);
+        lado.destino.add(deslocamento);
+
+        lado.update();
+
+        this.animacaoCriarEquacao(ladoOposto);
     }
 
-    animacaoCriarEquacao(){
-        
+    animacaoCriarEquacao(ladoOposto){
+
+        const fase = this.fase;
+
+        const bracket = new Bracket(0.2, ladoOposto.origem.toArray(), ladoOposto.destino.toArray()).addToScene(fase.scene);
+
+        // const igualdade = fase.createMathJaxTextBox(ladoOposto.value.name + "=" + lado.value.name, ladoOposto.position.toArray(), 3);
+
+        // fase.animar(bracket.animacao());
     }
 }

@@ -41,6 +41,15 @@ export default class MostrarValorAresta extends Output{
 
         if(!this.scene) console.log("Falta adicionar cena...");
 
+        const variavelTemValor = this.aresta.variable.value;
+
+        if(!variavelTemValor){
+            this.scene.remove(this.texto);
+        }
+        else{
+            this.scene.add(this.texto);
+        }
+
         this.calcularPosicaoTexto();
 
         const valorEmFormaDeTexto = this.unidadeMedida(this.aresta.length);

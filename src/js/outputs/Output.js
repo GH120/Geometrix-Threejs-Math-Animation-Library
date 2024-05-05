@@ -78,4 +78,10 @@ export class Output{
         return this;
     }
 
+    setEstadoInicial(estado){
+
+        this.estado = estado;
+
+        return this;
+    }
 }

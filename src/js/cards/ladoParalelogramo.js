@@ -61,7 +61,9 @@ export class LadoParalogramo {
 
         const paralelogramo = fase.paralelogramo2;
 
-        this.criarMoverLados(paralelogramo.edges[0], paralelogramo.edges[2])
+        fase.animar(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"))
+
+        this.criarMoverLados(paralelogramo.edges[0], paralelogramo.edges[2]);
         // Retorna uma equação de igualdade dos lados
         // Mudar texto da caixa de diálogos para ensinar jogador
     }
@@ -121,7 +123,7 @@ export class LadoParalogramo {
                                 if(estado.mouseSobreLadoPrincipal && novoEstado.dragging && !estado.arrastando){
 
                                     estado.arrastando    = true;
-                                    estado.ultimaPosicao = lado.getPosition();
+                                    estado.ultimaPosicao = lado.origem.clone();
                                     estado.direcao = ladoOposto.getPosition().sub(lado.getPosition()).normalize();
 
                                 }
@@ -172,32 +174,56 @@ export class LadoParalogramo {
                                         estado.verificar = false;
                                     }
 
-                                    if(estado.ladoOpostoSelecionado == false){
-                                        carta.voltarAoInicio();
+                                    if(!estado.ladoOpostoSelecionado){
+                                        carta.voltarAoInicio(lado, estado.ultimaPosicao);
                                         estado.verificar = false;
                                     }
                                 }
 
                                 //Se sim, retornar a equação
                            })
+                           .setEstadoInicial({
+                                mouseSobreLadoPrincipal: false,
+                                arrastar: false,
+                                ladoOpostoSelecionado: false,
+                                verificar: false,
+                            })
                            .addInputs(
                                 lado.draggable, 
                                 lado.hoverable,
                                 ladoOposto.hoverable
-                            );
-
-        alert("Criado output")
+                            )
 
         this.criadoMoverLados = true;
 
     }
 
 
-    voltarAoInicio(){
+    voltarAoInicio(lado, ultimaPosicao){
         alert("Falhou");
+
+        const deslocamento = ultimaPosicao.clone().sub(lado.origem);
+
+        lado.origem.add(deslocamento);
+        lado.destino.add(deslocamento);
+
+        lado.update();
+
+        const fase = this.fase;
+
+        const dialogo = fase.animacoesDialogo(
+                            "Lado não encontrado, arraste ele mais perto do lado oposto",
+                            "Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"
+                        )
+
+        fase.animar(dialogo);
     }
 
     criarEquacao(){
         alert("Sucesso");
+    }
+
+    animacaoCriarEquacao(){
+        
     }
 }

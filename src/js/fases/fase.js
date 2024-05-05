@@ -25,6 +25,7 @@ import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor.js';
 import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
 import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages'
 import { Operations } from '../equations/operations';
+import { AnimacaoSequencial } from '../animacoes/animation';
 
 export class Fase {
 
@@ -323,6 +324,14 @@ export class Fase {
             labelRenderer.render( scene, camera );
         }
         animate();
+    }
+
+    animacaoDialogo(texto){
+        return new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)).setValorFinal(100)
+    }
+
+    animacoesDialogo(...textos){
+        return new AnimacaoSequencial().setAnimacoes(textos.map(texto => this.animacaoDialogo(texto)));
     }
 
     getTranslatedPositionRelativeToDocument(element) {

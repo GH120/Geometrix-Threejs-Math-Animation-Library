@@ -9,6 +9,7 @@ import { HoverPosition } from "../inputs/position";
 import Bracket from "../objetos/bracket";
 import { Output } from "../outputs/Output";
 import * as THREE from 'three';
+import InsideElipse from "../outputs/insideElipse";
 
 export class LadoParalogramo {
 
@@ -69,6 +70,7 @@ export class LadoParalogramo {
         fase.animar(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"))
 
         this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xd3d3d3);
+        this.criarColorirArestaSelecionada(paralelogramo.edges[0], 0xffff00);
         this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
         // Retorna uma equação de igualdade dos lados
         // Mudar texto da caixa de diálogos para ensinar jogador
@@ -218,42 +220,29 @@ export class LadoParalogramo {
 
         const corInicial = aresta.material.color;
 
-        new HoverPosition(aresta, fase.camera);
-
         const colorir = new Output()
+                        .addInputs(
+                            new InsideElipse(aresta, 0.05, fase.camera, fase.scene) // Para saber se o mouse está proximo da elipse ao redor da aresta
+                        )
                         .setUpdateFunction(function(novoEstado){
 
                             const estado = this.estado;
-                            
-                            const foco1 = aresta.origem.clone();
-                            const foco2 = aresta.destino.clone();
 
-                            const posicaoMouse = novoEstado.position;
-
-                            //Círculo
-                            // const distanciaDoMouse = posicao.clone().sub(posicaoMouse).length();
-
-                            //Elipse
-                            const distanciaEntreEixos = new THREE.Vector3().subVectors(foco1, foco2).length();
-
-                            const semieixo = distanciaEntreEixos + distanciaDeHover * 2;
-
-                            const distanciaDoMouse = posicaoMouse.clone().sub(foco1).length() + posicaoMouse.clone().sub(foco2).length(); 
-
-                            estado.dentroDaElipse = distanciaDoMouse < semieixo;
-                           
-                            if(estado.dentroDaElipse && !estado.ativado){
+                            if(novoEstado.dentro && !estado.ativado){
+                                alert("dentro")
                                 estado.ativado = true;
                             }
 
                             if(estado.ativado && !estado.colorir){
+                                alert("colorindo")
                                 estado.colorirAresta = animarColorirAresta();
                                 estado.colorir = true;
 
                                 fase.animar(estado.colorirAresta);
                             }
 
-                            if(!estado.dentroDaElipse && estado.ativado){
+                            if(novoEstado.dentro == false && estado.ativado){
+                                alert("descolorindo")
                                 estado.ativado = false;
                                 estado.colorir = false;
                                 estado.colorirAresta.stop = true;
@@ -267,9 +256,7 @@ export class LadoParalogramo {
                             ativado:false,
                             colorir:false,
                             colorirAresta: null,
-                            dentroDaElipse: false,
-                        })
-                        .addInputs(aresta.hoverposition)
+                        });
 
         function animarColorirAresta(){
             

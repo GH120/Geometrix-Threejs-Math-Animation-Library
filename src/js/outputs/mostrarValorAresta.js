@@ -105,8 +105,8 @@ export default class MostrarValorAresta extends Output{
     animacao(){
 
         return new MostrarTexto(this.texto)
-                .setDuration(30)
-                .setValorFinal(100)
+                .setDuration(50)
+                .setValorFinal(50)
                 .setOnStart(() => this.update())
     }
 }

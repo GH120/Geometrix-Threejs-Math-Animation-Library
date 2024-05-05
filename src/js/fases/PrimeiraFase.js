@@ -983,6 +983,8 @@ export class PrimeiraFase extends Fase{
         const mostrarAngulo1 = new MostrarAngulo(fase.paralelogramo1.angles[1]).addToScene(fase.scene);
         const mostrarAngulo2 = new MostrarAngulo(fase.paralelogramo2.angles[0]).addToScene(fase.scene);
 
+        mostrarAngulo1.distanciaTextoParaAngulo = 1.2
+
         fase.mostrarAngulosParalelogramos = [mostrarAngulo1, mostrarAngulo2];
     }
    

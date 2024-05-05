@@ -1671,7 +1671,8 @@ export class PrimeiraFase extends Fase{
 
                                     if(updateMostrarAnguloCadaFrame) mostrarAngulo.update({dentro:true});
                                 })
-                                .setDuration(60)
+                                .setDuration(55)
+                                .setDelay(5)
                                 .setCurva(x => {
 
                                     x = 1 - Math.abs(1 - x*2)
@@ -1680,7 +1681,7 @@ export class PrimeiraFase extends Fase{
                                 })
                                 .voltarAoInicio(false)
                                 .manterExecucao(false)
-                                .setOnTermino(() => mostrarAngulo.update({dentro:false}))
+                                .setOnDelay(() => mostrarAngulo.update({dentro:false}))
                                 .setOnStart(() => {
                                     mostrarAngulo.update({dentro:true});
                                 })

@@ -82,7 +82,7 @@ export class MostrarAngulo extends Output{
 
         if(!this.scene) throw Error("Faltou setar a cena com o .addToScene(scene)")
 
-        // scene.remove(this.text.elemento)
+        scene.remove(this.text.elemento)
 
         if(this.estado.dentro)
             scene.add(this.text.elemento)

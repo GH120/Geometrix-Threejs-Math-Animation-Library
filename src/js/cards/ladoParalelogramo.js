@@ -189,6 +189,9 @@ export class LadoParalogramo {
                                         carta.criarEquacao(lado, ladoOposto, estado.ultimaPosicao);
 
                                         estado.verificar = false;
+
+                                        lado.removeAllOutputs();
+                                        ladoOposto.removeAllOutputs();
                                     }
 
                                     if(!estado.ladoOpostoSelecionado){
@@ -232,7 +235,7 @@ export class LadoParalogramo {
                             if(novoEstado.dentro && !estado.ativado){
                                 estado.ativado = true;
 
-                                estado.colorirAresta = animarColorirAresta(aresta.material.color, corFinal);
+                                estado.colorirAresta = animarColorirAresta(aresta.material.color.clone(), corFinal);
 
                                 fase.animar(estado.colorirAresta);
                             }
@@ -241,7 +244,7 @@ export class LadoParalogramo {
                                 estado.ativado = false;
                                 estado.colorirAresta.stop = true;
 
-                                estado.colorirAresta = animarColorirAresta(aresta.material.color, corInicial);
+                                estado.colorirAresta = animarColorirAresta(aresta.material.color.clone(), corInicial);
 
                                 fase.animar(estado.colorirAresta);
                             }
@@ -258,7 +261,7 @@ export class LadoParalogramo {
                             .setValorFinal(final)
                             .voltarAoInicio(false)
                             .setDuration(30)
-                            .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+                            // .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
 
             return animacao;
         }
@@ -309,25 +312,38 @@ export class LadoParalogramo {
         const bracket = Bracket.fromAresta(ladoOposto, -0.2, direcao)
                                .addToScene(fase.scene);
 
-        const igualdade = fase.createMathJaxTextBox(ladoOposto.variable.name + "=" + lado.variable.name, ladoOposto.getPosition().toArray(), 3);
+        const equacao = new Equality(lado.variable, ladoOposto.variable);
+
+        const igualdade = fase.createMathJaxTextBox(equacao.html.textContent, ladoOposto.getPosition().sub(direcao.clone().multiplyScalar(2)).toArray(), 10);
 
         //Tornar texto na animação de bracket um método do bracket
         const posicaoIgualdade = bracket.position;
 
-        const desenharChaves = bracket.animacao();
-
-        fase.scene.add(igualdade)
+        const desenharChaves = bracket.animacao().setDelay(60);
 
         const mostrarIgualdade = apagarCSS2(igualdade).reverse()
-                                .setOnTermino(() => null)
+                                .setOnTermino(() => null) //Mudar variáveis baseado naquelas que já tem valor, atualizar equação e desenhar novamente
                                 .setOnStart(() => {
                                     fase.scene.add(igualdade);
-                                    igualdade.position.copy(posicaoIgualdade)
+                                    // igualdade.position.copy(posicaoIgualdade)
+                                })
+                                .setDuration(100);
+
+        const moverEquacao = fase.moverEquacao({
+                                    elementoCSS2: igualdade,
+                                    duration1: 100,
+                                    duration2: 80,
+                                    spline: [
+                                        new THREE.Vector3(-4.05, 0.8, 0),
+                                        new THREE.Vector3(-3.95, 0, 0),
+                                    ],
+                                    delayDoMeio: 50,
                                 })
 
         const animacao = new AnimacaoSimultanea(
                             desenharChaves,
-                            mostrarIgualdade
+                            mostrarIgualdade,
+                            moverEquacao.filler(70)
                         );
 
         fase.animar(animacao);

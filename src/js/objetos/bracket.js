@@ -146,7 +146,7 @@ export default class Bracket extends Objeto{
     const ponto1 = edge.origem.clone();
     const ponto2 = edge.destino.clone();
 
-    return new Bracket(altura, ponto1, ponto2, offset);
+    return new Bracket(altura, ponto1, ponto2, offset.clone());
   }
 
   addToScene(scene){

@@ -67,4 +67,11 @@ export class Objeto{
     copia(){
         return Objeto.fromMesh(this.mesh.clone());
     }
+
+    removeAllOutputs(){
+        if(this.clickable) this.clickable.removeObservers();
+        if(this.draggable) this.draggable.removeObservers();
+        if(this.hoverable) this.hoverable.removeObservers();
+        if(this.hoverposition) this.hoverposition.removeObservers();
+    }
 }

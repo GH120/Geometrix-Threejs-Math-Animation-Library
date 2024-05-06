@@ -46,8 +46,6 @@ export default class InsideElipse extends Output{
 
         const dentroDaElipse = distanciaDoMouse < semieixo;
 
-        console.log(dentroDaElipse)
-        
         if(estado.dentroDaElipse != dentroDaElipse){
             
             estado.dentroDaElipse = dentroDaElipse;

@@ -143,8 +143,8 @@ export default class Bracket extends Objeto{
 
   static fromAresta(edge, altura, offset){
 
-    const ponto1 = edge.origem;
-    const ponto2 = edge.destino;
+    const ponto1 = edge.origem.clone();
+    const ponto2 = edge.destino.clone();
 
     return new Bracket(altura, ponto1, ponto2, offset);
   }

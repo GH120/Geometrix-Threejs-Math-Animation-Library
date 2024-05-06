@@ -69,7 +69,8 @@ export class LadoParalogramo {
 
         fase.animar(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"))
 
-        this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xd3d3d3);
+        //Ligar aresta oposta selecionada com o mover lados para só iluminar estiver sendo arrastado
+        this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xe828282);
         this.criarColorirArestaSelecionada(paralelogramo.edges[0], 0xffff00);
         this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
         // Retorna uma equação de igualdade dos lados
@@ -214,7 +215,7 @@ export class LadoParalogramo {
 
     }
 
-    criarColorirArestaSelecionada(aresta, corFinal, distanciaDeHover=1){
+    criarColorirArestaSelecionada(aresta, corFinal){
 
         const fase = this.fase;
 
@@ -229,44 +230,40 @@ export class LadoParalogramo {
                             const estado = this.estado;
 
                             if(novoEstado.dentro && !estado.ativado){
-                                alert("dentro")
                                 estado.ativado = true;
-                            }
 
-                            if(estado.ativado && !estado.colorir){
-                                alert("colorindo")
-                                estado.colorirAresta = animarColorirAresta();
-                                estado.colorir = true;
+                                estado.colorirAresta = animarColorirAresta(aresta.material.color, corFinal);
 
                                 fase.animar(estado.colorirAresta);
                             }
 
                             if(novoEstado.dentro == false && estado.ativado){
-                                alert("descolorindo")
                                 estado.ativado = false;
-                                estado.colorir = false;
                                 estado.colorirAresta.stop = true;
 
-                                estado.colorirAresta = animarColorirAresta().reverse();
+                                estado.colorirAresta = animarColorirAresta(aresta.material.color, corInicial);
 
                                 fase.animar(estado.colorirAresta);
                             }
                         })
                         .setEstadoInicial({
                             ativado:false,
-                            colorir:false,
                             colorirAresta: null,
                         });
 
-        function animarColorirAresta(){
+        function animarColorirAresta(inicial, final){
             
             const animacao = colorirAngulo(aresta)
-                            .setValorInicial(corInicial)
-                            .setValorFinal(corFinal)
-                            .voltarAoInicio(true);
+                            .setValorInicial(inicial)
+                            .setValorFinal(final)
+                            .voltarAoInicio(false)
+                            .setDuration(30)
+                            .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
 
             return animacao;
         }
+
+        return colorir;
     }
 
 

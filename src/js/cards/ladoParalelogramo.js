@@ -332,6 +332,11 @@ export class LadoParalogramo {
                                 })
                                 .setDuration(100);
 
+
+        //Mudar variável conhecida da equação => whiteboard guarda identidade das variáveis
+        //Animação de mudar variável para valor => pode ser afetada localmente
+        //Adcionar o valor conhecido da equação na whiteboard
+
         const moverEquacao = fase.moverEquacao({
                                     elementoCSS2: igualdade,
                                     duration1: 100,

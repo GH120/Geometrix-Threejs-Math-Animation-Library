@@ -177,7 +177,7 @@ export class LadoParalogramo {
                                         estado.ladoOpostoSelecionado = true;
                                     }
 
-                                    if(estado.dentro == false){
+                                    if(novoEstado.dentro == false){
                                         estado.ladoOpostoSelecionado = false;
                                     }
                                 }
@@ -222,7 +222,7 @@ export class LadoParalogramo {
 
         const fase = this.fase;
 
-        const corInicial = aresta.material.color;
+        const corInicial = aresta.material.color.getHex();
 
         const colorir = new Output()
                         .addInputs(
@@ -235,23 +235,26 @@ export class LadoParalogramo {
                             if(novoEstado.dentro && !estado.ativado){
                                 estado.ativado = true;
 
-                                estado.colorirAresta = animarColorirAresta(aresta.material.color.clone(), corFinal);
+                                if(estado.colorirAresta.execucaoTerminada()) 
+                                    estado.colorirAresta = animarColorirAresta(corInicial, corFinal);
+                                else
+                                    estado.colorirAresta.reverse(true);
+                                
 
                                 fase.animar(estado.colorirAresta);
                             }
 
                             if(novoEstado.dentro == false && estado.ativado){
                                 estado.ativado = false;
-                                estado.colorirAresta.stop = true;
-
-                                estado.colorirAresta = animarColorirAresta(aresta.material.color.clone(), corInicial);
+                                
+                                estado.colorirAresta.reverse(true);
 
                                 fase.animar(estado.colorirAresta);
                             }
                         })
                         .setEstadoInicial({
                             ativado:false,
-                            colorirAresta: null,
+                            colorirAresta: animarColorirAresta(corFinal, corInicial),
                         });
 
         function animarColorirAresta(inicial, final){

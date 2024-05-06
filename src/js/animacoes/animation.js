@@ -193,7 +193,7 @@ export default class Animacao {
         return this.frames;
     }
 
-    reverse(resetEndFunction, resetStartFunction){
+    reverse(reverterFrames){
 
         const valorFinal   = this.valorFinal;
         const valorInicial = this.valorInicial;
@@ -201,10 +201,14 @@ export default class Animacao {
         this.valorFinal = valorInicial;
         this.valorInicial = valorFinal;
 
-        if(resetEndFunction) this.onTermino = () => null;
-        if(resetStartFunction) this.onStart = () => null;
+        //Se precisar reverter animação equanto ela executa
+        if(reverterFrames) this.frame = this.frames - this.frame + 1;
 
         return this;
+    }
+
+    execucaoTerminada(){
+        return this.frame > this.frames + this.delay;
     }
 }
 

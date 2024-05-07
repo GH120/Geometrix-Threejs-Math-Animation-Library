@@ -24,6 +24,7 @@ function Carta(props) {
         
     };
     
+    //VERIFICAR BUG DE INTERATIVIDADE, AS VEZES CARTAS É UNDEFINED
     const handleDragEnd = async (e) => {
         console.log(componenteRef.current)
 

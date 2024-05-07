@@ -101,15 +101,67 @@ export class LadoParalogramo {
         this.verificadorDeHover = verificador; 
     }
 
+    
+    criarColorirArestaSelecionada(aresta, corFinal){
+
+        const fase = this.fase;
+
+        const corInicial = aresta.material.color.getHex();
+
+        const colorir = new Output()
+                        .addInputs(
+                            new InsideElipse(aresta, 0.05, fase.camera, fase.scene) // Para saber se o mouse está proximo da elipse ao redor da aresta
+                        )
+                        .setUpdateFunction(function(novoEstado){
+
+                            const estado = this.estado;
+
+                            if(novoEstado.dentro && !estado.ativado){
+                                estado.ativado = true;
+
+                                if(estado.colorirAresta.execucaoTerminada()) 
+                                    estado.colorirAresta = animarColorirAresta(corInicial, corFinal);
+                                else
+                                    estado.colorirAresta.reverse(true);
+                                
+
+                                fase.animar(estado.colorirAresta);
+                            }
+
+                            if(novoEstado.dentro == false && estado.ativado){
+                                estado.ativado = false;
+                                
+                                estado.colorirAresta.reverse(true);
+
+                                fase.animar(estado.colorirAresta);
+                            }
+                        })
+                        .setEstadoInicial({
+                            ativado:false,
+                            colorirAresta: animarColorirAresta(corFinal, corInicial),
+                        });
+
+        function animarColorirAresta(inicial, final){
+            
+            const animacao = colorirAngulo(aresta)
+                            .setValorInicial(inicial)
+                            .setValorFinal(final)
+                            .voltarAoInicio(false)
+                            .setDuration(30)
+                            // .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+
+            return animacao;
+        }
+
+        return colorir;
+    }
+
+    //Controle intermediário, move um lado apenas
     criarMoverLados(lado, ladoOposto){
 
         //Criar um suboutput para verificar se sobrevoa sobre um elemento?
 
         const carta = this;
-
-        if(this.criadoMoverLados) return;
-
-        this.criadoMoverLados = true;
 
         new Draggable(lado, this.fase.camera);
         new Hoverable(lado, this.fase.camera);
@@ -187,17 +239,12 @@ export class LadoParalogramo {
 
                                         estado.verificar = false;
 
+                                        //Avisa o controle principal qual lado foi selecionado
                                         this.notify({
                                             ladoSelecionado: ladoOposto, 
                                             ladoOriginal: lado,
                                             ultimaPosicaoDoLadoOriginal: estado.ultimaPosicao
                                         })
-
-                                        carta.criarEquacao(lado, ladoOposto, estado.ultimaPosicao)
-
-
-                                        lado.removeAllOutputs();
-                                        ladoOposto.removeAllOutputs();
                                     }
 
                                     if(!estado.ladoOpostoSelecionado){
@@ -220,67 +267,16 @@ export class LadoParalogramo {
                                 lado.draggable, 
                                 lado.hoverable,
                                 ladoOposto.hoverable
-                            )
+                            );
+
+        return moverLados;
 
     }
 
-    criarColorirArestaSelecionada(aresta, corFinal){
-
-        const fase = this.fase;
-
-        const corInicial = aresta.material.color.getHex();
-
-        const colorir = new Output()
-                        .addInputs(
-                            new InsideElipse(aresta, 0.05, fase.camera, fase.scene) // Para saber se o mouse está proximo da elipse ao redor da aresta
-                        )
-                        .setUpdateFunction(function(novoEstado){
-
-                            const estado = this.estado;
-
-                            if(novoEstado.dentro && !estado.ativado){
-                                estado.ativado = true;
-
-                                if(estado.colorirAresta.execucaoTerminada()) 
-                                    estado.colorirAresta = animarColorirAresta(corInicial, corFinal);
-                                else
-                                    estado.colorirAresta.reverse(true);
-                                
-
-                                fase.animar(estado.colorirAresta);
-                            }
-
-                            if(novoEstado.dentro == false && estado.ativado){
-                                estado.ativado = false;
-                                
-                                estado.colorirAresta.reverse(true);
-
-                                fase.animar(estado.colorirAresta);
-                            }
-                        })
-                        .setEstadoInicial({
-                            ativado:false,
-                            colorirAresta: animarColorirAresta(corFinal, corInicial),
-                        });
-
-        function animarColorirAresta(inicial, final){
-            
-            const animacao = colorirAngulo(aresta)
-                            .setValorInicial(inicial)
-                            .setValorFinal(final)
-                            .voltarAoInicio(false)
-                            .setDuration(30)
-                            // .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
-
-            return animacao;
-        }
-
-        return colorir;
-    }
 
     controleArrastarLados(){
 
-        const paralelogramo = fase.paralelogramo;
+        const paralelogramo = this.paralelogramoSelecionado;
 
         //Outputs auxiliares
         this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xe828282);
@@ -291,25 +287,67 @@ export class LadoParalogramo {
         const moverLadosLaterais  = this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
         const moverLadosVerticais = this.criarMoverLados(paralelogramo.edges[1], paralelogramo.edges[3]);
 
+
+        const dialogos = {
+            primeiroLadoMovido1: `Temos agora três lados conhecidos, `,
+            primeiroLadoMovido2: `Use o mesmo raciocinio com o lado restante para obter seu valor`,
+            ultimoLadoMovido: `Muito bem, agora conhecemos todos os lados`
+        }
+
+        const carta = this;
+
         //Controle propriamente dito
         return new Output()
                .addInputs(moverLadosLaterais, moverLadosVerticais)
                .setUpdateFunction(function(novoEstado){
 
+                    const estado = this.estado;
                     
-                estado.verificar = false;
+                    const lado       = novoEstado.ladoOriginal; 
+                    const ladoOposto = novoEstado.ladoSelecionado;
+                    const ultimaPosicao = novoEstado.ultimaPosicaoDoLadoOriginal;
 
-                const lado       = novoEstado.ladoOriginal; 
-                const ladoOposto = novoEstado.ladoSelecionado;
-                const ultimaPosicao = novoEstado.ultimaPosicaoDoLadoOriginal;
+                    //Desativa todos os outputs desses objetos
+                    lado.removeAllOutputs();
+                    ladoOposto.removeAllOutputs();
 
-                carta.criarEquacao(lado, ladoOposto, ultimaPosicao)
+                    const criarEquacao = carta.criarEquacao(lado, ladoOposto, ultimaPosicao);
 
+                    //Função para ser rodada no término do criarEquacao
+                    function animarComentario(){
 
-                lado.removeAllOutputs();
-                ladoOposto.removeAllOutputs();
+                        estado.ladosConhecidos++;
+
+                        if(estado.ladosconhecidos == 3){
+                            
+                            const animacaoDialogo = new AnimacaoSequencial(
+                                                        carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
+                                                        carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
+                                                    )
+
+                            carta.fase.animar(animacaoDialogo);
+                        }
+
+                        if(estado.ladosconhecidos == 4){
+                            
+                            const animacaoDialogo = new AnimacaoSequencial(
+                                                        carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
+                                                        carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
+                                                    );
+
+                            animacaoDialogo.setOnTermino(() => this.notify({terminadaExecucao: true}))
+
+                            carta.fase.animar(animacaoDialogo);
+                        }
+                    }
+
+                    //Só anima comentário depois de executar as animações da equação
+                    //Quando terminado diálogo, notifica termino dessa execução
+                    criarEquacao.setOnTermino(animarComentario);
                })
-               .setEstadoInicial({ladosConhecidos: 0})
+               .setEstadoInicial({
+                    ladosConhecidos: paralelogramo.edges.filter(aresta => aresta.variable.value).length
+                })
     }
 
 
@@ -345,7 +383,7 @@ export class LadoParalogramo {
 
         const direcao = deslocamento.clone().normalize();
 
-        this.animacaoCriarEquacao(lado, ladoOposto, direcao.multiplyScalar(0.7));
+        return this.animacaoCriarEquacao(lado, ladoOposto, direcao.multiplyScalar(0.7));
     }
 
     animacaoCriarEquacao(lado, ladoOposto, direcao){

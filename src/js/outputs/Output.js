@@ -14,8 +14,6 @@ export class Output{
 
         this._update(novoEstado); // função update privada
 
-        this.notify(this.estado);
-
         return this;
     }
 
@@ -72,6 +70,8 @@ export class Output{
     addInputs(...inputs){
 
         for(const input of inputs){
+
+            console.log(input, inputs)
             input.addObserver(this);
         }
 

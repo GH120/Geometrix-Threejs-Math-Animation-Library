@@ -70,10 +70,8 @@ export class LadoParalogramo {
 
         fase.animar(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"))
 
-        //Ligar aresta oposta selecionada com o mover lados para só iluminar estiver sendo arrastado
-        this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xe828282);
-        this.criarColorirArestaSelecionada(paralelogramo.edges[0], 0xffff00);
-        this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
+        
+        this.controleArrastarLados()
         // Retorna uma equação de igualdade dos lados
         // Mudar texto da caixa de diálogos para ensinar jogador
     }
@@ -187,9 +185,16 @@ export class LadoParalogramo {
 
                                     if(estado.ladoOpostoSelecionado == true){
 
-                                        carta.criarEquacao(lado, ladoOposto, estado.ultimaPosicao);
-
                                         estado.verificar = false;
+
+                                        this.notify({
+                                            ladoSelecionado: ladoOposto, 
+                                            ladoOriginal: lado,
+                                            ultimaPosicaoDoLadoOriginal: estado.ultimaPosicao
+                                        })
+
+                                        carta.criarEquacao(lado, ladoOposto, estado.ultimaPosicao)
+
 
                                         lado.removeAllOutputs();
                                         ladoOposto.removeAllOutputs();
@@ -271,6 +276,40 @@ export class LadoParalogramo {
         }
 
         return colorir;
+    }
+
+    controleArrastarLados(){
+
+        const paralelogramo = fase.paralelogramo;
+
+        //Outputs auxiliares
+        this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xe828282);
+        this.criarColorirArestaSelecionada(paralelogramo.edges[0], 0xffff00);
+        this.criarColorirArestaSelecionada(paralelogramo.edges[1], 0xe828282);
+        this.criarColorirArestaSelecionada(paralelogramo.edges[3], 0xffff00);
+
+        const moverLadosLaterais  = this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
+        const moverLadosVerticais = this.criarMoverLados(paralelogramo.edges[1], paralelogramo.edges[3]);
+
+        //Controle propriamente dito
+        return new Output()
+               .addInputs(moverLadosLaterais, moverLadosVerticais)
+               .setUpdateFunction(function(novoEstado){
+
+                    
+                estado.verificar = false;
+
+                const lado       = novoEstado.ladoOriginal; 
+                const ladoOposto = novoEstado.ladoSelecionado;
+                const ultimaPosicao = novoEstado.ultimaPosicaoDoLadoOriginal;
+
+                carta.criarEquacao(lado, ladoOposto, ultimaPosicao)
+
+
+                lado.removeAllOutputs();
+                ladoOposto.removeAllOutputs();
+               })
+               .setEstadoInicial({ladosConhecidos: 0})
     }
 
 
@@ -381,6 +420,6 @@ export class LadoParalogramo {
 
         fase.animar(animacao);
 
-        
+        return animacao;
     }
 }

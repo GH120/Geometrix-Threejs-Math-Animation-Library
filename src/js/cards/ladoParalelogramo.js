@@ -281,11 +281,11 @@ export class LadoParalogramo {
         //Outputs auxiliares
         this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xe828282);
         this.criarColorirArestaSelecionada(paralelogramo.edges[0], 0xffff00);
-        this.criarColorirArestaSelecionada(paralelogramo.edges[1], 0xe828282);
-        this.criarColorirArestaSelecionada(paralelogramo.edges[3], 0xffff00);
+        this.criarColorirArestaSelecionada(paralelogramo.edges[3], 0xe828282);
+        this.criarColorirArestaSelecionada(paralelogramo.edges[1], 0xffff00);
 
         const moverLadosLaterais  = this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
-        const moverLadosVerticais = this.criarMoverLados(paralelogramo.edges[1], paralelogramo.edges[3]);
+        const moverLadosVerticais = this.criarMoverLados(paralelogramo.edges[3], paralelogramo.edges[1]);
 
 
         const dialogos = {
@@ -307,47 +307,55 @@ export class LadoParalogramo {
                     const ladoOposto = novoEstado.ladoSelecionado;
                     const ultimaPosicao = novoEstado.ultimaPosicaoDoLadoOriginal;
 
-                    //Desativa todos os outputs desses objetos
+                    //Desativa todos os outputs como mover lado e colorir
                     lado.removeAllOutputs();
                     ladoOposto.removeAllOutputs();
 
-                    const criarEquacao = carta.criarEquacao(lado, ladoOposto, ultimaPosicao);
+                    estado.ladosConhecidos++;
 
-                    //Função para ser rodada no término do criarEquacao
-                    function animarComentario(){
-
-                        estado.ladosConhecidos++;
-
-                        if(estado.ladosconhecidos == 3){
-                            
-                            const animacaoDialogo = new AnimacaoSequencial(
-                                                        carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
-                                                        carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
-                                                    )
-
-                            carta.fase.animar(animacaoDialogo);
-                        }
-
-                        if(estado.ladosconhecidos == 4){
-                            
-                            const animacaoDialogo = new AnimacaoSequencial(
-                                                        carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
-                                                        carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
-                                                    );
-
-                            animacaoDialogo.setOnTermino(() => this.notify({terminadaExecucao: true}))
-
-                            carta.fase.animar(animacaoDialogo);
-                        }
-                    }
+                    const avisarSeControleTerminou = () => this.notify({execucaoTerminada: estado.ladosConhecidos == paralelogramo.numeroVertices})
 
                     //Só anima comentário depois de executar as animações da equação
                     //Quando terminado diálogo, notifica termino dessa execução
-                    criarEquacao.setOnTermino(animarComentario);
+                    carta.criarEquacao(lado, ladoOposto, ultimaPosicao)
+                         .setOnTermino(
+                            () => animarComentario(estado)
+                                 .setOnTermino(avisarSeControleTerminou)
+                        );
                })
                .setEstadoInicial({
                     ladosConhecidos: paralelogramo.edges.filter(aresta => aresta.variable.value).length
                 })
+
+        //Funções auxiliares:
+
+        //Função para ser rodada no término do criarEquacao
+        function animarComentario(estado){
+
+            let animacaoDialogo;
+
+            if(estado.ladosConhecidos == 3){
+                
+                animacaoDialogo = new AnimacaoSequencial(
+                                    carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
+                                    carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
+                                )
+
+                carta.fase.animar(animacaoDialogo);
+            }
+
+            if(estado.ladosConhecidos == 4){
+                
+                animacaoDialogo = new AnimacaoSequencial(
+                                    carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
+                                    carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
+                                );
+
+                carta.fase.animar(animacaoDialogo);
+            }
+
+            return animacaoDialogo;
+        }
     }
 
 

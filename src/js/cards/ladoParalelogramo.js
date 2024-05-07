@@ -341,34 +341,19 @@ export class LadoParalogramo {
         //Fazer animação mudando o valor 
 
         const mudarValor = new AnimacaoSequencial(
-            new MostrarTexto(igualdade)
-            .setValorInicial(100)
-            .setValorFinal(20)
-            .setDuration(80)
-            .setCurva(x => {
-                const c1 = 1.70158;
-                const c2 = c1 * 1.525;
+            apagarCSS2(igualdade, fase.scene)
+            .setDuration(500)
+            .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2),
 
-                return x < 0.5
-                ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
-                : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
-            })
-            .setOnTermino(function(){
+            apagarCSS2(igualdade).reverse()
+            .setOnTermino(() => null) 
+            .setOnStart(function(){
                 equacao.changeVariable(lado.variable.value, ladoOposto.variable.name);
                 igualdade.mudarTexto(equacao.html.textContent)
+                fase.scene.add(igualdade);
                 this.setProgresso(0)
-            }),
-
-            new MostrarTexto(igualdade)
-            .setDuration(80)
-            .setCurva(x => {
-                const c1 = 1.70158;
-                const c2 = c1 * 1.525;
-
-                return x < 0.5
-                ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
-                : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
             })
+            .setDuration(1000)
         )
 
         const moverEquacao = fase.moverEquacao({
@@ -384,7 +369,7 @@ export class LadoParalogramo {
 
         const animacao = new AnimacaoSimultanea(
                             desenharChaves,
-                            new AnimacaoSequencial(mostrarIgualdade, mudarValor, moverEquacao),
+                            new AnimacaoSequencial(mostrarIgualdade,mudarValor, moverEquacao),
                         );
 
         fase.animar(animacao);

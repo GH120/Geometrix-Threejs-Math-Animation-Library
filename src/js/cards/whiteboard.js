@@ -9,8 +9,10 @@ export class Whiteboard {
         this.animacoes = [];
         this.frames = [];
         this.equationWindow = null; // Initialize as null
+
         this.equacoes = []
-        this.variables = [];
+        this.variaveis = [];
+        this.variaveisIguais = [];
 
         this.start();
     }
@@ -230,11 +232,41 @@ export class Whiteboard {
         return new THREE.Vector2(normalizedX,normalizedY);
     }
 
-    adicionarVariavel(variavel){
+    //Talvez adicionar isso na classe operações
+    adicionarVariavelDefinida(expressao){
 
-        this.variaveis.push(variavel);
-        
-        return this;
+        const igualdade = expressao.name == "equality";
+
+        const temVariavel = expressao.right.type == "variable" || expressao.left.type == "variable"
+
+        //MALDITA SEJA FALTA DE POLIMORFISMO!!!!
+        if(igualdade && expressao.right.type == "variable" ){
+
+            const variable = expressao.right;
+            
+            if(expressao.left.type == "value"){
+                variable.valor = expressao.left
+                this.variaveis.push(variable)
+            }
+
+            if(expressao.left.type == "variable"){
+                this.variaveisIguais.push(variable)
+            }
+        }
+
+        if(igualdade && expressao.left.type == "variable" ){
+
+            const variable = expressao.right;
+            
+            if(expressao.right.type == "value"){
+                variable.valor = expressao.right
+                this.variaveis.push(variable)
+            }
+
+            if(expressao.right.type == "variable"){
+                this.variaveisIguais.push(variable)
+            }
+        }
     }
 
 }

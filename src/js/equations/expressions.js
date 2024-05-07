@@ -6,10 +6,12 @@ class Expression{
     changeVariable(value, name){
         
         if(this.right && this.right.changeVariable(value, name)){
+            this.right.value = value;
             this.right.substitute(value)
         }
 
         if(this.left && this.left.changeVariable(value, name)){
+            this.left.value = value;
             this.left.substitute(value)
         }
 

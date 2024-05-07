@@ -10,6 +10,7 @@ export class Whiteboard {
         this.frames = [];
         this.equationWindow = null; // Initialize as null
         this.equacoes = []
+        this.variables = [];
 
         this.start();
     }
@@ -227,6 +228,13 @@ export class Whiteboard {
         const normalizedX = (x - rect.left) / canvas.width * 2 - 1;
         const normalizedY = -(y - rect.top) / canvas.height * 2 + 1;
         return new THREE.Vector2(normalizedX,normalizedY);
+    }
+
+    adicionarVariavel(variavel){
+
+        this.variaveis.push(variavel);
+        
+        return this;
     }
 
 }

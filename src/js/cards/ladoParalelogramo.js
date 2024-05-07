@@ -1,4 +1,4 @@
-import { AnimacaoSimultanea } from "../animacoes/animation";
+import { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/animation";
 import { apagarCSS2 } from "../animacoes/apagarCSS2";
 import { colorirAngulo } from "../animacoes/colorirAngulo";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
@@ -10,6 +10,7 @@ import Bracket from "../objetos/bracket";
 import { Output } from "../outputs/Output";
 import * as THREE from 'three';
 import InsideElipse from "../outputs/insideElipse";
+import MostrarTexto from "../animacoes/MostrarTexto";
 
 export class LadoParalogramo {
 
@@ -337,6 +338,39 @@ export class LadoParalogramo {
         //Animação de mudar variável para valor => pode ser afetada localmente
         //Adcionar o valor conhecido da equação na whiteboard
 
+        //Fazer animação mudando o valor 
+
+        const mudarValor = new AnimacaoSequencial(
+            new MostrarTexto(igualdade)
+            .setValorInicial(100)
+            .setValorFinal(20)
+            .setDuration(80)
+            .setCurva(x => {
+                const c1 = 1.70158;
+                const c2 = c1 * 1.525;
+
+                return x < 0.5
+                ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+                : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+            })
+            .setOnTermino(function(){
+                equacao.changeVariable(lado.variable.value, ladoOposto.variable.name);
+                igualdade.mudarTexto(equacao.html.textContent)
+                this.setProgresso(0)
+            }),
+
+            new MostrarTexto(igualdade)
+            .setDuration(80)
+            .setCurva(x => {
+                const c1 = 1.70158;
+                const c2 = c1 * 1.525;
+
+                return x < 0.5
+                ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+                : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+            })
+        )
+
         const moverEquacao = fase.moverEquacao({
                                     elementoCSS2: igualdade,
                                     duration1: 100,
@@ -350,8 +384,7 @@ export class LadoParalogramo {
 
         const animacao = new AnimacaoSimultanea(
                             desenharChaves,
-                            mostrarIgualdade,
-                            moverEquacao.filler(70)
+                            new AnimacaoSequencial(mostrarIgualdade, mudarValor, moverEquacao),
                         );
 
         fase.animar(animacao);

@@ -325,13 +325,14 @@ export class LadoParalogramo {
 
         const desenharChaves = bracket.animacao().setDelay(60);
 
-        const mostrarIgualdade = apagarCSS2(igualdade).reverse()
-                                .setOnTermino(() => null) //Mudar variáveis baseado naquelas que já tem valor, atualizar equação e desenhar novamente
+        const mostrarIgualdade = new MostrarTexto(igualdade)
                                 .setOnStart(() => {
                                     fase.scene.add(igualdade);
                                     // igualdade.position.copy(posicaoIgualdade)
                                 })
-                                .setDuration(100);
+                                .setValorFinal(200)
+                                .setDuration(100)
+                                .setDelay(50)
 
 
         //Mudar variável conhecida da equação => whiteboard guarda identidade das variáveis
@@ -341,24 +342,30 @@ export class LadoParalogramo {
         //Fazer animação mudando o valor 
 
         const mudarValor = new AnimacaoSequencial(
-            apagarCSS2(igualdade, fase.scene)
-            .setDuration(500)
+            new MostrarTexto(igualdade)
+            .setOnTermino(() => fase.scene.remove(igualdade))
+            .setDuration(50)
+            .setValorInicial(200)
+            .setValorFinal(50)
+            .setDelay(50)
             .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2),
 
-            apagarCSS2(igualdade).reverse()
-            .setOnTermino(() => null) 
+            new MostrarTexto(igualdade)
             .setOnStart(function(){
                 equacao.changeVariable(lado.variable.value, ladoOposto.variable.name);
                 igualdade.mudarTexto(equacao.html.textContent)
                 fase.scene.add(igualdade);
                 this.setProgresso(0)
             })
-            .setDuration(1000)
+            .setValorInicial(50)
+            .setValorFinal(200)
+            .setDuration(100)
         )
 
         const moverEquacao = fase.moverEquacao({
                                     elementoCSS2: igualdade,
-                                    duration1: 100,
+                                    equacao: equacao,
+                                    duration1: 0,
                                     duration2: 80,
                                     spline: [
                                         new THREE.Vector3(-4.05, 0.8, 0),

@@ -1591,8 +1591,6 @@ export class PrimeiraFase extends Fase{
         // this.atualizarOptions();
 
         super.update();
-        super.update();
-        super.update();
 
         
 

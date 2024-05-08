@@ -264,6 +264,9 @@ export class Fase {
         if(animacaoRepetida.length) {
             animacaoRepetida[0].finalizarExecucao();
             this.animacoes = this.animacoes.filter(animacao => animacao.name != animacaoRepetida[0].name)
+            if(animacao.nome == "Dialogo Carta") {
+                console.log(this.animacoes, animacaoRepetida)
+            }
         }
 
         animacao.animationFrames = animacao.getFrames();
@@ -283,7 +286,7 @@ export class Fase {
     //** O update que roda no loop de animações*/
     update(){
 
-        this.frames.map(frame => frame.next()); //Roda as animações do programa
+        this.frames.forEach(frame => frame.next()); //Roda as animações do programa
 
         this.animationControler.handleCheckpoint();
     }

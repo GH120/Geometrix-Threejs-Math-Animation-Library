@@ -111,9 +111,9 @@ export default class Animacao {
 
             this.update(valor);
 
-            while (this.pause) yield this.frame; //se estiver pausado, continua executando// A FAZER
-
             if(this.stop) return;
+
+            while (this.pause) yield this.frame; //se estiver pausado, continua executando// A FAZER
 
             this.frame = frame;
 
@@ -226,6 +226,8 @@ export default class Animacao {
             this.onTermino();
             this.manter = false;
         }
+
+        this.frame = this.frames + this.delay
         
         return this;
     }
@@ -335,9 +337,16 @@ export class AnimacaoSimultanea extends Animacao{
     finalizarExecucao(){
 
         this.stop = true;
-        this.manter = false;
-
+        
         this.animacoes.map(animacao => animacao.finalizarExecucao());
+
+        if(this.frame < this.frames) {
+            this.onDelay();
+            this.onTermino();
+            this.manter = false;
+        }
+
+        this.frame = this.frames + this.delay
 
         return this;
     }
@@ -389,12 +398,9 @@ export class AnimacaoSequencial extends Animacao{
 
                 this.frame++;
 
-                if(this.pularAnimacoes){
-                    this.subAnimacaoAtual.finalizarExecucao();
-                    break;
-                }
-
                 while (this.pause) yield this.frame;
+
+                if(this.stop) return;
 
                 yield action.next();
 
@@ -470,8 +476,21 @@ export class AnimacaoSequencial extends Animacao{
         return this.animacoes.map(animacao => animacao._calculateFrames() + animacao.delay).reduce((a,b) => a+b,0);
     }
 
+    //Frames tem que ser o maximo
+    //Pense assim: se houver uma animação sequencial que tem uma animação sequencial
+    //Ela vai continuar a chamar essa execução mesmo ela tendo acabado
     finalizarExecucao(){
-        this.pularAnimacoes = true;
+        this.stop = true;
+
+        this.animacoes.map(animacao => animacao.finalizarExecucao()); 
+
+        if(this.frame < this.frames) {
+            this.onDelay();
+            this.onTermino();
+            this.manter = false;
+        }
+
+        this.frame = this.frames + this.delay
 
         return this;
     }

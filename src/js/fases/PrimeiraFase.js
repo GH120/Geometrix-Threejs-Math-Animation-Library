@@ -455,8 +455,8 @@ export class PrimeiraFase extends Fase{
         const animacao = new AnimacaoSequencial(
                             primeiraLinha,
                             segundaLinha,
-                            terceiraLinha,
-                            quartaLinha.setOnTermino(() => animacao.setNome('Dialogo Carta')),
+                            terceiraLinha.setOnTermino(() => animacao.setNome('Dialogo Carta')),
+                            quartaLinha,
                             quintaLinha
                         );
 
@@ -2535,7 +2535,7 @@ export class PrimeiraFase extends Fase{
 
                 dialogo1.setOnTermino(() => fase.settings.ativarMenuCartas(true));
 
-                fase.animar(new AnimacaoSequencial(dialogo1, dialogo2))
+                fase.animar(new AnimacaoSequencial(dialogo1, dialogo2).setNome("Dialogo Cartas"))
             },
 
             proximo(fase){

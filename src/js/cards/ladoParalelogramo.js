@@ -356,7 +356,7 @@ export class LadoParalogramo {
 
             if(estado.ladosConhecidos == 4){
                 
-                animacaoDialogo = carta.fase.animacaoDialogo(dialogos.ultimaPosicao);
+                animacaoDialogo = carta.fase.animacaoDialogo(dialogos.ultimoLadoMovido);
 
                 animacaoDialogo.setNome("Dialogo Carta");
 
@@ -466,7 +466,6 @@ export class LadoParalogramo {
                                         new THREE.Vector3(-4.05, 0.8, 0),
                                         new THREE.Vector3(-3.95, 0, 0),
                                     ],
-                                    delayDoMeio: 50,
                                 })
 
         const animacao = new AnimacaoSimultanea(

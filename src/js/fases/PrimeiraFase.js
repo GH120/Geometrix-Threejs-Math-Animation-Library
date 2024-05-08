@@ -1617,6 +1617,8 @@ export class PrimeiraFase extends Fase{
 
     //Muito complexo, melhor não
 
+    //Adicionar update(estado) ai passa o estado para o problema da fase
+    //Assim controles podem mudar o problema da fase satisfazendo uma condição
     update(){
         // this.atualizarOptions();
 

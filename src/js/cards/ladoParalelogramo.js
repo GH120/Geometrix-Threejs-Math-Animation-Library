@@ -317,6 +317,8 @@ export class LadoParalogramo {
                     lado.removeAllOutputs();
                     ladoOposto.removeAllOutputs();
 
+                    colorirArestas.map(arestaColorida => arestaColorida.update({dentro:false}));
+
                     estado.ladosConhecidos++;
 
                     const avisarSeControleTerminou = () => this.notify({execucaoTerminada: estado.ladosConhecidos == paralelogramo.numeroVertices})
@@ -342,7 +344,10 @@ export class LadoParalogramo {
 
             if(estado.ladosConhecidos == 3){
                 
-                animacaoDialogo = carta.fase.animacaoDialogo(dialogos.ultimaPosicao);
+                animacaoDialogo = new AnimacaoSequencial(
+                                    carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
+                                    carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
+                                );
 
                 animacaoDialogo.setNome("Dialogo Carta");
 
@@ -351,10 +356,7 @@ export class LadoParalogramo {
 
             if(estado.ladosConhecidos == 4){
                 
-                animacaoDialogo = new AnimacaoSequencial(
-                                    carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
-                                    carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
-                                );
+                animacaoDialogo = carta.fase.animacaoDialogo(dialogos.ultimaPosicao);
 
                 animacaoDialogo.setNome("Dialogo Carta");
 

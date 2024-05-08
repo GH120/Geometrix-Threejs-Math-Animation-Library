@@ -344,6 +344,8 @@ export class LadoParalogramo {
                 
                 animacaoDialogo = carta.fase.animacaoDialogo(dialogos.ultimaPosicao);
 
+                animacaoDialogo.setNome("Dialogo Carta");
+
                 carta.fase.animar(animacaoDialogo);
             }
 
@@ -353,6 +355,8 @@ export class LadoParalogramo {
                                     carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
                                     carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
                                 );
+
+                animacaoDialogo.setNome("Dialogo Carta");
 
                 carta.fase.animar(animacaoDialogo);
             }
@@ -378,6 +382,7 @@ export class LadoParalogramo {
                             "Lado não encontrado, arraste ele mais perto do lado oposto",
                             "Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"
                         )
+                        // .setNome("Dialogo Carta")
 
         fase.animar(dialogo);
     }
@@ -452,7 +457,7 @@ export class LadoParalogramo {
 
         const moverEquacao = fase.moverEquacao({
                                     elementoCSS2: igualdade,
-                                    // equacao: equacao,
+                                    equacao: equacao,
                                     duration1: 0,
                                     duration2: 80,
                                     spline: [

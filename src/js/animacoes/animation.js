@@ -69,6 +69,9 @@ export default class Animacao {
         return this;
     }
 
+    /** Usado no update da fase para determinar se substitui animação com mesmo nome
+     * Funciona como um identificador para apenas uma thread com esse nome executar no update
+    */
     setNome(nome){
         this.nome = nome;
         return this;
@@ -110,7 +113,7 @@ export default class Animacao {
 
             while (this.pause) yield this.frame; //se estiver pausado, continua executando// A FAZER
 
-            if(this.stop) return this.update(this.valorInicial); //se parar a execução, volta ao inicio
+            if(this.stop) return;
 
             this.frame = frame;
 
@@ -126,6 +129,8 @@ export default class Animacao {
 
             this.frame = frame;
 
+            if(this.stop) return;
+
             while (this.pause) yield this.frame;
 
             yield this.update(this.valorFinal);
@@ -134,7 +139,7 @@ export default class Animacao {
         //Enquanto estiver com a flag para manter a execução, continue retornando o ultimo frame
         while(this.manter) {
             
-            if(this.stop) return this.update(this.valorInicial);
+            if(this.stop) return;
 
             yield this.update(this.valorFinal);
         }
@@ -210,6 +215,20 @@ export default class Animacao {
     execucaoTerminada(){
         return this.frame > this.frames + this.delay;
     }
+
+    finalizarExecucao(){
+
+        this.stop = true;
+
+        if(this.frame < this.frames) {
+            this.setProgresso(1);
+            this.onDelay();
+            this.onTermino();
+            this.manter = false;
+        }
+        
+        return this;
+    }
 }
 
 //BUG A CONSERTAR: MANTER EXECUÇÃO TODOS
@@ -251,6 +270,8 @@ export class AnimacaoSimultanea extends Animacao{
         for(let frame = 0; frame <= this.frames; frame++){
 
             this.frame = frame;
+
+            if(this.stop) return;
 
             while (this.pause) yield this.frame;
 
@@ -310,6 +331,16 @@ export class AnimacaoSimultanea extends Animacao{
                     .map(animacao => animacao._calculateFrames() + animacao.delay)
                     .reduce((a,b) => (a>b)? a : b);
     }
+
+    finalizarExecucao(){
+
+        this.stop = true;
+        this.manter = false;
+
+        this.animacoes.map(animacao => animacao.finalizarExecucao());
+
+        return this;
+    }
 }
 
 export class AnimacaoSequencial extends Animacao{
@@ -358,6 +389,11 @@ export class AnimacaoSequencial extends Animacao{
 
                 this.frame++;
 
+                if(this.pularAnimacoes){
+                    this.subAnimacaoAtual.finalizarExecucao();
+                    break;
+                }
+
                 while (this.pause) yield this.frame;
 
                 yield action.next();
@@ -367,16 +403,7 @@ export class AnimacaoSequencial extends Animacao{
             //Com dois desses por algum motivo funciona
             action.next();
             action.next();
-
-
-            // // //Quando terminada, adicionar as completadas
-            // completedActions.push(action);
-
-            // //Mantém a execução opcionalmente das animações completas
-            // completedActions.map(completed => completed.next());
         }
-
-        if(this.nome == "SELECIONADO") console.log("sucesso2")
         
 
         //Mantém a execução do frame final de todas as animações
@@ -441,6 +468,12 @@ export class AnimacaoSequencial extends Animacao{
 
     _calculateFrames(){
         return this.animacoes.map(animacao => animacao._calculateFrames() + animacao.delay).reduce((a,b) => a+b,0);
+    }
+
+    finalizarExecucao(){
+        this.pularAnimacoes = true;
+
+        return this;
     }
 }
 

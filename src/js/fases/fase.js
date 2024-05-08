@@ -258,6 +258,14 @@ export class Fase {
     //Roda animação
     animar(animacao){
 
+        // Só uma animação com o mesmo nome, como se fossem threads
+        const animacaoRepetida = this.animacoes.filter(repetida => repetida.nome && repetida.nome == animacao.nome);
+
+        if(animacaoRepetida.length) {
+            animacaoRepetida[0].finalizarExecucao();
+            this.animacoes = this.animacoes.filter(animacao => animacao.name != animacaoRepetida[0].name)
+        }
+
         animacao.animationFrames = animacao.getFrames();
 
         this.frames.push(animacao.animationFrames);

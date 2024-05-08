@@ -296,7 +296,7 @@ export class PrimeiraFase extends Fase{
                               .setOnStart(criarControleJuntarEquacoes)
                               .setOnTermino(() => fase.whiteboard.ativar(true));
 
-        const quartaLinha   = animarDialogo[3];
+        const quartaLinha   = animarDialogo[3].setDuration(10000);
 
         //Cada um desses limpa as equações da tela e coloca a equação resultante
         const TodosOsAngulosIguais = fase.animacaoEquacoesVirandoUmaSo("primeiroDialogo", equacoes.angulosIguais, 3);
@@ -311,7 +311,7 @@ export class PrimeiraFase extends Fase{
                             quartaLinha
                         )
 
-        this.animar(animacao);
+        this.animar(animacao.setNome("Execução Principal"));
 
 
         function criarControleJuntarEquacoes() {
@@ -456,11 +456,11 @@ export class PrimeiraFase extends Fase{
                             primeiraLinha,
                             segundaLinha,
                             terceiraLinha,
-                            quartaLinha,
+                            quartaLinha.setOnTermino(() => animacao.setNome('Dialogo Carta')),
                             quintaLinha
                         );
 
-        fase.animar(animacao);
+        fase.animar(animacao.setNome("Execução Principal"));
     }
 
     secondDialogue(){
@@ -2419,7 +2419,6 @@ export class PrimeiraFase extends Fase{
                                 adicionarTotal.setCheckpoint(false),
                                 apagarTotal.setCheckpoint(false)
                             )
-                            .setNome("SELECIONADO")
                             .setCheckpoint(false)
                             .setOnTermino(() => fase.whiteboard.ativar(false))
 

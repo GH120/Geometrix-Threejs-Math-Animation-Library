@@ -77,7 +77,7 @@ export class Fase {
         this.animationControler = new AnimationControler(null,this,null,null,null);
         this.operadores = new Operations(null,this);
         this.dimensoes  = {width: width, height: height}
-
+        this.controleDaCarta = null;
     }
     
 
@@ -447,5 +447,10 @@ export class Fase {
         equationWindow.appendChild(selecionador);
     }
 
+    //Adiciona o controle da carta em execução, verificar necessidade de tornar uma pilha
+    adicionarControleDaCarta(controle){
+        this.controleDaCarta = controle;
 
+        return this;
+    }
 }

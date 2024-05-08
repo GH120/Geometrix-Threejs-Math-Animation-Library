@@ -49,15 +49,15 @@ export class LadoParalogramo {
     
     accept(){
 
-        const paralelogramoValido    = this.outputs.filter(output => output.estado.valido);
+        const paralelogramo    = this.paralelogramoSelecionado
 
-        const paralelogramoRetangulo = paralelogramoValido.length;
+        const todosLadosConhecidos = paralelogramo.edges.filter(edge => edge.variable.value).length == paralelogramo.edges.length;
 
-        alert(`paralelogramo ${(paralelogramoValido.length)? "encontrado" : "não encontrado"}`);
+        alert(`paralelogramo ${(paralelogramo)? "encontrado" : "não encontrado"}`);
 
-        alert(`paralelogramo ${paralelogramoRetangulo? "retângulo: ACEITO" : "não retângulo: REJEITADO"}`);
+        alert(`paralelogramo ${(!todosLadosConhecidos) ? "retângulo: ACEITO" : "não retângulo: REJEITADO"}`);
 
-        return paralelogramoRetangulo;
+        return paralelogramo && !todosLadosConhecidos;
     }
 
     process(){
@@ -71,7 +71,9 @@ export class LadoParalogramo {
         fase.animar(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"))
 
         
-        this.controleArrastarLados()
+        //Transformar isso em uma pilha?
+        //Fase agora lida com esse controle
+        fase.adicionarControleDaCarta(this.controleArrastarLados());
         // Retorna uma equação de igualdade dos lados
         // Mudar texto da caixa de diálogos para ensinar jogador
     }
@@ -298,6 +300,7 @@ export class LadoParalogramo {
 
         //Controle propriamente dito
         return new Output()
+               .setName('Controle Arraste') 
                .addInputs(moverLadosLaterais, moverLadosVerticais)
                .setUpdateFunction(function(novoEstado){
 
@@ -336,10 +339,7 @@ export class LadoParalogramo {
 
             if(estado.ladosConhecidos == 3){
                 
-                animacaoDialogo = new AnimacaoSequencial(
-                                    carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
-                                    carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
-                                )
+                animacaoDialogo = carta.fase.animacaoDialogo(dialogos.ultimaPosicao);
 
                 carta.fase.animar(animacaoDialogo);
             }

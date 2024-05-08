@@ -987,6 +987,36 @@ export class PrimeiraFase extends Fase{
 
         fase.mostrarAngulosParalelogramos = [mostrarAngulo1, mostrarAngulo2];
     }
+
+    Configuracao7(informacao){
+
+        const fase = this;
+
+        fase.informacao = {...fase.informacao, ...informacao};
+
+        const controleDaCarta = informacao.controle;
+
+        fase.mostrarValorDosLados.forEach(mostrarAresta => controleDaCarta.addObserver(mostrarAresta));
+
+        const tratarFimDaExecucao = new Output()
+                                    .setUpdateFunction((novoEstado) => {
+                                        
+                                        if(novoEstado.execucaoTerminada){
+                                            //Comentar para o usuário o que deve ser feito
+                                            fase.progresso++;
+                                            fase.informacao.paralelogramoCompleto = true;
+                                            //Limitar o quesito do lado paralelogramo -> feito na carta
+                                        }
+                                    })
+
+        //Requerimetos:
+        //Quando terminar execução, executar texto
+        controleDaCarta.addObserver(tratarFimDaExecucao);
+    }
+
+    Configuracao7b(){
+        
+    }
    
 
     //Outputs abaixo
@@ -2499,42 +2529,31 @@ export class PrimeiraFase extends Fase{
 
             consequencia(fase){
                 
-                fase.outputClickVertice[2].update({clicado:true})
+                const dialogo1 = fase.animacaoDialogo("Ótimo, agora só por precaução faça o mesmo para o outro paralelogramo")
+                const dialogo2 = fase.animacaoDialogo("Queremos ver se os lados são proporcionais, e é útil descobrir os desconhecidos");
+
+                dialogo1.setOnTermino(() => fase.settings.ativarMenuCartas(true));
+
+                fase.animar(new AnimacaoSequencial(dialogo1, dialogo2))
             },
 
             proximo(fase){
-                return 180
+                return "final"
             }
         },
 
-        180: {
-            //Se dois outputs de arraste tiverem finalizado(posições corretas), então 180° está satisfeito
-            satisfeito: (fase) => fase.outputDragAngle.filter(output => output.estado.finalizado).length == 2,
-
-            consequencia: (fase) => {
-
-                fase.animar180Graus();
-
-                fase.Configuracao4();
-
-            },
-
-            proximo: (fase) => 5,
-
-            // estado: new Estado(this, "setupObjects", "Configuracao3", "180", {})
-        },
-
-        5: {
-            satisfeito(fase){
-                console.log(fase.informacao.angulosDeletados)
-                return fase.informacao.angulosDeletados == 2;
-            },
-
-            consequencia(fase){
-                
-                fase.animar(fase.dialogo3());
-            },
+        final: {
+            satisfeito: () => false
         }
+    }
+
+    //Termina o setup dos controles de interação das cartas
+    //Interface para realizar interações entre cartas e fase
+    adicionarControleDaCarta(controle){
+
+        const fase = this;
+
+        if(controle.name == "Controle Arraste") fase.Configuracao7({controle: controle});
     }
 
 

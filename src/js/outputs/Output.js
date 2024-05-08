@@ -84,4 +84,9 @@ export class Output{
 
         return this;
     }
+
+    setName(name){
+        this.name = name;
+        return this;
+    }
 }

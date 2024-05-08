@@ -31,9 +31,14 @@ export default class InsideElipse extends Output{
 
         const aresta = this.aresta;
         const estado = this.estado;
+
+        const deslocamento = aresta.destino.clone()
+                                           .sub(aresta.origem)
+                                           .normalize()
+                                           .multiplyScalar(this.distanciaDeHover);
                             
-        const foco1 = aresta.origem.clone();
-        const foco2 = aresta.destino.clone();
+        const foco1 = aresta.origem.clone().add(deslocamento);
+        const foco2 = aresta.destino.clone().sub(deslocamento);
 
         const posicaoMouse = novoEstado.position;
 

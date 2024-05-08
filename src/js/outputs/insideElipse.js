@@ -18,6 +18,9 @@ export default class InsideElipse extends Output{
 
         this.addInputs(new HoverPosition(this.hitbox, camera));
 
+        aresta.interactable = this; //Trata isso como se fosse um input, para quando for deletar inputs esse vim incluso
+
+
         this.setEstadoInicial({
             dentroDaElipse: false
         })

@@ -73,5 +73,7 @@ export class Objeto{
         if(this.draggable) this.draggable.removeObservers();
         if(this.hoverable) this.hoverable.removeObservers();
         if(this.hoverposition) this.hoverposition.removeObservers();
+
+        if(this.interactable) this.interactable.removeObservers();
     }
 }

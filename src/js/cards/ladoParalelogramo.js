@@ -281,10 +281,13 @@ export class LadoParalogramo {
         const paralelogramo = this.paralelogramoSelecionado;
 
         //Outputs auxiliares
-        this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xe828282);
-        this.criarColorirArestaSelecionada(paralelogramo.edges[0], 0xffff00);
-        this.criarColorirArestaSelecionada(paralelogramo.edges[3], 0xe828282);
-        this.criarColorirArestaSelecionada(paralelogramo.edges[1], 0xffff00);
+
+        const colorirArestas = [
+            this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xe828282),
+            this.criarColorirArestaSelecionada(paralelogramo.edges[0], 0xffff00),
+            this.criarColorirArestaSelecionada(paralelogramo.edges[3], 0xe828282),
+            this.criarColorirArestaSelecionada(paralelogramo.edges[1], 0xffff00)
+        ]
 
         const moverLadosLaterais  = this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
         const moverLadosVerticais = this.criarMoverLados(paralelogramo.edges[3], paralelogramo.edges[1]);
@@ -449,7 +452,7 @@ export class LadoParalogramo {
 
         const moverEquacao = fase.moverEquacao({
                                     elementoCSS2: igualdade,
-                                    equacao: equacao,
+                                    // equacao: equacao,
                                     duration1: 0,
                                     duration2: 80,
                                     spline: [
@@ -461,7 +464,7 @@ export class LadoParalogramo {
 
         const animacao = new AnimacaoSimultanea(
                             desenharChaves,
-                            new AnimacaoSequencial(mostrarIgualdade,mudarValor, moverEquacao),
+                            new AnimacaoSequencial(mostrarIgualdade, mudarValor, moverEquacao),
                         );
 
         fase.animar(animacao);

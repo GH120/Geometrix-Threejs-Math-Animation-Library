@@ -13,10 +13,15 @@ import { GiCardAceSpades } from 'react-icons/gi'
 import MenuFaseNovo from '../MenuFaseNovo/MenuFaseNovo';
 import Modal from '../modal/Modal';
 
+import { LadoParalogramo } from '../../js/cards/ladoParalelogramo';
+import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
+import { AnguloParalogramo } from '../../js/cards/anguloParalelogramo';
+import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
+
 const cartas = [
-  { valor: 'A', naipe: 'copas' },
-  { valor: '2', naipe: 'espadas' },
-  { valor: 'K', naipe: 'ouros' },
+  { tipo: LadoParalogramo,   imagem: imagemParalelogramoLado },
+  { tipo: AnguloParalogramo, imagem: imagemAnguloParalelogramo},
+  { tipo: LadoParalogramo,   imagem: imagemParalelogramoLado },
   // Adicione mais cartas conforme necessário
 ];
 

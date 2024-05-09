@@ -2,7 +2,9 @@ import * as THREE from 'three'
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { Output } from './Output';
 import { apagarCSS2 } from '../animacoes/apagarCSS2';
+import { Value } from '../equations/expressions';
 
+//REFATORAR DEPOIS, DESCULPE QUEM ESTÁ LENDO ISSO
 export class MostrarAngulo extends Output{
 
     constructor(angle){
@@ -19,10 +21,6 @@ export class MostrarAngulo extends Output{
         const p = document.createElement('p');
         p.style.fontFamily = "'Latin Modern Math', 'Computer Modern', serif";
         p.textContent = "teste";
-
-        // const wrapper = document.createElement("div");
-
-        // wrapper.addChild(p);
 
         const cPointLabel = new CSS2DObject(p);
 
@@ -69,10 +67,15 @@ export class MostrarAngulo extends Output{
 
             elemento.position.copy(newPosition)
 
+            this.angle.variable.value = new Value(angulo.degrees.toFixed())
+
             this.text.on = true;
         }
         else{
             this.text.on = false;
+
+            this.angle.variable.value = null
+
         }
     }
 

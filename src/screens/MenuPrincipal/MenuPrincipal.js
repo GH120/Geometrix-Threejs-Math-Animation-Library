@@ -149,7 +149,7 @@ export const MenuPrincipal = () => {
       <div className="options">
         <h1>Geometrix</h1>
         <ul>
-          <li className="elemento-lista-menu"><Link to="/">INICIAR JOGO</Link></li>
+          <li className="elemento-lista-menu"><Link to="/level/8">INICIAR JOGO</Link></li>
           <li className="elemento-lista-menu" onClick={() => {setModalOpen(true)}}><a href="#">ESCOLHER FASE</a></li>
           <li className="elemento-lista-menu"><a href="#">CRÉDITOS</a></li>
         </ul>

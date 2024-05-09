@@ -326,10 +326,13 @@ export class LadoParalogramo {
                     //Só anima comentário depois de executar as animações da equação
                     //Quando terminado diálogo, notifica termino dessa execução
                     carta.criarEquacao(lado, ladoOposto, ultimaPosicao)
-                         .setOnTermino(
-                            () => animarComentario(estado)
+                         .setOnStart(
+                            () => animarComentario(estado.ladosConhecidos)
                                  .setOnTermino(avisarSeControleTerminou)
-                        );
+                         )
+                         .setOnTermino(() =>{
+                             this.notify({}) //Atualiza o valor das aresta que tem esse controle como input
+                         })
                })
                .setEstadoInicial({
                     ladosConhecidos: paralelogramo.edges.filter(aresta => aresta.variable.value).length
@@ -338,11 +341,11 @@ export class LadoParalogramo {
         //Funções auxiliares:
 
         //Função para ser rodada no término do criarEquacao
-        function animarComentario(estado){
+        function animarComentario(ladosConhecidos){
 
             let animacaoDialogo;
 
-            if(estado.ladosConhecidos == 3){
+            if(ladosConhecidos == 3){
                 
                 animacaoDialogo = new AnimacaoSequencial(
                                     carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
@@ -354,7 +357,7 @@ export class LadoParalogramo {
                 carta.fase.animar(animacaoDialogo);
             }
 
-            if(estado.ladosConhecidos == 4){
+            if(ladosConhecidos == 4){
                 
                 animacaoDialogo = carta.fase.animacaoDialogo(dialogos.ultimoLadoMovido);
 
@@ -408,12 +411,18 @@ export class LadoParalogramo {
 
         const fase = this.fase;
 
-        const bracket = Bracket.fromAresta(ladoOposto, -0.2, direcao)
+        const bracket = Bracket.fromAresta(ladoOposto, -0.2, direcao.clone().multiplyScalar(0.5))
                                .addToScene(fase.scene);
 
-        const equacao = new Equality(lado.variable, ladoOposto.variable);
+        const equacao = new Equality(ladoOposto.variable, lado.variable);
 
-        const igualdade = fase.createMathJaxTextBox(equacao.html.textContent, ladoOposto.getPosition().sub(direcao.clone().multiplyScalar(2)).toArray(), 10);
+
+        const posicaoTexto = ladoOposto.getPosition()
+                                       .sub(direcao.clone().multiplyScalar(0.75));
+                                       
+        if(direcao.x > 0.3) posicaoTexto.sub(new THREE.Vector3(0.7,0,0)); //Offset do lado esquerdo
+
+        const igualdade = fase.createMathJaxTextBox(equacao.html.textContent, posicaoTexto.toArray(), 10);
 
         //Tornar texto na animação de bracket um método do bracket
         const posicaoIgualdade = bracket.position;
@@ -441,36 +450,44 @@ export class LadoParalogramo {
             .setOnTermino(() => fase.scene.remove(igualdade))
             .setDuration(50)
             .setValorInicial(200)
-            .setValorFinal(50)
+            .setValorFinal(45)
             .setDelay(50)
             .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2),
 
             new MostrarTexto(igualdade)
             .setOnStart(function(){
-                equacao.changeVariable(lado.variable.value, ladoOposto.variable.name);
+
+                equacao.changeVariable(lado.variable.value, lado.variable.name);
+
+                ladoOposto.variable.value = lado.variable.value;
+
                 igualdade.mudarTexto(equacao.html.textContent)
                 fase.scene.add(igualdade);
                 this.setProgresso(0)
             })
-            .setValorInicial(50)
+            .setValorInicial(45)
             .setValorFinal(200)
             .setDuration(100)
         )
 
-        const moverEquacao = fase.moverEquacao({
-                                    elementoCSS2: igualdade,
-                                    equacao: equacao,
-                                    duration1: 0,
-                                    duration2: 80,
-                                    spline: [
-                                        new THREE.Vector3(-4.05, 0.8, 0),
-                                        new THREE.Vector3(-3.95, 0, 0),
-                                    ],
-                                })
+        const apagarEquacao = apagarCSS2(igualdade, fase.scene)
+                              .setDuration(30)
+                              .setCurva(x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
+
+        // const moverEquacao = fase.moverEquacao({
+        //                             elementoCSS2: igualdade,
+        //                             equacao: equacao,
+        //                             duration1: 0,
+        //                             duration2: 80,
+        //                             spline: [
+        //                                 new THREE.Vector3(-4.05, 0.8, 0),
+        //                                 new THREE.Vector3(-3.95, 0, 0),
+        //                             ],
+        //                         })
 
         const animacao = new AnimacaoSimultanea(
                             desenharChaves,
-                            new AnimacaoSequencial(mostrarIgualdade, mudarValor, moverEquacao),
+                            new AnimacaoSequencial(mostrarIgualdade, mudarValor, apagarEquacao),
                         );
 
         fase.animar(animacao);

@@ -49,7 +49,7 @@ export class PrimeiraFase extends Fase{
 
         this.outputTesteClick();
 
-        this.debug = true;
+        this.debug = false;
         this.debugProblem = 3;
 
         //A fazer:
@@ -296,7 +296,7 @@ export class PrimeiraFase extends Fase{
                               .setOnStart(criarControleJuntarEquacoes)
                               .setOnTermino(() => fase.whiteboard.ativar(true));
 
-        const quartaLinha   = animarDialogo[3].setDuration(10000);
+        const quartaLinha   = animarDialogo[3];
 
         //Cada um desses limpa as equações da tela e coloca a equação resultante
         const TodosOsAngulosIguais = fase.animacaoEquacoesVirandoUmaSo("primeiroDialogo", equacoes.angulosIguais, 3);

@@ -68,7 +68,7 @@ export class LadoParalogramo {
 
         fase.adicionarControleDaCarta(this.controleArrastarLados());
 
-        const dialogo = fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um conhecido para seu oposto e veja o que acontece");
+        const dialogo = new AnimacaoSequencial(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um conhecido para seu oposto e veja o que acontece"));
         
         dialogo.setNome("Dialogo Carta")
 

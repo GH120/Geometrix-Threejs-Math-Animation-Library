@@ -70,7 +70,7 @@ export class AnguloParalogramo {
 
         const paralelogramo    = this.paralelogramoSelecionado
 
-        const todosLadosConhecidos = paralelogramo.edges.filter(edge => edge.variable.value).length == paralelogramo.edges.length;
+        const todosLadosConhecidos = false;
 
         alert(`paralelogramo ${(paralelogramo)? "encontrado" : "não encontrado"}`);
 
@@ -85,14 +85,12 @@ export class AnguloParalogramo {
 
         const fase = this.fase;
 
-        this.controle = this.controleGeral()
+        this.controle = this.controleGeral();
 
         fase.adicionarControleDaCarta(this.controle);
 
-
-
         const dialogo = fase.animacaoDialogo(this.dialogos.inicio)
-                            .setNome("Dialogo Carta")
+                            // .setNome("Dialogo Carta")
                             .setOnTermino(() => this.controle.update({iniciar: true}))
 
         fase.animar(dialogo);
@@ -334,21 +332,20 @@ export class AnguloParalogramo {
         const n = paralelogramo.numeroVertices;
 
         //Função para conseguir proximo indice circular 
-        const proximoIndice = (i, step) => (i < 0)? (i + n - step) % n : (i + step) % n;
+        const proximoIndice = (i, step) => (step < 0)? (i + n + step%n) % n : (i + step) % n
 
-        const anguloConhecido = paralelogramo.angles.filter(angle => angle.variable.value);
+        const anguloConhecido = paralelogramo.angles.filter(angle => angle.variable.value)[0];
 
         const indiceAnguloOposto = proximoIndice(anguloConhecido.index, n/2);
 
         const anguloOposto = paralelogramo.angles[indiceAnguloOposto];
-        
 
-        const lados = [
+        const ladosOpostos = [
             paralelogramo.edges[indiceAnguloOposto], 
             paralelogramo.edges[proximoIndice(indiceAnguloOposto, 1)]
         ];
 
-        const ladosOpostos = [
+        const lados = [
             paralelogramo.edges[proximoIndice(indiceAnguloOposto, 2)], 
             paralelogramo.edges[proximoIndice(indiceAnguloOposto, 3)]
         ];
@@ -360,7 +357,9 @@ export class AnguloParalogramo {
 
                     //Começa com o desenhar tracejado e explicando funcionamento
                     //Pede para arrastar os dois lados
-                    if(estado.etapa == carta.dialogos.inicio){
+                    if(novoEstado.iniciar){
+
+                        console.log(lados, proximoIndice(indiceAnguloOposto, 1), indiceAnguloOposto, anguloConhecido.index)
 
                         carta.moverLados = lados.map((lado, indice) => carta.criarMoverLados(lado, ladosOpostos[indice]))
 
@@ -425,7 +424,7 @@ export class AnguloParalogramo {
 
         this.tracejado = new Tracejado(vertice1.getPosition(), vertice2.getPosition());
 
-        const desenharTracejado = MostrarTracejado(this.tracejado, this.fase.scene);
+        const desenharTracejado = new MostrarTracejado(this.tracejado, this.fase.scene);
 
         return desenharTracejado;
     }

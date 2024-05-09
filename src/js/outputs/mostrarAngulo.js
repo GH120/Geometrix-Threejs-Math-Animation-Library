@@ -67,14 +67,14 @@ export class MostrarAngulo extends Output{
 
             elemento.position.copy(newPosition)
 
-            this.angle.variable.value = new Value(angulo.degrees.toFixed())
+            this.angulo.variable.value = new Value(angulo.degrees.toFixed())
 
             this.text.on = true;
         }
         else{
             this.text.on = false;
 
-            this.angle.variable.value = null
+            this.angulo.variable.value = null
 
         }
     }

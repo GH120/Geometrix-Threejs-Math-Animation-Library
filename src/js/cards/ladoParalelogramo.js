@@ -66,14 +66,20 @@ export class LadoParalogramo {
 
         const fase = this.fase;
 
-        const paralelogramo = this.paralelogramoSelecionado;
+        fase.adicionarControleDaCarta(this.controleArrastarLados());
 
-        fase.animar(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"))
+        const dialogo = fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um conhecido para seu oposto e veja o que acontece");
+        
+        dialogo.setNome("Dialogo Carta")
+
+        dialogo.setOnStart(  () => this.colorirArestas.map(colorir => colorir.update({dentro: true})));
+        dialogo.setOnTermino(() => this.colorirArestas.map(colorir => colorir.update({dentro: false})));
+
+        fase.animar(dialogo)
 
         
         //Transformar isso em uma pilha?
         //Fase agora lida com esse controle
-        fase.adicionarControleDaCarta(this.controleArrastarLados());
         // Retorna uma equação de igualdade dos lados
         // Mudar texto da caixa de diálogos para ensinar jogador
     }
@@ -278,16 +284,18 @@ export class LadoParalogramo {
 
     controleArrastarLados(){
 
+        const carta = this;
+
         const paralelogramo = this.paralelogramoSelecionado;
 
         //Outputs auxiliares
 
-        const colorirArestas = [
+        carta.colorirArestas = [
             this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xe828282),
             this.criarColorirArestaSelecionada(paralelogramo.edges[0], 0xffff00),
             this.criarColorirArestaSelecionada(paralelogramo.edges[3], 0xe828282),
             this.criarColorirArestaSelecionada(paralelogramo.edges[1], 0xffff00)
-        ]
+        ];
 
         const moverLadosLaterais  = this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
         const moverLadosVerticais = this.criarMoverLados(paralelogramo.edges[3], paralelogramo.edges[1]);
@@ -298,8 +306,6 @@ export class LadoParalogramo {
             primeiroLadoMovido2: `Use o mesmo raciocinio com o lado restante para obter seu valor`,
             ultimoLadoMovido: `Muito bem, agora conhecemos todos os lados`
         }
-
-        const carta = this;
 
         //Controle propriamente dito
         return new Output()
@@ -317,7 +323,7 @@ export class LadoParalogramo {
                     lado.removeAllOutputs();
                     ladoOposto.removeAllOutputs();
 
-                    colorirArestas.map(arestaColorida => arestaColorida.update({dentro:false}));
+                    carta.colorirArestas.map(arestaColorida => arestaColorida.update({dentro:false}));
 
                     estado.ladosConhecidos++;
 

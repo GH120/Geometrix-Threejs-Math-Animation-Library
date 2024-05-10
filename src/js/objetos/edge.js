@@ -62,4 +62,16 @@ export class Edge extends Objeto{
     get hitbox(){
         return this.mesh;
     }
+
+    setPosition(posicao){
+
+        const centro = this.mesh.position;
+
+        const deslocamento = posicao.clone().sub(centro);
+
+        this.origem.add(deslocamento);
+        this.destino.add(deslocamento);
+
+        this.update();
+    }
 }

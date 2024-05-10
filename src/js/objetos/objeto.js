@@ -76,4 +76,8 @@ export class Objeto{
 
         if(this.interactable) this.interactable.removeObservers();
     }
+
+    setPosition(posicao){
+        this.mesh.position.copy(posicao);
+    }
 }

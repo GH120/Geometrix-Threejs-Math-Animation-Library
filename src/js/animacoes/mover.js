@@ -10,7 +10,7 @@ export const mover = (objeto, posicaoInicial, posicaoFinal) =>
                         return new THREE.Vector3().lerpVectors(inicial,final,peso);
                     })
                     .setUpdateFunction(function(position){
-                        this.objeto.mesh.position.copy(position);
+                        this.objeto.setPosition(position);
                     })
                     .setCurva(x =>  -(Math.cos(Math.PI * x) - 1) / 2)
                     .setDuration(100)

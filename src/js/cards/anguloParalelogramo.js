@@ -13,6 +13,7 @@ import InsideElipse from "../outputs/insideElipse";
 import MostrarTexto from "../animacoes/MostrarTexto";
 import MostrarTracejado from "../animacoes/mostrarTracejado";
 import { Tracejado } from "../objetos/tracejado";
+import { mover } from "../animacoes/mover";
 
 export class AnguloParalogramo {
 
@@ -41,7 +42,9 @@ export class AnguloParalogramo {
         //Arrasta o ângulo desconhecido ao original, formando um triângulo superior
         //Retorna os lados as suas poisções e o ângulo também, formando o paralelogramo novamente
         //Aparece o mostrarAngulo do ângulo desconhecido
-        divisaoAnguloIgual4: "Logo, os dois ângulos são iguais"
+        divisaoAnguloIgual4: "Logo, os dois ângulos são iguais",
+        comentario1: "Agora arraste o outro",
+        comentario2: "(Pode parecer um pouco repetitivo, mas verá o propósito)"
 
     }
 
@@ -107,7 +110,8 @@ export class AnguloParalogramo {
         const dialogos = {
             inicio: "Vamos usar o ângulo conhecido para descobrir o restante",
             divisaoAnguloIgual1: "Podemos dividir o paralelogramo em dois triângulos",
-            divisaoAnguloIgual2: "Arraste os lados amarelos para os cinza",
+            divisaoAnguloIgual2a: "Eles não são parecidos?",
+            divisaoAnguloIgual2b: "Isso pois",
     
             //Colore um azul e o outro vermelho
             divisaoAnguloIgual3: "Veja, os lados do ângulo desconhecido são os mesmos do conhecido",
@@ -168,6 +172,8 @@ export class AnguloParalogramo {
 
                                 const estado = this.estado;
 
+                                if(estado.finalizado) return;
+
                                 //Tratar seleção do lado principal
                                 //Transformar em suboutput?
                                 if(novoEstado.alvo == lado){
@@ -184,7 +190,7 @@ export class AnguloParalogramo {
                                 if(estado.mouseSobreLadoPrincipal && novoEstado.dragging && !estado.arrastando){
 
                                     estado.arrastando    = true;
-                                    estado.ultimaPosicao = lado.origem.clone();
+                                    estado.ultimaPosicao = lado.getPosition();
                                     estado.direcao = ladoOposto.getPosition().sub(lado.getPosition()).normalize();
 
                                 }
@@ -234,6 +240,8 @@ export class AnguloParalogramo {
 
                                         estado.verificar = false;
 
+                                        estado.finalizado = true;
+
                                         //Avisa o controle principal qual lado foi selecionado
                                         this.notify({
                                             ladoSelecionado: ladoOposto, 
@@ -257,6 +265,7 @@ export class AnguloParalogramo {
                                 arrastar: false,
                                 ladoOpostoSelecionado: false,
                                 verificar: false,
+                                finalizado: false
                             })
                            .addInputs(
                                 lado.draggable, 
@@ -340,12 +349,12 @@ export class AnguloParalogramo {
 
         const anguloOposto = paralelogramo.angles[indiceAnguloOposto];
 
-        const ladosOpostos = [
+        const lados = [
             paralelogramo.edges[indiceAnguloOposto], 
             paralelogramo.edges[proximoIndice(indiceAnguloOposto, 1)]
         ];
 
-        const lados = [
+        const ladosOpostos = [
             paralelogramo.edges[proximoIndice(indiceAnguloOposto, 2)], 
             paralelogramo.edges[proximoIndice(indiceAnguloOposto, 3)]
         ];
@@ -359,9 +368,11 @@ export class AnguloParalogramo {
                     //Pede para arrastar os dois lados
                     if(novoEstado.iniciar){
 
-                        console.log(lados, proximoIndice(indiceAnguloOposto, 1), indiceAnguloOposto, anguloConhecido.index)
+                        carta.colorirLados = lados.concat(ladosOpostos)
+                                                  .map((lado, indice) => carta.criarColorirArestaSelecionada(lado, (indice >= 2)? 0xffff00 : 0x828282))
+                        carta.moverLados   = lados.map((lado, indice) => carta.criarMoverLados(lado, ladosOpostos[indice]))
 
-                        carta.moverLados = lados.map((lado, indice) => carta.criarMoverLados(lado, ladosOpostos[indice]))
+                        this.addInputs(...carta.moverLados);
 
                         const proximo  = proximoIndice(anguloConhecido.index, 1);
                         const anterior = proximoIndice(anguloConhecido.index, -1);
@@ -384,9 +395,13 @@ export class AnguloParalogramo {
                         estado.etapa = carta.dialogos.divisaoAnguloIgual2;
                     }
 
-                    if(estado.etapa == carta.dialogos.divisaoAnguloIgual2 && novoEstado.ladoSelecionado){
+                    if(novoEstado.ladoSelecionado){
+
+                        alert("yes")
 
                         estado.ladosMovidos++;
+
+                        let cor = 0xaa0000;
 
                         if(estado.ladosMovidos == 1){
 
@@ -397,9 +412,27 @@ export class AnguloParalogramo {
 
                             dialogo.setNome("Dialogo Carta")
 
-                            carta.fase.animarDialogo(dialogo)
-                        }
+                            carta.fase.animar(dialogo);
 
+                            cor = 0x0000aa
+                        }
+    
+                        const lado            = novoEstado.ladoOriginal;
+                        const ladoOposto      = novoEstado.ladoSelecionado;
+                        const posicaoOriginal = novoEstado.ultimaPosicaoDoLadoOriginal;
+
+                        const moverLado = new AnimacaoSequencial(
+                                            mover(lado, lado.getPosition(), ladoOposto.getPosition()).setDelay(200),
+                                            mover(lado, lado.getPosition(), posicaoOriginal.clone())
+                                         );
+
+                        const colorir1  = colorirAngulo(lado).setValorInicial(lado.material.color.getHex(), cor);
+                        const colorir2  = colorirAngulo(ladoOposto).setValorInicial(ladoOposto.material.color.getHex(), cor)
+
+                        carta.fase.animar(new AnimacaoSimultanea(moverLado,colorir1,colorir2));
+
+                        lado.removeAllOutputs();
+                        ladoOposto.removeAllOutputs();
                     }
 
                     //Moveu os dois lados:
@@ -483,6 +516,26 @@ export class AnguloParalogramo {
         return colorir;
     }
 
+    voltarAoInicio(lado, ultimaPosicao){
+        alert("Falhou");
+
+        const deslocamento = ultimaPosicao.clone().sub(lado.origem);
+
+        lado.origem.add(deslocamento);
+        lado.destino.add(deslocamento);
+
+        lado.update();
+
+        const fase = this.fase;
+
+        const dialogo = fase.animacoesDialogo(
+                            "Lado não encontrado, arraste ele mais perto do lado oposto",
+                            "Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"
+                        )
+                        .setNome("Dialogo Carta")
+
+        fase.animar(dialogo);
+    }
 
     
 }

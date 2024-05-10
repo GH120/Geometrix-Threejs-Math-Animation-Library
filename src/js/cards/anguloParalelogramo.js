@@ -397,11 +397,25 @@ export class AnguloParalogramo {
 
                     if(novoEstado.ladoSelecionado){
 
-                        alert("yes")
-
                         estado.ladosMovidos++;
 
-                        let cor = 0xaa0000;
+                        let cor = (estado.ladosMovidos == 1)? 0xaa0000 : 0x0000aa;
+
+                        const lado            = novoEstado.ladoOriginal;
+                        const ladoOposto      = novoEstado.ladoSelecionado;
+                        const posicaoOriginal = novoEstado.ultimaPosicaoDoLadoOriginal;
+
+                        //Desativa os controles desativando os outputs dos lados
+                        lado.removeAllOutputs();
+                        ladoOposto.removeAllOutputs();
+
+                        const moverLado = new AnimacaoSequencial(
+                                            mover(lado, lado.getPosition(), ladoOposto.getPosition()).setDelay(200),
+                                            mover(lado, lado.getPosition(), posicaoOriginal.clone())
+                                         );
+
+                        const colorir1  = colorirAngulo(lado).setValorInicial(lado.material.color.getHex()).setValorFinal(cor);
+                        const colorir2  = colorirAngulo(ladoOposto).setValorInicial(ladoOposto.material.color.getHex()).setValorFinal(cor);
 
                         if(estado.ladosMovidos == 1){
 
@@ -410,29 +424,25 @@ export class AnguloParalogramo {
                                                 carta.fase.animacaoDialogo(carta.dialogos.comentario2)
                                             )
 
-                            dialogo.setNome("Dialogo Carta")
 
-                            carta.fase.animar(dialogo);
+                            const animacao = new AnimacaoSimultanea(moverLado,colorir1,colorir2,dialogo);
 
-                            cor = 0x0000aa
+                            animacao.setNome("Dialogo Carta");
+
+                            carta.fase.animar(animacao);
+
                         }
-    
-                        const lado            = novoEstado.ladoOriginal;
-                        const ladoOposto      = novoEstado.ladoSelecionado;
-                        const posicaoOriginal = novoEstado.ultimaPosicaoDoLadoOriginal;
 
-                        const moverLado = new AnimacaoSequencial(
-                                            mover(lado, lado.getPosition(), ladoOposto.getPosition()).setDelay(200),
-                                            mover(lado, lado.getPosition(), posicaoOriginal.clone())
-                                         );
+                        else if(estado.ladosMovidos == 2){
 
-                        const colorir1  = colorirAngulo(lado).setValorInicial(lado.material.color.getHex(), cor);
-                        const colorir2  = colorirAngulo(ladoOposto).setValorInicial(ladoOposto.material.color.getHex(), cor)
+                            const dialogo = carta.fase.animacaoDialogo(carta.dialogos.divisaoAnguloIgual3)
 
-                        carta.fase.animar(new AnimacaoSimultanea(moverLado,colorir1,colorir2));
+                            const animacao = new AnimacaoSimultanea(moverLado,colorir1,colorir2,dialogo);
 
-                        lado.removeAllOutputs();
-                        ladoOposto.removeAllOutputs();
+                            animacao.setNome("Dialogo Carta");
+
+                            carta.fase.animar(animacao);
+                        }
                     }
 
                     //Moveu os dois lados:
@@ -516,10 +526,18 @@ export class AnguloParalogramo {
         return colorir;
     }
 
+    animacaoMostrarTriangulo(){
+
+        //Mostrar uma nova aresta aparecendo no lugar do tracejado
+        //Mostrar um Triângulo do threejs aparecendo com coloração translucida
+        //Girar esse triângulo no seu eixo de rotação para mostrar que os dois triângulos são iguais
+        //Aparecer valor do mostrarAngulo
+    }
+
     voltarAoInicio(lado, ultimaPosicao){
         alert("Falhou");
 
-        const deslocamento = ultimaPosicao.clone().sub(lado.origem);
+        const deslocamento = ultimaPosicao.clone().sub(lado.mesh.position);
 
         lado.origem.add(deslocamento);
         lado.destino.add(deslocamento);

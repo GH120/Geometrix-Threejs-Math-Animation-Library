@@ -39,13 +39,13 @@ export class AnguloParalogramo {
         divisaoAnguloIgual2: "Arraste os lados amarelos para os cinza",
 
         //Colore um azul e o outro vermelho
-        divisaoAnguloIgual3: "Veja, os lados do ângulo desconhecido são os mesmos do conhecido",
+        divisaoAnguloIgual3: "Veja, o triângulo de baixo é igual ao de cima, pois seus lados são iguais",
 
         //Cria uma aresta solida no lugar do tracejado, cor amarela
         //Arrasta o ângulo desconhecido ao original, formando um triângulo superior
         //Retorna os lados as suas poisções e o ângulo também, formando o paralelogramo novamente
         //Aparece o mostrarAngulo do ângulo desconhecido
-        divisaoAnguloIgual4: "Logo, os dois ângulos são iguais",
+        divisaoAnguloIgual4: "Logo, o angulo oposto é igual ao conhecido",
         comentario1: "Agora arraste o outro",
         comentario2: "(Pode parecer um pouco repetitivo, mas verá o propósito)"
 
@@ -549,8 +549,21 @@ export class AnguloParalogramo {
                                   .reverse()
                                   .setOnTermino(() => null)
                                   .setOnStart(() => trianguloNovo.addToScene(this.fase.scene))
-                                  .setDuration(100);
+                                  .setDuration(100)
+                                  .filler(250);
         //Mostrar um Triângulo do threejs aparecendo com coloração translucida
+
+        const shape = new THREE.Shape();
+
+        shape.moveTo(...paralelogramo.vertices[0].getPosition().toArray());
+        shape.lineTo(...paralelogramo.vertices[1].getPosition().toArray());
+        shape.lineTo(...paralelogramo.vertices[3].getPosition().toArray());
+
+        console.log(shape);
+
+        const triangulo1 = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshLambertMaterial({color: 0x0000aa, opacity:0.1, transparent: true}))
+
+        this.fase.scene.add(triangulo1);
         //Girar esse triângulo no seu eixo de rotação para mostrar que os dois triângulos são iguais
         //Aparecer valor do mostrarAngulo
 

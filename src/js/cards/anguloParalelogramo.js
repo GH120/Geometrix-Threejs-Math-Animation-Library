@@ -14,6 +14,9 @@ import MostrarTexto from "../animacoes/MostrarTexto";
 import MostrarTracejado from "../animacoes/mostrarTracejado";
 import { Tracejado } from "../objetos/tracejado";
 import { mover } from "../animacoes/mover";
+import { Triangle } from "../objetos/triangle";
+import { ApagarPoligono } from "../animacoes/apagarPoligono";
+import { Poligono } from "../objetos/poligono";
 
 export class AnguloParalogramo {
 
@@ -437,7 +440,9 @@ export class AnguloParalogramo {
 
                             const dialogo = carta.fase.animacaoDialogo(carta.dialogos.divisaoAnguloIgual3)
 
-                            const animacao = new AnimacaoSimultanea(moverLado,colorir1,colorir2,dialogo);
+                            const mostrarTriangulo =  carta.animacaoMostrarTriangulo();
+
+                            const animacao = new AnimacaoSimultanea(moverLado,colorir1,colorir2,dialogo,mostrarTriangulo);
 
                             animacao.setNome("Dialogo Carta");
 
@@ -528,10 +533,28 @@ export class AnguloParalogramo {
 
     animacaoMostrarTriangulo(){
 
+        const paralelogramo = this.paralelogramoSelecionado;
+
+        const posicoesVertices = paralelogramo.vertices.slice(1,4).map(vertice => vertice.getPosition().toArray());
+
         //Mostrar uma nova aresta aparecendo no lugar do tracejado
+        //Hard coded, depois generalizar
+        const trianguloNovo = new Poligono(posicoesVertices)
+                                .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.2})
+                                .render();
+
+        trianguloNovo.edges.map(edge => edge.material.color = 0xffff00);
+
+        const aparecerTriangulo = new ApagarPoligono(trianguloNovo)
+                                  .reverse()
+                                  .setOnTermino(() => null)
+                                  .setOnStart(() => trianguloNovo.addToScene(this.fase.scene))
+                                  .setDuration(100);
         //Mostrar um Triângulo do threejs aparecendo com coloração translucida
         //Girar esse triângulo no seu eixo de rotação para mostrar que os dois triângulos são iguais
         //Aparecer valor do mostrarAngulo
+
+        return aparecerTriangulo;
     }
 
     voltarAoInicio(lado, ultimaPosicao){

@@ -22,6 +22,7 @@ import { Objeto } from "../objetos/objeto";
 import { Clickable } from "../inputs/clickable";
 import MetalicSheen from "../animacoes/metalicSheen";
 import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
+import { MostrarAngulo } from "../outputs/mostrarAngulo";
 
 //Consertar: mostrar igualdade de ângulo (valor inicial cortando delta YZW)
 //           tamanho dos vertices (Muito pequeno)
@@ -29,6 +30,8 @@ import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 //           Posição da aresta horizontal quando arrastando
 //           Hitbox dos lados e suas cores
 
+
+//Refatorar depois, código improvisado na pressa
 export class AnguloParalogramo {
 
 
@@ -117,34 +120,12 @@ export class AnguloParalogramo {
 
         //Planejamento:
 
-        //1 - Dividir o paralelogramo em dois triângulos baseado no ângulo conhecido
-        //2 - Mostrar que eles são iguais pois os triângulos são iguais
+        //1 - Dividir o paralelogramo em dois triângulos baseado no ângulo conhecido -> feito
+        //2 - Mostrar que eles são iguais pois os triângulos são iguais -> feito
         //3 - Dividir o paralelogramo em dois triângulos baseado nos dois ângulos desconhecidos
         //4 - Usar a carta dos 180° para mostrar que o ângulo restante pode ser calculado
 
-        //1.1 - Animação dividir paralelogramo
-
-        const dialogos = {
-            inicio: "Vamos usar o ângulo conhecido para descobrir o restante",
-            divisaoAnguloIgual1: "Podemos dividir o paralelogramo em dois triângulos",
-            divisaoAnguloIgual2a: "Eles não são parecidos?",
-            divisaoAnguloIgual2b: "Isso pois",
-    
-            //Colore um azul e o outro vermelho
-            divisaoAnguloIgual3: "Veja, os lados do ângulo desconhecido são os mesmos do conhecido",
-    
-            //Cria uma aresta solida no lugar do tracejado, cor amarela
-            //Arrasta o ângulo desconhecido ao original, formando um triângulo superior
-            //Retorna os lados as suas poisções e o ângulo também, formando o paralelogramo novamente
-            //Aparece o mostrarAngulo do ângulo desconhecido
-            divisaoAnguloIgual4: "Logo, os dois ângulos são iguais",
-
-            comentario1: "Agora arraste o outro",
-            comentario2: "(Pode parecer um pouco repetitivo, mas verá o propósito)"
-
-
-    
-        }
+        //1.1 - Animação dividir paralelogramos
     }
 
 
@@ -400,7 +381,8 @@ export class AnguloParalogramo {
                         
                         const desenharTracejado = carta.animacaoDividirParalelogramo(
                                                     paralelogramo.vertices[proximo], 
-                                                    paralelogramo.vertices[anterior]
+                                                    paralelogramo.vertices[anterior],
+                                                    estado //Adiciona tracejado ao estado para ser removido depois
                                                  )
 
                         const dialogo = new AnimacaoSequencial(
@@ -498,21 +480,32 @@ export class AnguloParalogramo {
                         );
 
                         const dialogo = new AnimacaoSequencial(
-                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAnguloIgual4)
-                                                      .filler(10)
-                                                      .setOnStart(() => mostrarBissetriz2.update({dentro:true})), 
 
                                             carta.fase.animacaoDialogo(carta.dialogos.divisaoAnguloIgual5)
                                                       .filler(10)
-                                                      .setOnStart(() => mostrarBissetriz1.update({dentro:true}))
+                                                      .setOnStart(() => mostrarBissetriz2.update({dentro:true})), 
 
+                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAnguloIgual6)
+                                                      .filler(10)
+                                                      .setOnStart(() => mostrarBissetriz1.update({dentro:true})),
+
+                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAnguloIgual7),
+                                            
+                                            carta.animacaoMostrarGrausAparecendo(anguloOposto, false, false),
+
+                                            new AnimacaoSimultanea(
+                                                new ApagarPoligono(estado.trianguloSuperior),
+                                                new ApagarPoligono(trianguloInferior),
+                                                apagarCSS2(estado.equacao, carta.fase.scene),
+                                                apagarObjeto(estado.tracejado).setOnTermino(() => estado.tracejado.removeFromScene())
+                                            )
                                         )
                                         .setNome("Dialogo Carta")
                                         .setDelay(100)
                                         .setOnTermino(() =>{
                                             mostrarBissetriz1.update({dentro:false});
                                             mostrarBissetriz2.update({dentro:false});
-                                        })
+                                        });
 
 
                         //Ativar controle de clique e colorir dos ângulos
@@ -534,18 +527,65 @@ export class AnguloParalogramo {
                     anguloDesconhecido: anguloOposto,
                     ladosSelecionados:  lados,
                     posicoesOriginais:  {},
-                    trianguloSuperior: null,
-                    ladosMovidos:       0
+                    trianguloSuperior:  null,
+                    ladosMovidos:       0,
+                    equacao:            null,
+                    tracejado:          null
                })
     }
 
-    animacaoDividirParalelogramo(vertice1, vertice2){
+    animacaoDividirParalelogramo(vertice1, vertice2, estado){
 
-        this.tracejado = new Tracejado(vertice1.getPosition(), vertice2.getPosition());
+        estado.tracejado = new Tracejado(vertice1.getPosition(), vertice2.getPosition());
 
-        const desenharTracejado = new MostrarTracejado(this.tracejado, this.fase.scene);
+        const desenharTracejado = new MostrarTracejado(estado.tracejado, this.fase.scene);
 
         return desenharTracejado;
+    }
+
+    animacaoMostrarGrausAparecendo(angle, updateMostrarAnguloCadaFrame = false, mostrarEdesaparecer=true){
+
+
+        if(!angle.mostrarAngulo){
+
+            angle.mostrarAngulo = new MostrarAngulo(angle).addToFase(this.fase);
+        }
+
+        const mostrarAngulo = angle.mostrarAngulo;
+
+        const aparecerTexto = new Animacao()
+                                .setValorInicial(0)
+                                .setValorFinal(1)
+                                .setInterpolacao((a,b,c) => a*(1-c) + b*c)
+                                .setUpdateFunction((valor) => {
+
+                                    mostrarAngulo.text.elemento.element.style.opacity = valor
+
+                                    if(updateMostrarAnguloCadaFrame) mostrarAngulo.update({dentro:true});
+                                })
+                                .setDuration(55)
+                                .setDelay(5)
+                                .setCurva(x => {
+
+                                    x = 1 - Math.abs(1 - x*2)
+
+                                    return -(Math.cos(Math.PI * x) - 1) / 2;
+                                })
+                                .voltarAoInicio(false)
+                                .manterExecucao(false)
+                                .setOnDelay(() => mostrarAngulo.update({dentro:false}))
+                                .setOnStart(() => {
+                                    mostrarAngulo.update({dentro:true});
+                                })
+
+        if(!mostrarEdesaparecer){
+            aparecerTexto.setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+            aparecerTexto.setOnTermino(() => null)
+            aparecerTexto.setOnDelay(() => null)
+        }
+
+        return aparecerTexto;
+
     }
 
     criarColorirArestaSelecionada(aresta, corFinal){
@@ -649,7 +689,6 @@ export class AnguloParalogramo {
 
         trianguloNovo.angles.map(angulo => angulo.material.color = 0x0000aa);
 
-        estado.trianguloSuperior = trianguloNovo;
 
         const aparecerTriangulo = new ApagarPoligono(trianguloNovo)
                                   .reverse()
@@ -707,10 +746,13 @@ export class AnguloParalogramo {
 
         const mudarEquacao = new MostrarTexto(equacao)
                              .setOnStart( () => equacao.mudarTexto(`\\Delta ${nomeTrianguloSuperior} \\equiv \\Delta ${nomeTrianguloInferior}`, 4))
-                             .setValorInicial(90)
+                             .setValorInicial(80)
                              .setValorFinal(200)
                              .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
 
+        estado.equacao = equacao;
+        estado.trianguloSuperior = trianguloNovo;
+        
         return new AnimacaoSequencial(
                 new AnimacaoSimultanea(
                     aparecerAresta, 

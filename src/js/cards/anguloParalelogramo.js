@@ -1,4 +1,4 @@
-import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from "../animacoes/animation";
+import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente } from "../animacoes/animation";
 import { apagarCSS2 } from "../animacoes/apagarCSS2";
 import { colorirAngulo } from "../animacoes/colorirAngulo";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
@@ -19,6 +19,15 @@ import { ApagarPoligono } from "../animacoes/apagarPoligono";
 import { Poligono } from "../objetos/poligono";
 import { apagarObjeto } from "../animacoes/apagarObjeto";
 import { Objeto } from "../objetos/objeto";
+import { Clickable } from "../inputs/clickable";
+import MetalicSheen from "../animacoes/metalicSheen";
+import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
+
+//Consertar: mostrar igualdade de ângulo (valor inicial cortando delta YZW)
+//           tamanho dos vertices (Muito pequeno)
+//           Cor da aresta do meio quando engrossando
+//           Posição da aresta horizontal quando arrastando
+//           Hitbox dos lados e suas cores
 
 export class AnguloParalogramo {
 
@@ -36,7 +45,7 @@ export class AnguloParalogramo {
     }
 
     dialogos = {
-        inicio: "Vamos usar o ângulo conhecido para descobrir o restante",
+        inicio: "Vamos usar o ângulo conhecido para descobrir os restantes",
         divisaoAnguloIgual1: "Podemos dividir o paralelogramo em dois triângulos",
         divisaoAnguloIgual2: "Arraste os lados cinza para os amarelos",
 
@@ -48,9 +57,11 @@ export class AnguloParalogramo {
         //Retorna os lados as suas poisções e o ângulo também, formando o paralelogramo novamente
         //Aparece o mostrarAngulo do ângulo desconhecido
         divisaoAnguloIgual4: "Então seus ângulos são iguais",
-        divisaoAnguloIgual5: "Sabendo disso, e qual é o ângulo de 70° no triangulo de cima? Clique nele",
+        divisaoAnguloIgual5: "Olhe para aresta que o angulo conhecido aponta",
+        divisaoAnguloIgual6: "Perceba que o angulo azul também aponta para ela",
+        divisaoAnguloIgual7: "Então ele é igual ao conhecido",
+
         comentario1: "Agora arraste o outro",
-        comentario2: "(Pode parecer um pouco repetitivo, mas verá o propósito)"
 
     }
 
@@ -368,6 +379,8 @@ export class AnguloParalogramo {
         return new Output()
                .setUpdateFunction(function(novoEstado){
 
+                    console.log(novoEstado)
+
                     const estado = this.estado;
 
                     //Começa com o desenhar tracejado e explicando funcionamento
@@ -432,12 +445,8 @@ export class AnguloParalogramo {
                         if(estado.ladosMovidos == 1){
 
 
-                            const dialogo = new AnimacaoSequencial(
-                                                carta.fase.animacaoDialogo(carta.dialogos.comentario1),
-                                                carta.fase.animacaoDialogo(carta.dialogos.comentario2)
-                                            )
-
-
+                            const dialogo = carta.fase.animacaoDialogo(carta.dialogos.comentario1);
+                                               
                             const animacao = new AnimacaoSimultanea(moverLado,colorir1,colorir2,dialogo);
 
                             animacao.setNome("Dialogo Carta");
@@ -451,11 +460,13 @@ export class AnguloParalogramo {
 
                             const dialogo = carta.fase.animacaoDialogo(carta.dialogos.divisaoAnguloIgual3)
 
-                            const mostrarTriangulo =  carta.animacaoMostrarTriangulo(lados,ladosOpostos, estado.posicoesOriginais);
+                            const mostrarTriangulo =  carta.animacaoMostrarTriangulo(lados,ladosOpostos, estado); //Adiciona triangulo superior
 
                             const animacao = new AnimacaoSimultanea(moverLado,colorir1,colorir2,dialogo,mostrarTriangulo);
 
                             animacao.setNome("Dialogo Carta");
+
+                            animacao.setOnTermino(() => this.update({etapa: carta.dialogos.divisaoAnguloIgual4}));
 
                             carta.fase.animar(animacao);
                         }
@@ -464,18 +475,66 @@ export class AnguloParalogramo {
                     //Moveu os dois lados:
                     //Mudar etapa para arrastar angulo
 
-                    if(estado.ladosMovidos == 2){
-                        alert("Termino");
+                    if(novoEstado.etapa){
+
+                        const mostrarBissetriz1 = new MostrarBissetriz(
+                            estado.trianguloSuperior, 
+                            estado.trianguloSuperior.angles[1], 
+                            carta.fase
+                        );
+
+                        const posicoesVertices = paralelogramo.vertices.filter((x,i) => i != 2).map(vertice => vertice.getPosition().toArray());
+
+
+                        const trianguloInferior = new Poligono(posicoesVertices)
+                                                    .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.3})
+                                                    .render()
+                                                    .addToScene(carta.fase.scene);
+
+                        const mostrarBissetriz2 = new MostrarBissetriz(
+                            trianguloInferior, 
+                            trianguloInferior.angles[0], 
+                            carta.fase
+                        );
+
+                        const dialogo = new AnimacaoSequencial(
+                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAnguloIgual4)
+                                                      .filler(10)
+                                                      .setOnStart(() => mostrarBissetriz2.update({dentro:true})), 
+
+                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAnguloIgual5)
+                                                      .filler(10)
+                                                      .setOnStart(() => mostrarBissetriz1.update({dentro:true}))
+
+                                        )
+                                        .setNome("Dialogo Carta")
+                                        .setDelay(100)
+                                        .setOnTermino(() =>{
+                                            mostrarBissetriz1.update({dentro:false});
+                                            mostrarBissetriz2.update({dentro:false});
+                                        })
+
+
+                        //Ativar controle de clique e colorir dos ângulos
+                        //Controle clicar aceitar angulo oposto -> update para cá a nova etapa
+                        //Controle clicar rejeitar angulos normais -> update para cá rejeitar
+                        //Controle colorir angulo selecionado
+                        //Controle mexer angulo
+
+                        
+
+                        carta.fase.animar(dialogo);
                     }
                     
                     //Angulos iguais
                })
                .setEstadoInicial({
-                    etapa:              this.dialogos.inicio,
+                    etapa:              carta.dialogos.inicio,
                     anguloConhecido:    anguloConhecido,
                     anguloDesconhecido: anguloOposto,
                     ladosSelecionados:  lados,
                     posicoesOriginais:  {},
+                    trianguloSuperior: null,
                     ladosMovidos:       0
                })
     }
@@ -543,8 +602,9 @@ export class AnguloParalogramo {
         return colorir;
     }
 
-    animacaoMostrarTriangulo(lados,ladosOpostos, posicoesOriginais){
-
+    animacaoMostrarTriangulo(lados,ladosOpostos, estado){
+        
+        const posicoesOriginais = estado.posicoesOriginais;
         const paralelogramo = this.paralelogramoSelecionado;
 
         const moverLados = new AnimacaoSequencial(
@@ -588,15 +648,27 @@ export class AnguloParalogramo {
                                 .render();
 
         trianguloNovo.angles.map(angulo => angulo.material.color = 0x0000aa);
-        trianguloNovo.edges[1].material.color = 0xaa0000;
-        trianguloNovo.edges[0].material.color = 0x0000aa;
+
+        estado.trianguloSuperior = trianguloNovo;
 
         const aparecerTriangulo = new ApagarPoligono(trianguloNovo)
                                   .reverse()
                                   .setOnTermino(() => null)
                                   .setOnStart(() => trianguloNovo.addToScene(this.fase.scene))
                                   .setDuration(300)
-                                  .filler(250);
+                                  .filler(250)
+
+        const colorirCinza = animacaoIndependente(() =>
+                                this.fase.animar(
+                                          new AnimacaoSequencial()
+                                          .setAnimacoes(
+                                                paralelogramo.edges.map(lado => colorirAngulo(lado)
+                                                                                .setValorInicial(lado.material.color.getHex())
+                                                                                .setValorFinal(0x525252)
+                                                                    )
+                                          )
+                                )
+                            )
 
         const edge = trianguloNovo.edges[2];
 
@@ -608,13 +680,6 @@ export class AnguloParalogramo {
                               .reverse()
                               .setOnTermino(() => null)
                               .setOnStart(() => edge.addToScene(this.fase.scene));
-        //Mostrar um Triângulo do threejs aparecendo com coloração translucida
-
-        const shape = new THREE.Shape();
-
-        shape.moveTo(...paralelogramo.vertices[0].getPosition().toArray());
-        shape.lineTo(...paralelogramo.vertices[1].getPosition().toArray());
-        shape.lineTo(...paralelogramo.vertices[3].getPosition().toArray());
 
         const mostrarLados = new AnimacaoSequencial(
                                 new AnimacaoSimultanea(
@@ -627,23 +692,6 @@ export class AnguloParalogramo {
                                 ),
                                 this.animacaoEngrossarLado(edge)
                             )
-
-        const triangulo1 = Objeto.fromMesh(new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshBasicMaterial({color: 0x0000aa, opacity:0.5, transparent: true})))
-
-
-        const aparecerAreaTriangulo = apagarObjeto(triangulo1)
-                                       .reverse()
-                                       .setValorFinal(0.5)
-                                       .setCurva(x => {
-
-                                            x = 1 - Math.abs(1-2*x);
-
-                                            return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
-                                        })
-                                       .setOnStart(() => triangulo1.addToScene(this.fase.scene))
-                                       .setOnTermino(() => null);
-        //Girar esse triângulo no seu eixo de rotação para mostrar que os dois triângulos são iguais
-        //Aparecer valor do mostrarAngulo
 
         console.log(paralelogramo.vertices.slice(0,3))
 
@@ -659,11 +707,9 @@ export class AnguloParalogramo {
 
         const mudarEquacao = new MostrarTexto(equacao)
                              .setOnStart( () => equacao.mudarTexto(`\\Delta ${nomeTrianguloSuperior} \\equiv \\Delta ${nomeTrianguloInferior}`, 4))
-                             .setValorInicial(70)
+                             .setValorInicial(90)
                              .setValorFinal(200)
                              .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
-
-        const ilustrarIgualdade = new AnimacaoSequencial(mudarEquacao, moverDeVolta)
 
         return new AnimacaoSequencial(
                 new AnimacaoSimultanea(
@@ -671,9 +717,16 @@ export class AnguloParalogramo {
                     aparecerEquacao
                 ), 
                 moverLados, 
-                ilustrarIgualdade,
+                new AnimacaoSequencial(
+                    mudarEquacao, 
+                    moverDeVolta
+                ),
                 moverFinal,  
-                mostrarLados
+                mostrarLados,
+                new AnimacaoSimultanea(
+                    colorirCinza,
+                    aparecerTriangulo
+                )
         );
     }
 

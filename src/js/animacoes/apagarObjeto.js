@@ -14,4 +14,3 @@ export const apagarObjeto = (objeto) => new Animacao()
                                             : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2)
                                         .setDuration(200)
                                         .voltarAoInicio(false)
-                                        .setOnTermino(() => objeto.removeFromScene());

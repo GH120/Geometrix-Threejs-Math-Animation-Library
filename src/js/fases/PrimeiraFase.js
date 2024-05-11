@@ -49,7 +49,7 @@ export class PrimeiraFase extends Fase{
 
         this.outputTesteClick();
 
-        this.debug = false;
+        this.debug = true;
         this.debugProblem = 3;
 
         //A fazer:
@@ -410,7 +410,8 @@ export class PrimeiraFase extends Fase{
                                     new ApagarPoligono(fase.pentagono), 
                                     new ApagarPoligono(fase.pentagono2)
                                 )
-                                .setOnStart(() => fase.whiteboard.ativar(false));
+                                .setOnStart(() => fase.whiteboard.ativar(false))
+                                .setOnTermino(() => {fase.pentagono.removeFromScene(); fase.pentagono2.removeFromScene()})
         
         const primeiraLinha = dialogosAnimados[0];
 

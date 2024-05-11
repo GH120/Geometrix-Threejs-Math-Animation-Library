@@ -3,16 +3,18 @@ import { Output } from './Output';
 import { Tracejado } from "../objetos/tracejado";
 
 //No ato de criar uma bissetriz, criar um novo triangulo?
+//DEPRECATED: Refatorar depois
 export class MostrarBissetriz extends Output{
 
-    constructor(triangulo, angulo, scene){
+    constructor(triangulo, angulo, fase){
         super();
         
         this.triangulo = triangulo;
         this.angulo = angulo;
         this.vertice = triangulo.vertices[angulo.index];
         this.ladoOposto = triangulo.edges[(angulo.index+1)%3];
-        this.scene = scene;
+        this.scene = fase.scene;
+        this.fase = fase;
 
         this.estado = {selecionado:false, clicados:[]};
 
@@ -38,7 +40,7 @@ export class MostrarBissetriz extends Output{
 
             const animacao = new MostrarTracejado(this.tracejado, this.scene);
 
-            if(this.novaAnimacao(animacao)) this.animar(animacao);
+            if(this.novaAnimacao(animacao)) this.fase.animar(animacao);
         }
         else{
             //Ignora remoção se clicado

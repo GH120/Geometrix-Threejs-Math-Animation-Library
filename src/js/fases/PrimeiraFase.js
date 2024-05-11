@@ -48,6 +48,7 @@ export class PrimeiraFase extends Fase{
         this.createOutputs();
 
         this.outputTesteClick();
+        this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
 
         this.debug = false;
         this.debugProblem = 3;
@@ -394,8 +395,8 @@ export class PrimeiraFase extends Fase{
         //Adicionar mostrarAngulo nos dois paralelogramos
         //Criar um handler que mostra o tamanho de um certo segmento de reta -> feito
         //Criar um handler que mostra o nome de um vértice -> feito
-        //Criar propriedade paralelogramo => lados paralelos => DA = CB e AB = DC  -> fazendo
-        //Criar propriedade paralelogramo => angulos iguais dos lados paralelos 
+        //Criar propriedade paralelogramo => lados paralelos => DA = CB e AB = DC  -> feito
+        //Criar propriedade paralelogramo => angulos iguais dos lados paralelos  -> feito
         //Criar interação obter razão de dois lados 
         //Com todas as razões => juntar para formar todos os lados proporcionais
         //Todos os lados proporcionais junta com angulos iguais para gerar semelhança

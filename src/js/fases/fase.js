@@ -78,6 +78,7 @@ export class Fase {
         this.operadores = new Operations(null,this);
         this.dimensoes  = {width: width, height: height}
         this.controleDaCarta = null;
+        this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
     }
     
 

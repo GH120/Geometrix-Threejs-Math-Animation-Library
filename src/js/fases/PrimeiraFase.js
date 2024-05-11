@@ -49,7 +49,7 @@ export class PrimeiraFase extends Fase{
 
         this.outputTesteClick();
 
-        this.debug = true;
+        this.debug = false;
         this.debugProblem = 3;
 
         //A fazer:

@@ -556,7 +556,7 @@ export class AnguloParalogramo {
                                     mover(lados[1], ladosOpostos[1].getPosition(), posicoesOriginais[1].clone()),
                                     mover(ladosOpostos[1], ladosOpostos[1].getPosition(), posicoesOriginais[1].clone())
                             ))
-                            .filler(500)
+                            .filler(250)
 
         const moverDeVolta = new AnimacaoSequencial(
                                 new AnimacaoSimultanea(
@@ -571,13 +571,13 @@ export class AnguloParalogramo {
                                     mover(ladosOpostos[1], ladosOpostos[1].getPosition(), posicoesOriginais[1].clone())
                                     .reverse()
                             ))
-                            .filler(500)
+                            .filler(250)
 
         const moverFinal = new AnimacaoSequencial(
                                 mover(lados[0], lados[0].getPosition(), posicoesOriginais[0].clone()),
                                 mover(lados[1], lados[1].getPosition(), posicoesOriginais[1].clone()),
                          )
-                         .filler(500)
+                         .filler(250)
 
         const posicoesVertices = paralelogramo.vertices.slice(1,4).map(vertice => vertice.getPosition().toArray());
 
@@ -683,7 +683,7 @@ export class AnguloParalogramo {
                .setValorInicial(lado.grossura)
                .setValorFinal(lado.grossura * 1.3)
                .setInterpolacao((a,b,c) => a*(1-c) + b*c)
-               .setDuration(600)
+               .setDuration(200)
                .voltarAoInicio(true)
                .setCurva(x => {
 

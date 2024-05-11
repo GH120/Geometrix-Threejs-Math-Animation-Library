@@ -64,7 +64,16 @@ export class AnguloParalogramo {
         divisaoAnguloIgual6: "Perceba que o angulo azul também aponta para ela",
         divisaoAnguloIgual7: "Então ele é igual ao conhecido",
 
-        comentario1: "Agora arraste o outro",
+        comentario1: "Agora arraste o outro lado restante",
+        comentario2: "Muito bom, vamos usar isso depois",
+
+        intermediario: "Dito isso, faltam descobrir mais dois ângulos",
+
+        divisaoAngulosVizinhos1: "Se nós dividirmos o paralelogramo pela outra metade, conseguimos dois triângulos iguais de novo", 
+        divisaoAngulosVizinhos2: "Então esses ângulos desconhecidos são iguais não é?", //Mesma animação de tracejado para aresta central
+        divisaoAngulosVizinhos3: "Como não sabemos seus valores, chame eles de algum nome:", //Aparece text box para digitar o nome da variável
+        divisaoAngulosVizinhos4: "A execução dessa carta terminou, use outra para resolver esse problema"
+
 
     }
 
@@ -457,7 +466,7 @@ export class AnguloParalogramo {
                     //Moveu os dois lados:
                     //Mudar etapa para arrastar angulo
 
-                    if(novoEstado.etapa){
+                    if(novoEstado.etapa == carta.dialogos.divisaoAnguloIgual4){
 
                         const mostrarBissetriz1 = new MostrarBissetriz(
                             estado.trianguloSuperior, 
@@ -505,6 +514,7 @@ export class AnguloParalogramo {
                                         .setOnTermino(() =>{
                                             mostrarBissetriz1.update({dentro:false});
                                             mostrarBissetriz2.update({dentro:false});
+                                            this.update({etapa: carta.dialogos.divisaoAngulosVizinhos1})
                                         });
 
 
@@ -515,6 +525,21 @@ export class AnguloParalogramo {
                         //Controle mexer angulo
 
                         
+
+                        carta.fase.animar(dialogo);
+                    }
+
+                    if(novoEstado.etapa == carta.dialogos.divisaoAngulosVizinhos1){
+
+                        const dialogo = new AnimacaoSequencial(
+                                            carta.fase.animacaoDialogo(carta.dialogos.intermediario),
+                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAngulosVizinhos1),
+                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAngulosVizinhos2),
+                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAngulosVizinhos3),
+                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAngulosVizinhos4)
+                        );
+
+                        dialogo.setNome("Dialogo Carta");
 
                         carta.fase.animar(dialogo);
                     }

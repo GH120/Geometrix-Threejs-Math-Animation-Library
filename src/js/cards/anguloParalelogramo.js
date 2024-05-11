@@ -47,7 +47,8 @@ export class AnguloParalogramo {
         //Arrasta o ângulo desconhecido ao original, formando um triângulo superior
         //Retorna os lados as suas poisções e o ângulo também, formando o paralelogramo novamente
         //Aparece o mostrarAngulo do ângulo desconhecido
-        divisaoAnguloIgual4: "Logo, o angulo oposto é igual ao conhecido",
+        divisaoAnguloIgual4: "Então seus ângulos são iguais",
+        divisaoAnguloIgual5: "Sabendo disso, e qual é o ângulo de 70° no triangulo de cima? Clique nele",
         comentario1: "Agora arraste o outro",
         comentario2: "(Pode parecer um pouco repetitivo, mas verá o propósito)"
 
@@ -395,7 +396,8 @@ export class AnguloParalogramo {
                                         )   
 
                         const animacao = new AnimacaoSimultanea(desenharTracejado, dialogo)
-                                         .setNome("Dialogo Carta");
+                                         .setNome("Dialogo Carta")
+                                         .setOnTermino(() => carta.colorirLados.map(colorir => colorir.update({dentro:false})))
 
                         carta.fase.animar(animacao);
 
@@ -545,28 +547,49 @@ export class AnguloParalogramo {
 
         const paralelogramo = this.paralelogramoSelecionado;
 
-        console.log(lados.map(lado => lado.mesh.position.clone()), posicoesOriginais)
-
         const moverLados = new AnimacaoSequencial(
                                 new AnimacaoSimultanea(
-                                    mover(lados[0], lados[0].getPosition(), posicoesOriginais[0]),
-                                    mover(ladosOpostos[0], ladosOpostos[0].getPosition(), posicoesOriginais[0])
+                                    mover(lados[0], ladosOpostos[0].getPosition(), posicoesOriginais[0].clone()),
+                                    mover(ladosOpostos[0], ladosOpostos[0].getPosition(), posicoesOriginais[0].clone())
                                 ),
                                 new AnimacaoSimultanea(
-                                    mover(lados[1], lados[1].getPosition(), posicoesOriginais[1]),
-                                    mover(ladosOpostos[1], ladosOpostos[1].getPosition(), posicoesOriginais[1])
+                                    mover(lados[1], ladosOpostos[1].getPosition(), posicoesOriginais[1].clone()),
+                                    mover(ladosOpostos[1], ladosOpostos[1].getPosition(), posicoesOriginais[1].clone())
                             ))
                             .filler(500)
+
+        const moverDeVolta = new AnimacaoSequencial(
+                                new AnimacaoSimultanea(
+                                    mover(lados[0], ladosOpostos[0].getPosition(), posicoesOriginais[0].clone())
+                                    .reverse(),
+                                    mover(ladosOpostos[0], ladosOpostos[0].getPosition(), posicoesOriginais[0].clone())
+                                    .reverse()
+                                ),
+                                new AnimacaoSimultanea(
+                                    mover(lados[1], ladosOpostos[1].getPosition(), posicoesOriginais[1].clone())
+                                    .reverse(),
+                                    mover(ladosOpostos[1], ladosOpostos[1].getPosition(), posicoesOriginais[1].clone())
+                                    .reverse()
+                            ))
+                            .filler(500)
+
+        const moverFinal = new AnimacaoSequencial(
+                                mover(lados[0], lados[0].getPosition(), posicoesOriginais[0].clone()),
+                                mover(lados[1], lados[1].getPosition(), posicoesOriginais[1].clone()),
+                         )
+                         .filler(500)
 
         const posicoesVertices = paralelogramo.vertices.slice(1,4).map(vertice => vertice.getPosition().toArray());
 
         //Mostrar uma nova aresta aparecendo no lugar do tracejado
         //Hard coded, depois generalizar
         const trianguloNovo = new Poligono(posicoesVertices)
-                                .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.2})
+                                .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.3})
                                 .render();
 
-        // trianguloNovo.edges.map(edge => edge.material.color = 0xffff00);
+        trianguloNovo.angles.map(angulo => angulo.material.color = 0x0000aa);
+        trianguloNovo.edges[1].material.color = 0xaa0000;
+        trianguloNovo.edges[0].material.color = 0x0000aa;
 
         const aparecerTriangulo = new ApagarPoligono(trianguloNovo)
                                   .reverse()
@@ -574,6 +597,17 @@ export class AnguloParalogramo {
                                   .setOnStart(() => trianguloNovo.addToScene(this.fase.scene))
                                   .setDuration(300)
                                   .filler(250);
+
+        const edge = trianguloNovo.edges[2];
+
+        edge.material.color = 0xeeeeee;
+        edge.grossura = 0.024;
+        edge.render();
+
+        const aparecerAresta = apagarObjeto(edge)
+                              .reverse()
+                              .setOnTermino(() => null)
+                              .setOnStart(() => edge.addToScene(this.fase.scene));
         //Mostrar um Triângulo do threejs aparecendo com coloração translucida
 
         const shape = new THREE.Shape();
@@ -582,13 +616,16 @@ export class AnguloParalogramo {
         shape.lineTo(...paralelogramo.vertices[1].getPosition().toArray());
         shape.lineTo(...paralelogramo.vertices[3].getPosition().toArray());
 
-        console.log(shape);
-
         const mostrarLados = new AnimacaoSequencial(
-                                this.animacaoEngrossarLado(paralelogramo.edges[1]),
-                                this.animacaoEngrossarLado(paralelogramo.edges[0]),
-                                this.animacaoEngrossarLado(paralelogramo.edges[2]),
-                                this.animacaoEngrossarLado(paralelogramo.edges[3]),
+                                new AnimacaoSimultanea(
+                                    this.animacaoEngrossarLado(paralelogramo.edges[1]),
+                                    this.animacaoEngrossarLado(paralelogramo.edges[3]),
+                                ),
+                                new AnimacaoSimultanea(
+                                    this.animacaoEngrossarLado(paralelogramo.edges[0]),
+                                    this.animacaoEngrossarLado(paralelogramo.edges[2]),
+                                ),
+                                this.animacaoEngrossarLado(edge)
                             )
 
         const triangulo1 = Objeto.fromMesh(new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshBasicMaterial({color: 0x0000aa, opacity:0.5, transparent: true})))
@@ -608,21 +645,46 @@ export class AnguloParalogramo {
         //Girar esse triângulo no seu eixo de rotação para mostrar que os dois triângulos são iguais
         //Aparecer valor do mostrarAngulo
 
-        const equacao = this.fase.createMathJaxTextBox("\\delta");
+        console.log(paralelogramo.vertices.slice(0,3))
 
-        this.scene.add(equacao);
+        const nomeTrianguloSuperior = paralelogramo.vertices.slice(1,4).map(vertice => vertice.variable.name).join('');
+        const nomeTrianguloInferior = paralelogramo.vertices.filter((x,i) => i != 2).map(vertice => vertice.variable.name).join('');
 
-        return new AnimacaoSequencial(moverLados, aparecerTriangulo, mostrarLados ,aparecerAreaTriangulo);
+        const equacao = this.fase.createMathJaxTextBox(`\\Delta ${nomeTrianguloSuperior}`, trianguloNovo.edges[0].getPosition().clone().add(new THREE.Vector3(0,0.3,0)).toArray(), 5);
+
+        const aparecerEquacao = apagarCSS2(equacao)
+                                .reverse()
+                                .setOnTermino(() => null)
+                                .setOnStart(() => this.fase.scene.add(equacao));
+
+        const mudarEquacao = new MostrarTexto(equacao)
+                             .setOnStart( () => equacao.mudarTexto(`\\Delta ${nomeTrianguloSuperior} \\equiv \\Delta ${nomeTrianguloInferior}`, 4))
+                             .setValorInicial(70)
+                             .setValorFinal(200)
+                             .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
+
+        const ilustrarIgualdade = new AnimacaoSequencial(mudarEquacao, moverDeVolta)
+
+        return new AnimacaoSequencial(
+                new AnimacaoSimultanea(
+                    aparecerAresta, 
+                    aparecerEquacao
+                ), 
+                moverLados, 
+                ilustrarIgualdade,
+                moverFinal,  
+                mostrarLados
+        );
     }
 
     animacaoEngrossarLado(lado){
 
         return new Animacao()
                .setValorInicial(lado.grossura)
-               .setValorFinal(lado.grossura * 1.1)
+               .setValorFinal(lado.grossura * 1.3)
                .setInterpolacao((a,b,c) => a*(1-c) + b*c)
                .setDuration(600)
-               .voltarAoInicio(false)
+               .voltarAoInicio(true)
                .setCurva(x => {
 
                     x = Math.abs(Math.sin(4.5*x*Math.PI)); //Vai e volta
@@ -636,6 +698,10 @@ export class AnguloParalogramo {
                 })
                 .setUpdateFunction(function(valor){
                     lado.grossura = valor;
+                    lado.update();
+                })
+                .setOnTermino(() =>{
+                    lado.grossura = 0.024;
                     lado.update();
                 })
     }

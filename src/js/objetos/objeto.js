@@ -30,6 +30,7 @@ export class Objeto{
         if(this.clickable) this.clickable.removeObservers();
         if(this.draggable) this.draggable.removeObservers();
         if(this.hoverable) this.hoverable.removeObservers();
+        if(this.interactable) this.interactable.removeObservers();
 
         return this;
     } 

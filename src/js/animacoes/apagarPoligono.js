@@ -55,6 +55,13 @@ export class ApagarPoligono extends AnimacaoSimultanea{
         this.setValorFinal(valorInicial);
         this.setValorInicial(valorFinal);
 
+        this.setOnTermino(() => null)
+
+        return this;
+    }
+
+    onTermino(){
+        this.poligono.removeFromScene();
         return this;
     }
 }

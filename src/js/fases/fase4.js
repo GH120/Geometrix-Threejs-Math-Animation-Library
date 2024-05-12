@@ -394,20 +394,25 @@ export class Fase4 extends Fase{
         //Usamos essa razão para calcular graus a partir da hora (transforma razão em função graus(hora) = hora * razao)
         //Dado uma hora, basta multiplicar por ela para conseguir o resultado (aparece texto 'arraste horas para essa equação', na junção joga pra fora o valor em graus)
         //(Depois de mostrar todas as horas na função) Com isso, aprendemos proporcionalidade.
+        //Razão horas pra minutos
+        //42 minutos são 60 * 360/12 graus
+
+
 
         const dialogos = [
             "Veja, quanto mais horas maior a quantidade de graus, pois são diretamente proporcionais",
-            "Por isso que se 1 hora tem 30°, então 5 horas tem 5 vezes o tanto de graus",
-            "Então chamamos de **razão** o valor de proporção,", //que nesse caso é 30°/1 hora '30 graus para cada hora' na parte direita da tela,
+            "Por isso que se 1 hora tem 30°, então 5 horas tem 5 vezes (150) o tanto de graus",
+            "Assim, a razão entre as duas grandezas sempre é a mesma por serem diretamente proporcionais,", //que nesse caso é 30°/1 hora '30 graus para cada hora' na parte direita da tela,
             "Usamos essa razão para calcular graus a partir da hora",
             "Dada uma hora, basta multiplicar por ela para conseguir o resultado",
-            "Com isso, aprendemos proporcionalidade"
+            "Isso vale até para valores quebrados, digamos 0,4 horas",
+            "Podemos expressar também razões entre grandezas, como 60 minutos / 1 hora"
         ]
         .map(texto => this.animacaoDialogo(texto));
 
         const anim1 = this.aula2Dialogo1(dialogos[0]);
         const anim2 = dialogos[1];
-        const anim3 = dialogos[2];
+        const anim3 = this.aula2Dialogo3(dialogos[2]);
         const anim4 = dialogos[3];
         const anim5 = dialogos[4];
         const anim6 = dialogos[5];
@@ -457,7 +462,7 @@ export class Fase4 extends Fase{
 
                                     return -(Math.cos(Math.PI * x) - 1) / 2
                                 })
-                                .setOnStart(() => equacao.mudarTexto(equacoes.proporcao(4), 2)) 
+                                .setOnStart(() => equacao.mudarTexto(equacoes.proporcao(4), 1.5)) 
 
         const mostrarEquacao3 = new MostrarTexto(equacao)
                                 .setValorFinal(400)
@@ -466,7 +471,7 @@ export class Fase4 extends Fase{
 
                                     return -(Math.cos(Math.PI * x) - 1) / 2
                                 })
-                                .setOnStart(() => equacao.mudarTexto(equacoes.proporcao(5), 2)) 
+                                .setOnStart(() => equacao.mudarTexto(equacoes.proporcao(5), 1.5)) 
 
 
         const moverPonteiro1 = this.moverPonteiro(30,60)
@@ -500,10 +505,18 @@ export class Fase4 extends Fase{
         return animacao;
     }
 
-    aula2Dialogo2(dialogo){
+    aula2Dialogo3(dialogo){
 
+        //"Então chamamos de Razão o valor de proporção,", //que nesse caso é 30°/1 hora '30 graus para cada hora' na parte direita da tela,
+
+        const texto1 = `que~nesse~caso~é~\\large{\\color{purple} RAZ \\tilde{A} O ~ = ~ \\frac{\\color{blue} 30°} {\\color{red} 1h}}`
+        const texto2 = "ela serve para conseguir as horas a partir dos graus"
+
+        const sidenote = this.createMathJaxTextBox(texto1, [5.2, 0, 0], 2);
+
+        const mostrarSidenote = new MostrarTexto(sidenote).setDuration(100).setOnStart(() => this.scene.add(sidenote));
         
-        const animacao = new AnimacaoSequencial(dialogo, );
+        const animacao = new AnimacaoSequencial(dialogo, mostrarSidenote);
 
         return animacao;
     }
@@ -611,6 +624,9 @@ export class Fase4 extends Fase{
         // this.atualizarOptions();
 
         super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
 
         if(this.debug && this.problema > this.progresso){
             super.update();

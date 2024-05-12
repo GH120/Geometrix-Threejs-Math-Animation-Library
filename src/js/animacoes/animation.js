@@ -141,7 +141,7 @@ export default class Animacao {
             
             if(this.stop) return;
 
-            yield this.update(this.valorFinal);
+            yield this.setProgresso(1);
         }
 
         //Se tiver uma função ao terminar, executa ela

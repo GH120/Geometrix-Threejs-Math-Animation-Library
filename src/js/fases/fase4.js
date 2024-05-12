@@ -34,6 +34,7 @@ import { Angle } from '../objetos/angle';
 import ColorirOnHover from '../outputs/colorirOnHover';
 import { Fase } from './fase';
 import { apagarObjeto } from '../animacoes/apagarObjeto';
+import MostrarTexto from '../animacoes/MostrarTexto';
   
 
 export class Fase4 extends Fase{
@@ -49,6 +50,8 @@ export class Fase4 extends Fase{
         this.createInputs();
         this.createOutputs();
         this.levelDesign();
+
+        this.text.position.copy(new THREE.Vector3(0,3.7,0))
     }
 
     //Objetos básicos
@@ -156,6 +159,8 @@ export class Fase4 extends Fase{
         //Quando começar a animação 4, ativa os controles para mover o ponteiro
         anim4.setOnTermino(() => this.Configuracao1());
 
+        anim9.setOnTermino(() => this.Configuracao1());
+
         this.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7,anim8,anim9));
 
     }
@@ -228,6 +233,33 @@ export class Fase4 extends Fase{
                                             pontoDoCirculo.update(); //Refatorar circulo, update deve ser apenas update
                                             pontoDoCirculo.updateObservers();
                                         })
+                                        .setOnTermino(() => {
+                                            const texto = this.createMathJaxTextBox("Ponteiro~arrastável", 
+                                                                                    pontoDoCirculo.position.clone()
+                                                                                                           .add(new THREE.Vector3(1, 0, 0))
+                                                                                                           .toArray(), 
+                                                                                    5           
+                                                                                  );
+
+                                            const mostrarTexto = new MostrarTexto(texto)
+                                                                .setCurva(x => {
+                                                                    x = 1 - Math.abs(1 - 2*x)
+
+                                                                    return -(Math.cos(Math.PI * x) - 1) / 2
+                                                                })
+                                                                .setDelay(50)
+                                                                .setOnStart(() => {
+                                                                    this.scene.add(texto);
+                                                                    this.ponto2.hoverable.observers.map(observer => observer.update({dentro:true}));
+                                                                 })
+                                                                .setOnTermino(() => {
+                                                                    this.scene.remove(texto);
+                                                                    this.ponto2.hoverable.observers.map(observer => observer.update({dentro:false}))
+                                                                });
+
+                                            this.animar(mostrarTexto)
+
+                                        })
         
         const demonstrarRaio = new AnimacaoSequencial(
                                     new AnimacaoSimultanea(criarPonto, new MostrarTracejado(tracejado, this.scene)),
@@ -281,7 +313,9 @@ export class Fase4 extends Fase{
 
         simultanea.setDuration(50);
 
-        simultanea.setOnStart(() => {
+        simultanea
+        .setOnStart(() => {
+            this.Configuracao2();
             const graus          = Math.round(this.angle.degrees);
             simultanea.animacoes = descolorir.slice(graus, 360)
             this.tracejados      = tracejados.slice(0, graus + 1);
@@ -319,9 +353,7 @@ export class Fase4 extends Fase{
         const fase = this;
 
 
-        const light = new THREE.AmbientLight(0xffffff,1);
-
-        fase.scene.add(light);
+        const light = new THREE.AmbientLight(0xffffff,10);
 
         dialogue.setOnTermino(() =>{
 
@@ -331,11 +363,11 @@ export class Fase4 extends Fase{
             loader.load(
                 RelogioGLB,
                 ( gltf ) =>  {
-                    console.log(gltf.scene.children[0])
-                    console.log(gltf);
                     const relogio = gltf.scene.children[0];
                     relogio.scale.set(7,7,1)
                     relogio.position.z = -0.5
+                    gltf.scene.add(light);
+                    fase.circulo.removeFromScene();
                     fase.scene.add(gltf.scene);
                 },
             );
@@ -343,7 +375,7 @@ export class Fase4 extends Fase{
             fase.dialogoTerminado = true; //Avisa para os problemas saberem que terminou o diálogo
         })
 
-        return dialogue;
+        return new AnimacaoSimultanea(dialogue);
     }
 
     moverTracejado(tracejado, filler){
@@ -437,6 +469,14 @@ export class Fase4 extends Fase{
         this.ponto2.draggable.addObserver(colorirTracejado)
     }
 
+    //Desativa o controle de arrastar o ponteiro temporariamente
+    Configuracao2(){
+
+        this.ponto2.draggable.observers.map(output => output.update({dragging: false}));
+        this.ponto2.hoverable.observers.map(output => output.update({dentro:false}));
+        this.ponto2.removeAllOutputs();
+    }
+
     update(){
         // this.atualizarOptions();
 
@@ -467,13 +507,18 @@ export class Fase4 extends Fase{
 
             consequencia(fase){
 
+                this.Configuracao2()
+
                 const dialogo1 = `Uma hora tem 30°, como acabou de demonstrar`
 
                 const animacao1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo1))
 
                 const dialogo2 = `Agora, consegue mostrar quanto vale 5 horas?`
 
-                const animacao2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo2))
+                const animacao2 = new TextoAparecendo(fase.text.element).setOnStart(() => {
+                                                                            fase.changeText(dialogo2)
+                                                                            fase.Configuracao1();
+                                                                        });
 
                 fase.animar(new AnimacaoSequencial(animacao1,animacao2))
             }
@@ -508,6 +553,7 @@ export class Fase4 extends Fase{
         }
     }
 
+    //Trabalhar na carta proporcionalidade
     //Cria a equação da regra de 3, útil para os problemas
     createEquationBox(equation, position){
 

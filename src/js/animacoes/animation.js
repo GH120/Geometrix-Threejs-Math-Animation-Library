@@ -133,7 +133,7 @@ export default class Animacao {
 
             while (this.pause) yield this.frame;
 
-            yield this.update(this.valorFinal);
+            yield this.setProgresso(1);
         }
 
         //Enquanto estiver com a flag para manter a execução, continue retornando o ultimo frame
@@ -153,7 +153,7 @@ export default class Animacao {
 
     setProgresso(progresso){
 
-        const lerp = (peso) => this.interpolacao(this.valorInicial, this.valorFinal, peso);
+        const lerp = (peso) => this.interpolacao(this.valorInicial, this.valorFinal, this.curva(peso));
 
         const valor = lerp(progresso);
 
@@ -463,7 +463,7 @@ export class AnimacaoSequencial extends Animacao{
         return this;
     }
 
-    setCheckpoint(trueOrFalse){
+    setCheckpointAll(trueOrFalse){
 
         this.checkpoint = trueOrFalse;
 

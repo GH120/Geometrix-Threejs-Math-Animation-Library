@@ -133,7 +133,10 @@ export default class AnimationControler {
 
             const hasCheckPoint = animacao.subAnimacaoAtual.checkpoint;
 
-            const lastFrame = animacao.subAnimacaoAtual.frame == animacao.subAnimacaoAtual.frames;
+            const lastFrame = animacao.subAnimacaoAtual.frame >= animacao.subAnimacaoAtual.frames - 1;
+
+            console.log(hasCheckPoint, lastFrame, !animacao.pause)
+
 
             if(hasCheckPoint && lastFrame && !animacao.pause){
                 

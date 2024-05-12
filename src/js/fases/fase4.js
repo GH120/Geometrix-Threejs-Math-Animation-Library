@@ -35,6 +35,7 @@ import ColorirOnHover from '../outputs/colorirOnHover';
 import { Fase } from './fase';
 import { apagarObjeto } from '../animacoes/apagarObjeto';
 import MostrarTexto from '../animacoes/MostrarTexto';
+import MoverTexto from '../animacoes/moverTexto';
   
 
 export class Fase4 extends Fase{
@@ -52,6 +53,10 @@ export class Fase4 extends Fase{
         this.levelDesign();
 
         this.text.position.copy(new THREE.Vector3(0,3.7,0))
+
+        this.problema = 1
+
+        this.debug = true;
     }
 
     //Objetos básicos
@@ -482,6 +487,23 @@ export class Fase4 extends Fase{
 
         super.update();
 
+        if(this.debug && this.problema > this.progresso){
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+        }
+
         // if(options.atualizar) triangle.update();
 
         const problema = this.problemas[this.progresso];
@@ -507,20 +529,26 @@ export class Fase4 extends Fase{
 
             consequencia(fase){
 
-                this.Configuracao2()
+                fase.Configuracao2()
 
-                const dialogo1 = `Uma hora tem 30°, como acabou de demonstrar`
+                const dialogo1 = fase.animacaoDialogo(`Uma hora tem 30°, como acabou de demonstrar`);
 
-                const animacao1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo1))
+                fase.equacaoUmaHora = fase.createMathJaxTextBox(`\\color{red}{1~h}~\\color{black}{tem}~\\color{blue}{30°}`, [4,2.5,0], 1);
 
-                const dialogo2 = `Agora, consegue mostrar quanto vale 5 horas?`
+                const mostrarEquacao = fase.moverEquacao({
+                    elementoCSS2: fase.equacaoUmaHora,
+                    duration1: 100,
+                    duration2: 50,
+                    delaydoMeio: 50,
+                });
 
-                const animacao2 = new TextoAparecendo(fase.text.element).setOnStart(() => {
-                                                                            fase.changeText(dialogo2)
+                const dialogo2 = fase.animacaoDialogo(`Agora, consegue mostrar quanto vale 5 horas?`);
+
+                const animacao2 = new AnimacaoSequencial(dialogo2).setOnStart(() => {
                                                                             fase.Configuracao1();
                                                                         });
 
-                fase.animar(new AnimacaoSequencial(animacao1,animacao2))
+                fase.animar(new AnimacaoSequencial(dialogo1,mostrarEquacao,animacao2))
             }
         },
 
@@ -533,6 +561,15 @@ export class Fase4 extends Fase{
             },
 
             consequencia(fase){
+
+                fase.equacaocincoHoras = fase.createMathJaxTextBox(`\\color{red}{5~h}~\\color{black}{tem}~\\color{blue}{150°}`, [4,2.5,0], 1);
+
+                const mostrarEquacao = fase.moverEquacao({
+                                            elementoCSS2: fase.equacaocincoHoras,
+                                            duration1: 100,
+                                            duration2: 50,
+                                            delaydoMeio: 50,
+                                        });
 
                 const dialogo1 = `5 horas tem 150°, como acabou de demonstrar`
 
@@ -548,7 +585,7 @@ export class Fase4 extends Fase{
 
                 const mostrarHora = fase.mostrarHora();
 
-                fase.animar(new AnimacaoSequencial(animacao1,animacao2, new AnimacaoSimultanea(mostrarHora)))
+                fase.animar(new AnimacaoSequencial(animacao1,mostrarEquacao,animacao2, new AnimacaoSimultanea(mostrarHora)))
             }
         }
     }
@@ -648,4 +685,105 @@ export class Fase4 extends Fase{
                     )
                 );
     }
+
+    //Transformar isso numa classe?
+    moverEquacao(configs){
+
+        let {elementoCSS2, equacao, spline, duration1, duration2, delayDoMeio} = configs;
+
+        if(!spline){
+            spline = [
+                new THREE.Vector3(1.473684210526315, -2.2692913385826774, 0),
+                new THREE.Vector3(-0.39766081871345005, -0.6944881889763783, 0),
+            ]
+        }
+
+        if(!equacao){
+
+            const novoElemento = document.createElement("div");
+
+            novoElemento.innerHTML = elementoCSS2.element.innerHTML;
+
+            novoElemento.style.width = '400px'; // Set width to 200 pixels
+            novoElemento.style.height = '40px'; // Set height to 150 pixels
+            novoElemento.style.top = '10px'; // Set top position to 50 pixels from the top of the parent element
+
+            novoElemento.style.position = 'relative';
+
+            novoElemento.children[0].style.width = '400px';
+            novoElemento.children[0].style.height = 'auto';
+
+            equacao = {html: novoElemento}
+        }
+
+        if(!duration1){
+            duration1 = 50
+        }
+
+        if(!duration2){
+            duration2 = 50;
+        }
+
+        if(!delayDoMeio){
+            delayDoMeio = 0;
+        }
+
+        const fase = this;
+
+
+        fase.whiteboard.adicionarEquacao(equacao)
+
+        //Consertar depois, está debaixo da whiteboard
+        // novoElemento.element.style.zIndex = 10000;
+
+        fase.scene.add(elementoCSS2);
+
+
+        const mostrarTexto = new MostrarTexto(elementoCSS2)
+                                .setValorFinal(300)
+                                .setProgresso(0)
+                                .setDelay(delayDoMeio)
+                                .setDuration(duration1)
+                                .setValorFinal(3000)
+
+        
+
+        const moverEquacaoParaDiv = new MoverTexto(elementoCSS2)
+                                    .setOnStart(function(){
+                                        const equacaoDiv   = fase.whiteboard.equacoes[0].element;
+
+                                        const dimensoes    = equacaoDiv.getBoundingClientRect();
+
+                                        const posicaoFinal = fase.pixelToCoordinates((dimensoes.right + dimensoes.left)/2, (dimensoes.top + dimensoes.bottom)/2)
+
+                                        this.setSpline([
+                                            elementoCSS2.position.clone(),
+                                            ...spline,
+                                            posicaoFinal
+                                        ])
+
+                                        // fase.whiteboard.equationList.children[0].style.display = "none"
+                                        
+
+                                    })
+                                    .setOnTermino(() =>{
+                                        fase.scene.remove(elementoCSS2);
+                                        // fase.whiteboard.equationList.children[0].style.display = "block"
+                                        fase.whiteboard.ativar(true);
+                                    })
+                                    .setDuration(duration2)
+
+
+        const animacao = new AnimacaoSequencial( 
+                            mostrarTexto, 
+                            moverEquacaoParaDiv
+                        )
+
+        animacao.setCheckpoint(false);
+
+        return animacao
+
+        
+    }
+
 }

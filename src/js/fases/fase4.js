@@ -50,7 +50,7 @@ export class Fase4 extends Fase{
         this.setupObjects();
         this.createInputs();
         this.createOutputs();
-        this.levelDesign();
+        this.aula1();
 
         this.text.position.copy(new THREE.Vector3(0,3.7,0))
 
@@ -123,8 +123,7 @@ export class Fase4 extends Fase{
         this.tracejados = tracejados;
     }
 
-    //Onde toda a lógica da fase é realizada, a sequência de animações/texto
-    levelDesign(){
+    aula1(){
 
         const dialogo = ["O círculo é uma das figuras geométricas mais básicas",
                          "Ele tem um centro",
@@ -383,6 +382,21 @@ export class Fase4 extends Fase{
         return new AnimacaoSimultanea(dialogue);
     }
 
+    aula2(){
+
+        //Veja, quanto mais horas maior a quantidade de graus, pois elas são ** proporcionais **
+        //Por isso que se 1 hora tem 30°, então 5 horas tem 5 vezes o tanto de graus (Mostra animação incrementando a hora e somando 30°)
+        //Então chamamos de **razão** o valor de proporção, que nesse caso é 30°/1 hora '30 graus para cada hora' (adiciona razão na whiteboard)
+        //Usamos essa razão para calcular graus a partir da hora (transforma razão em função graus(hora) = hora * razao)
+        //Dado uma hora, basta multiplicar por ela para conseguir o resultado (aparece texto 'arraste horas para essa equação', na junção joga pra fora o valor em graus)
+        //(Depois de mostrar todas as horas na função) Com isso, aprendemos proporcionalidade.
+
+
+        //-> Criar carta verificar proporcionalidade => pega duas comparações e verifica se são proporcionais, retorna a razão
+        //Todos os lados proporcionais é uma carta que coloca na lousa uma equação que precisa ser preenchida com todos os lados
+        //Todos os angulos iguais basta clicar nos dois polígonos com angulos iguais e retorna a propriedade na lousa
+    }
+
     moverTracejado(tracejado, filler){
 
 
@@ -562,6 +576,8 @@ export class Fase4 extends Fase{
 
             consequencia(fase){
 
+                fase.Configuracao2();
+
                 fase.equacaocincoHoras = fase.createMathJaxTextBox(`\\color{red}{5~h}~\\color{black}{tem}~\\color{blue}{150°}`, [4,2.5,0], 1);
 
                 const mostrarEquacao = fase.moverEquacao({
@@ -663,26 +679,23 @@ export class Fase4 extends Fase{
         //e 1 hora tem 30°
         //Shortcut,adicionar bônus se resolver por essa maneira
 
-        const anguloText = this.mostrarAngulo.text.elemento
+        // const anguloText = this.mostrarAngulo.text.elemento
 
-        const moverAngulo = new Animacao(anguloText)
-                                .setValorInicial(anguloText.position.clone())
-                                .setValorFinal(new THREE.Vector3(5,2,0))
-                                .setDuration(200)
-                                .voltarAoInicio(false)
-                                .setInterpolacao((inicial,final,peso) => new THREE.Vector3().lerpVectors(inicial,final,peso))
-                                .setUpdateFunction(value => {
-                                    anguloText.position.copy(value);
-                                })
+        // const moverAngulo = new Animacao(anguloText)
+        //                         .setValorInicial(anguloText.position.clone())
+        //                         .setValorFinal(new THREE.Vector3(5,2,0))
+        //                         .setDuration(200)
+        //                         .voltarAoInicio(false)
+        //                         .setInterpolacao((inicial,final,peso) => new THREE.Vector3().lerpVectors(inicial,final,peso))
+        //                         .setUpdateFunction(value => {
+        //                             anguloText.position.copy(value);
+        //                         })
         //Animação desativar mostrarÂngulo, mover texto do ângulo
         //Criar texto 1 hora = {Angulo}
 
         return new AnimacaoSequencial(
-                    moverPonteiro, 
-                    new AnimacaoSimultanea(
-                        PlaceholderAparecendo, 
-                        moverAngulo
-                    )
+                    moverPonteiro
+                    
                 );
     }
 
@@ -704,13 +717,13 @@ export class Fase4 extends Fase{
 
             novoElemento.innerHTML = elementoCSS2.element.innerHTML;
 
-            novoElemento.style.width = '400px'; // Set width to 200 pixels
-            novoElemento.style.height = '40px'; // Set height to 150 pixels
-            novoElemento.style.top = '10px'; // Set top position to 50 pixels from the top of the parent element
+            // novoElemento.style.width = '400px'; // Set width to 200 pixels
+            // novoElemento.style.height = '40px'; // Set height to 150 pixels
+            // novoElemento.style.top = '10px'; // Set top position to 50 pixels from the top of the parent element
 
             novoElemento.style.position = 'relative';
 
-            novoElemento.children[0].style.width = '400px';
+            // novoElemento.children[0].style.width = '400px';
             novoElemento.children[0].style.height = 'auto';
 
             equacao = {html: novoElemento}

@@ -165,7 +165,11 @@ export class Fase4 extends Fase{
 
         anim9.setOnTermino(() => this.Configuracao1());
 
-        this.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7,anim8,anim9));
+        const animacaoPrincipal = new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5,anim6,anim7,anim8,anim9);
+
+        animacaoPrincipal.setNome("Execução Principal");
+
+        this.animar(animacaoPrincipal);
 
     }
 
@@ -391,10 +395,117 @@ export class Fase4 extends Fase{
         //Dado uma hora, basta multiplicar por ela para conseguir o resultado (aparece texto 'arraste horas para essa equação', na junção joga pra fora o valor em graus)
         //(Depois de mostrar todas as horas na função) Com isso, aprendemos proporcionalidade.
 
+        const dialogos = [
+            "Veja, quanto mais horas maior a quantidade de graus, pois são diretamente proporcionais",
+            "Por isso que se 1 hora tem 30°, então 5 horas tem 5 vezes o tanto de graus",
+            "Então chamamos de **razão** o valor de proporção,", //que nesse caso é 30°/1 hora '30 graus para cada hora' na parte direita da tela,
+            "Usamos essa razão para calcular graus a partir da hora",
+            "Dada uma hora, basta multiplicar por ela para conseguir o resultado",
+            "Com isso, aprendemos proporcionalidade"
+        ]
+        .map(texto => this.animacaoDialogo(texto));
+
+        const anim1 = this.aula2Dialogo1(dialogos[0]);
+        const anim2 = dialogos[1];
+        const anim3 = dialogos[2];
+        const anim4 = dialogos[3];
+        const anim5 = dialogos[4];
+        const anim6 = dialogos[5];
+
+        const animacao = new AnimacaoSequencial(
+                            anim1,
+                            anim2,
+                            anim3,
+                            anim4,
+                            anim5,
+                            anim6
+                        )
+
+        this.animar(animacao)
+
+
+
 
         //-> Criar carta verificar proporcionalidade => pega duas comparações e verifica se são proporcionais, retorna a razão
         //Todos os lados proporcionais é uma carta que coloca na lousa uma equação que precisa ser preenchida com todos os lados
         //Todos os angulos iguais basta clicar nos dois polígonos com angulos iguais e retorna a propriedade na lousa
+    }
+
+    aula2Dialogo1(dialogo){
+
+        //Animar incrementação 
+        const equacoes = {
+           proporcao: (fator) => ` \\color{purple} ${fator}~ \\cdot ~ \\color{red} 1~horas ~ \\color{black} ~tem~ \\color{purple} ~${fator}~ \\cdot \\color{blue} ~30° `,
+        }
+
+        const equacao = this.createMathJaxTextBox(equacoes.proporcao(2), [4,2.5,0], 1.5);
+
+        const mostrarEquacao1 = new MostrarTexto(equacao)
+                                .setValorFinal(400)
+                                .setCurva(x => {
+                                    x = 1 - Math.abs(1 - 2*x);
+
+                                    return -(Math.cos(Math.PI * x) - 1) / 2
+                                })
+                                .setDuration(300)
+                                .setOnStart(() => this.scene.add(equacao));
+
+        const mostrarEquacao2 = new MostrarTexto(equacao)
+                                .setValorFinal(400)
+                                .setCurva(x => {
+                                    x = 1 - Math.abs(1 - 2*x);
+
+                                    return -(Math.cos(Math.PI * x) - 1) / 2
+                                })
+                                .setOnStart(() => equacao.mudarTexto(equacoes.proporcao(4), 2)) 
+
+        const mostrarEquacao3 = new MostrarTexto(equacao)
+                                .setValorFinal(400)
+                                .setCurva(x => {
+                                    x = 1 - Math.abs(1 - 2*x);
+
+                                    return -(Math.cos(Math.PI * x) - 1) / 2
+                                })
+                                .setOnStart(() => equacao.mudarTexto(equacoes.proporcao(5), 2)) 
+
+
+        const moverPonteiro1 = this.moverPonteiro(30,60)
+                                   .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+                                   .setDelay(100)
+        const moverPonteiro2 = this.moverPonteiro(60,120)
+                                   .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
+                                   .setDelay(100)
+
+        const moverPonteiro3 = this.moverPonteiro(120,150)
+                                   .setCurva(x => {
+                                        const c1 = 1.70158;
+                                        const c2 = c1 * 1.525;
+                                        
+                                        return x < 0.5
+                                        ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+                                        : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+                                    })
+                                   .setDelay(100)
+
+
+        const movimentacaoDePonteiro = new AnimacaoSequencial(
+                                        new AnimacaoSimultanea(moverPonteiro1, mostrarEquacao1), 
+                                        new AnimacaoSimultanea(moverPonteiro2, mostrarEquacao2), 
+                                        new AnimacaoSimultanea(moverPonteiro3, mostrarEquacao3)
+                                    )
+
+
+        const animacao = new AnimacaoSimultanea(dialogo, movimentacaoDePonteiro);
+
+        return animacao;
+    }
+
+    aula2Dialogo2(dialogo){
+
+        
+        const animacao = new AnimacaoSequencial(dialogo, );
+
+        return animacao;
     }
 
     moverTracejado(tracejado, filler){
@@ -543,7 +654,7 @@ export class Fase4 extends Fase{
 
             consequencia(fase){
 
-                fase.Configuracao2()
+                fase.Configuracao2();
 
                 const dialogo1 = fase.animacaoDialogo(`Uma hora tem 30°, como acabou de demonstrar`);
 
@@ -562,7 +673,13 @@ export class Fase4 extends Fase{
                                                                             fase.Configuracao1();
                                                                         });
 
-                fase.animar(new AnimacaoSequencial(dialogo1,mostrarEquacao,animacao2))
+                const animacao = new AnimacaoSequencial(dialogo1,mostrarEquacao,animacao2);
+
+                animacao.setOnTermino(() => fase.whiteboard.ativar(false));
+
+                animacao.setNome("Execução Principal");
+
+                fase.animar(animacao)
             }
         },
 
@@ -601,7 +718,19 @@ export class Fase4 extends Fase{
 
                 const mostrarHora = fase.mostrarHora();
 
-                fase.animar(new AnimacaoSequencial(animacao1,mostrarEquacao,animacao2, new AnimacaoSimultanea(mostrarHora)))
+                const animacao = new AnimacaoSequencial(animacao1,mostrarEquacao,animacao2, new AnimacaoSimultanea(mostrarHora));
+
+                fase.animar(animacao.setOnTermino(() => fase.progresso = 3));
+            }
+        },
+
+        3: {
+            satisfeito(){
+                return true;
+            },
+
+            consequencia(fase){
+                fase.aula2();
             }
         }
     }
@@ -641,34 +770,28 @@ export class Fase4 extends Fase{
 
     //Animações dos problemas
 
+    moverPonteiro(anguloInicial, anguloFinal){
+
+        return new Animacao(this.ponto2)
+                .setValorInicial(Math.PI*anguloInicial/180)
+                .setValorFinal(Math.PI*anguloFinal/180)
+                .setInterpolacao((inicial, final, peso) => inicial*(1-peso) + final*peso)
+                .setDuration(200)
+                .voltarAoInicio(false)
+                .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+                .setUpdateFunction((angulo) => {
+                    const posicao = new THREE.Vector3(3*Math.sin(angulo), 3*Math.cos(angulo), 0)
+                    this.ponto2.position = posicao;
+                    this.ponto2.update(); //Refatorar circulo, update deve ser apenas update
+                    this.ponto2.updateObservers();
+                });
+
+    }
+
     mostrarHora(){
 
-        const moverPonteiro =  new Animacao(this.ponto2)
-                                .setValorInicial(Math.PI*150/180)
-                                .setValorFinal(Math.PI*1/6)
-                                .setInterpolacao((inicial, final, peso) => inicial*(1-peso) + final*peso)
-                                .setDuration(200)
-                                .voltarAoInicio(false)
-                                .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
-                                .setUpdateFunction((angulo) => {
-                                    const posicao = new THREE.Vector3(3*Math.sin(angulo), 3*Math.cos(angulo), 0)
-                                    this.ponto2.position = posicao;
-                                    this.ponto2.update(); //Refatorar circulo, update deve ser apenas update
-                                    this.ponto2.updateObservers();
-                                });
+        const moverPonteiro = this.moverPonteiro(this.angle.degrees,30);
 
-        const equacao = new Equality(
-                                new VariableMultiplication(new Value(1), new Variable(" horas")),
-                                new VariableMultiplication(new Value(30), new Variable("°"))
-                            );
-
-        const placeholder = this.createEquationBox("1 hora = ", new THREE.Vector3(4,2,0));
-
-        const PlaceholderAparecendo = new TextoAparecendo(placeholder.element);
-
-        this.scene.add(placeholder);
-
-        console.log(placeholder)
 
         //Forma algébrica, desenvolver animações para lidar com isso (criar carta e mover)
         //Adicionar carta (círculo tem 360°)

@@ -36,6 +36,7 @@ import { Fase } from './fase';
 import { apagarObjeto } from '../animacoes/apagarObjeto';
 import MostrarTexto from '../animacoes/MostrarTexto';
 import MoverTexto from '../animacoes/moverTexto';
+import { apagarCSS2 } from '../animacoes/apagarCSS2';
   
 
 export class Fase4 extends Fase{
@@ -397,12 +398,12 @@ export class Fase4 extends Fase{
         //Razão horas pra minutos
         //42 minutos são 60 * 360/12 graus
 
-
+        this.whiteboard.ativar(false);
 
         const dialogos = [
             "Veja, quanto mais horas maior a quantidade de graus, pois são diretamente proporcionais",
-            "Por isso que se 1 hora tem 30°, então 5 horas tem 5 vezes (150) o tanto de graus",
-            "Assim, a razão entre as duas grandezas sempre é a mesma por serem diretamente proporcionais,", //que nesse caso é 30°/1 hora '30 graus para cada hora' na parte direita da tela,
+            "Por isso que se 1 hora tem 30°, então 5 horas tem 5 vezes (150°) o tanto de graus",
+            "A razão entre as duas grandezas diretamente proporcionais sempre é a mesma,", //que nesse caso é 30°/1 hora '30 graus para cada hora' na parte direita da tela,
             "Usamos essa razão para calcular graus a partir da hora",
             "Dada uma hora, basta multiplicar por ela para conseguir o resultado",
             "Isso vale até para valores quebrados, digamos 0,4 horas",
@@ -413,7 +414,7 @@ export class Fase4 extends Fase{
         const anim1 = this.aula2Dialogo1(dialogos[0]);
         const anim2 = dialogos[1];
         const anim3 = this.aula2Dialogo3(dialogos[2]);
-        const anim4 = dialogos[3];
+        const anim4 = this.aula2Dialogo4(dialogos[3]);
         const anim5 = dialogos[4];
         const anim6 = dialogos[5];
 
@@ -443,7 +444,7 @@ export class Fase4 extends Fase{
            proporcao: (fator) => ` \\color{purple} ${fator}~ \\cdot ~ \\color{red} 1~horas ~ \\color{black} ~tem~ \\color{purple} ~${fator}~ \\cdot \\color{blue} ~30° `,
         }
 
-        const equacao = this.createMathJaxTextBox(equacoes.proporcao(2), [4,2.5,0], 1.5);
+        const equacao = this.createMathJaxTextBox(equacoes.proporcao(2), [5,0,0], 1.5);
 
         const mostrarEquacao1 = new MostrarTexto(equacao)
                                 .setValorFinal(400)
@@ -509,14 +510,60 @@ export class Fase4 extends Fase{
 
         //"Então chamamos de Razão o valor de proporção,", //que nesse caso é 30°/1 hora '30 graus para cada hora' na parte direita da tela,
 
-        const texto1 = `que~nesse~caso~é~\\large{\\color{purple} RAZ \\tilde{A} O ~ = ~ \\frac{\\color{blue} 30°} {\\color{red} 1h}}`
-        const texto2 = "ela serve para conseguir as horas a partir dos graus"
+        const texto1 = `\\displaylines{ que~nesse~caso~é~ \\large{\\color{purple} RAZ \\tilde{A} O ~ = ~ \\frac{\\color{blue} 30°} {\\color{red} 1h~}} \\\\ ela~serve~para~conseguir~as~ \\color{red}{horas}~a~partir~dos~ \\color {blue}{graus}}`
 
-        const sidenote = this.createMathJaxTextBox(texto1, [5.2, 0, 0], 2);
+        const sidenote = this.createMathJaxTextBox(texto1, [5.5, 0, 0], 1.2);
 
         const mostrarSidenote = new MostrarTexto(sidenote).setDuration(100).setOnStart(() => this.scene.add(sidenote));
         
-        const animacao = new AnimacaoSequencial(dialogo, mostrarSidenote);
+        const animacao = new AnimacaoSequencial(dialogo, mostrarSidenote)
+                            .setOnTermino(() => this.scene.remove(sidenote));
+
+        return animacao;
+    }
+
+    aula2Dialogo4(dialogo){
+        //Usamos essa razão para calcular graus a partir da hora (transforma razão em função graus(hora) = hora * razao)
+
+
+        const equacoes = {
+            formula: '\\color{blue} graus( color{red} {hora})  = color{red} {hora} \\cdot color{purple} {RAZ \\tilde{A}O}',
+            fatorada: '\\color{blue} graus( color{red} hora color{blue}) color{black} = color{red} hora  color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} ~1h}',
+            instanciada: (hora) => `\\color{blue} graus( color{red} ${hora}h color{blue}) color{black} = color{red} ${hora}h  color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} ~1h}`
+        } 
+
+        const equacaoInicial = this.createMathJaxTextBox(equacoes.formula, [5, 0, 0], 1);
+
+        const aparecerEquacao = apagarCSS2(equacaoInicial).reverse();
+
+        const mudarEquacao = new AnimacaoSequencial(
+                                new MostrarTexto(equacaoInicial)
+                                .setValorInicial(400)
+                                .setValorFinal(300)
+                                .setOnTermino(() => equacaoInicial.mudarTexto(equacoes.fatorada)),
+                                new MostrarTexto(equacaoInicial)
+                                .setValorInicial(300)
+                                .setValorFinal(400)
+        )
+
+        const moverEquacao = this.moverEquacao({
+                                elementoCSS2: equacaoInicial,
+                                duration1: 100,
+                                duration2: 50,
+                                delayDoMeio: 50
+                            });
+
+        //Criar objeto que contem equação na whiteboard, quando arrastar para perto uma variável hora retornar uma resposta
+
+
+        const animacao = new AnimacaoSimultanea(
+                            dialogo, 
+                            new AnimacaoSequencial(
+                                aparecerEquacao,
+                                mudarEquacao,
+                                moverEquacao
+                            )
+                        );
 
         return animacao;
     }
@@ -629,6 +676,18 @@ export class Fase4 extends Fase{
         if(this.debug) super.update();
 
         if(this.debug && this.problema > this.progresso){
+
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
             super.update();
             super.update();
             super.update();
@@ -746,6 +805,9 @@ export class Fase4 extends Fase{
             },
 
             consequencia(fase){
+
+                fase.whiteboard.removerTodasEquacoes();
+
                 fase.aula2();
             }
         }

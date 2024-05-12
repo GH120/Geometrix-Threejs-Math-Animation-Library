@@ -138,6 +138,15 @@ export class Whiteboard {
         return this;
     }
 
+    removerTodasEquacoes(){
+
+        this.equacoes.map(equacao => this.scene.remove(equacao));
+
+        this.equacoes = [];
+
+        return this;
+    }
+
     addWhiteBoard(equationWindow){
         
         const rect = equationWindow.getBoundingClientRect();

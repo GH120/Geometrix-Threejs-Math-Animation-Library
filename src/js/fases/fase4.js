@@ -57,7 +57,7 @@ export class Fase4 extends Fase{
 
         this.problema = 1
 
-        this.debug = true;
+        this.debug = false;
     }
 
     //Objetos básicos
@@ -579,7 +579,9 @@ export class Fase4 extends Fase{
     }
 
     aula2Dialogo5(dialogo){
-        
+
+        //Criar controle
+
     }
 
     moverTracejado(tracejado, filler){

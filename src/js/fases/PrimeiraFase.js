@@ -30,6 +30,7 @@ import {apagarCSS2} from "../animacoes/apagarCSS2";
 import ElementoCSS2D from "../objetos/elementocss2d";
 import MostrarValorAresta from "../outputs/mostrarValorAresta";
 import MostrarNomeVertice from "../outputs/mostrarNomeVertice";
+import JuntarEquacoes from "../outputs/juntarEquacoes";
 
 export class PrimeiraFase extends Fase{
 
@@ -50,7 +51,7 @@ export class PrimeiraFase extends Fase{
         this.outputTesteClick();
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
 
-        this.debug = false;
+        this.debug = true;
         this.debugProblem = 3;
 
         //A fazer:
@@ -320,56 +321,8 @@ export class PrimeiraFase extends Fase{
             const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
             const equacao2 = new ElementoCSS2D(fase.whiteboard.equacoes[1], fase.whiteboard);
 
-            new Draggable(equacao2,fase.whiteboard.camera, fase.whiteboard);
-            new Draggable(equacao1,fase.whiteboard.camera, fase.whiteboard);
-            new Hoverable(equacao2,fase.whiteboard.camera, fase.whiteboard);
-            new Hoverable(equacao1,fase.whiteboard.camera, fase.whiteboard);
-
-            const controle1 = fase.juntarEquacoes(equacao1, juntarEquacoes)
-                                 .addInputs(
-                                    equacao1.draggable,
-                                    equacao2.hoverable,
-                                    equacao1.hoverable
-                                 );
-
-            const controle2 = fase.juntarEquacoes(equacao2, juntarEquacoes)
-                                  .addInputs(
-                                    equacao2.draggable,
-                                    equacao1.hoverable,
-                                    equacao2.hoverable
-                                );
-        }
-
-        //Junta equações e muda o progresso para aula2
-        function juntarEquacoes(equacaoMovida, equacaoSelecionada){
-
-            //Fade out das duas equações, remoção delas da whiteboard
-
-            const fadeOutEquacao1 = apagarCSS2(equacaoMovida.texto     , fase.whiteboard.scene).setDuration(100);
-            const fadeOutEquacao2 = apagarCSS2(equacaoSelecionada.texto, fase.whiteboard.scene).setDuration(100);
-
-            //Fade in da equação nova, adiciona ela na whiteboard
-
-            const equacaoNova = fase.createMathJaxTextBox(equacoes.semelhanca, [0,1,0], 6);
-
-            const fadeInEquacaoNova = apagarCSS2(equacaoNova, fase.whiteboard.scene)
-                                      .reverse()
-                                      .setOnStart  (() => fase.whiteboard.adicionarEquacao({html:equacaoNova.element}))
-                                      .setOnTermino(() => null)
-                                      .setDuration(100)
-
-            fase.whiteboard.removerEquacao(equacaoMovida.texto);
-            fase.whiteboard.removerEquacao(equacaoSelecionada.texto);
-
-
-            const animacao = new AnimacaoSimultanea(
-                                fadeOutEquacao1,
-                                fadeOutEquacao2,
-                                fadeInEquacaoNova
-                            )
-                            .setOnTermino(() => fase.progresso = 2)
-
-            fase.animar(animacao);
+            new JuntarEquacoes(equacao1, [equacao2], fase);
+            new JuntarEquacoes(equacao2, [equacao1], fase);
         }
     }
 

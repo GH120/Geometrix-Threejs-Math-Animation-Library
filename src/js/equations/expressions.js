@@ -1,5 +1,7 @@
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
 
+//DEPRECATED: FALTOU MODIFICAR PARA USAR MATHJAX FULL
+
 class Expression{
 
     //Muda a variável com o nome escolhido para seu novo valor, que também pode ser uma expressão

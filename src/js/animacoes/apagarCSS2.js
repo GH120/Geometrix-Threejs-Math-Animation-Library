@@ -10,5 +10,5 @@ export const apagarCSS2 = (texto, scene) => new Animacao()
 
                                         })
                                         .voltarAoInicio(false)
-                                        .setOnTermino(() => scene.remove(texto))
+                                        .setOnTermino(() => (scene)? scene.remove(texto) : null)
                                         .setDuration(30)

@@ -18,7 +18,7 @@ import FixarAoCirculo from '../outputs/fixarAoCirculo';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
-import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from '../animacoes/animation';
+import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente } from '../animacoes/animation';
 import { colorirAngulo } from '../animacoes/colorirAngulo';
 import { Tracejado } from '../objetos/tracejado';
 import MostrarTracejado from '../animacoes/mostrarTracejado';
@@ -424,7 +424,7 @@ export class Fase4 extends Fase{
                             anim3,
                             anim4,
                             anim5,
-                            anim6
+                            // anim6
                         )
 
         this.animar(animacao)
@@ -510,14 +510,14 @@ export class Fase4 extends Fase{
 
         //"Então chamamos de Razão o valor de proporção,", //que nesse caso é 30°/1 hora '30 graus para cada hora' na parte direita da tela,
 
-        const texto1 = `\\displaylines{ que~nesse~caso~é~ \\large{\\color{purple} RAZ \\tilde{A} O ~ = ~ \\frac{\\color{blue} 30°} {\\color{red} 1h~}} \\\\ ela~serve~para~conseguir~as~ \\color{red}{horas}~a~partir~dos~ \\color {blue}{graus}}`
+        const texto1 = `\\displaylines{ que~nesse~caso~é~ \\large{\\color{purple} RAZ \\tilde{A} O ~ = ~ \\frac{\\color{blue} 30°} {\\color{red} 1h~}} \\\\ ela~serve~para~conseguir~os~ \\color {blue}{graus}~ \\color{black} {~a~partir~das~} \\color{red}{horas}}`
 
-        const sidenote = this.createMathJaxTextBox(texto1, [5.5, 0, 0], 1.2);
+        const sidenote = this.createMathJaxTextBox(texto1, [5.5, 0, 0], 1.1);
 
         const mostrarSidenote = new MostrarTexto(sidenote).setDuration(100).setOnStart(() => this.scene.add(sidenote));
         
         const animacao = new AnimacaoSequencial(dialogo, mostrarSidenote)
-                            .setOnTermino(() => this.scene.remove(sidenote));
+                            .setOnTermino(() => this.animar(apagarCSS2(sidenote, this.scene)));
 
         return animacao;
     }
@@ -525,33 +525,43 @@ export class Fase4 extends Fase{
     aula2Dialogo4(dialogo){
         //Usamos essa razão para calcular graus a partir da hora (transforma razão em função graus(hora) = hora * razao)
 
-
         const equacoes = {
-            formula: '\\color{blue} graus( color{red} {hora})  = color{red} {hora} \\cdot color{purple} {RAZ \\tilde{A}O}',
-            fatorada: '\\color{blue} graus( color{red} hora color{blue}) color{black} = color{red} hora  color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} ~1h}',
-            instanciada: (hora) => `\\color{blue} graus( color{red} ${hora}h color{blue}) color{black} = color{red} ${hora}h  color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} ~1h}`
+            formula: '\\color{blue} graus( \\color{red} {hora} \\color{blue}) \\color{black} = \\color{red} {hora} \\cdot \\color{purple} {RAZ \\tilde{A}O}',
+            fatorada: '\\color{blue} graus( \\color{red} hora \\color{blue}) \\color{black} = \\color{red} hora  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}',
+            instanciada: (hora) => `\\color{blue} graus( \\color{red} ${hora} \\color{blue}) \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`
         } 
 
         const equacaoInicial = this.createMathJaxTextBox(equacoes.formula, [5, 0, 0], 1);
 
-        const aparecerEquacao = apagarCSS2(equacaoInicial).reverse();
+        const aparecerEquacao = apagarCSS2(equacaoInicial)
+                                .reverse()
+                                .setOnDelay(() => this.debug = false)
+                                .setDelay(150)
+                                .setOnStart(() => this.scene.add(equacaoInicial));
 
         const mudarEquacao = new AnimacaoSequencial(
                                 new MostrarTexto(equacaoInicial)
                                 .setValorInicial(400)
-                                .setValorFinal(300)
-                                .setOnTermino(() => equacaoInicial.mudarTexto(equacoes.fatorada)),
+                                .setValorFinal(140)
+                                .setOnTermino(() => equacaoInicial.mudarTexto(equacoes.fatorada, 0.9)),
                                 new MostrarTexto(equacaoInicial)
-                                .setValorInicial(300)
+                                .setValorInicial(140)
                                 .setValorFinal(400)
         )
 
-        const moverEquacao = this.moverEquacao({
-                                elementoCSS2: equacaoInicial,
-                                duration1: 100,
-                                duration2: 50,
-                                delayDoMeio: 50
-                            });
+        const moverEquacao = animacaoIndependente(
+                                () =>{
+
+                                    this.animar(
+                                        this.moverEquacao({
+                                            elementoCSS2: equacaoInicial,
+                                            duration1: 100,
+                                            duration2: 50,
+                                            delayDoMeio: 50
+                                        })
+                                    )
+                                }
+                            );
 
         //Criar objeto que contem equação na whiteboard, quando arrastar para perto uma variável hora retornar uma resposta
 
@@ -566,6 +576,10 @@ export class Fase4 extends Fase{
                         );
 
         return animacao;
+    }
+
+    aula2Dialogo5(dialogo){
+        
     }
 
     moverTracejado(tracejado, filler){

@@ -57,7 +57,7 @@ export class Fase4 extends Fase{
 
         this.text.position.copy(new THREE.Vector3(0,3.7,0))
 
-        this.problema = 1
+        this.problema = 10
 
         this.debug = true;
     }
@@ -559,7 +559,7 @@ export class Fase4 extends Fase{
                                 .setValorFinal(140)
                                 .setOnTermino(() => equacaoInicial.mudarTexto(equacoes.fatorada, 0.9)),
                                 new MostrarTexto(equacaoInicial)
-                                .setValorInicial(140)
+                                .setValorInicial(170)
                                 .setValorFinal(400)
         )
 
@@ -574,7 +574,7 @@ export class Fase4 extends Fase{
                                         })
                                     )
                                 }
-                            );
+                            )
 
         //Criar objeto que contem equação na whiteboard, quando arrastar para perto uma variável hora retornar uma resposta
 
@@ -595,12 +595,14 @@ export class Fase4 extends Fase{
 
         //Criar controle
 
-        const valor = this.createMathJaxTextBox(`\\color{red} 3h`, [5,0,0], 1.3)
+        const valor = this.createMathJaxTextBox(`\\color{red} 5h`, [5,0,0], 1.3)
 
         const aparecer = apagarCSS2(valor)
                         .reverse()
-                        .setOnStart(()=> this.scene.add(valor))
-                        .setOnTermino(() => alert("funcionando"))
+                        .setOnStart(()=> {
+                            this.scene.add(valor);
+                            this.whiteboard.ativar(false);
+                        })
 
         const mover = this.moverEquacao({
                         duration1:0,
@@ -608,9 +610,9 @@ export class Fase4 extends Fase{
                         elementoCSS2: valor
                     });
 
-        const sidenote = this.createMathJaxTextBox(`Arraste o valor para a função na lousa`, [-3, 0, 0], 4);
+        const sidenote = this.createTextBox(`Arraste o valor para a função na lousa`, [-5.6, 0.6, 0], 17, false);
 
-        const mostrarSidenote = new MostrarTexto(sidenote);
+        const mostrarSidenote = new MostrarTexto(sidenote).setOnStart(() => this.scene.add(sidenote));
 
 
         mover.setOnTermino(() => 
@@ -743,16 +745,18 @@ export class Fase4 extends Fase{
         } 
 
         //Vai ser a função que vai instanciar as equações
-        const funcao = new ElementoCSS2D(informacao.funcao, this);
-        const valor  = new ElementoCSS2D(informacao.valor,  this);
+        const funcao = new ElementoCSS2D(informacao.funcao, this.whiteboard);
+        const valor  = new ElementoCSS2D(informacao.valor,  this.whiteboard);
+
+        console.log(funcao, valor);
 
 
         //Criar controle de juntar funcao com valores
 
-        const controle = new JuntarEquacoes(valor,funcao, this);
+        const controle = new JuntarEquacoes(valor,[funcao], this);
 
 
-        controle.equacaoResultante = equacoes.instanciada(4);
+        controle.equacaoResultante = equacoes.instanciada("5h");
     }
 
     update(){
@@ -1037,7 +1041,7 @@ export class Fase4 extends Fase{
 
         const mostrarTexto = new MostrarTexto(elementoCSS2)
                                 .setValorFinal(300)
-                                .setProgresso(0)
+                                .setProgresso((duration1)? 0 : 1)
                                 .setDelay(delayDoMeio)
                                 .setDuration(duration1)
                                 .setValorFinal(3000)
@@ -1045,8 +1049,6 @@ export class Fase4 extends Fase{
                                     fase.scene.add(elementoCSS2);
                                     fase.whiteboard.adicionarEquacao(equacao)
                                 });
-
-        
 
         const moverEquacaoParaDiv = new MoverTexto(elementoCSS2)
                                     .setOnStart(function(){

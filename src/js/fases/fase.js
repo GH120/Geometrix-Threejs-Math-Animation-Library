@@ -115,10 +115,10 @@ export class Fase {
     }
 
     //Cria elementos css2d a partir de um texto
-    createTextBox(text, position=[0,0,0]){
+    createTextBox(text, position=[0,0,0], tamanhoDaFonte=25, addToScene=true){
 
         const container = document.createElement('p');
-        container.style.fontSize = "25px";
+        container.style.fontSize = tamanhoDaFonte + "px";
         container.style.fontFamily = "Courier New, monospace";
         container.style.fontWeight = 500;
         container.style.display = 'inline-block';
@@ -140,7 +140,7 @@ export class Fase {
         cPointLabel.position.y = position[1];
         cPointLabel.position.z = position[2];
 
-        this.scene.add(cPointLabel);
+        if(addToScene) this.scene.add(cPointLabel);
 
         return cPointLabel;
     }

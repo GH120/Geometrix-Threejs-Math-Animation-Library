@@ -14,6 +14,7 @@ export default class JuntarEquacoes extends Output{
 
         this.equacaoMovida = equacaoMovida;
         this.equacoesAlvo  = equacoesAlvo;
+        this.tamanhoFonte  = 1;
 
         this.equacaoResultante = `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
         
@@ -55,6 +56,7 @@ export default class JuntarEquacoes extends Output{
 
         //Verifica se está dentro da equação movida
         if(novoEstado.alvo == equacaoMovida){
+
             if(novoEstado.dentro == true){
                 estado.dentro = true;
             }
@@ -134,7 +136,7 @@ export default class JuntarEquacoes extends Output{
 
         //Fade in da equação nova, adiciona ela na whiteboard
 
-        const equacaoNova = fase.createMathJaxTextBox(this.equacaoResultante, [0,1,0], 6);
+        const equacaoNova = fase.createMathJaxTextBox(this.equacaoResultante, [0,1,0], this.tamanhoFonte);
 
         const fadeInEquacaoNova = apagarCSS2(equacaoNova, fase.whiteboard.scene)
                                   .reverse()

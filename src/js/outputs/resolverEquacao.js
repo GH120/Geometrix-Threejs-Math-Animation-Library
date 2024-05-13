@@ -39,7 +39,7 @@ export default class ResolverEquacao extends Output{
 
         if(novoEstado.clicado){
 
-            this.handleResolucao()
+            this.handleResolucao(this.equacao)
             this.notify({clicado: true})
         }
     }

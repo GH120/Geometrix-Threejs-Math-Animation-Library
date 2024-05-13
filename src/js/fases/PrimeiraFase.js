@@ -321,8 +321,11 @@ export class PrimeiraFase extends Fase{
             const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
             const equacao2 = new ElementoCSS2D(fase.whiteboard.equacoes[1], fase.whiteboard);
 
-            new JuntarEquacoes(equacao1, [equacao2], fase);
-            new JuntarEquacoes(equacao2, [equacao1], fase);
+            const arraste1 = new JuntarEquacoes(equacao1, [equacao2], fase);
+            const arraste2 = new JuntarEquacoes(equacao2, [equacao1], fase);
+
+            arraste1.tamanhoFonte = 5;
+            arraste2.tamanhoFonte = 5;
         }
     }
 
@@ -1477,99 +1480,6 @@ export class PrimeiraFase extends Fase{
         }
     }
 
-    juntarEquacoes(equacaoMovida, juntarEquacoes){
-
-        //Inputs: Arrastar da equação movida e dentro da equação alvo
-        return new Output()
-               .setUpdateFunction(function(novoEstado){
-
-                    //O Estado de execução do output
-                    const estado = this.estado;
-
-
-                    //Verifica se está dentro da equação movida
-                    if(novoEstado.alvo == equacaoMovida){
-                        if(novoEstado.dentro == true){
-                            estado.dentro = true;
-                        }
-                        if(novoEstado.dentro == false){
-                            estado.dentro = false;
-                        }
-                    }
-
-                    else{
-
-                        //Verifica se a equação movida está sobre alguma equação alvo
-                        if(novoEstado.dentro == true){
-                            estado.valido = true;
-                            estado.equacaoSelecionada = novoEstado.alvo;
-                        }
-                        if(novoEstado.dentro == false){
-                            estado.valido = false;
-                            estado.equacaoSelecionada = null;
-                        }
-                    }
-
-
-                    // if(novoEstado.dragging){
-                    //     alert("arrasta pra cima")
-                    // }
-
-                    //Condição de começo da execução
-                    if( 
-                        estado.dentro       == true  && 
-                        !estado.dragging             &&  //Também aceita estado.dragging indefinido
-                        novoEstado.dragging == true
-                    ){ 
-                        estado.dragging      = novoEstado.dragging;
-                        estado.equacaoMovida = novoEstado.alvo;
-                        estado.ultimaPosicao = novoEstado.alvo.mesh.position.clone();
-                    }
-
-                     // //Condição de termino da execução
-                    if(
-                        estado.dragging     == true  &&
-                        novoEstado.dragging == false 
-                    ){
-
-                        estado.dragging = false;
-
-                        //Ambas as equações, a movida por arraste e a que o cursor está acima
-                        const equacaoMovida      = estado.equacaoMovida;
-                        const equacaoSelecionada = estado.equacaoSelecionada;
-
-                        //Evaluate
-                        if(estado.valido) juntarEquacoes(equacaoMovida, equacaoSelecionada);
-                        else              voltarAoInicio(estado); 
-                    }
-
-                    //Condição de execução
-                    if(estado.dragging == true && novoEstado.position){
-                        
-                        console.log(novoEstado.position)
-                        equacaoMovida.mesh.position.copy(novoEstado.position);
-                        // alert(equacaoMovida.mesh.position.x)
-                    }
-
-                    
-               });
-
-        //Funções auxiliares
-        // function juntarEquacoes(){
-        //     alert("YEEEEEEEEESSSSSSS");
-        // }
-
-        function voltarAoInicio(estado){
-            // alert("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-
-            const ultimaPosicao = estado.ultimaPosicao;
-
-            const equacaoMovida = estado.equacaoMovida;
-
-            equacaoMovida.mesh.position.copy(ultimaPosicao);
-        }
-    }
-
     //Muito complexo, melhor não
 
     //Adicionar update(estado) ai passa o estado para o problema da fase
@@ -1728,7 +1638,7 @@ export class PrimeiraFase extends Fase{
                         .manterExecucaoTodos(false)
                     })
                 )
-                .setCheckpoint(false)
+                .setCheckpointAll(false)
     }
 
     animacaoDividirLadosIguais(poligono1, poligono2){
@@ -2034,7 +1944,7 @@ export class PrimeiraFase extends Fase{
                                 moverEquacaoParaDiv
                             )
 
-            animacao.setCheckpoint(false);
+            animacao.setCheckpointAll(false);
 
             fase.animar(animacao);
         }
@@ -2133,7 +2043,7 @@ export class PrimeiraFase extends Fase{
                             moverEquacaoParaDiv
                         )
 
-        animacao.setCheckpoint(false);
+        animacao.setCheckpointAll(false);
 
         return animacao
 
@@ -2327,7 +2237,7 @@ export class PrimeiraFase extends Fase{
                                 moverEquacao
                             )
                             .filler(75)
-                            .setCheckpoint(false);
+                            .setCheckpointAll(false);
 
             
             //Adiciona essa caixa de texto as caixas de texto ativas
@@ -2380,7 +2290,7 @@ export class PrimeiraFase extends Fase{
                                 adicionarTotal.setCheckpoint(false),
                                 apagarTotal.setCheckpoint(false)
                             )
-                            .setCheckpoint(false)
+                            .setCheckpointAll(false)
                             .setOnTermino(() => fase.whiteboard.ativar(false))
 
             fase.animar(animacao);

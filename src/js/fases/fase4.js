@@ -61,7 +61,7 @@ export class Fase4 extends Fase{
 
         this.problema = 10
 
-        this.debug = true;
+        this.debug = false;
     }
 
     //Objetos básicos
@@ -409,7 +409,7 @@ export class Fase4 extends Fase{
             "Por isso que se 1 hora tem 30°, então 5 horas tem 5 vezes (150°) o tanto de graus",
             "A razão entre as duas grandezas diretamente proporcionais sempre é a mesma,", //que nesse caso é 30°/1 hora '30 graus para cada hora' na parte direita da tela,
             "Usamos essa razão para calcular graus a partir da hora",
-            "Dada uma hora, basta multiplicar por ela para conseguir o resultado",
+            "Dada uma hora, basta multiplicar por ela para conseguir os graus",
             "Mova os todos os valores das horas para testar isso",
             "Isso vale até para valores quebrados, digamos 0,4 horas",
             "Podemos expressar também razões entre grandezas, como 60 minutos / 1 hora"
@@ -446,7 +446,7 @@ export class Fase4 extends Fase{
 
         //Animar incrementação 
         const equacoes = {
-           proporcao: (fator) => ` ( \\color{purple} ${fator}~ \\cdot ~ \\color{red} 1 \\color{black} )\\color{red} ~h ~ \\color{black} ~tem~ (\\color{purple} ~${fator}~ \\cdot \\color{blue} ~30 \\color{black}) \\color{blue} ° `,
+           proporcao: (fator) => ` ( \\color{red} ${fator}~ \\cdot ~ \\color{red} 1 \\color{red} )\\color{red} ~h ~ \\color{black} ~tem~ (\\color{blue} ~${fator}~ \\cdot \\color{blue} ~30 \\color{blue}) \\color{blue} ° `,
         }
 
         const equacao = this.createMathJaxTextBox(equacoes.proporcao(2), [5,0,0], 1);
@@ -789,7 +789,7 @@ export class Fase4 extends Fase{
                     if(novaEquacao && estado.etapa == 1){
                         const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
 
-                        const mudarSidenote = fase.animacaoDialogo("Clique na equação para resolvê-la", fase.informacao.sidenote)
+                        const mudarSidenote = fase.animacaoDialogo("Clique para resolvê-la", fase.informacao.sidenote)
 
                         fase.animar(mudarSidenote)
 
@@ -800,7 +800,7 @@ export class Fase4 extends Fase{
                         estado.etapa++;
                     }
 
-                    if(novaEquacao && estado.etapa == 2){
+                    else if(novaEquacao && estado.etapa == 2){
                         const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
 
                         const mudarSidenote = fase.animacaoDialogo("Clique mais uma vez na equação para resolvê-la", fase.informacao.sidenote)

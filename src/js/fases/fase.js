@@ -214,11 +214,13 @@ export class Fase {
 
     
     //Muda o conteúdo da caixa de texto
-    changeText(texto){
+    changeText(texto, target = null){
 
         console.log(texto);
 
-        this.text.element.textContent = '';
+        if(target == null) target = this.text;
+
+        target.element.textContent = '';
 
         // Split the text into individual characters
         const characters = texto.split('');
@@ -227,7 +229,7 @@ export class Fase {
         characters.forEach((character,index) => {
             const span = document.createElement('span');
             span.textContent = character;
-            this.text.element.appendChild(span);
+            target.element.appendChild(span);
         });
     }
 
@@ -338,8 +340,8 @@ export class Fase {
         animate();
     }
 
-    animacaoDialogo(texto){
-        return new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)).setValorFinal(100)
+    animacaoDialogo(texto, target = null){
+        return new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto, target)).setValorFinal(100)
     }
 
     animacoesDialogo(...textos){

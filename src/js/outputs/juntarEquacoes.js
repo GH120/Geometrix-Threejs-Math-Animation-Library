@@ -140,7 +140,15 @@ export default class JuntarEquacoes extends Output{
 
         const fadeInEquacaoNova = apagarCSS2(equacaoNova, fase.whiteboard.scene)
                                   .reverse()
-                                  .setOnStart  (() => fase.whiteboard.adicionarEquacao({html:equacaoNova.element}))
+                                  .setOnStart  (() => {
+
+                                    fase.whiteboard.adicionarEquacao({html:equacaoNova.element});
+
+                                    this.notify({
+                                        novaEquacao: fase.whiteboard.equacoes[fase.whiteboard.equacoes.length - 1]
+                                    })
+
+                                  })
                                   .setOnTermino(() => null)
                                   .setDuration(100)
 
@@ -153,7 +161,7 @@ export default class JuntarEquacoes extends Output{
                             fadeOutEquacao2,
                             fadeInEquacaoNova
                         )
-                        .setOnTermino(() => fase.progresso = 2)
+                        .setOnTermino(() => fase.progresso = 2) //Consertar isso depois
 
         fase.whiteboard.animar(animacao);
 

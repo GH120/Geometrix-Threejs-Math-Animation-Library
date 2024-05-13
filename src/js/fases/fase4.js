@@ -39,6 +39,8 @@ import MoverTexto from '../animacoes/moverTexto';
 import { apagarCSS2 } from '../animacoes/apagarCSS2';
 import ElementoCSS2D from '../objetos/elementocss2d';
 import JuntarEquacoes from '../outputs/juntarEquacoes';
+import { Output } from '../outputs/Output';
+import ResolverEquacao from '../outputs/resolverEquacao';
   
 
 export class Fase4 extends Fase{
@@ -427,7 +429,7 @@ export class Fase4 extends Fase{
                             anim3,
                             anim4,
                             anim5,
-                            anim6
+                            // anim6
                         )
 
         this.animar(animacao)
@@ -618,7 +620,8 @@ export class Fase4 extends Fase{
         mover.setOnTermino(() => 
             this.Configuracao3({
                 valor: this.whiteboard.equacoes[1], 
-                funcao:this.whiteboard.equacoes[0]
+                funcao:this.whiteboard.equacoes[0],
+                sidenote: sidenote
             })
         )
 
@@ -738,6 +741,8 @@ export class Fase4 extends Fase{
     //Arraste e instanciação de equações
     Configuracao3(informacao){
 
+        this.informacao = {...this.informacao, ...informacao};
+
         const equacoes = {
             formula: '\\color{blue} graus( \\color{red} {hora} \\color{blue}) \\color{black} = \\color{red} {hora} \\cdot \\color{purple} {RAZ \\tilde{A}O}',
             fatorada: '\\color{blue} graus( \\color{red} hora \\color{blue}) \\color{black} = \\color{red} hora  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}',
@@ -753,10 +758,67 @@ export class Fase4 extends Fase{
 
         //Criar controle de juntar funcao com valores
 
-        const controle = new JuntarEquacoes(valor,[funcao], this);
+        const juntar = new JuntarEquacoes(valor,[funcao], this);
 
+        juntar.equacaoResultante = equacoes.instanciada("5h");
 
-        controle.equacaoResultante = equacoes.instanciada("5h");
+        this.controleEquacoes("5h").addInputs(juntar);
+    }
+
+    controleEquacoes(valor){
+
+        //Refatorar depois a parte das equações, esse trabalho aqui é desnecessário
+        const equacoes = {
+            formula: '\\color{blue} graus( \\color{red} {hora} \\color{blue}) \\color{black} = \\color{red} {hora} \\cdot \\color{purple} {RAZ \\tilde{A}O}',
+            fatorada: '\\color{blue} graus( \\color{red} hora \\color{blue}) \\color{black} = \\color{red} hora  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}',
+            instanciada: (hora) => `\\color{blue} graus( \\color{red} ${hora} \\color{blue}) \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`,
+            resolvidaParcialmente:   (hora) => `\\color{blue} graus(\\color{red} ${hora} \\color{blue}) \\color{black} = \\color{blue} ${hora} \\cdot 30°`,
+            resolvida:   (hora) => `\\color{blue} graus(\\color{red} ${hora} \\color{blue}) \\color{black} = \\color{blue} ${parseInt(hora) * 30}°`
+
+        } 
+
+        const fase = this;
+
+        return new Output()
+               .setUpdateFunction(function(novoEstado){
+
+                    const estado = this.estado;
+
+                    const novaEquacao = novoEstado.novaEquacao;
+
+                    if(novaEquacao && estado.etapa == 1){
+                        const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
+
+                        const mudarSidenote = fase.animacaoDialogo("Clique na equação para resolvê-la", fase.informacao.sidenote)
+
+                        fase.animar(mudarSidenote)
+
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase, null, equacoes.resolvidaParcialmente(estado.valor))
+
+                        this.addInputs(resolverEquacao);
+
+                        estado.etapa++;
+                    }
+
+                    if(novaEquacao && estado.etapa == 2){
+                        const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
+
+                        const mudarSidenote = fase.animacaoDialogo("Clique mais uma vez na equação para resolvê-la", fase.informacao.sidenote)
+
+                        fase.animar(mudarSidenote)
+
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase, null, equacoes.resolvidaParcialmente(estado.valor))
+
+                        this.addInputs(resolverEquacao);
+
+                        estado.etapa++;
+                    }
+               })
+               .setEstadoInicial({
+                    valor: valor,
+                    etapa: 1
+               })
+
     }
 
     update(){

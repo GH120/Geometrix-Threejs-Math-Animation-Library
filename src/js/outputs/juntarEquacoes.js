@@ -17,7 +17,16 @@ export default class JuntarEquacoes extends Output{
 
         this.equacaoResultante = `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
         
-        if(onJuncao)          this.handleJuncao      = onJuncao;
+        this.setup(onJuncao, equacaoResultante);
+    }
+
+    setup(onJuncao, equacaoResultante){
+
+        const fase          = this.fase;
+        const equacaoMovida = this.equacaoMovida;
+        const equacoesAlvo  = this.equacoesAlvo;
+
+        if(onJuncao)          this.handleJuncao      = onJuncao.bind(this);
         if(equacaoResultante) this.equacaoResultante = equacaoResultante;
 
         if(!equacaoMovida.hoverable) new Hoverable(equacaoMovida, fase.whiteboard.camera, fase.whiteboard);
@@ -34,7 +43,6 @@ export default class JuntarEquacoes extends Output{
             ...equacoesAlvo.map(equacao => equacao.hoverable)
         )
 
-        console.log(this);
     }
 
     update(novoEstado){
@@ -146,5 +154,8 @@ export default class JuntarEquacoes extends Output{
                         .setOnTermino(() => fase.progresso = 2)
 
         fase.whiteboard.animar(animacao);
+
+        equacaoMovida.removeAllOutputs();
+        equacaoSelecionada.removeAllOutputs();
     }
 }

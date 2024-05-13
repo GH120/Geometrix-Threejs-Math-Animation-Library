@@ -37,6 +37,8 @@ import { apagarObjeto } from '../animacoes/apagarObjeto';
 import MostrarTexto from '../animacoes/MostrarTexto';
 import MoverTexto from '../animacoes/moverTexto';
 import { apagarCSS2 } from '../animacoes/apagarCSS2';
+import ElementoCSS2D from '../objetos/elementocss2d';
+import JuntarEquacoes from '../outputs/juntarEquacoes';
   
 
 export class Fase4 extends Fase{
@@ -406,6 +408,7 @@ export class Fase4 extends Fase{
             "A razão entre as duas grandezas diretamente proporcionais sempre é a mesma,", //que nesse caso é 30°/1 hora '30 graus para cada hora' na parte direita da tela,
             "Usamos essa razão para calcular graus a partir da hora",
             "Dada uma hora, basta multiplicar por ela para conseguir o resultado",
+            "Mova os todos os valores das horas para testar isso",
             "Isso vale até para valores quebrados, digamos 0,4 horas",
             "Podemos expressar também razões entre grandezas, como 60 minutos / 1 hora"
         ]
@@ -415,7 +418,7 @@ export class Fase4 extends Fase{
         const anim2 = dialogos[1];
         const anim3 = this.aula2Dialogo3(dialogos[2]);
         const anim4 = this.aula2Dialogo4(dialogos[3]);
-        const anim5 = dialogos[4];
+        const anim5 = this.aula2Dialogo5(dialogos[4]);
         const anim6 = dialogos[5];
 
         const animacao = new AnimacaoSequencial(
@@ -424,7 +427,7 @@ export class Fase4 extends Fase{
                             anim3,
                             anim4,
                             anim5,
-                            // anim6
+                            anim6
                         )
 
         this.animar(animacao)
@@ -441,46 +444,57 @@ export class Fase4 extends Fase{
 
         //Animar incrementação 
         const equacoes = {
-           proporcao: (fator) => ` \\color{purple} ${fator}~ \\cdot ~ \\color{red} 1~horas ~ \\color{black} ~tem~ \\color{purple} ~${fator}~ \\cdot \\color{blue} ~30° `,
+           proporcao: (fator) => ` ( \\color{purple} ${fator}~ \\cdot ~ \\color{red} 1 \\color{black} )\\color{red} ~h ~ \\color{black} ~tem~ (\\color{purple} ~${fator}~ \\cdot \\color{blue} ~30 \\color{black}) \\color{blue} ° `,
         }
 
-        const equacao = this.createMathJaxTextBox(equacoes.proporcao(2), [5,0,0], 1.5);
+        const equacao = this.createMathJaxTextBox(equacoes.proporcao(2), [5,0,0], 1);
 
         const mostrarEquacao1 = new MostrarTexto(equacao)
                                 .setValorFinal(400)
                                 .setCurva(x => {
-                                    x = 1 - Math.abs(1 - 2*x);
+
+                                    x = (x > 0.25)? (x < 0.75)? 0.25 : x/2 : x;
+
+                                    x = 1 - Math.abs(1 - 4*x);
 
                                     return -(Math.cos(Math.PI * x) - 1) / 2
                                 })
-                                .setDuration(300)
+                                .setDuration(400)
                                 .setOnStart(() => this.scene.add(equacao));
 
         const mostrarEquacao2 = new MostrarTexto(equacao)
                                 .setValorFinal(400)
                                 .setCurva(x => {
-                                    x = 1 - Math.abs(1 - 2*x);
+
+                                    x = (x > 0.25)? (x < 0.75)? 0.25 : x/2 : x;
+
+                                    x = 1 - Math.abs(1 - 4*x);
 
                                     return -(Math.cos(Math.PI * x) - 1) / 2
                                 })
-                                .setOnStart(() => equacao.mudarTexto(equacoes.proporcao(4), 1.5)) 
+                                .setDuration(400)
+                                .setOnStart(() => equacao.mudarTexto(equacoes.proporcao(4), 1)) 
 
         const mostrarEquacao3 = new MostrarTexto(equacao)
                                 .setValorFinal(400)
                                 .setCurva(x => {
-                                    x = 1 - Math.abs(1 - 2*x);
+
+                                    x = (x > 0.25)? (x < 0.75)? 0.25 : x/2 : x;
+
+                                    x = 1 - Math.abs(1 - 4*x);
 
                                     return -(Math.cos(Math.PI * x) - 1) / 2
                                 })
-                                .setOnStart(() => equacao.mudarTexto(equacoes.proporcao(5), 1.5)) 
+                                .setDuration(400)
+                                .setOnStart(() => equacao.mudarTexto(equacoes.proporcao(5), 1)) 
 
 
         const moverPonteiro1 = this.moverPonteiro(30,60)
                                    .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
-                                   .setDelay(100)
+                                   .setDelay(200)
         const moverPonteiro2 = this.moverPonteiro(60,120)
                                    .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
-                                   .setDelay(100)
+                                   .setDelay(200)
 
         const moverPonteiro3 = this.moverPonteiro(120,150)
                                    .setCurva(x => {
@@ -491,7 +505,7 @@ export class Fase4 extends Fase{
                                         ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
                                         : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
                                     })
-                                   .setDelay(100)
+                                   .setDelay(200)
 
 
         const movimentacaoDePonteiro = new AnimacaoSequencial(
@@ -555,9 +569,8 @@ export class Fase4 extends Fase{
                                     this.animar(
                                         this.moverEquacao({
                                             elementoCSS2: equacaoInicial,
-                                            duration1: 100,
-                                            duration2: 50,
-                                            delayDoMeio: 50
+                                            duration1: 0,
+                                            duration2: 100,
                                         })
                                     )
                                 }
@@ -581,6 +594,43 @@ export class Fase4 extends Fase{
     aula2Dialogo5(dialogo){
 
         //Criar controle
+
+        const valor = this.createMathJaxTextBox(`\\color{red} 3h`, [5,0,0], 1.3)
+
+        const aparecer = apagarCSS2(valor)
+                        .reverse()
+                        .setOnStart(()=> this.scene.add(valor))
+                        .setOnTermino(() => alert("funcionando"))
+
+        const mover = this.moverEquacao({
+                        duration1:0,
+                        duration2:100,
+                        elementoCSS2: valor
+                    });
+
+        const sidenote = this.createMathJaxTextBox(`Arraste o valor para a função na lousa`, [-3, 0, 0], 4);
+
+        const mostrarSidenote = new MostrarTexto(sidenote);
+
+
+        mover.setOnTermino(() => 
+            this.Configuracao3({
+                valor: this.whiteboard.equacoes[1], 
+                funcao:this.whiteboard.equacoes[0]
+            })
+        )
+
+
+        const animacao = new AnimacaoSimultanea(
+                            dialogo, 
+                            new AnimacaoSequencial(
+                                aparecer, 
+                                mover,
+                                mostrarSidenote
+                            )
+                        );
+
+        return animacao;
 
     }
 
@@ -681,6 +731,28 @@ export class Fase4 extends Fase{
         this.ponto2.draggable.observers.map(output => output.update({dragging: false}));
         this.ponto2.hoverable.observers.map(output => output.update({dentro:false}));
         this.ponto2.removeAllOutputs();
+    }
+
+    //Arraste e instanciação de equações
+    Configuracao3(informacao){
+
+        const equacoes = {
+            formula: '\\color{blue} graus( \\color{red} {hora} \\color{blue}) \\color{black} = \\color{red} {hora} \\cdot \\color{purple} {RAZ \\tilde{A}O}',
+            fatorada: '\\color{blue} graus( \\color{red} hora \\color{blue}) \\color{black} = \\color{red} hora  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}',
+            instanciada: (hora) => `\\color{blue} graus( \\color{red} ${hora} \\color{blue}) \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`
+        } 
+
+        //Vai ser a função que vai instanciar as equações
+        const funcao = new ElementoCSS2D(informacao.funcao, this);
+        const valor  = new ElementoCSS2D(informacao.valor,  this);
+
+
+        //Criar controle de juntar funcao com valores
+
+        const controle = new JuntarEquacoes(valor,funcao, this);
+
+
+        controle.equacaoResultante = equacoes.instanciada(4);
     }
 
     update(){
@@ -960,14 +1032,8 @@ export class Fase4 extends Fase{
 
         const fase = this;
 
-
-        fase.whiteboard.adicionarEquacao(equacao)
-
         //Consertar depois, está debaixo da whiteboard
         // novoElemento.element.style.zIndex = 10000;
-
-        fase.scene.add(elementoCSS2);
-
 
         const mostrarTexto = new MostrarTexto(elementoCSS2)
                                 .setValorFinal(300)
@@ -975,6 +1041,10 @@ export class Fase4 extends Fase{
                                 .setDelay(delayDoMeio)
                                 .setDuration(duration1)
                                 .setValorFinal(3000)
+                                .setOnStart(() => {
+                                    fase.scene.add(elementoCSS2);
+                                    fase.whiteboard.adicionarEquacao(equacao)
+                                });
 
         
 
@@ -1009,7 +1079,7 @@ export class Fase4 extends Fase{
                             moverEquacaoParaDiv
                         )
 
-        animacao.setCheckpoint(false);
+        animacao.setCheckpointAll(false);
 
         return animacao
 

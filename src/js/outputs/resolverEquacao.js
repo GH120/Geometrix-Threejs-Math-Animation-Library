@@ -33,6 +33,8 @@ export default class ResolverEquacao extends Output{
 
         this.addInputs(equacao.clickable);
 
+        equacao.clickable.addOutput({update: () => alert("clicado")})
+
     }
 
     update(novoEstado){

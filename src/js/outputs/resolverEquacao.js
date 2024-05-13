@@ -31,9 +31,9 @@ export default class ResolverEquacao extends Output{
 
         if(!equacao.clickable) new Clickable(equacao, fase.whiteboard.camera, fase.whiteboard);
 
-        this.addInputs(equacao.clickable);
+        console.log(equacao, "setup")
 
-        equacao.clickable.addOutput({update: () => alert("clicado")})
+        this.addInputs(equacao.clickable);
 
     }
 
@@ -62,7 +62,9 @@ export default class ResolverEquacao extends Output{
 
         //Fade out das duas equações, remoção delas da whiteboard
 
-        const fadeOutEquacao = apagarCSS2(equacao.texto     , fase.whiteboard.scene).setDuration(100);
+        console.log("texto", equacao.texto);
+
+        const fadeOutEquacao = apagarCSS2(equacao.texto     , fase.whiteboard.scene).setDuration(50);
 
         //Fade in da equação nova, adiciona ela na whiteboard
 
@@ -80,7 +82,7 @@ export default class ResolverEquacao extends Output{
                                     
                                   })
                                   .setOnTermino(() => null)
-                                  .setDuration(100)
+                                  .setDuration(50)
 
         fase.whiteboard.removerEquacao(equacao.texto);
 

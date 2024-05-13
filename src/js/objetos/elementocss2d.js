@@ -12,12 +12,16 @@ export default class ElementoCSS2D extends Objeto{
 
         this.tamanhoHitbox = new THREE.Vector3(1.05, 1.3, 0) //Constante aumenta tamanho da hitbox
 
+        this.debug = false; //Para debugar hitbox
+
         this.gerarHitbox();
     }
 
     gerarHitbox(){
 
         const retangulo = this.texto.element.getBoundingClientRect();
+
+        if(!retangulo.bottom && !retangulo.top) return setTimeout(() => this.gerarHitbox(), 1000);
 
         const posicao  = this.container.pixelToCoordinates(
                             (retangulo.left   + retangulo.right)/2,
@@ -43,7 +47,7 @@ export default class ElementoCSS2D extends Objeto{
 
         const plano = new THREE.Mesh(
                         new THREE.PlaneGeometry(largura,altura), 
-                        new THREE.MeshBasicMaterial({visible:true, color:0xffff00})
+                        new THREE.MeshBasicMaterial({visible:this.debug, color:0xffff00})
                     );
 
         plano.position.copy(posicao);

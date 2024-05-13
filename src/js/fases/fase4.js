@@ -551,7 +551,6 @@ export class Fase4 extends Fase{
 
         const aparecerEquacao = apagarCSS2(equacaoInicial)
                                 .reverse()
-                                .setOnDelay(() => this.debug = false)
                                 .setDelay(150)
                                 .setOnStart(() => this.scene.add(equacaoInicial));
 
@@ -772,19 +771,25 @@ export class Fase4 extends Fase{
             formula: '\\color{blue} graus( \\color{red} {hora} \\color{blue}) \\color{black} = \\color{red} {hora} \\cdot \\color{purple} {RAZ \\tilde{A}O}',
             fatorada: '\\color{blue} graus( \\color{red} hora \\color{blue}) \\color{black} = \\color{red} hora  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}',
             instanciada: (hora) => `\\color{blue} graus( \\color{red} ${hora} \\color{blue}) \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`,
-            resolvidaParcialmente:   (hora) => `\\color{blue} graus(\\color{red} ${hora} \\color{blue}) \\color{black} = \\color{blue} ${hora} \\cdot 30°`,
+            resolvidaParcialmente:   (hora) => `\\color{blue} graus(\\color{red} ${hora} \\color{blue}) \\color{black} = \\color{blue} ${parseInt(hora)} \\cdot 30°`,
             resolvida:   (hora) => `\\color{blue} graus(\\color{red} ${hora} \\color{blue}) \\color{black} = \\color{blue} ${parseInt(hora) * 30}°`
 
         } 
 
         const fase = this;
 
+        //Quando tiver a parte de expressões mathjax funcional,
+        //Vamos adicionar inputs do usuário para auxiliá-lo a resolver
+        //Se ele acertar os valores das variáveis ele é recompensado
+        //REFARTORAR EXPRESSÕES, EM STANDBY POR ENQUANTO
         return new Output()
                .setUpdateFunction(function(novoEstado){
 
                     const estado = this.estado;
 
                     const novaEquacao = novoEstado.novaEquacao;
+
+                    console.log(novaEquacao);
 
                     if(novaEquacao && estado.etapa == 1){
                         const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
@@ -803,15 +808,26 @@ export class Fase4 extends Fase{
                     else if(novaEquacao && estado.etapa == 2){
                         const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
 
-                        const mudarSidenote = fase.animacaoDialogo("Clique mais uma vez na equação para resolvê-la", fase.informacao.sidenote)
+                        const mudarSidenote = fase.animacaoDialogo("Continue assim", fase.informacao.sidenote)
 
                         fase.animar(mudarSidenote)
 
-                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase, null, equacoes.resolvidaParcialmente(estado.valor))
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase, null, equacoes.resolvida(estado.valor))
+
+                        resolverEquacao.tamanhoFonte = 1.7
 
                         this.addInputs(resolverEquacao);
 
                         estado.etapa++;
+                    }
+
+                    else if(novaEquacao && estado.etapa == 3){
+
+                        const dialogo = "Então " + estado.valor + "tem " + 30* parseInt(estado.valor) + "°";
+
+                        const mudarSidenote = fase.animacaoDialogo("Então " + estado.valor + "tem " + 30* parseInt(estado.valor) + "°", fase.informacao.sidenote)
+
+                        fase.animar(mudarSidenote);
                     }
                })
                .setEstadoInicial({

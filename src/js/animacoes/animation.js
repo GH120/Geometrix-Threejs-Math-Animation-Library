@@ -182,7 +182,7 @@ export default class Animacao {
 
                                       this
                                      )
-                                     .setCheckpoint(false)
+                                     .setCheckpointAll(false)
     }
 
     recalculateFrames(){

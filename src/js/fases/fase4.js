@@ -761,10 +761,10 @@ export class Fase4 extends Fase{
 
         juntar.equacaoResultante = equacoes.instanciada("5h");
 
-        this.controleEquacoes("5h").addInputs(juntar);
+        this.controleEquacoes("5h", funcao).addInputs(juntar);
     }
 
-    controleEquacoes(valor){
+    controleEquacoes(valor, funcao){
 
         //Refatorar depois a parte das equações, esse trabalho aqui é desnecessário
         const equacoes = {
@@ -823,11 +823,46 @@ export class Fase4 extends Fase{
 
                     else if(novaEquacao && estado.etapa == 3){
 
-                        const dialogo = "Então " + estado.valor + "tem " + 30* parseInt(estado.valor) + "°";
+                        const sidenote = "Então " + estado.valor + " tem " + 30* parseInt(estado.valor) + "°";
 
-                        const mudarSidenote = fase.animacaoDialogo("Então " + estado.valor + "tem " + 30* parseInt(estado.valor) + "°", fase.informacao.sidenote)
+                        const mudarSidenote = fase.animacaoDialogo(sidenote, fase.informacao.sidenote);
 
-                        fase.animar(mudarSidenote);
+                        const apagarEquacao = apagarCSS2(fase.whiteboard.equacoes[0], fase.whiteboard.scene);
+
+                        const animacao = new AnimacaoSimultanea(mudarSidenote, apagarEquacao)
+                                        .setOnTermino(() => {
+                                                estado.etapa++;
+                                                this.update({});
+                                        })
+
+                        fase.animar(animacao);
+
+                    }
+
+                    else if(estado.etapa == 4){
+
+                        fase.whiteboard.removerTodasEquacoes();
+
+                        estado.valor = Math.round(2 + Math.random() * 10) + "h";
+
+                        valor = fase.createMathJaxTextBox("\\color{red}" + estado.valor, [0,0,0], 2);
+
+                        fase.whiteboard.adicionarEquacao({html: funcao.texto.element});
+                        fase.whiteboard.adicionarEquacao({html: valor.element});
+
+                        valor  = new ElementoCSS2D(valor, fase.whiteboard);
+
+                        const juntarEquacoes = new JuntarEquacoes(valor, [funcao], fase, null, equacoes.instanciada(estado.valor));
+
+                        this.addInputs(juntarEquacoes);
+                        
+                        const mostrarEquacao = apagarCSS2(funcao.texto).reverse().filler(70);
+                        const mostrarValor   = apagarCSS2(funcao.texto).reverse().filler(70);
+
+                        fase.animar(mostrarEquacao);
+                        fase.animar(mostrarValor);
+
+                        estado.etapa = 1;
                     }
                })
                .setEstadoInicial({

@@ -82,10 +82,10 @@ export class Poligono extends Objeto{
         const getPosition = (objeto) => objeto.mesh.position;
 
         this.edges = this.vertices.map(
-                        (vertice, index) => new Edge(getPosition(vertice), getPosition(proximo(index)))
+                        (vertice, index) => new Edge(getPosition(vertice), getPosition(proximo(index), this.grossura))
                     );
 
-        this.edges.map(edge => edge.grossura = this.grossura)
+        this.edges.map(edge => edge.grossura = this.grossura);
 
         return this;
     }
@@ -170,6 +170,10 @@ export class Poligono extends Objeto{
         const scene = this.scene;
 
         //Atualiza as malhas das arestas
+        this.edges.map(edge => edge.removeFromScene());
+        this.renderEdges();
+        this.edges.map(edge => edge.addToScene(scene));
+
         this.edges.map(edge => edge.update());
 
         //Atualiza a malha dos ângulos

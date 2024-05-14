@@ -3,12 +3,13 @@ import { Output } from "./Output";
 
 export default class ColorirOnHover extends Output{
 
-    constructor(objeto, corInicial, corFinal){
+    constructor(objeto, corInicial, corFinal, fase){
         super()
         this.objeto     = objeto;
         this.corInicial = corInicial;
         this.corFinal   = corFinal;
         this.animation = null;
+        this.fase = fase;
     }
 
     _update(estado){
@@ -30,7 +31,7 @@ export default class ColorirOnHover extends Output{
 
             this.animation = animacao;
 
-            this.animar(animacao);
+            this.fase.animar(animacao);
         }
         else if(estado.dentro == false){
 
@@ -44,7 +45,7 @@ export default class ColorirOnHover extends Output{
 
             this.animation = animacao;
 
-            this.animar(animacao);
+            this.fase.animar(animacao);
         }
 
     }

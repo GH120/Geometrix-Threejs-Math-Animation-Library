@@ -3,7 +3,7 @@ import { Objeto } from './objeto';
 
 export class Edge extends Objeto{
 
-    constructor(origem, destino){
+    constructor(origem, destino, grossura=0.05){
 
         super();
 
@@ -11,7 +11,7 @@ export class Edge extends Objeto{
         this.destino = destino.clone();
 
         this.material = new THREE.MeshBasicMaterial({ color: 0xe525252 });
-        this.grossura = 0.05;
+        this.grossura = grossura;
 
         this.render();
     }

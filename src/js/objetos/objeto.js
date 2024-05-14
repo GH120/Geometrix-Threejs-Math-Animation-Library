@@ -6,7 +6,7 @@ export class Objeto{
     }
     //Retira a malha da cena, atualiza a malha e adicioca ela de novo a cena
     update(){
-
+        this.mesh.material = this.material;
     }
 
     //Adiciona a malha a cena e seta a cena do objeto
@@ -75,7 +75,7 @@ export class Objeto{
         if(this.hoverable) this.hoverable.removeObservers();
         if(this.hoverposition) this.hoverposition.removeObservers();
 
-        if(this.interactable) this.interactable.removeObservers();
+        if(this.insideElipse) this.insideElipse.removeObservers();
     }
 
     setPosition(posicao){

@@ -12,20 +12,45 @@ export default class InsideElipse extends Output{
         this.aresta = aresta;
         this.distanciaDeHover = distanciaDeHover;
 
+        aresta.insideElipse = this; //Trata isso como se fosse um input, para quando for deletar inputs esse vim incluso
+
+        this.setup(camera, scene);
+
+    }
+
+    /**Se instanciar um objeto, passe uma aresta que tenha funções get para a origem e o destino
+     * exemplo: {get origem(){ return objeto.getPosition()}, get destino(){ return objeto.getPosition()}} */ 
+    static fromObjeto(objeto, aresta, distanciaDeHover, camera, scene){
+
+        if(objeto.insideElipse) {
+
+            objeto.insideElipse.aresta = aresta;
+
+            return objeto.insideElipse;
+        }
+
+        const novaInstancia = new InsideElipse(aresta, distanciaDeHover, camera, scene);
+
+        objeto.insideElipse = novaInstancia;
+
+        return novaInstancia;
+    }
+
+    setup(camera, scene){
         this.hitbox = Objeto.fromMesh(new THREE.Mesh(new THREE.PlaneGeometry(100,100), new THREE.MeshBasicMaterial({visible:false})));
 
         scene.add(this.hitbox);
 
         this.addInputs(new HoverPosition(this.hitbox, camera));
 
-        aresta.interactable = this; //Trata isso como se fosse um input, para quando for deletar inputs esse vim incluso
 
 
         this.setEstadoInicial({
             dentroDaElipse: false
         })
-
     }
+
+    
 
     _update(novoEstado){
 

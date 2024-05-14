@@ -23,6 +23,9 @@ import { Output } from '../outputs/Output';
 import Circle from '../objetos/circle';
 import DesenharMalha from '../animacoes/desenharMalha';
 import Estado from './estado';
+import { Poligono } from '../objetos/poligono';
+import ColorirOnHover from '../outputs/colorirOnHover';
+import InsideElipse from '../outputs/insideElipse';
 
 export class Fase5  extends Fase{
 
@@ -35,6 +38,9 @@ export class Fase5  extends Fase{
         this.createOutputs();
         this.setupTextBox();
         this.Configuracao1(); //É uma versão generalizada do ligar Input ao Output
+
+
+        this.debug = true;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -52,11 +58,12 @@ export class Fase5  extends Fase{
 
         this.resetObjects();
 
-        this.triangulo = new Triangle([
+        this.triangulo = new Poligono([
             [-1,-1,0],
             [1,2.5,0],
             [4,1.6,0]
         ])
+        .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.7})
         .render()
         .addToScene(this.scene);
 
@@ -64,40 +71,60 @@ export class Fase5  extends Fase{
     }
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto
-    levelDesign(){
+    aula1(){
 
+        const fase = this;
         
-        const dialogo = ['Mostraremos como a soma dos ângulos de um triângulo é 180°',
-                         'Clique em um dos vértices do triângulo']
+        const dialogo = [
+            'Na última fase, aprendemos sobre proporcionalidade e ângulos',
+            'Nosso objetivo final é chegar na semelhança,',
+            'e para isso vamos ver uma propriedade do triângulo fundamental: Seus ângulos somam 180°',
+            'Isso vale para qualquer triângulo, como iremos mostrar',
+            'Para iniciarmos nossa análise, clique em um vértice qualquer'
+        ]
 
-        const anim1 = this.firstAnim(dialogo);
+        const animacao = new AnimacaoSequencial().setAnimacoes(dialogo.map(linha => this.animacaoDialogo(linha)))
 
-        this.animar(new AnimacaoSequencial(anim1).setNome("dialogo"));
+        animacao.setNome("dialogo");
+
+        animacao.setOnTermino(() => fase.controleFluxo.update({terminadoDialogo: true}))
+
+        this.animar(animacao);
 
     }
 
-    // primeiros dialogos
-    firstAnim(textos) {
+    aula2(){
 
-        const animacoesTextos = [];
+        this.debug = false;
 
-        textos.forEach((texto) => {
-            animacoesTextos.push(
-                new TextoAparecendo(this.text.element)
-                    .setOnStart(
-                        () => {
-                            this.changeText(texto);
-                        })
-                    .setDelay(100)
-            )
-        })
-        
-        //Bug de threads consertado, usar setAnimações toda vez que lidar com listas de animações
-        //Do tipo [anim1,anim2,anim3,anim4...]
-        const sequencial = new AnimacaoSequencial().setAnimacoes(animacoesTextos);
-        
-        return sequencial;
-            
+        const fase = this;
+
+        const dialogo = ["Veja esse novo tracejado e a aresta que liga os outros dois vértices",
+                         "Ele é paralelo a ela, isso vale para qualquer triângulo",
+                         "Tente arrastar os vértices não clicados por exemplo"]
+
+        const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0])).setDelay(200);
+        const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1]));
+        const anim3 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[2]));
+
+
+        const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : -1)
+                                               .filter(indice => indice != -1)[0];
+
+        const arestaOposta  = fase.triangulo.edges[(index+1)%3];
+
+        const corInicial = arestaOposta.material.color;
+
+        const colorirAresta = colorirAngulo(arestaOposta)
+                              .setValorInicial(corInicial)
+                              .setValorFinal(0xcf2200)
+                              .setDuration(100)
+                              .setDelay(200)
+                              .setCurva(x =>-(Math.cos(Math.PI * x) - 1) / 2)
+                              .filler(100)
+
+
+        fase.animar(new AnimacaoSequencial(new AnimacaoSimultanea(colorirAresta,anim1),anim2, anim3.setOnTermino(() => arestaOposta.material.color = corInicial)));
     }
 
     createInputs(){
@@ -120,7 +147,7 @@ export class Fase5  extends Fase{
         this.outputDragAngle      = this.triangulo.angles.map(  angle =>    this.criarMovimentacaoDeAngulo(angle))
         this.outputEscolheuErrado = this.triangulo.angles.map(  angle =>    this.outputAnguloErrado(angle))
         this.outputMoverVertice   = this.triangulo.vertices.map(vertice => new MoverVertice(vertice));
-
+        this.outputColorirVertice = this.triangulo.vertices.map(vertice => new ColorirOnHover(vertice, 0x8c8c8c, 0xffff00, this))
     }
 
     resetarInputs(){
@@ -131,6 +158,43 @@ export class Fase5  extends Fase{
         vertices.map(vertice => vertice.draggable.removeObservers());
         vertices.map(vertice => vertice.clickable.removeObservers());
         angles.map(  angle => angle.draggable.removeObservers());
+
+    }
+
+    Configuracao0(){
+
+        const fase = this;
+
+        fase.resetarInputs();
+
+        const vertices = fase.triangulo.vertices;
+
+        vertices.forEach((vertice, index) => {
+
+            const dentroDeUmaElipse = InsideElipse.fromObjeto(
+                                                    vertice, 
+                                                    {
+                                                        get origem(){ return vertice.getPosition()},
+                                                        get destino(){ return vertice.getPosition()}
+                                                    },
+                                                    1, 
+                                                    fase.camera, 
+                                                    fase.scene
+                                    );
+
+            fase.outputMoverVertice[index].addInputs(vertice.draggable);
+            fase.outputColorirVertice[index].addInputs(dentroDeUmaElipse);
+
+            const atualizarTriangulo = new Output()
+                                      .addInputs(vertice.draggable)
+                                      .setUpdateFunction(estado => {
+
+                                            if(estado.dragging){
+                                                fase.triangulo.update()
+                                            } 
+                                      })
+
+        })
 
     }
 
@@ -168,8 +232,6 @@ export class Fase5  extends Fase{
         fase.resetarInputs();
 
         fase.informacao = {...fase.informacao, ...informacao};
-
-        console.log(informacao, fase.informacao)
 
         const verticeSelecionado = fase.informacao.verticeSelecionado;
         const criarTracejado     = fase.informacao.criarTracejadoSelecionado;
@@ -270,7 +332,6 @@ export class Fase5  extends Fase{
         const atualizarCopia = new Output().setUpdateFunction((estado) => {
             if(estado.dragging){
 
-                console.log(atualizarCopia)
 
                 const previousPosition = copia.getPosition();
                 
@@ -298,7 +359,6 @@ export class Fase5  extends Fase{
 
                 copia.removeFromScene();
 
-                console.log(angle)
 
                 //Por que isso? analisar depois...
                 angle.material = new THREE.MeshBasicMaterial({color: 0xff0000});
@@ -406,7 +466,6 @@ export class Fase5  extends Fase{
         //Funções auxiliares
         function moverAnguloAnimacao(angle, origem, destino){
 
-            console.log(origem, destino);
 
             const anguloInicial = angle;
             
@@ -498,7 +557,8 @@ export class Fase5  extends Fase{
         const outros_dois = this.triangulo.vertices.filter((vertice) => vertice != vertex);
 
         let ativado = false;
-        let tracejado = null;
+        let tracejado  = null;
+        let tracejado2 = null;
         let desenharTracejado = null;
 
         let trianguloInvisivel1 = null;
@@ -516,12 +576,12 @@ export class Fase5  extends Fase{
 
                         const estado = this.estado;
 
-                        // console.log(novoEstado)
 
                         //Se um dos outros vértices tiver sendo arrastado, remove tudo e desenha de novo
                         if(estado.dragging){
 
                             desenharTracejado.stop = true;
+                            tracejado2.removeFromScene();
                             tracejado.removeFromScene(fase.scene)
                             anguloInvisivel1.removeFromScene(fase.scene)
                             anguloInvisivel2.removeFromScene(fase.scene)
@@ -536,6 +596,7 @@ export class Fase5  extends Fase{
 
                             // ativarMoverOutrosVertices(this);
 
+                            //Transformar isso num output composto?
                             fase.Configuracao2({
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
@@ -547,9 +608,12 @@ export class Fase5  extends Fase{
 
                             tracejado.addToScene(fase.scene);
 
+                            tracejado2 = new Tracejado(outros_dois[0].getPosition().sub(vetorTracejado1.multiplyScalar(3)), outros_dois[0].getPosition().add(vetorTracejado1.multiplyScalar(3)))
+
+                            tracejado2.addToScene(fase.scene);
+
                             estado.arraste = true;
 
-                            console.log(1)
 
                             return;
                         }
@@ -558,15 +622,24 @@ export class Fase5  extends Fase{
 
                             ativado = !ativado
 
-                            const posicao = vertex.mesh.position.clone();
+                            const posicao = vertex.getPosition();
+                            const posicao2 = outros_dois[0].getPosition();
                             const vetorTracejado1 = outros_dois[0].mesh.position.clone().sub(outros_dois[1].mesh.position.clone());
                             const vetorTracejado2 = outros_dois[1].mesh.position.clone().sub(outros_dois[0].mesh.position.clone());
 
                             //Funções auxiliares, estão logo abaixo do return
                             criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2);
 
-                            animacaoTracejado(posicao,vetorTracejado1,vetorTracejado2);
+                            tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1), posicao.clone().add(vetorTracejado1))
+                            tracejado.addToScene(fase.scene);
 
+                            tracejado2 = new Tracejado(posicao2.sub(vetorTracejado1.multiplyScalar(3)), posicao2.add(vetorTracejado1.multiplyScalar(3)))
+                            tracejado2.addToScene(fase.scene);
+
+                            animacaoTracejado(tracejado, posicao, vetorTracejado1);
+                            // animacaoTracejado(tracejado2, posicao2, vetorTracejado2);
+
+                            //Transformar isso num output composto?
                             fase.Configuracao2({
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
@@ -574,12 +647,16 @@ export class Fase5  extends Fase{
                                 angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
                             })
 
+                            this.notify({tracejadoAtivado: true});
+
+
                         } else if (estado.clicado) {
 
                             ativado = !ativado
                             
                             desenharTracejado.stop = true;
                             tracejado.removeFromScene(fase.scene)
+                            tracejado2.removeFromScene(fase.scene)
                             anguloInvisivel1.removeFromScene(fase.scene)
                             anguloInvisivel2.removeFromScene(fase.scene)
                             
@@ -588,6 +665,9 @@ export class Fase5  extends Fase{
                             
                             fase.triangulo.removeFromScene();
                             fase.triangulo.addToScene(fase.scene);
+
+                            this.notify({tracejadoAtivado: true});
+
                         }
 
                         estado.ativado = ativado; //Sinaliza se o output foi ativado
@@ -641,15 +721,12 @@ export class Fase5  extends Fase{
         }
 
         //Anima o desenhar tracejado
-        function animacaoTracejado(posicao,vetorTracejado1,vetorTracejado2){
-
-            tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1), posicao.clone().add(vetorTracejado1))
-            tracejado.addToScene(fase.scene);
+        function animacaoTracejado(tracejado, posicao, vetorTracejado1){
 
             // animação
             desenharTracejado = new Animacao(tracejado)
                 .setValorInicial(0)
-                .setValorFinal(2)
+                .setValorFinal(1)
                 .setDuration(200)
                 .setInterpolacao((inicial, final, peso) => inicial * (1 - peso) + final*peso)
                 .setUpdateFunction((progresso) => {
@@ -746,66 +823,34 @@ export class Fase5  extends Fase{
         }
     }
 
-    //No primeiro click dos vértices, muda o texto
-    //Roda apenas uma vez
-    primeiroClick(){
+    //Controla a mudança do fluxo dos probl
+    controleGeral(){
 
         //Inputs: os 3 criarTracejados -> quando um deles atualiza, notifica esse output também
 
         const fase = this;
 
-        return new Output(fase.outputClickVertice)
+        return new Output()
+               .addInputs(...fase.outputClickVertice)
                .setUpdateFunction(function(novoEstado){
-
-
-                    this.estado = {...this.estado, ...novoEstado}
 
                     const estado = this.estado;
 
-                    if(estado.finalizado) return;
-
-                    if(estado.ativado){
-
-                        estado.finalizado = true;
-
-                        mudarTexto();
+                    if(novoEstado.terminadoDialogo && estado.etapa == "inicio"){
+                        estado.etapa = "esperando";
+                        fase.Configuracao1();
+                        return;
+                    }
+                    
+                    if(novoEstado.tracejadoAtivado && estado.etapa == "esperando"){
+                        estado.etapa = "arraste";
+                        alert("yes")
+                        return;
                     }
                })
-
-        //Funções auxiliares
-        function mudarTexto(){
-            
-            // const dialogo = ["Veja o tracejado paralelo a aresta oposta ao vértice",
-            //                  "Ele tem buracos onde se encaixam ângulos",
-            //                  "Tente arrastar os ângulos para esses buracos"]
-
-            const dialogo = ["Veja esse novo tracejado e a aresta que liga os outros dois vértices",
-                             "Ele é paralelo a ela, isso vale para qualquer triângulo",
-                             "Tente arrastar os vértices não clicados por exemplo"]
-
-            const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0])).setDelay(200);
-            const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1]));
-            const anim3 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[2]));
-
-
-            const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : -1)
-                                                   .filter(indice => indice != -1)[0];
-
-            const arestaOposta  = fase.triangulo.edges[(index+1)%3];
-
-            const corInicial = arestaOposta.material.color;
-
-            const colorirAresta = colorirAngulo(arestaOposta)
-                                  .setValorInicial(corInicial)
-                                  .setValorFinal(0xcf2200)
-                                  .setDuration(100)
-                                  .setDelay(200)
-                                  .setCurva(x =>-(Math.cos(Math.PI * x) - 1) / 2)
-                                  .filler(100)
-
-
-            fase.animar(new AnimacaoSequencial(new AnimacaoSimultanea(colorirAresta,anim1),anim2, anim3.setOnTermino(() => arestaOposta.material.color = corInicial)));
-        }
+               .setEstadoInicial({
+                    etapa: "inicio"
+               })
     }
 
     animar(animacao){
@@ -821,11 +866,28 @@ export class Fase5  extends Fase{
 
     update(){
 
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+
         super.update();
 
         if(!this.progresso) this.progresso = "start";
 
         const problemaAtual = this.problemas[this.progresso];
+
+        console.log(problemaAtual, this.controleFluxo)
 
         if(problemaAtual.satisfeito(this)){
 
@@ -835,7 +897,6 @@ export class Fase5  extends Fase{
 
             // const proximoProblema = this.problemas[this.progresso];
 
-            // console.log(proximoProblema, "proximo")
 
             // proximoProblema.estado.informacao = this.informacao;
         }
@@ -847,40 +908,25 @@ export class Fase5  extends Fase{
             satisfeito: () => true,
 
             consequencia: (fase) => {
-                fase.levelDesign();
+                fase.aula1();
+
+                fase.Configuracao0();
+
+                fase.controleFluxo  = fase.controleGeral(); 
             },
 
-            proximo: () => "first",
+            proximo: () => "clicouVertice",
 
             estado: new Estado(this, "setupObjects", null, "start", {})
         },
 
-        first:{
-            satisfeito: (fase) => true,
-
-            consequencia: (fase) =>{
-
-                // // desativa o arraste inicialmente, até clicar no vértice
-                fase.outputDragAngle.map(output => output.removeInputs());
-
-                //Muda texto quando o player clica no primeiro vértice e ativa o arraste
-                fase.clicouPrimeiroVertice  = fase.primeiroClick();   
-            },
-
-            proximo: (fase) => "clicouVertice",
-
-            // estado: new Estado(this, "setupObjects", "Configuracao1", "first", {})
-
-        },
-
         clicouVertice: {
-            satisfeito: (fase) => fase.clicouPrimeiroVertice.estado.finalizado,
+            satisfeito: (fase) => fase.controleFluxo.estado.etapa == "arraste",
 
-            consequencia: (fase) => null,
+            consequencia: (fase) => fase.aula2(),
 
             proximo: (fase) => "arrastouVertice",
 
-            // estado: new Estado(this, "setupObjects", "Configuracao2", "clicouVertice", {})
         },
 
         arrastouVertice: {

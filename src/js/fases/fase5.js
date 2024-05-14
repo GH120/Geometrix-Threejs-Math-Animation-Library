@@ -136,6 +136,8 @@ export class Fase5  extends Fase{
 
     //Configurações que ligam inputs aos outputs
     //Basicamente os controles de cada estado da fase
+            //Configurações que ligam inputs aos outputs
+    //Basicamente os controles de cada estado da fase
     Configuracao1(){
 
         const fase = this;
@@ -259,20 +261,26 @@ export class Fase5  extends Fase{
         
 
         const angle              = fase.informacao.anguloSelecionado;
-        const copia              = fase.informacao.copiaDoAngulo;
+        let   copia              = fase.informacao.copiaDoAngulo;
         const verticeSelecionado = fase.informacao.verticeSelecionado;
+
+        angle.copiaDoAngulo = copia;
         
         //Output atualiza a copia
         const atualizarCopia = new Output().setUpdateFunction((estado) => {
             if(estado.dragging){
 
                 console.log(atualizarCopia)
+
+                const previousPosition = copia.getPosition();
                 
                 copia.removeFromScene();
 
                 const material = copia.mesh.material.clone();
 
                 copia = angle.copia();
+
+                angle.copiaDoAngulo = copia;
 
                 copia.material = material;
 
@@ -314,31 +322,7 @@ export class Fase5  extends Fase{
         fase.resetarInputs();
     }
 
-    //Agora é a configuração 1
-    // ligarInputAoOutput(){
 
-    //     const vertices = this.triangulo.vertices;
-    //     const angles   = this.triangulo.angles;
-
-    //     //Liga o vertice.clickable input ao output
-    //     for (let i = 0; i < 3; ++i) {
-
-    //         const vertice = vertices[i];
-
-    //         vertice.clickable.addObserver(this.outputClickVertice[i])
-    //     }
-
-    //     //Liga o angulo.draggable ao output do draggable
-    //     for (let i = 0; i < 3; ++i) {
-
-    //         const angulo = angles[i];
-
-    //         angulo.draggable.addObserver(this.outputDragAngle[i]);
-    //     }
-    // }
-
-
-    //Outputs abaixo
     criarMovimentacaoDeAngulo = (angle) => {
 
 
@@ -385,15 +369,22 @@ export class Fase5  extends Fase{
 
                             //Roda a animação de movimentar ângulo, é uma função auxiliar abaixo
                             //Move e gira a copia
-                            moverAnguloAnimacao(copia, estado.position.clone(), invisivel.getPosition());
+
+                            const posicaoVerticeInvisivel = invisivel.vertices[0].mesh.position.clone()
+
+                            const posicaoFinal = posicaoVerticeInvisivel
+
+
+                            copia.addToScene(fase.scene)
+                            moverAnguloAnimacao(copia, estado.position.clone(), posicaoFinal);
                             girarAngulo(copia);
 
                             //Retorna o ângulo a sua posição original
                             moverAnguloAnimacao(angle, angle.getPosition(), angle.position);
                             
                             fase.cor = !fase.cor;
-                            animarMudarDeCor(copia);
-                            animarMudarDeCor(angle);
+                            // animarMudarDeCor(copia);
+                            // animarMudarDeCor(angle);
 
                             //Muda os outputs que o angulo aceita( não pode ser mais arrastado)
                             //Adiciona um output que atualiza a copia no arraste
@@ -405,6 +396,7 @@ export class Fase5  extends Fase{
                         if (!estado.dragging) {
                             angle.mesh.position.copy(angle.position);
                             
+
                         }
 
                         estado.valido = false;
@@ -422,7 +414,7 @@ export class Fase5  extends Fase{
             const moveAngulo = new Animacao()
                             .setValorInicial(origem)
                             .setValorFinal(destino)
-                            .setInterpolacao(new THREE.Vector3().lerpVectors)
+                            .setInterpolacao((a,b,c) => new THREE.Vector3().lerpVectors(a,b,c))
                             .setUpdateFunction(function(posicao){
                                     anguloInicial.mesh.position.copy(posicao)
                             })
@@ -540,12 +532,14 @@ export class Fase5  extends Fase{
 
                             //Funções auxiliares, estão logo abaixo do return
                             criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2);
+                            // updateDegrees();
 
                             // ativarMoverOutrosVertices(this);
 
                             fase.Configuracao2({
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
+                                sentido:vetorTracejado1,
                                 angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
                             });
 
@@ -576,6 +570,7 @@ export class Fase5  extends Fase{
                             fase.Configuracao2({
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
+                                sentido: vetorTracejado1,
                                 angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
                             })
 
@@ -666,6 +661,18 @@ export class Fase5  extends Fase{
                 .voltarAoInicio(false);
             
             fase.animar(desenharTracejado);
+        }
+
+        function updateDegrees(){
+
+            for(const angle of fase.triangulo.angles){
+
+                const valor = angle.mostrarAngulo.text.elemento.element.textContent;
+
+                angle.mostrarAngulo.update({dentro:true});
+
+                if(valor == "?") angle.mostrarAngulo.text.elemento.element.textContent = valor;
+            }
         }
 
 
@@ -854,7 +861,7 @@ export class Fase5  extends Fase{
             consequencia: (fase) =>{
 
                 // // desativa o arraste inicialmente, até clicar no vértice
-                // fase.outputDragAngle.map(output => output.removeInputs());
+                fase.outputDragAngle.map(output => output.removeInputs());
 
                 //Muda texto quando o player clica no primeiro vértice e ativa o arraste
                 fase.clicouPrimeiroVertice  = fase.primeiroClick();   

@@ -12,13 +12,13 @@ import Navbar from '../../components/Navbar/Navbar';
 import { PrimeiraFase } from '../../js/fases/PrimeiraFase';
 
 const fases = {
-  '1' : Fase1,
-  '2' : Fase2,
-  '3' : Fase3,
-  '4' : Fase4,
+  '1' : Fase4,
+  '2' : Fase5,
+  '3' : Fase6,
+  '4' : PrimeiraFase,
   '5' : Fase5,
   '6' : Fase6,
-  '7' : Fase7,
+  '7' : PrimeiraFase,
   '8' : PrimeiraFase
 }
 

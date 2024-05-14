@@ -633,11 +633,11 @@ export class Fase5  extends Fase{
                             tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1), posicao.clone().add(vetorTracejado1))
                             tracejado.addToScene(fase.scene);
 
-                            tracejado2 = new Tracejado(posicao2.sub(vetorTracejado1.multiplyScalar(3)), posicao2.add(vetorTracejado1.multiplyScalar(3)))
+                            tracejado2 = new Tracejado(outros_dois[0].getPosition().sub(vetorTracejado1.clone()), outros_dois[0].getPosition().add(vetorTracejado1.clone()))
                             tracejado2.addToScene(fase.scene);
 
-                            animacaoTracejado(tracejado, posicao, vetorTracejado1);
-                            // animacaoTracejado(tracejado2, posicao2, vetorTracejado2);
+                            animacaoTracejado(tracejado, posicao.clone(), vetorTracejado1.clone());
+                            animacaoTracejado(tracejado2, posicao2, vetorTracejado2);
 
                             //Transformar isso num output composto?
                             fase.Configuracao2({
@@ -726,15 +726,18 @@ export class Fase5  extends Fase{
             // animação
             desenharTracejado = new Animacao(tracejado)
                 .setValorInicial(0)
-                .setValorFinal(1)
-                .setDuration(200)
+                .setValorFinal(2)
+                .setDuration(50)
                 .setInterpolacao((inicial, final, peso) => inicial * (1 - peso) + final*peso)
                 .setUpdateFunction((progresso) => {
                     tracejado.origem = posicao.clone().sub(vetorTracejado1.clone().multiplyScalar(progresso))
                     tracejado.destino = posicao.clone().add(vetorTracejado1.clone().multiplyScalar(progresso))
                     tracejado.update();
                 })
-                .setCurva((x) => 1 - (1 - x) * (1 - x))
+                .setCurva((x) => x < 0.5
+                                ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
+                                : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2
+                )
                 .voltarAoInicio(false);
             
             fase.animar(desenharTracejado);

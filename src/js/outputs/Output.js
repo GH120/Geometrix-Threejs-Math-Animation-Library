@@ -27,7 +27,9 @@ export class Output{
      * Faz com que possa colocar uma animação para rodar na fase sem ter que ter a referencia da fase no handler.
     */
     setCanvas(fase){
-        this.animar = fase.animar.bind(fase);
+
+        this.animar = fase.animar.bind(this);
+        this.fase = fase;
         return this;
     }
 

@@ -11,7 +11,7 @@ import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
-import Animacao, { AnimacaoSequencial, AnimacaoSimultanea } from '../animacoes/animation';
+import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente } from '../animacoes/animation';
 import { colorirAngulo } from '../animacoes/colorirAngulo';
 import { Tracejado } from '../objetos/tracejado';
 import MostrarTracejado from '../animacoes/mostrarTracejado';
@@ -26,6 +26,9 @@ import Estado from './estado';
 import { Poligono } from '../objetos/poligono';
 import ColorirOnHover from '../outputs/colorirOnHover';
 import InsideElipse from '../outputs/insideElipse';
+import { Edge } from '../objetos/edge';
+import { ApagarPoligono } from '../animacoes/apagarPoligono';
+import { mover } from '../animacoes/mover';
 
 export class Fase5  extends Fase{
 
@@ -70,7 +73,6 @@ export class Fase5  extends Fase{
         this.objetos.push(this.triangulo);
     }
 
-    //Onde toda a lógica da fase é realizada, a sequência de animações/texto
     aula1(){
 
         const fase = this;
@@ -99,32 +101,113 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
-        const dialogo = ["Veja esse novo tracejado e a aresta que liga os outros dois vértices",
-                         "Ele é paralelo a ela, isso vale para qualquer triângulo",
+        //Dialogo:
+        //Desenhamos uma linha paralela a aresta que esse vértice aponta
+        //Vera o uso dela a seguir: Dividir esse triângulo em dois
+        //Perceba
+
+        const dialogo = ["Desenhamos uma linha paralela a aresta que esse vértice aponta",
+                         "Vera o uso dela a seguir: Dividir esse triângulo em dois",
                          "Tente arrastar os vértices não clicados por exemplo"]
 
-        const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0])).setDelay(200);
-        const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1]));
-        const anim3 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[2]));
+        const animacao = new AnimacaoSequencial(
+                            fase.animacaoDialogo(dialogo[0]),
+                            fase.animacaoDialogo(dialogo[1]),
+                            animacaoIndependente( () => fase.animar(this.animacaoDividirTriangulo()))
+        )
+
+        fase.animar(animacao);
+    }
+
+    aula3(){
+
+        const fase = this;
+
+        //Veja esses subtriângulos, 
+        //Temos um ângulo proximo do vértice selecionado, um afastado e um reto. (girar angulos, mostrar nome)
+        //se arrastarmos seus lados para fora...
+        //Construimos outro triângulo igual a ele, com os ângulos invertidos de lugar (girar angulos respectivos)
+        //O ângulo proximo e o afastado somam 90°, pois a figura é um retângulo nos dois lados
+        //Assim, os ângulos do triângulo somam 180°
+
+        const dialogo = [
+            "Veja esses subtriângulos, ",
+            "Temos um ângulo proximo do vértice selecionado,", 
+            "um angulo afastado",
+            "e um angulo reto",
+            "se arrastarmos seus lados para fora...",
+            "Construimos outro triângulo igual a ele, com os ângulos invertidos de lugar",
+            "O ângulo proximo e o afastado somam 90°, pois a figura é um retângulo nos dois lados",
+            "Assim, junte na lousa as equações para conseguir o resultado"
+        ]
+        .map(linha => fase.animacaoDialogo(linha));
+
+        const animacao = new AnimacaoSequencial(
+                            new AnimacaoSimultanea(dialogo[0]),
+                            this.aula3Dialogo2(dialogo.slice(1,4), this.subtriangulo1),
+                            this.aula3Dialogo3(dialogo[4], this.subtriangulo1),
+                            new AnimacaoSimultanea(dialogo[5]),
+                            new AnimacaoSimultanea(dialogo[6])
+        )
+
+        fase.animar(animacao);
+    }
+
+    aula3Dialogo2(dialogos, triangulo){
 
 
-        const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : -1)
-                                               .filter(indice => indice != -1)[0];
+        const index = this.triangulo.vertices.indexOf(this.informacao.verticeSelecionado)
 
-        const arestaOposta  = fase.triangulo.edges[(index+1)%3];
+        const anguloProximo  = triangulo.angles[(index+2)%3];
+        const anguloAfastado = triangulo.angles[(index+3)%3];
+        const anguloReto     = triangulo.angles[(index+4)%3]; 
 
-        const corInicial = arestaOposta.material.color;
+        const girarAngulos = new AnimacaoSequencial(
+                                new AnimacaoSimultanea(
+                                    this.animacaoGirarAngulo(anguloProximo),
+                                    dialogos[0]
+                                ), 
+                                new AnimacaoSimultanea(
+                                    this.animacaoGirarAngulo(anguloAfastado),
+                                    dialogos[1]
+                                ), 
+                                new AnimacaoSimultanea(
+                                    this.animacaoGirarAngulo(anguloReto),
+                                    dialogos[2]
+                                ), 
+                                
+                            );
 
-        const colorirAresta = colorirAngulo(arestaOposta)
-                              .setValorInicial(corInicial)
-                              .setValorFinal(0xcf2200)
-                              .setDuration(100)
-                              .setDelay(200)
-                              .setCurva(x =>-(Math.cos(Math.PI * x) - 1) / 2)
-                              .filler(100)
+
+        return  girarAngulos;
+    }
+
+    aula3Dialogo3(dialogo, triangulo){
+
+        const indice = this.triangulo.vertices.indexOf(this.informacao.verticeSelecionado)
+
+        const lado       = triangulo.edges[indice];
+        const ladoOposto = triangulo.edges[(indice+1)%3];
+
+        const direcao1 = lado.origem.clone().sub(lado.destino).cross(new THREE.Vector3(0,0,-1)).normalize();
+        const direcao2 = ladoOposto.origem.clone().sub(ladoOposto.destino).cross(new THREE.Vector3(0,0,-1)).normalize();
+
+        const colorir1  = colorirAngulo(lado).setValorInicial(lado.material.color.getHex()).setValorFinal(0xaa0000);
+        const colorir2  = colorirAngulo(ladoOposto).setValorInicial(ladoOposto.material.color.getHex()).setValorFinal(0x0000aa);
+
+        const moverLado = new AnimacaoSequencial(
+            new AnimacaoSimultanea(
+                mover(lado, lado.getPosition(), lado.getPosition().add(direcao1.multiplyScalar(ladoOposto.length))).setDelay(100),
+                colorir1
+            ),
+            new AnimacaoSimultanea(
+                mover(ladoOposto, ladoOposto.getPosition(), ladoOposto.getPosition().add(direcao2.multiplyScalar(lado.length))),
+                colorir2
+            )
+         );
 
 
-        fase.animar(new AnimacaoSequencial(new AnimacaoSimultanea(colorirAresta,anim1),anim2, anim3.setOnTermino(() => arestaOposta.material.color = corInicial)));
+        return moverLado
     }
 
     createInputs(){
@@ -545,6 +628,8 @@ export class Fase5  extends Fase{
         }
     }
 
+    //Adcionar texto "Pivô" no ponto de inflexão e arrastável nos outros
+    //Escolher pivô quando não tem nenhum
     criarTracejado = (vertex) => {
 
         //Input: clickable do vertice, diz se foi o vertice clicado ou não
@@ -847,7 +932,15 @@ export class Fase5  extends Fase{
                     
                     if(novoEstado.tracejadoAtivado && estado.etapa == "esperando"){
                         estado.etapa = "arraste";
-                        alert("yes")
+                        return;
+                    }
+
+                    console.log(novoEstado)
+                    if(novoEstado.trianguloDividido){
+
+                        estado.etapa = "mostrarIgualdade";
+                        alert("começou")
+                        fase.aula3();
                         return;
                     }
                })
@@ -856,17 +949,105 @@ export class Fase5  extends Fase{
                })
     }
 
-    animar(animacao){
+    animacaoGirarAngulo(angle){
 
-        animacao.animationFrames = animacao.getFrames();
+        const quaternionInicial = new THREE.Quaternion();
+        const quaternionFinal   = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,-1), 0.3);
 
-        this.frames.push(animacao.animationFrames);
+        function easeInOutBack(x) {
+            const c1 = 1.70158;
+            const c2 = c1 * 1.525;
+            
+            return x < 0.5
+              ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+              : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+            
+        }
+        
+        const giro =  new Animacao(angle)
+                    .setValorInicial(quaternionInicial)
+                    .setValorFinal(quaternionFinal)
+                    .setDuration(30)
+                    .setInterpolacao(function(inicial,final,peso){
+                        return new THREE.Quaternion().slerpQuaternions(inicial,final,peso);
+                    })
+                    .setCurva(x => (y => Math.sin(y*2*Math.PI))(easeInOutBack(x + 0.03*Math.random())))
+                    .setUpdateFunction(function(quaternion){
+                        angle.mesh.quaternion.copy(quaternion);
+                    });
 
-        this.animacoes.push(animacao);
+        return giro;
 
-        return this;
     }
 
+    animacaoDividirTriangulo(){
+
+        const fase = this;
+
+        this.Configuracao4();
+
+        const vertice  = this.informacao.verticeSelecionado;
+        const indice   = this.triangulo.vertices.indexOf(vertice);
+        const vertice2 = this.triangulo.vertices[(indice + 1)%3];
+        const vertice3 = this.triangulo.vertices[(indice + 2)%3];
+        
+        const aresta  = this.triangulo.edges[(indice + 1)%3];
+
+        const vetorDirecaoAresta  = aresta.origem.clone().sub(aresta.destino).normalize();
+
+        const vetorDirecao90Graus = new THREE.Vector3(0,0,-1).cross(vetorDirecaoAresta);
+
+        const distancia = aresta.getPosition().sub(vertice.getPosition()).dot(vetorDirecao90Graus);
+
+        const vetorDestinoDivisao = vetorDirecao90Graus.clone().multiplyScalar(distancia);
+
+        const pontoDeDivisao = vertice.getPosition().add(vetorDestinoDivisao);
+
+        const tracejado = new Tracejado(vertice.getPosition(), pontoDeDivisao.clone());
+
+        const desenharTracejado = new MostrarTracejado(tracejado, this.scene).setOnStart(() => tracejado.addToScene(this.scene))
+        
+
+        //Desenhar subtriângulo1
+
+        const subtriangulo1 = new Poligono([vertice.getPosition(), vertice2.getPosition(), pontoDeDivisao.clone()])
+                                 .configuration({grossura:0.026, raioVertice:0.04, raioAngulo:0.7}) //Grossura levemente maior para sobrepor a aresta original
+                                 .render();
+
+        subtriangulo1.angles.map(angle => angle.material.color = 0x0000aa);
+
+        const mostrarTriangulo = new ApagarPoligono(subtriangulo1)
+                                    .reverse()
+                                    .setOnStart(() => subtriangulo1.addToScene(this.scene));
+
+        //Desenhar subtriângulo2
+        //Mostrar que eles são congruentes com os triângulos externos (usar Carta?)
+
+
+        const subtriangulo2 = new Poligono([vertice.getPosition(), vertice3.getPosition(), pontoDeDivisao.clone()])
+                                 .configuration({grossura:0.026, raioVertice:0.04, raioAngulo:0.7}) //Grossura levemente maior para sobrepor a aresta original
+                                 .render();
+
+        subtriangulo2.angles.map(angle => angle.material.color = 0x00b7eb);
+
+        const mostrarTriangulo2 = new ApagarPoligono(subtriangulo2)
+                                    .reverse()
+                                    .setOnStart(() => subtriangulo2.addToScene(this.scene));
+
+        this.subtriangulo1 = subtriangulo1;
+        this.subtrinagulo2 = subtriangulo2;
+        this.tracejadoDivisao = tracejado;
+
+        const animacao = new AnimacaoSequencial(desenharTracejado, mostrarTriangulo, mostrarTriangulo2);
+
+        animacao.setOnTermino(() => {
+            fase.triangulo.angles.map(angle=> angle.material.visible = false);
+            fase.controleFluxo.update({trianguloDividido: true})
+        });
+
+        return animacao;
+    }
+    
     update(){
 
         if(this.debug) super.update();
@@ -889,8 +1070,6 @@ export class Fase5  extends Fase{
         if(!this.progresso) this.progresso = "start";
 
         const problemaAtual = this.problemas[this.progresso];
-
-        console.log(problemaAtual, this.controleFluxo)
 
         if(problemaAtual.satisfeito(this)){
 

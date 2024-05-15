@@ -96,7 +96,7 @@ export class Poligono extends Objeto{
         
         this.angles = vertices.map( (vertex, index) => {
             
-            const angle = new Angle(vertices, index);
+            const angle = new Angle(vertices, index).render();
 
             angle.angleRadius = this.raioAngulo;
 

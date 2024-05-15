@@ -45,7 +45,7 @@ export class Fase5  extends Fase{
         this.Configuracao1(); //É uma versão generalizada do ligar Input ao Output
 
 
-        this.debug = false;
+        this.debug = true;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -95,6 +95,8 @@ export class Fase5  extends Fase{
 
         this.animar(animacao);
 
+        this.outputMostrarAngulo.map(output => output.update({dentro:true})) //Fazer animação aparecer triângulo?
+
     }
 
     aula2(){
@@ -142,7 +144,7 @@ export class Fase5  extends Fase{
             "O angulo proximo do novo triângulo é o afastado do antigo pois apontam para lados iguais",
             "Os dois juntos formam 90°, pois a reta que divide o triângulo é perpendicular ao tracejado",
             "Podemos fazer o mesmo para o outro subtriângulo",
-            "Assim, junte na lousa as equações para conseguir o resultado"
+            "Assim, temos que os ângulos somados formam 180°"
         ]
         .map(linha => fase.animacaoDialogo(linha));
 
@@ -302,6 +304,7 @@ export class Fase5  extends Fase{
                         )
                     )
                 )
+                .setCheckpointAll(false)
             )
         }).setDuration(600)
     }
@@ -351,7 +354,7 @@ export class Fase5  extends Fase{
                             .setValorFinal(destino)
                             .setInterpolacao((a,b,c) => new THREE.Vector3().lerpVectors(a,b,c))
                             .setUpdateFunction(function(posicao){
-                                    anguloInicial.mesh.position.copy(posicao)
+                                    anguloInicial.mesh.position.copy(posicao);
                             })
                             .voltarAoInicio(false)
                             .setDuration(75)
@@ -417,7 +420,8 @@ export class Fase5  extends Fase{
         this.outputDragAngle      = this.triangulo.angles.map(  angle =>    this.criarMovimentacaoDeAngulo(angle))
         this.outputEscolheuErrado = this.triangulo.angles.map(  angle =>    this.outputAnguloErrado(angle))
         this.outputMoverVertice   = this.triangulo.vertices.map(vertice => new MoverVertice(vertice));
-        this.outputColorirVertice = this.triangulo.vertices.map(vertice => new ColorirOnHover(vertice, 0x8c8c8c, 0xffff00, this))
+        this.outputColorirVertice = this.triangulo.vertices.map(vertice => new ColorirOnHover(vertice, 0x8c8c8c, 0xffff00, this));
+        this.outputMostrarAngulo  = this.triangulo.angles.map(angle => new MostrarAngulo(angle, 1.4).addToFase(this));
     }
 
     resetarInputs(){
@@ -454,6 +458,7 @@ export class Fase5  extends Fase{
 
             fase.outputMoverVertice[index].addInputs(vertice.draggable);
             fase.outputColorirVertice[index].addInputs(dentroDeUmaElipse);
+            fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable))
 
             const atualizarTriangulo = new Output()
                                       .addInputs(vertice.draggable)
@@ -1171,21 +1176,24 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
+        this.debug = false;
+
         this.Configuracao4();
 
+        //Definindo valores úteis
         const vertice  = this.informacao.verticeSelecionado;
         const indice   = this.triangulo.vertices.indexOf(vertice);
         const vertice2 = this.triangulo.vertices[(indice + 1)%3];
         const vertice3 = this.triangulo.vertices[(indice + 2)%3];
+
+        const mostrarAngulo   = this.outputMostrarAngulo[indice];
         
         const aresta  = this.triangulo.edges[(indice + 1)%3];
 
+        //Definindo ponto de divisão do triângulo e o tracejado a ser desenhado
         const vetorDirecaoAresta  = aresta.origem.clone().sub(aresta.destino).normalize();
-
         const vetorDirecao90Graus = new THREE.Vector3(0,0,-1).cross(vetorDirecaoAresta);
-
-        const distancia = aresta.getPosition().sub(vertice.getPosition()).dot(vetorDirecao90Graus);
-
+        const distancia           = aresta.getPosition().sub(vertice.getPosition()).dot(vetorDirecao90Graus);
         const vetorDestinoDivisao = vetorDirecao90Graus.clone().multiplyScalar(distancia);
 
         const pontoDeDivisao = vertice.getPosition().add(vetorDestinoDivisao);
@@ -1196,7 +1204,6 @@ export class Fase5  extends Fase{
         
 
         //Desenhar subtriângulo1
-
         const subtriangulo1 = new Poligono([vertice.getPosition(), vertice2.getPosition(), pontoDeDivisao.clone()])
                                  .configuration({grossura:0.027, raioVertice:0.04, raioAngulo:0.7}) //Grossura levemente maior para sobrepor a aresta original
                                  .render();
@@ -1209,8 +1216,6 @@ export class Fase5  extends Fase{
 
         //Desenhar subtriângulo2
         //Mostrar que eles são congruentes com os triângulos externos (usar Carta?)
-
-
         const subtriangulo2 = new Poligono([vertice.getPosition(), vertice3.getPosition(), pontoDeDivisao.clone()])
                                  .configuration({grossura:0.026, raioVertice:0.04, raioAngulo:0.7}) //Grossura levemente maior para sobrepor a aresta original
                                  .render();
@@ -1225,7 +1230,21 @@ export class Fase5  extends Fase{
         this.subtriangulo2 = subtriangulo2;
         this.tracejadoDivisao = tracejado;
 
-        const animacao = new AnimacaoSequencial(desenharTracejado, mostrarTriangulo, mostrarTriangulo2);
+        //MostrarAngulos dos angulos divididos
+        this.outputMostrarAnguloSubtriangulo = [
+            new MostrarAngulo(subtriangulo1.angles[0], 1.4).addToFase(this), 
+            new MostrarAngulo(subtriangulo2.angles[0], 1.4).addToFase(this)
+        ]
+
+        const animacao = new AnimacaoSequencial(
+                            new AnimacaoSimultanea(
+                                mostrarAngulo.animacao(false),
+                                ...this.outputMostrarAnguloSubtriangulo.map(output => output.animacao(true))
+                            ), 
+                            desenharTracejado, 
+                            mostrarTriangulo, 
+                            mostrarTriangulo2
+                        );
 
         animacao.setOnTermino(() => {
             fase.triangulo.angles.map(angle=> angle.material.visible = false);

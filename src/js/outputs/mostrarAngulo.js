@@ -7,13 +7,13 @@ import { Value } from '../equations/expressions';
 //REFATORAR DEPOIS, DESCULPE QUEM ESTÁ LENDO ISSO
 export class MostrarAngulo extends Output{
 
-    constructor(angle){
+    constructor(angle, distanciaTextoParaAngulo=2){
         super();
 
         this.angulo = angle;
         this.estado  = {};
         this.createText();
-        this.distanciaTextoParaAngulo = 2;
+        this.distanciaTextoParaAngulo = distanciaTextoParaAngulo;
 
     }
 
@@ -38,6 +38,8 @@ export class MostrarAngulo extends Output{
             const angulo = this.angulo;
 
             elemento.element.textContent = `${(angulo.degrees).toFixed()}°`;
+
+            console.log(angulo)
 
             const vetor = new THREE.Vector3(0,0,0)
                         .lerpVectors(angulo.vetor2,     angulo.vetor1,      0.5)
@@ -106,9 +108,11 @@ export class MostrarAngulo extends Output{
         return this;
     }
 
-    animacao(){
+    animacao(dentro){
 
-        return  apagarCSS2(this.texto.elemento).reverse()
+        if(dentro == false) return apagarCSS2(this.text.elemento, this.scene);
+
+        return  apagarCSS2(this.text.elemento).reverse()
                                                .setOnTermino(() => null)
                                                .setOnStart(() => this.update({dentro: true}))
     }

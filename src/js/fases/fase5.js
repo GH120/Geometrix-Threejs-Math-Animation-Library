@@ -52,7 +52,7 @@ export class Fase5  extends Fase{
         //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
         //Mostrar que a soma dos 
 
-        this.debug = true;
+        this.debug = false;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -151,7 +151,7 @@ export class Fase5  extends Fase{
             "O angulo proximo do novo triângulo é o afastado do antigo pois apontam para lados iguais",
             "Os dois juntos formam 90°, pois a reta que divide o triângulo é perpendicular ao tracejado",
             "Podemos fazer o mesmo para o outro subtriângulo",
-            "Assim, temos que os ângulos somados formam 180°"
+            "Junte as duas fórmulas na lousa, para conseguirmos a soma de todos os ângulos"
         ]
         .map(linha => fase.animacaoDialogo(linha));
 
@@ -168,6 +168,7 @@ export class Fase5  extends Fase{
                             new AnimacaoSimultanea(dialogo[5]),
                             this.aula3Dialogo5(dialogo[6], this.subtriangulo2, this.subtriangulo3),
                             this.aula3Dialogo7(dialogo[7], this.subtriangulo2, this.subtriangulo3),
+                            this.aula3Dialogo9(dialogo[9])
         )
 
         fase.animar(animacao);
@@ -265,7 +266,7 @@ export class Fase5  extends Fase{
         novoTriangulo.edges[0] = ladoClone.removeFromScene();
         novoTriangulo.edges[1] = opostoClone.removeFromScene();
 
-        novoTriangulo.angles.map(angle => angle.material.color = 0x0000aa);
+        novoTriangulo.angles.map(angle => angle.material.color = triangulo.angles[0].material.color);
 
         const aparecerTriangulo = new ApagarPoligono(novoTriangulo)
                                         .reverse()
@@ -376,6 +377,13 @@ export class Fase5  extends Fase{
 
         return new AnimacaoSequencial(apagarTrianguloAuxiliar,movimentacao ,dialogo, mostrar90, moverAngulosParaEquacao);
 
+    }
+
+    aula3Dialogo9(dialogo){
+
+
+
+        return new AnimacaoSimultanea(dialogo, )
     }
 
     createInputs(){
@@ -1083,7 +1091,7 @@ export class Fase5  extends Fase{
         }
     }
 
-    //Controla a mudança do fluxo dos probl
+    //Controla a mudança do fluxo dos problemas
     controleGeral(){
 
         //Inputs: os 3 criarTracejados -> quando um deles atualiza, notifica esse output também
@@ -1469,7 +1477,7 @@ export class Fase5  extends Fase{
 
     }
 
-    mostrarGrausAparecendo(angle, updateMostrarAnguloCadaFrame = false, mostrarEdesaparecer=true){
+    mostrarGrausAparecendo(angle, updateMostrarAnguloCadaFrame = false, mostrarEdesaparecer=false){
 
 
         if(!angle.mostrarAngulo){
@@ -1515,6 +1523,9 @@ export class Fase5  extends Fase{
 
 
     //Refatorar essa monstruosidade aqui depois
+    //Problema: dois ângulos de 45° vão para o mesmo valor da equação, melhorar checagem
+    //Problema: angulos aparecem e desaparecem de novo quando termina o arraste da equação
+    //Problema: ou a spline está grande demais, ou é muito lenta
     moverGrausParaPosicaoEquacao(angulos){
 
         const fase = this;

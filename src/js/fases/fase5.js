@@ -319,9 +319,29 @@ export class Fase5  extends Fase{
 
         const verticeSelecionado = triangulo.vertices[0];
 
+         //Gambiarra, pega o mostrar angulo do angulo original afastado
+        //Coloca ele para ver o angulo copiado enquanto faz o movimento
+        //E finalmente reverte 
+        console.log(fase.informacao)
+        let mostrarAnguloAfastado = fase.informacao.mostrarAngulosAfastados[(triangulo == this.subtriangulo1)? 0 : 1];
+        const anguloAfastado      = mostrarAnguloAfastado.angulo;
+        mostrarAnguloAfastado.distanciaTextoParaAngulo = 1.4;
+
+        const atualizarAngulo =  animacaoIndependente(() => {
+                                    mostrarAnguloAfastado.angulo = angulo;
+                                })
+                                 .setOnTermino(() => {
+                                    // mostrarAnguloAfastado.update();
+                                    mostrarAnguloAfastado.angulo = anguloAfastado
+                                })
+                                 .setDelay(0)
+        
+        //Função girar angulo alterada para acomodar atualização do mostrarAngulo
+
         const movimentacao = new AnimacaoSimultanea(
                                 moverAnguloAnimacao(angulo, angulo.getPosition(), verticeSelecionado.getPosition()),
-                                girarAngulo(angulo)
+                                girarAngulo(angulo),
+                                atualizarAngulo
                             )
 
         const noventaGraus = new Angle([triangulo.vertices[0], triangulo.vertices[2], trianguloCopia.vertices[1]]).render()
@@ -354,13 +374,16 @@ export class Fase5  extends Fase{
                             .setValorFinal(destino)
                             .setInterpolacao((a,b,c) => new THREE.Vector3().lerpVectors(a,b,c))
                             .setUpdateFunction(function(posicao){
-                                    anguloInicial.mesh.position.copy(posicao);
+                                
+                                console.log(posicao.toArray())
+                                anguloInicial.mesh.position.copy(posicao);
+                                mostrarAnguloAfastado.update();
                             })
                             .voltarAoInicio(false)
                             .setDuration(75)
                             .setCurva(function easeInOutSine(x) {
                                     return -(Math.cos(Math.PI * x) - 1) / 2;
-                                })
+                            })
             
             return moveAngulo;
         }
@@ -650,9 +673,11 @@ export class Fase5  extends Fase{
         fase.outputEscolheuErrado[angle.index].removeInputs(); //Não consegue errar mais pois já está selecionado
     }
 
-    Configuracao4(){
+    Configuracao4(informacao){
 
         const fase = this;
+
+        fase.informacao = {...fase.informacao, ...informacao};
 
         fase.resetarInputs();
     }
@@ -1176,9 +1201,6 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
-        this.debug = false;
-
-        this.Configuracao4();
 
         //Definindo valores úteis
         const vertice  = this.informacao.verticeSelecionado;
@@ -1229,6 +1251,18 @@ export class Fase5  extends Fase{
         this.subtriangulo1 = subtriangulo1;
         this.subtriangulo2 = subtriangulo2;
         this.tracejadoDivisao = tracejado;
+
+        this.Configuracao4({
+            subtriangulo1: subtriangulo1, 
+            subtriangulo2: subtriangulo2,
+            mostrarAngulo: mostrarAngulo, 
+
+            //Vamos usar esse para quando mover o angulo, também mover suas cópias
+            mostrarAngulosAfastados: [
+                this.outputMostrarAngulo[(indice+1)%3], //Angulo copiado do subtriangulo1
+                this.outputMostrarAngulo[(indice+2)%3]  //Angulo copiado do subtriangulo2
+            ]
+        })
 
         //MostrarAngulos dos angulos divididos
         this.outputMostrarAnguloSubtriangulo = [

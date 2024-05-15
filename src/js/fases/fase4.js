@@ -61,7 +61,7 @@ export class Fase4 extends Fase{
 
         this.problema = 10
 
-        this.debug = true;
+        this.debug = false;
     }
 
     //Objetos básicos

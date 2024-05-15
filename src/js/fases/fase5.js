@@ -45,7 +45,7 @@ export class Fase5  extends Fase{
         this.Configuracao1(); //É uma versão generalizada do ligar Input ao Output
 
 
-        this.debug = true;
+        this.debug = false;
 
         this.aceitaControleDeAnimacao = true;
 

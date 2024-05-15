@@ -31,6 +31,9 @@ import { ApagarPoligono } from '../animacoes/apagarPoligono';
 import { mover } from '../animacoes/mover';
 import { engrossarLado } from '../animacoes/engrossarLado';
 import { apagarObjeto } from '../animacoes/apagarObjeto';
+import { Addition, Equality, Value, Variable } from '../equations/expressions';
+import MoverTexto from '../animacoes/moverTexto';
+import MostrarTexto from '../animacoes/MostrarTexto';
 
 export class Fase5  extends Fase{
 
@@ -44,6 +47,10 @@ export class Fase5  extends Fase{
         this.setupTextBox();
         this.Configuracao1(); //É uma versão generalizada do ligar Input ao Output
 
+
+        //Mostrar a1,a2,a3 e seus valores indo para lousa
+        //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
+        //Mostrar que a soma dos 
 
         this.debug = true;
 
@@ -316,6 +323,7 @@ export class Fase5  extends Fase{
         const apagarTrianguloAuxiliar = new ApagarPoligono(trianguloCopia).setDuration(100);
 
         const angulo = triangulo.angles[1];
+        const anguloProximo = triangulo.angles[0];
 
         const verticeSelecionado = triangulo.vertices[0];
 
@@ -327,20 +335,25 @@ export class Fase5  extends Fase{
         const anguloAfastado      = mostrarAnguloAfastado.angulo;
         mostrarAnguloAfastado.distanciaTextoParaAngulo = 1.4;
 
-        const atualizarAngulo =  animacaoIndependente(() => {
-                                    mostrarAnguloAfastado.angulo = angulo;
-                                })
-                                 .setOnTermino(() => {
-                                    // mostrarAnguloAfastado.update();
-                                    mostrarAnguloAfastado.angulo = anguloAfastado
-                                })
-                                 .setDelay(0)
+        const atualizarAngulo =  animacaoIndependente(  () => mostrarAnguloAfastado.angulo = angulo)
+                                .setUpdateFunction(     () => mostrarAnguloAfastado.update())
+                                 .setOnTermino(         () => mostrarAnguloAfastado.angulo = anguloAfastado)
+                                 .setDelay(0);
+
+        //Equacao -> refatorar depois, precisa de mostrarAngulo como atributo de cada angulo
+
+        const mostrarAnguloProximo  = this.outputMostrarAnguloSubtriangulo[(triangulo == this.subtriangulo1)? 0 : 1]
+        
+        angulo.mostrarAngulo        = mostrarAnguloAfastado;
+        anguloProximo.mostrarAngulo = mostrarAnguloProximo;
+
+        const moverAngulosParaEquacao = this.moverGrausParaPosicaoEquacao([angulo, anguloProximo]);
         
         //Função girar angulo alterada para acomodar atualização do mostrarAngulo
 
         const movimentacao = new AnimacaoSimultanea(
-                                moverAnguloAnimacao(angulo, angulo.getPosition(), verticeSelecionado.getPosition()),
-                                girarAngulo(angulo),
+                                fase.moverAnguloAnimacao(angulo, angulo.getPosition(), verticeSelecionado.getPosition()),
+                                fase.girarAngulo(angulo),
                                 atualizarAngulo
                             )
 
@@ -361,65 +374,7 @@ export class Fase5  extends Fase{
                             )
                         )
 
-        return new AnimacaoSequencial(apagarTrianguloAuxiliar,movimentacao ,dialogo, mostrar90);
-
-        function moverAnguloAnimacao(angle, origem, destino){
-
-
-            const anguloInicial = angle;
-            
-    
-            const moveAngulo = new Animacao()
-                            .setValorInicial(origem)
-                            .setValorFinal(destino)
-                            .setInterpolacao((a,b,c) => new THREE.Vector3().lerpVectors(a,b,c))
-                            .setUpdateFunction(function(posicao){
-                                
-                                console.log(posicao.toArray())
-                                anguloInicial.mesh.position.copy(posicao);
-                                mostrarAnguloAfastado.update();
-                            })
-                            .voltarAoInicio(false)
-                            .setDuration(75)
-                            .setCurva(function easeInOutSine(x) {
-                                    return -(Math.cos(Math.PI * x) - 1) / 2;
-                            })
-            
-            return moveAngulo;
-        }
-
-        function girarAngulo(angulo){
-
-            const anguloInicial = angulo;
-    
-            const quaternionInicial = anguloInicial.mesh.quaternion.clone(); 
-            const quaternionFinal = new THREE.Quaternion();
-            quaternionFinal.setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI);
-    
-            const tempoInterpolacao = 0.5; // Define o tempo de duração da interpolação (ajuste conforme necessário)
-            const quaternionInterpolado = new THREE.Quaternion();
-            quaternionInterpolado.slerp(quaternionInicial, quaternionFinal, tempoInterpolacao);
-    
-            // animação
-            const animacaoRodaeMoveAngulo = new Animacao()
-                .setValorInicial(quaternionInicial)
-                .setValorFinal(quaternionFinal)
-                .setDuration(75)
-                .setInterpolacao(function(inicial, final, peso) {
-                    return new THREE.Quaternion().slerpQuaternions(inicial, final, peso)
-                })
-                .setUpdateFunction(function(quaternum) {
-                    anguloInicial.mesh.quaternion.copy(quaternum)
-                })
-                .voltarAoInicio(false) //Pra não resetar quando terminada a animação
-                .setCurva(function easeInOutSine(x) {
-                    return -(Math.cos(Math.PI * x) - 1) / 2;
-                })
-                .setOnStart(() => angulo.addToScene(fase.scene))
-
-            return animacaoRodaeMoveAngulo;
-
-        }
+        return new AnimacaoSequencial(apagarTrianguloAuxiliar,movimentacao ,dialogo, mostrar90, moverAngulosParaEquacao);
 
     }
 
@@ -1458,4 +1413,316 @@ export class Fase5  extends Fase{
         fase.animar(new AnimacaoSequencial(anim1,new AnimacaoSimultanea(anim2,desenharCirculo),anim3))
         
     }
+
+    moverAnguloAnimacao(angle, origem, destino){
+
+
+        const anguloInicial = angle;
+        
+
+        const moveAngulo = new Animacao()
+                        .setValorInicial(origem)
+                        .setValorFinal(destino)
+                        .setInterpolacao((a,b,c) => new THREE.Vector3().lerpVectors(a,b,c))
+                        .setUpdateFunction(function(posicao){
+                            anguloInicial.mesh.position.copy(posicao);
+                        })
+                        .voltarAoInicio(false)
+                        .setDuration(75)
+                        .setCurva(function easeInOutSine(x) {
+                                return -(Math.cos(Math.PI * x) - 1) / 2;
+                        })
+        
+        return moveAngulo;
+    }
+
+    girarAngulo(angulo){
+
+        const anguloInicial = angulo;
+
+        const quaternionInicial = anguloInicial.mesh.quaternion.clone(); 
+        const quaternionFinal = new THREE.Quaternion();
+        quaternionFinal.setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI);
+
+        const tempoInterpolacao = 0.5; // Define o tempo de duração da interpolação (ajuste conforme necessário)
+        const quaternionInterpolado = new THREE.Quaternion();
+        quaternionInterpolado.slerp(quaternionInicial, quaternionFinal, tempoInterpolacao);
+
+        // animação
+        const animacaoRodaeMoveAngulo = new Animacao()
+            .setValorInicial(quaternionInicial)
+            .setValorFinal(quaternionFinal)
+            .setDuration(75)
+            .setInterpolacao(function(inicial, final, peso) {
+                return new THREE.Quaternion().slerpQuaternions(inicial, final, peso)
+            })
+            .setUpdateFunction(function(quaternum) {
+                anguloInicial.mesh.quaternion.copy(quaternum)
+            })
+            .voltarAoInicio(false) //Pra não resetar quando terminada a animação
+            .setCurva(function easeInOutSine(x) {
+                return -(Math.cos(Math.PI * x) - 1) / 2;
+            })
+            .setOnStart(() => angulo.addToScene(this.scene))
+
+        return animacaoRodaeMoveAngulo;
+
+    }
+
+    mostrarGrausAparecendo(angle, updateMostrarAnguloCadaFrame = false, mostrarEdesaparecer=true){
+
+
+        if(!angle.mostrarAngulo){
+
+            angle.mostrarAngulo = new MostrarAngulo(angle).addToFase(this);
+        }
+
+        const mostrarAngulo = angle.mostrarAngulo;
+
+        const aparecerTexto = new Animacao()
+                                .setValorInicial(0)
+                                .setValorFinal(1)
+                                .setInterpolacao((a,b,c) => a*(1-c) + b*c)
+                                .setUpdateFunction((valor) => {
+
+                                    mostrarAngulo.text.elemento.element.style.opacity = valor
+
+                                    if(updateMostrarAnguloCadaFrame) mostrarAngulo.update({dentro:true});
+                                })
+                                .setDuration(55)
+                                .setDelay(5)
+                                .setCurva(x => {
+
+                                    x = 1 - Math.abs(1 - x*2)
+
+                                    return -(Math.cos(Math.PI * x) - 1) / 2;
+                                })
+                                .voltarAoInicio(false)
+                                .manterExecucao(false)
+                                .setOnDelay(() => mostrarAngulo.update({dentro:false}))
+                                .setOnStart(() => {
+                                    mostrarAngulo.update({dentro:true});
+                                })
+
+        if(!mostrarEdesaparecer){
+            aparecerTexto.setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+            aparecerTexto.setOnTermino(() => null)
+        }
+
+        return aparecerTexto;
+
+    }
+
+
+    //Refatorar essa monstruosidade aqui depois
+    moverGrausParaPosicaoEquacao(angulos){
+
+        const fase = this;
+
+        angulos.forEach(angulo => {
+            angulo.mostrarAngulo.text.elemento.element.style.fontFamily = "Courier New, monospace";
+            angulo.mostrarAngulo.text.elemento.element.style.fontSize   = "18px";
+        })
+
+        const moverTexto = (angulo) => {
+                                        const mover = new MoverTexto().voltarAoInicio(true)
+                                        
+                                        
+                                        const elementoCSS2 = angulo.mostrarAngulo.text.elemento;
+
+                                        mover.setText(elementoCSS2)
+
+                                        return mover;
+                                    }
+
+        const spline = [
+            new THREE.Vector3(1.473684210526315, -2.2692913385826774, 0),
+            new THREE.Vector3(-0.39766081871345005, -0.6944881889763783, 0),
+            // new THREE.Vector3(3.5,2,0)
+        ]
+
+        const mover1 = moverTexto(angulos[0]);
+        const mover2 = moverTexto(angulos[1]);
+        // const mover3 = moverTexto(angulos[2]);
+
+        var novoElemento = null;
+
+        return new AnimacaoSimultanea(
+                new AnimacaoSimultanea(
+                        mover1,
+                        mover2,
+                        // mover3
+                )
+                .setOnStart(criarEquacao)
+                .setOnTermino(mostrarEquacaoEMoverParaWhiteboard))
+
+
+        //Funções auxiliares
+
+        function criarEquacao(){
+            const valores = angulos.map( angulo => angulo.mostrarAngulo.text.elemento.element.textContent);
+
+            const x = new Variable(valores[0]);
+            const y = new Value(valores[1]);
+            // const z = new Value(valores[2]);
+
+            const equacao = new Equality(
+                                new Addition(
+                                    x,
+                                    y
+                                ),
+                                new Value("90°")
+                            )
+
+            fase.informacao.equacao = {equacao:equacao, angulos:[x,y]}
+
+            novoElemento = new CSS2DObject(equacao.html);
+
+            novoElemento.position.copy(new THREE.Vector3(0,0,0));
+
+            novoElemento.equacao = equacao;
+
+            
+
+            // fase.scene.add(novoElemento);
+
+            fase.equacao = equacao;
+
+            fase.operadores.expression = equacao;
+
+            for(const node of equacao.nodes){
+
+                node.comeco = equacao.element.textContent.indexOf(node.element.innerText);
+            }
+
+            const getPosition = (subelemento) => {
+                const deslocamento = calcularDeslocamento(equacao,subelemento);
+
+                const posicao = novoElemento.position.clone().add(deslocamento)
+
+                return posicao;
+            }
+
+            mover1.setSpline([
+                mover1.elementoTexto.position.clone(),
+                ...spline,
+                getPosition(x)
+            ])
+
+            mover2.setSpline([
+                mover2.elementoTexto.position.clone(),
+                ...spline,
+                getPosition(y)
+
+            ])
+
+            // mover3.setSpline([
+            //     mover3.elementoTexto.position.clone(),
+            //     ...spline,
+            //     getPosition(z)
+            // ])
+        }
+
+
+        function calcularDeslocamento(equacao, subequacao){
+
+            const tamanho      = equacao.element.textContent.length;
+            const deslocamento = subequacao.comeco + subequacao.element.innerText.length/2;
+
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            context.font = '18px Courier New, monospace'
+
+            console.log(context.measureText(equacao.element.textContent))
+
+            const medidas = context.measureText(equacao.element.textContent)
+
+            const width = medidas.width;
+
+            const height = medidas.actualBoundingBoxAscent;
+
+            const offset = (deslocamento/tamanho - 0.5)*width;
+
+            const point = fase.pixelToCoordinates(fase.width/2 + offset, fase.height/2 - 18); //18 é o tamanho da fonte em pixeis
+
+            console.log(point)
+
+            //VERIFICAR BUGS, MODIFICAR CENTRO DA CÂMERA PROVAVELMENTE É DESVIO
+            return new THREE.Vector3(point.x,point.y - 1, 0); // por algum motivo o y é 1 se for metade da altura
+        }
+
+        function mostrarEquacaoEMoverParaWhiteboard(){
+
+            fase.whiteboard.adicionarEquacao(novoElemento.equacao)
+
+            //Consertar depois, está debaixo da whiteboard
+            // novoElemento.element.style.zIndex = 10000;
+
+            fase.scene.add(novoElemento);
+
+
+            // console.log(novoElemento)
+
+            
+            const spline = [
+                new THREE.Vector3(-2, -0.3937007874015752, 0),
+                new THREE.Vector3(-4.432748538011696,  0.36771653543307, 0),
+                // new THREE.Vector3(3.5,2,0)
+            ]
+
+
+            const mostrarTexto = new MostrarTexto(novoElemento)
+                                    .setValorFinal(300)
+                                    .setProgresso(0);
+
+            const voltarAngulos = angulos.map(angulo => fase.mostrarGrausAparecendo(angulo,false,false))
+
+            const voltarAngulosAnimacao = new AnimacaoSimultanea()
+                                              .setAnimacoes(voltarAngulos)
+                                              .setOnStart(() =>{
+
+                                                    angulos.map(angulo => angulo.mostrarAngulo.update({dentro:true}));
+
+                                                    //Mudar se tornar escolha de ângulo geral
+                                                    // angulos[2].mostrarAngulo.text.elemento.element.textContent = '?';
+                                              })
+
+            const moverEquacaoParaDiv = new MoverTexto(novoElemento)
+                                        .setOnStart(function(){
+                                            const equacaoDiv   = fase.whiteboard.equacoes.slice(-1)[0].element;
+
+                                            const dimensoes    = equacaoDiv.getBoundingClientRect();
+
+                                            const posicaoFinal = fase.pixelToCoordinates((dimensoes.right + dimensoes.left)/2, (dimensoes.top + dimensoes.bottom)/2)
+
+                                            this.setSpline([
+                                                novoElemento.position.clone(),
+                                                ...spline,
+                                                posicaoFinal
+                                            ])
+
+                                            // fase.whiteboard.equationList.children[0].style.display = "none"
+                                            
+
+                                        })
+                                        .setOnTermino(() =>{
+                                            fase.scene.remove(novoElemento);
+                                            // fase.whiteboard.equationList.children[0].style.display = "block"
+                                            fase.whiteboard.ativar(true);
+                                        })
+
+
+            const animacao = new AnimacaoSequencial(
+                                mostrarTexto, 
+                                voltarAngulosAnimacao,
+                                moverEquacaoParaDiv
+                            )
+
+            animacao.setCheckpointAll(false);
+
+            fase.animar(animacao);
+        }
+
+    }
+
 }

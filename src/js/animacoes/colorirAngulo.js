@@ -7,6 +7,7 @@ export const colorirAngulo = (angulo) =>    new Animacao(angulo)
                                                 .setValorInicial(0x00f00a)
                                                 .setValorFinal(0x0f00ff)
                                                 .setDuration(300)
+                                                .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
                                                 .setInterpolacao(function (color1, color2, weight) {
 
                                                     const r1 = (color1 >> 16) & 0xff;

@@ -83,7 +83,7 @@ export class Tracejado extends Objeto{
         this.scene.add(this.mesh);
     }
 
-    removefromScene(){
+    removeFromScene(){
 
         if(this.mesh) this.mesh.children.forEach(child => child.geometry.dispose());
 

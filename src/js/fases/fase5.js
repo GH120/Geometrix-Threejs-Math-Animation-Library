@@ -97,7 +97,7 @@ export class Fase5  extends Fase{
 
     aula2(){
 
-        this.debug = false;
+        // this.debug = false;
 
         const fase = this;
 
@@ -137,7 +137,8 @@ export class Fase5  extends Fase{
             "e um angulo reto",
             "se arrastarmos seus lados para fora...",
             "Construimos outro triângulo igual a ele, com os ângulos invertidos de lugar",
-            "O ângulo proximo e o afastado somam 90°, pois a figura é um retângulo nos dois lados",
+            "O angulo proximo do novo triângulo é o afastado do antigo pois apontam para lados iguais",
+            "Os dois próximos somam 90°, pois estão em uma reta perpendicular a outra",
             "Assim, junte na lousa as equações para conseguir o resultado"
         ]
         .map(linha => fase.animacaoDialogo(linha));
@@ -184,30 +185,93 @@ export class Fase5  extends Fase{
 
     aula3Dialogo3(dialogo, triangulo){
 
-        const indice = this.triangulo.vertices.indexOf(this.informacao.verticeSelecionado)
+        const lado       = triangulo.edges[1];
+        const ladoOposto = triangulo.edges[2];
 
-        const lado       = triangulo.edges[indice];
-        const ladoOposto = triangulo.edges[(indice+1)%3];
+        const ladoClone   = lado.clone().addToScene(this.scene);
+        const opostoClone = ladoOposto.clone().addToScene(this.scene);
 
         const direcao1 = lado.origem.clone().sub(lado.destino).cross(new THREE.Vector3(0,0,-1)).normalize();
         const direcao2 = ladoOposto.origem.clone().sub(ladoOposto.destino).cross(new THREE.Vector3(0,0,-1)).normalize();
 
-        const colorir1  = colorirAngulo(lado).setValorInicial(lado.material.color.getHex()).setValorFinal(0xaa0000);
-        const colorir2  = colorirAngulo(ladoOposto).setValorInicial(ladoOposto.material.color.getHex()).setValorFinal(0x0000aa);
+        const colorir1  = colorirAngulo(lado)
+                         .setValorInicial(lado.material.color.getHex())
+                         .setValorFinal(0xaa0000)
+                         .voltarAoInicio(false)
+                         .setDuration(50);
+
+        const colorir2  = colorirAngulo(ladoClone)
+                         .setValorInicial(lado.material.color.getHex())
+                         .voltarAoInicio(false)
+                         .setValorFinal(0xaa0000)
+                         .setDuration(50);
+
+        const colorir3  = colorirAngulo(ladoOposto)
+                         .setValorInicial(ladoOposto.material.color.getHex())
+                         .voltarAoInicio(false)
+                         .setValorFinal(0x0000aa)
+                         .setDuration(50);
+
+        const colorir4  = colorirAngulo(opostoClone)
+                         .setValorInicial(ladoOposto.material.color.getHex())
+                         .voltarAoInicio(false)
+                         .setValorFinal(0x0000aa)
+                         .setDuration(50);
 
         const moverLado = new AnimacaoSequencial(
             new AnimacaoSimultanea(
-                mover(lado, lado.getPosition(), lado.getPosition().add(direcao1.multiplyScalar(ladoOposto.length))).setDelay(100),
-                colorir1
+                mover(ladoClone, lado.getPosition(), lado.getPosition().add(direcao1.multiplyScalar(ladoOposto.length))).setDelay(100),
+                colorir1,
+                colorir2
             ),
             new AnimacaoSimultanea(
-                mover(ladoOposto, ladoOposto.getPosition(), ladoOposto.getPosition().add(direcao2.multiplyScalar(lado.length))),
-                colorir2
+                mover(opostoClone, ladoOposto.getPosition(), ladoOposto.getPosition().add(direcao2.multiplyScalar(lado.length))),
+                colorir3,
+                colorir4
             )
-         );
+         )
+
+         
+
+         const novoTriangulo =  new Poligono([
+                                            triangulo.vertices[0].getPosition(), 
+                                            triangulo.vertices[1].getPosition().add(direcao1), 
+                                            triangulo.vertices[2].getPosition().add(direcao2)
+                                        ])
+                                        .configuration({grossura:0.026, raioVertice:0.04, raioAngulo:0.7}) //Grossura levemente maior para sobrepor a aresta original
+                                        .render();
+                                        
+        novoTriangulo.edges[0] = ladoClone.removeFromScene();
+        novoTriangulo.edges[1] = opostoClone.removeFromScene();
+
+        novoTriangulo.angles.map(angle => angle.material.color = 0x0000aa);
+
+        const aparecerTriangulo = new ApagarPoligono(novoTriangulo)
+                                        .reverse()
+                                        .setOnStart(() => {
+                                            this.debug = false
+                                            novoTriangulo.addToScene(this.scene);
+                                        })
+
+        aparecerTriangulo.animacoes.splice(3,2); // Ignora animações de mostrar os lados já em cena
+
+        return new AnimacaoSimultanea(
+                 new AnimacaoSequencial(moverLado, aparecerTriangulo),
+                 dialogo
+            )
+    }
+
+    aula3Dialogo5(dialogo,triangulo){
+
+        // const mostrarOposto1 = new MostrarBissetriz(triangulo, triangulo.angles[0], this);
+        // const mostrarOposto2 = new MostrarBissetriz(triangulo, triangulo.angles[1], this);
+        // const mostrarOposto3 = new MostrarBissetriz(triangulo, triangulo.angles[2], this);
 
 
-        return moverLado
+        return new AnimacaoSimultanea(
+                    new AnimacaoSequencial(),
+                    dialogo
+        )
     }
 
     createInputs(){
@@ -1011,7 +1075,7 @@ export class Fase5  extends Fase{
         //Desenhar subtriângulo1
 
         const subtriangulo1 = new Poligono([vertice.getPosition(), vertice2.getPosition(), pontoDeDivisao.clone()])
-                                 .configuration({grossura:0.026, raioVertice:0.04, raioAngulo:0.7}) //Grossura levemente maior para sobrepor a aresta original
+                                 .configuration({grossura:0.027, raioVertice:0.04, raioAngulo:0.7}) //Grossura levemente maior para sobrepor a aresta original
                                  .render();
 
         subtriangulo1.angles.map(angle => angle.material.color = 0x0000aa);

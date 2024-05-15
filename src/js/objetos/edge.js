@@ -74,4 +74,9 @@ export class Edge extends Objeto{
 
         this.update();
     }
+
+    clone(){
+
+        return new Edge(this.origem, this.destino, this.grossura);
+    }
 }

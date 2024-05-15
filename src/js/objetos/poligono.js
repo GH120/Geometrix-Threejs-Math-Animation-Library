@@ -167,12 +167,19 @@ export class Poligono extends Objeto{
 
     update(){
 
+        const proximo = (index) => this.vertices[(index+1) % this.numeroVertices];
+
         const scene = this.scene;
 
         //Atualiza as malhas das arestas
-        this.edges.map(edge => edge.removeFromScene());
-        this.renderEdges();
-        this.edges.map(edge => edge.addToScene(scene));
+        // this.edges.map(edge => (edge.scene)? edge.removeFromScene() : null);
+        // this.renderEdges();
+        // this.edges.map(edge => edge.addToScene(scene));
+
+        this.vertices.forEach((vertice, index) => {
+            this.edges[index].origem  = vertice.getPosition();
+            this.edges[index].destino = proximo(index).getPosition();
+        });
 
         this.edges.map(edge => edge.update());
 

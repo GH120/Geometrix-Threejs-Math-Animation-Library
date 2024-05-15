@@ -321,4 +321,19 @@ export class Poligono extends Objeto{
 
         return this._hitbox;
     }
+
+    /**Retorna se é horário ou antihorário */
+    calcularSentido() {
+
+        const vertices = this.vertices.map(vertice => vertice.getPosition());
+
+        let soma = 0;
+        for (let i = 0; i < vertices.length; i++) {
+            const current = vertices[i];
+            const next = vertices[(i + 1) % vertices.length];
+            soma += (next.x - current.x) * (next.y + current.y);
+        }
+
+        return soma > 0 ? 1 : -1;
+    }
 }

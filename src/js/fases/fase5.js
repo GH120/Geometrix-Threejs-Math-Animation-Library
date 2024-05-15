@@ -154,7 +154,6 @@ export class Fase5  extends Fase{
                             this.aula3Dialogo5(dialogo[6], this.subtriangulo1, this.subtriangulo3),
                             this.aula3Dialogo7(dialogo[7], this.subtriangulo1, this.subtriangulo3),
                             dialogo[8],
-                            new AnimacaoSimultanea(dialogo[0]),
                             this.aula3Dialogo2(dialogo.slice(1,4), this.subtriangulo2),
                             this.aula3Dialogo3(dialogo[4], this.subtriangulo2),
                             new AnimacaoSimultanea(dialogo[5]),
@@ -202,8 +201,10 @@ export class Fase5  extends Fase{
         const ladoClone   = lado.clone().addToScene(this.scene);
         const opostoClone = ladoOposto.clone().addToScene(this.scene);
 
-        const direcao1 = lado.origem.clone().sub(lado.destino).cross(new THREE.Vector3(0,0,-1)).normalize();
-        const direcao2 = ladoOposto.origem.clone().sub(ladoOposto.destino).cross(new THREE.Vector3(0,0,-1)).normalize();
+        const horario = -triangulo.calcularSentido();
+
+        const direcao1 = lado.origem.clone().sub(lado.destino).cross(new THREE.Vector3(0,0,horario)).normalize();
+        const direcao2 = ladoOposto.origem.clone().sub(ladoOposto.destino).cross(new THREE.Vector3(0,0,horario)).normalize();
 
         const colorir1  = colorirAngulo(lado)
                          .setValorInicial(lado.material.color.getHex())
@@ -260,7 +261,6 @@ export class Fase5  extends Fase{
         const aparecerTriangulo = new ApagarPoligono(novoTriangulo)
                                         .reverse()
                                         .setOnStart(() => {
-                                            this.debug = false
                                             novoTriangulo.addToScene(this.scene);
                                         })
 
@@ -1222,7 +1222,7 @@ export class Fase5  extends Fase{
                                     .setOnStart(() => subtriangulo2.addToScene(this.scene));
 
         this.subtriangulo1 = subtriangulo1;
-        this.subtrinagulo2 = subtriangulo2;
+        this.subtriangulo2 = subtriangulo2;
         this.tracejadoDivisao = tracejado;
 
         const animacao = new AnimacaoSequencial(desenharTracejado, mostrarTriangulo, mostrarTriangulo2);

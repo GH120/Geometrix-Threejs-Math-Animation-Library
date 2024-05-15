@@ -8,6 +8,8 @@ export class MostrarBissetriz extends Output{
 
     constructor(triangulo, angulo, fase){
         super();
+
+        console.log(triangulo, angulo)
         
         this.triangulo = triangulo;
         this.angulo = angulo;
@@ -18,7 +20,7 @@ export class MostrarBissetriz extends Output{
 
         this.estado = {selecionado:false, clicados:[]};
 
-        const origem  = this.angulo.position.clone();
+        const origem  = this.angulo.getPosition();
         const destino = this.ladoOposto.mesh.position.clone();
 
         this.tracejado = new Tracejado(origem,destino);

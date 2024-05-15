@@ -29,6 +29,8 @@ import InsideElipse from '../outputs/insideElipse';
 import { Edge } from '../objetos/edge';
 import { ApagarPoligono } from '../animacoes/apagarPoligono';
 import { mover } from '../animacoes/mover';
+import { engrossarLado } from '../animacoes/engrossarLado';
+import { apagarObjeto } from '../animacoes/apagarObjeto';
 
 export class Fase5  extends Fase{
 
@@ -138,7 +140,8 @@ export class Fase5  extends Fase{
             "se arrastarmos seus lados para fora...",
             "Construimos outro triângulo igual a ele, com os ângulos invertidos de lugar",
             "O angulo proximo do novo triângulo é o afastado do antigo pois apontam para lados iguais",
-            "Os dois próximos somam 90°, pois estão em uma reta perpendicular a outra",
+            "Os dois juntos formam 90°, pois a reta que divide o triângulo é perpendicular ao tracejado",
+            "Podemos fazer o mesmo para o outro subtriângulo",
             "Assim, junte na lousa as equações para conseguir o resultado"
         ]
         .map(linha => fase.animacaoDialogo(linha));
@@ -148,7 +151,15 @@ export class Fase5  extends Fase{
                             this.aula3Dialogo2(dialogo.slice(1,4), this.subtriangulo1),
                             this.aula3Dialogo3(dialogo[4], this.subtriangulo1),
                             new AnimacaoSimultanea(dialogo[5]),
-                            new AnimacaoSimultanea(dialogo[6])
+                            this.aula3Dialogo5(dialogo[6], this.subtriangulo1, this.subtriangulo3),
+                            this.aula3Dialogo7(dialogo[7], this.subtriangulo1, this.subtriangulo3),
+                            dialogo[8],
+                            new AnimacaoSimultanea(dialogo[0]),
+                            this.aula3Dialogo2(dialogo.slice(1,4), this.subtriangulo2),
+                            this.aula3Dialogo3(dialogo[4], this.subtriangulo2),
+                            new AnimacaoSimultanea(dialogo[5]),
+                            this.aula3Dialogo5(dialogo[6], this.subtriangulo2, this.subtriangulo3),
+                            this.aula3Dialogo7(dialogo[7], this.subtriangulo2, this.subtriangulo3),
         )
 
         fase.animar(animacao);
@@ -255,23 +266,135 @@ export class Fase5  extends Fase{
 
         aparecerTriangulo.animacoes.splice(3,2); // Ignora animações de mostrar os lados já em cena
 
+        this.subtriangulo3 = novoTriangulo;
+
         return new AnimacaoSimultanea(
                  new AnimacaoSequencial(moverLado, aparecerTriangulo),
                  dialogo
             )
     }
 
-    aula3Dialogo5(dialogo,triangulo){
+    aula3Dialogo5(dialogo,triangulo, trianguloCopia){
 
-        // const mostrarOposto1 = new MostrarBissetriz(triangulo, triangulo.angles[0], this);
-        // const mostrarOposto2 = new MostrarBissetriz(triangulo, triangulo.angles[1], this);
+        
         // const mostrarOposto3 = new MostrarBissetriz(triangulo, triangulo.angles[2], this);
 
 
-        return new AnimacaoSimultanea(
-                    new AnimacaoSequencial(),
-                    dialogo
-        )
+        return animacaoIndependente(() => {
+
+            const mostrarOposto1 = new MostrarBissetriz(trianguloCopia, trianguloCopia.angles[0], this);
+            const mostrarOposto2 = new MostrarBissetriz(triangulo, triangulo.angles[1], this);
+            
+            this.animar(
+                new AnimacaoSequencial(
+                    dialogo,
+
+                    new AnimacaoSequencial(
+                        new AnimacaoSimultanea(
+                            animacaoIndependente(() => mostrarOposto1.update({dentro:true})).setOnTermino(() => mostrarOposto1.update({dentro:false})),
+                            engrossarLado(trianguloCopia.edges[1]).filler(50),
+                            animacaoIndependente(() => mostrarOposto2.update({dentro:true})).setOnTermino(() => mostrarOposto2.update({dentro:false})),
+                            engrossarLado(triangulo.edges[2]).filler(50),
+                        ),
+                        new AnimacaoSimultanea(
+                            this.animacaoGirarAngulo(trianguloCopia.angles[0]).setDuration(100),
+                            this.animacaoGirarAngulo(triangulo.angles[1]).setDuration(100)
+                        )
+                    )
+                )
+            )
+        }).setDuration(600)
+    }
+
+    aula3Dialogo7(dialogo, triangulo, trianguloCopia){
+
+        const fase = this;
+
+        const apagarTrianguloAuxiliar = new ApagarPoligono(trianguloCopia).setDuration(100);
+
+        const angulo = triangulo.angles[1];
+
+        const verticeSelecionado = triangulo.vertices[0];
+
+        const movimentacao = new AnimacaoSimultanea(
+                                moverAnguloAnimacao(angulo, angulo.getPosition(), verticeSelecionado.getPosition()),
+                                girarAngulo(angulo)
+                            )
+
+        const noventaGraus = new Angle([triangulo.vertices[0], triangulo.vertices[2], trianguloCopia.vertices[1]]).render()
+
+        const apagarObjeto2 = (objeto) => apagarObjeto(objeto).setDuration(50);
+
+        const mostrar90 = new AnimacaoSequencial(
+                            new AnimacaoSimultanea(
+                                apagarObjeto2(triangulo.angles[0]).setDuration(50),
+                                apagarObjeto2(triangulo.angles[1]).setDuration(50),
+                            ),
+                            apagarObjeto2(noventaGraus).reverse().setOnStart(() => noventaGraus.addToScene(this.scene)),
+                            apagarObjeto2(noventaGraus).setOnTermino(()=> noventaGraus.removeFromScene()),
+                            new AnimacaoSimultanea(
+                                apagarObjeto2(triangulo.angles[0]).reverse(),
+                                apagarObjeto2(triangulo.angles[1]).reverse(),
+                            )
+                        )
+
+        return new AnimacaoSequencial(apagarTrianguloAuxiliar,movimentacao ,dialogo, mostrar90);
+
+        function moverAnguloAnimacao(angle, origem, destino){
+
+
+            const anguloInicial = angle;
+            
+    
+            const moveAngulo = new Animacao()
+                            .setValorInicial(origem)
+                            .setValorFinal(destino)
+                            .setInterpolacao((a,b,c) => new THREE.Vector3().lerpVectors(a,b,c))
+                            .setUpdateFunction(function(posicao){
+                                    anguloInicial.mesh.position.copy(posicao)
+                            })
+                            .voltarAoInicio(false)
+                            .setDuration(75)
+                            .setCurva(function easeInOutSine(x) {
+                                    return -(Math.cos(Math.PI * x) - 1) / 2;
+                                })
+            
+            return moveAngulo;
+        }
+
+        function girarAngulo(angulo){
+
+            const anguloInicial = angulo;
+    
+            const quaternionInicial = anguloInicial.mesh.quaternion.clone(); 
+            const quaternionFinal = new THREE.Quaternion();
+            quaternionFinal.setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI);
+    
+            const tempoInterpolacao = 0.5; // Define o tempo de duração da interpolação (ajuste conforme necessário)
+            const quaternionInterpolado = new THREE.Quaternion();
+            quaternionInterpolado.slerp(quaternionInicial, quaternionFinal, tempoInterpolacao);
+    
+            // animação
+            const animacaoRodaeMoveAngulo = new Animacao()
+                .setValorInicial(quaternionInicial)
+                .setValorFinal(quaternionFinal)
+                .setDuration(75)
+                .setInterpolacao(function(inicial, final, peso) {
+                    return new THREE.Quaternion().slerpQuaternions(inicial, final, peso)
+                })
+                .setUpdateFunction(function(quaternum) {
+                    anguloInicial.mesh.quaternion.copy(quaternum)
+                })
+                .voltarAoInicio(false) //Pra não resetar quando terminada a animação
+                .setCurva(function easeInOutSine(x) {
+                    return -(Math.cos(Math.PI * x) - 1) / 2;
+                })
+                .setOnStart(() => angulo.addToScene(fase.scene))
+
+            return animacaoRodaeMoveAngulo;
+
+        }
+
     }
 
     createInputs(){

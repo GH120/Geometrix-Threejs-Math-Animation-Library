@@ -104,8 +104,11 @@ export default class JuntarEquacoes extends Output{
             const equacaoSelecionada = estado.equacaoSelecionada;
 
             //Evaluate
-            if(estado.valido) this.handleJuncao(equacaoMovida, equacaoSelecionada);
-            else              this.voltarAoInicio(estado); 
+            if(estado.valido) {
+                this.handleJuncao(equacaoMovida, equacaoSelecionada);
+            }
+            else  
+                this.voltarAoInicio(estado); 
         }
 
         //Condição de execução

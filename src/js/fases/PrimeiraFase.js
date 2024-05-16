@@ -326,6 +326,10 @@ export class PrimeiraFase extends Fase{
 
             arraste1.tamanhoFonte = 5;
             arraste2.tamanhoFonte = 5;
+
+            const mudarProblema = new Output()
+                                 .addInputs(arraste1, arraste2)
+                                 .setUpdateFunction(() => fase.progresso = 2)
         }
     }
 

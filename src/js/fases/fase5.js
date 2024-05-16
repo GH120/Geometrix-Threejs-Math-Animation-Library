@@ -36,6 +36,8 @@ import MoverTexto from '../animacoes/moverTexto';
 import MostrarTexto from '../animacoes/MostrarTexto';
 import ElementoCSS2D from '../objetos/elementocss2d';
 import JuntarEquacoes from '../outputs/juntarEquacoes';
+import ResolverEquacao from '../outputs/resolverEquacao';
+import MetalicSheen from '../animacoes/metalicSheen';
 
 export class Fase5  extends Fase{
 
@@ -396,10 +398,24 @@ export class Fase5  extends Fase{
 
         const dialogo = ["Junte as duas fórmulas na lousa, para conseguirmos a soma de todos os ângulos"].map(linha => fase.animacaoDialogo(linha))
 
+        this.controleEquacoes();
+
+        const animacao = new AnimacaoSimultanea(dialogo[0], ).setDelay(30).setOnTermino(() => fase.whiteboard.ativar(true))
+
+        fase.animar(animacao)
+    }
+
+    controleEquacoes(){
+
+        const fase = this;
+
         const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
         const equacao2 = new ElementoCSS2D(fase.whiteboard.equacoes[1], fase.whiteboard);
 
         const angulos = fase.informacao.equacoes.flatMap(equacao => equacao.angulos);
+
+        const temp = angulos[2]; angulos[2] = angulos[3]; angulos[3] = temp;
+
         const soma = angulos.reduce((equacao, angulo) => new Addition(equacao, angulo));
         const equacao = new Equality(soma, new Addition(new Variable('90°'), new Variable('90°')));
 
@@ -409,9 +425,70 @@ export class Fase5  extends Fase{
         juncao1.equacaoNova = new CSS2DObject(equacao.html);
         juncao2.equacaoNova = new CSS2DObject(equacao.html);
 
-        const animacao = new AnimacaoSimultanea(dialogo[0], ).setDelay(30).setOnTermino(() => fase.whiteboard.ativar(true))
 
-        fase.animar(animacao)
+        return new Output()
+               .addInputs(juncao1, juncao2)
+               .setUpdateFunction(function(novoEstado){
+
+                    const estado = this.estado;
+
+                    if(novoEstado.novaEquacao && estado.etapa == 0){
+
+                        const objetoEquacao = new ElementoCSS2D(novoEstado.novaEquacao, fase.whiteboard)
+                        
+                        const resultado = new Equality(soma, new Variable("180°"));
+
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase);
+
+                        resolverEquacao.equacaoNova = new CSS2DObject(resultado.html);
+
+                        this.addInputs(resolverEquacao);
+
+                        estado.etapa++;
+
+                        return;
+                    }
+
+                    if(novoEstado.novaEquacao && estado.etapa == 1){
+
+                        //Mostrar dois subangulos se juntando para formar o angulo selecionado
+                        //Mostrar que a soma dos três angulos é 180°
+
+                        const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado)
+
+                        const anguloSelecionado = new Variable(Math.round(fase.triangulo.angles[indice].degrees) + "°")
+                        
+                        const novaEquacao = new Equality(
+                                                new Addition(
+                                                    new Addition(
+                                                        angulos[0], 
+                                                        anguloSelecionado
+                                                    ), 
+                                                    angulos[2]
+                                                ),
+                                                new Variable("180°"));
+
+                        const objetoEquacao = new ElementoCSS2D(novoEstado.novaEquacao, fase.whiteboard)
+
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase);
+
+                        resolverEquacao.equacaoNova = new CSS2DObject(novaEquacao.html);
+
+                        this.addInputs(resolverEquacao);
+
+                        estado.etapa++;
+
+                        const angulosSelecionados = fase.informacao.equacoes.flatMap(equacao => equacao.angulosObjetos);
+
+                        fase.animar(fase.mostrarEApagar180Graus(fase.informacao.verticeSelecionado, angulosSelecionados))
+
+                        return;
+
+                    }
+               })
+               .setEstadoInicial({
+                    etapa: 0
+               })
     }
 
     createInputs(){
@@ -1400,6 +1477,77 @@ export class Fase5  extends Fase{
 
     //Funções, outputs etc. usados nos problemas
 
+    mostrarEApagar180Graus(vertice, angulos){
+
+        this.debug = false;
+
+        const fase = this;
+
+        const sentidoTracejado = fase.informacao.sentido;
+        
+        //Gambiarra, ao invés de criar só o ângulo, cria o triângulo dele e o extrai posteriormente
+        const triangulo = new Triangle([
+            vertice.getPosition(),
+            vertice.getPosition().add(sentidoTracejado.normalize()),
+            vertice.getPosition().sub(sentidoTracejado.clone()
+                                                      .add(
+                                                                sentidoTracejado
+                                                                .clone()
+                                                                .crossVectors(
+                                                                    sentidoTracejado.clone(), 
+                                                                    new THREE.Vector3(0,0,1)
+                                                            )
+                                                            .multiplyScalar(0.06)
+                                                       ).normalize()
+                                    )
+        ].map(position => position.toArray()))
+
+        triangulo.render();      
+        
+        const angulo180graus = triangulo.angles[0];
+
+        angulo180graus.angulo = Math.PI;
+        angulo180graus.mesh.position.z = 0.05
+
+        const mostrar180Graus = apagarObjeto(angulo180graus)
+        .setOnStart(() => angulo180graus.addToScene(this.scene))
+        .reverse();
+
+        const apagar180Graus  = apagarObjeto(angulo180graus)
+        .setOnTermino(() => angulo180graus.removeFromScene())
+
+        const brilharMetalico = new MetalicSheen(angulo180graus);
+
+        const desaparecerGraus = new AnimacaoSimultanea().setAnimacoes(angulos.map(angulo => this.mostrarGrausDesaparecendo(angulo).setOnTermino(() => null)))
+
+        const reaparecerGraus  =  new AnimacaoSimultanea()
+                                  .setAnimacoes([
+                                                    ...angulos
+                                                    .map(angulo => this.mostrarGrausAparecendo(angulo,false,false)
+                                                                              .setOnStart(() => null)
+                                                    ), 
+                                                    apagar180Graus
+                                                ]);
+                        
+
+        return new AnimacaoSequencial(
+                    mostrar180Graus, 
+                    new AnimacaoSequencial(
+                        new AnimacaoSimultanea(
+                            new AnimacaoSequencial(
+                                desaparecerGraus, 
+                                this.mostrarGrausAparecendo(angulo180graus).setDuration(200)
+                            ),
+                            brilharMetalico
+                        ),
+                        reaparecerGraus,
+                        // this.moverGrausParaPosicaoEquacao(angulos)
+                    ),
+                )
+                .setCheckpointAll(false)
+
+    }
+
     animar180Graus(){
 
 
@@ -1555,6 +1703,14 @@ export class Fase5  extends Fase{
 
     }
 
+    mostrarGrausDesaparecendo(angle){
+        return  this.mostrarGrausAparecendo(angle)
+                    .reverse()
+                    .voltarAoInicio(false)
+                    .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+                    .setOnStart(() => null)
+    }
+
 
     //Refatorar essa monstruosidade aqui depois
     //Problema: dois ângulos de 45° vão para o mesmo valor da equação, melhorar checagem
@@ -1622,7 +1778,7 @@ export class Fase5  extends Fase{
 
             //Gambiarra colocando os valores dessa equacao no final
             if(!fase.informacao.equacoes) fase.informacao.equacoes = []
-            fase.informacao.equacoes.push({equacao:equacao, angulos:[x,y]})
+            fase.informacao.equacoes.push({equacao:equacao, angulos:[x,y], angulosObjetos: angulos})
 
             novoElemento = new CSS2DObject(equacao.html);
 

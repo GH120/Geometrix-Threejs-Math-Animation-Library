@@ -11,6 +11,8 @@ export class MostrarAngulo extends Output{
         super();
 
         this.angulo = angle;
+
+        angle.mostrarAngulo = this; //Gambiarra, mas funciona
         this.estado  = {};
         this.createText();
         this.distanciaTextoParaAngulo = distanciaTextoParaAngulo;

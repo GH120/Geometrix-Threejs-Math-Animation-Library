@@ -8,13 +8,14 @@ import { Output } from "./Output";
 export default class ResolverEquacao extends Output{
 
     /**Inputs: hover e drag da equacao movida e hovers das equacaoAlvos */
-    constructor(equacao, fase, onResolucao = null, equacaoResultante=null){
+    constructor(equacao, fase, onResolucao = null, equacaoResultante=null, equacaoNova=null){
         super();
 
         this.fase = fase;
 
         this.equacao = equacao;
         this.tamanhoFonte  = 1;
+        this.equacaoNova = null;
 
         this.equacaoResultante = `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
         
@@ -68,7 +69,7 @@ export default class ResolverEquacao extends Output{
 
         //Fade in da equação nova, adiciona ela na whiteboard
 
-        const equacaoNova = fase.createMathJaxTextBox(this.equacaoResultante, [0,1,0], this.tamanhoFonte);
+        const equacaoNova = (this.equacaoNova)? this.equacaoNova : fase.createMathJaxTextBox(this.equacaoResultante, [0,1,0], this.tamanhoFonte);
 
         const fadeInEquacaoNova = apagarCSS2(equacaoNova, fase.whiteboard.scene)
                                   .reverse()

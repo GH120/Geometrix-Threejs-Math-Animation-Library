@@ -34,6 +34,8 @@ import { apagarObjeto } from '../animacoes/apagarObjeto';
 import { Addition, Equality, MathJaxTextBox, Value, Variable } from '../equations/expressions';
 import MoverTexto from '../animacoes/moverTexto';
 import MostrarTexto from '../animacoes/MostrarTexto';
+import ElementoCSS2D from '../objetos/elementocss2d';
+import JuntarEquacoes from '../outputs/juntarEquacoes';
 
 export class Fase5  extends Fase{
 
@@ -167,9 +169,10 @@ export class Fase5  extends Fase{
                             this.aula3Dialogo3(dialogo[4], this.subtriangulo2),
                             new AnimacaoSimultanea(dialogo[5]),
                             this.aula3Dialogo5(dialogo[6], this.subtriangulo2, this.subtriangulo3),
-                            this.aula3Dialogo7(dialogo[7], this.subtriangulo2, this.subtriangulo3),
-                            this.aula3Dialogo9(dialogo[9])
+                            this.aula3Dialogo7(dialogo[7], this.subtriangulo2, this.subtriangulo3)
         )
+
+        animacao.setOnTermino(() => fase.controleFluxo.update({juntarEquacoes: true}))
 
         fase.animar(animacao);
     }
@@ -387,11 +390,28 @@ export class Fase5  extends Fase{
     }
 
     //Mover isso para um caso do controle de fluxo?
-    aula3Dialogo9(dialogo){
+    juntarEquacoes(){
 
+        const fase = this;
 
+        const dialogo = ["Junte as duas fórmulas na lousa, para conseguirmos a soma de todos os ângulos"].map(linha => fase.animacaoDialogo(linha))
 
-        return new AnimacaoSimultanea(dialogo, )
+        const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
+        const equacao2 = new ElementoCSS2D(fase.whiteboard.equacoes[1], fase.whiteboard);
+
+        const angulos = fase.informacao.equacoes.flatMap(equacao => equacao.angulos);
+        const soma = angulos.reduce((equacao, angulo) => new Addition(equacao, angulo));
+        const equacao = new Equality(soma, new Addition(new Variable('90°'), new Variable('90°')));
+
+        const juncao1 = new JuntarEquacoes(equacao1, [equacao2], fase);
+        const juncao2 = new JuntarEquacoes(equacao2, [equacao1], fase);
+
+        juncao1.equacaoNova = new CSS2DObject(equacao.html);
+        juncao2.equacaoNova = new CSS2DObject(equacao.html);
+
+        const animacao = new AnimacaoSimultanea(dialogo[0], ).setDelay(30).setOnTermino(() => fase.whiteboard.ativar(true))
+
+        fase.animar(animacao)
     }
 
     createInputs(){
@@ -1123,12 +1143,17 @@ export class Fase5  extends Fase{
                         return;
                     }
 
-                    console.log(novoEstado)
                     if(novoEstado.trianguloDividido){
 
                         estado.etapa = "mostrarIgualdade";
                         alert("começou")
                         fase.aula3();
+                        return;
+                    }
+
+                    if(novoEstado.juntarEquacoes){
+                        estado.etapa = "juntarEquações"
+                        fase.juntarEquacoes();
                         return;
                     }
                })
@@ -1595,7 +1620,9 @@ export class Fase5  extends Fase{
                                 new Value("90°")
                             )
 
-            fase.informacao.equacao = {equacao:equacao, angulos:[x,y]}
+            //Gambiarra colocando os valores dessa equacao no final
+            if(!fase.informacao.equacoes) fase.informacao.equacoes = []
+            fase.informacao.equacoes.push({equacao:equacao, angulos:[x,y]})
 
             novoElemento = new CSS2DObject(equacao.html);
 

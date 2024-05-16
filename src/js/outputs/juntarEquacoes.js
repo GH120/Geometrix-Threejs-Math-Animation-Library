@@ -14,8 +14,10 @@ export default class JuntarEquacoes extends Output{
 
         this.equacaoMovida = equacaoMovida;
         this.equacoesAlvo  = equacoesAlvo;
+        this.equacaoNova   = null;
         this.tamanhoFonte  = 1;
 
+        //Para criar na hora uma equacaoNova mathjax
         this.equacaoResultante = `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
         
         this.setup(onJuncao, equacaoResultante);
@@ -136,7 +138,7 @@ export default class JuntarEquacoes extends Output{
 
         //Fade in da equação nova, adiciona ela na whiteboard
 
-        const equacaoNova = fase.createMathJaxTextBox(this.equacaoResultante, [0,1,0], this.tamanhoFonte);
+        const equacaoNova = (this.equacaoNova)? this.equacaoNova : fase.createMathJaxTextBox(this.equacaoResultante, [0,1,0], this.tamanhoFonte);
 
         const fadeInEquacaoNova = apagarCSS2(equacaoNova, fase.whiteboard.scene)
                                   .reverse()
@@ -161,7 +163,6 @@ export default class JuntarEquacoes extends Output{
                             fadeOutEquacao2,
                             fadeInEquacaoNova
                         )
-                        .setOnTermino(() => fase.progresso = 2) //Consertar isso depois
 
         fase.whiteboard.animar(animacao);
 

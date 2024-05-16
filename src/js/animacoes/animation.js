@@ -499,7 +499,7 @@ export class AnimacaoSequencial extends Animacao{
 /** Caso seja necessário inicializar a animação só quando começar sua execução
  *  Efetivamente é como se rodasse tudo no start de uma função
  */
-export const animacaoIndependente = (funcao,duracao=300, delay=0) =>  new Animacao()
+export const animacaoIndependente = (funcao = () => null,duracao=300, delay=0) =>  new Animacao()
                                                                 .setInterpolacao(() => null)
                                                                 .setUpdateFunction(() => null)
                                                                 .setDuration(duracao)

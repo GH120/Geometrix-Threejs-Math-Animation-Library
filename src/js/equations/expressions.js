@@ -1,6 +1,52 @@
 import { ExpoenteParaMult } from "../animacoes/expoenteParaMult";
 
+import { mathjax } from 'mathjax-full/js/mathjax.js';
+import { TeX } from 'mathjax-full/js/input/tex.js';
+import { SVG } from 'mathjax-full/js/output/svg.js';
+import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor.js';
+import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
+import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages'
+import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
+
 //DEPRECATED: FALTOU MODIFICAR PARA USAR MATHJAX FULL
+
+//Cria elementos css2d que renderizam MathJax a partir de um texto input
+export class MathJaxTextBox extends CSS2DObject{
+
+
+    constructor(inputTex,position=[0,0,0], tamanhoDaFonte=10){
+
+        super();
+
+        this.adaptor = liteAdaptor();
+        RegisterHTMLHandler(this.adaptor);
+
+        const tex = new TeX({ packages: AllPackages });
+        const svg = new SVG();
+        
+        this.html = mathjax.document('', { InputJax: tex, OutputJax: svg });
+
+        this.position.copy(position);
+
+        // Função auxiliar para mudar texto renderizado pelo mathjax dinamicamente
+        this.mudarTexto(inputTex, tamanhoDaFonte);
+    }
+
+    mudarTexto(text, fontsize=10){
+
+        //Cria o html e coloca ele dentro do div
+        const display = this.html.convert(text, { display: true });
+
+        this.element.innerHTML = this.adaptor.innerHTML(display);
+
+        //Configura tamanho da fonte
+        this.element.children[0].style.width  = `${fontsize*text.length/10}em`;
+        this.element.children[0].style.height = `${fontsize*text.length/10}em`;
+        this.element.children[0].style.color  = 'black';
+
+        return this;
+    }
+}
 
 class Expression{
 
@@ -91,6 +137,11 @@ class Expression{
         if(this.left.igual(termo2.left) && this.right && this.right.igual(termo2.right)) return true;
 
         return false;
+    }
+
+
+    getTextElement(){
+        return new CSS2DObject(this.html);
     }
 }
 

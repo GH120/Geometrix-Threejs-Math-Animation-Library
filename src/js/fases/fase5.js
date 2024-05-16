@@ -31,7 +31,7 @@ import { ApagarPoligono } from '../animacoes/apagarPoligono';
 import { mover } from '../animacoes/mover';
 import { engrossarLado } from '../animacoes/engrossarLado';
 import { apagarObjeto } from '../animacoes/apagarObjeto';
-import { Addition, Equality, Value, Variable } from '../equations/expressions';
+import { Addition, Equality, MathJaxTextBox, Value, Variable } from '../equations/expressions';
 import MoverTexto from '../animacoes/moverTexto';
 import MostrarTexto from '../animacoes/MostrarTexto';
 
@@ -52,7 +52,7 @@ export class Fase5  extends Fase{
         //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
         //Mostrar que a soma dos 
 
-        this.debug = false;
+        this.debug = true;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -331,14 +331,13 @@ export class Fase5  extends Fase{
          //Gambiarra, pega o mostrar angulo do angulo original afastado
         //Coloca ele para ver o angulo copiado enquanto faz o movimento
         //E finalmente reverte 
-        console.log(fase.informacao)
         let mostrarAnguloAfastado = fase.informacao.mostrarAngulosAfastados[(triangulo == this.subtriangulo1)? 0 : 1];
         const anguloAfastado      = mostrarAnguloAfastado.angulo;
         mostrarAnguloAfastado.distanciaTextoParaAngulo = 1.4;
 
         const atualizarAngulo =  animacaoIndependente(  () => mostrarAnguloAfastado.angulo = angulo)
                                 .setUpdateFunction(     () => mostrarAnguloAfastado.update())
-                                 .setOnTermino(         () => mostrarAnguloAfastado.angulo = anguloAfastado)
+                                //  .setOnTermino(         () => mostrarAnguloAfastado.angulo = anguloAfastado)
                                  .setDelay(0);
 
         //Equacao -> refatorar depois, precisa de mostrarAngulo como atributo de cada angulo
@@ -375,10 +374,19 @@ export class Fase5  extends Fase{
                             )
                         )
 
-        return new AnimacaoSequencial(apagarTrianguloAuxiliar,movimentacao ,dialogo, mostrar90, moverAngulosParaEquacao);
+        return new AnimacaoSequencial(
+            apagarTrianguloAuxiliar,
+            movimentacao ,
+            dialogo, 
+            mostrar90, 
+            moverAngulosParaEquacao
+        )
+        .setOnTermino(() => mostrarAnguloAfastado.angulo = anguloAfastado)
+
 
     }
 
+    //Mover isso para um caso do controle de fluxo?
     aula3Dialogo9(dialogo){
 
 
@@ -1515,6 +1523,7 @@ export class Fase5  extends Fase{
         if(!mostrarEdesaparecer){
             aparecerTexto.setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
             aparecerTexto.setOnTermino(() => null)
+            aparecerTexto.setOnDelay(() => null)
         }
 
         return aparecerTexto;
@@ -1558,14 +1567,15 @@ export class Fase5  extends Fase{
 
         var novoElemento = null;
 
-        return new AnimacaoSimultanea(
+        return new AnimacaoSequencial(
                 new AnimacaoSimultanea(
                         mover1,
                         mover2,
                         // mover3
                 )
-                .setOnStart(criarEquacao)
-                .setOnTermino(mostrarEquacaoEMoverParaWhiteboard))
+                .setOnStart(criarEquacao),
+                animacaoIndependente( () => fase.animar(mostrarEquacaoEMoverParaWhiteboard()), 405, 0)
+            )
 
 
         //Funções auxiliares
@@ -1684,19 +1694,13 @@ export class Fase5  extends Fase{
 
             const mostrarTexto = new MostrarTexto(novoElemento)
                                     .setValorFinal(300)
-                                    .setProgresso(0);
+                                    .setProgresso(0)
+                                    .setDuration(150);
 
             const voltarAngulos = angulos.map(angulo => fase.mostrarGrausAparecendo(angulo,false,false))
 
             const voltarAngulosAnimacao = new AnimacaoSimultanea()
-                                              .setAnimacoes(voltarAngulos)
-                                              .setOnStart(() =>{
-
-                                                    angulos.map(angulo => angulo.mostrarAngulo.update({dentro:true}));
-
-                                                    //Mudar se tornar escolha de ângulo geral
-                                                    // angulos[2].mostrarAngulo.text.elemento.element.textContent = '?';
-                                              })
+                                              .setAnimacoes(voltarAngulos);
 
             const moverEquacaoParaDiv = new MoverTexto(novoElemento)
                                         .setOnStart(function(){
@@ -1726,12 +1730,17 @@ export class Fase5  extends Fase{
             const animacao = new AnimacaoSequencial(
                                 mostrarTexto, 
                                 voltarAngulosAnimacao,
-                                moverEquacaoParaDiv
+                                moverEquacaoParaDiv,
+                                
+                                animacaoIndependente()
+                                .setDuration(30)
+                                .setDelay(0)
+                                .setOnTermino(() => fase.whiteboard.ativar(false))
                             )
 
             animacao.setCheckpointAll(false);
 
-            fase.animar(animacao);
+            return animacao;
         }
 
     }

@@ -130,6 +130,22 @@ export class Whiteboard {
 
         return elementoCSS2;
     }
+    
+    adicionarTexto(objetoCSS2D){
+
+        const ListaEquacoes = this.equacoes;
+
+        //Atualiza a posição para não ter equações em cima das outras
+        const position = new THREE.Vector3(-0.5, 2-ListaEquacoes.length*1, 0);
+
+        objetoCSS2D.position.copy(position);
+
+        this.scene.add(objetoCSS2D);
+
+        ListaEquacoes.push(objetoCSS2D);
+
+        return objetoCSS2D;
+    }
 
     removerEquacao(equacao){
 

@@ -61,7 +61,7 @@ export class Fase4 extends Fase{
 
         this.problema = 10
 
-        this.debug = false;
+        this.debug = true;
     }
 
     //Objetos básicos
@@ -793,6 +793,7 @@ export class Fase4 extends Fase{
                     const novaEquacao = novoEstado.novaEquacao;
 
                     if(novaEquacao && estado.etapa == 1){
+
                         const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
 
                         const mudarSidenote = fase.animacaoDialogo("Clique para resolver a equação", fase.informacao.sidenote)
@@ -866,17 +867,18 @@ export class Fase4 extends Fase{
 
                     }
 
-                    else if(estado.etapa == 5 && estado.equacoesResolvidas < 6){
+                    else if(estado.etapa == 5 && estado.equacoesResolvidas < 3){
 
                         fase.whiteboard.removerTodasEquacoes();
 
-                        estado.valor = Math.round(2 + Math.random() * 10) + "h";
+                        estado.hora  = estado.horarios.splice(Math.round(Math.random() * (estado.horarios.length - 1)), 1)[0]; //Escolhe uma e remove do array
+                        estado.valor = `${estado.hora}h`;
+
+                        fase.whiteboard.adicionarTexto(funcao.texto);
 
                         valor = fase.createMathJaxTextBox("\\color{red}" + estado.valor, [0,0,0], 2);
-
-                        fase.whiteboard.adicionarEquacao({html: funcao.texto.element});
-
-                        valor = fase.whiteboard.adicionarEquacao({html: valor.element}); //Elemento clonado na lousa retornado
+                        
+                        fase.whiteboard.adicionarTexto(valor); //Elemento clonado na lousa retornado
 
                         valor  = new ElementoCSS2D(valor, fase.whiteboard);
 
@@ -898,15 +900,18 @@ export class Fase4 extends Fase{
                         estado.equacoesResolvidas++;
                     }
 
-                    else if(estado.etapa == 5 && estado.equacoesResolvidas >= 6){
+                    else if(estado.etapa == 5 && estado.equacoesResolvidas >= 3){
 
+                        alert("terminado")
                         //Move para a próxima parte 
                     }
                })
                .setEstadoInicial({
                     valor: valor,
                     etapa: 1,
-                    equacoesResolvidas: 0
+                    equacoesResolvidas: 0,
+                    horarios: [2,3,4,6,7,8,9,10,11,12],
+                    hora: parseInt(valor)
                })
 
     }

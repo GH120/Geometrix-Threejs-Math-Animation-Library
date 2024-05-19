@@ -341,7 +341,11 @@ export class Fase {
     }
 
     animacaoDialogo(texto, target = null){
-        return new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto, target)).setValorFinal(100)
+        return new TextoAparecendo(target? target : this.text.element)
+                                  .setOnStart(
+                                    () => this.changeText(texto, target)
+                                  )
+                                  .setValorFinal(100)
     }
 
     animacoesDialogo(...textos){

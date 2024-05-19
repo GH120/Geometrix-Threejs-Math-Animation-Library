@@ -409,7 +409,7 @@ export class Fase4 extends Fase{
             "Por isso que se 1 hora tem 30°, então 5 horas tem 5 vezes (150°) o tanto de graus",
             "A razão entre as duas grandezas diretamente proporcionais sempre é a mesma,", //que nesse caso é 30°/1 hora '30 graus para cada hora' na parte direita da tela,
             "Usamos essa razão para calcular graus a partir da hora",
-            "Dada uma hora, basta multiplicar por ela para conseguir os graus",
+            "Dada uma hora, basta multiplicar ela pela razão para conseguir os graus",
             "Mova os todos os valores das horas para testar isso",
             "Isso vale até para valores quebrados, digamos 0,4 horas",
             "Podemos expressar também razões entre grandezas, como 60 minutos / 1 hora"
@@ -771,6 +771,7 @@ export class Fase4 extends Fase{
             formula: '\\color{blue} graus( \\color{red} {hora} \\color{blue}) \\color{black} = \\color{red} {hora} \\cdot \\color{purple} {RAZ \\tilde{A}O}',
             fatorada: '\\color{blue} graus( \\color{red} hora \\color{blue}) \\color{black} = \\color{red} hora  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}',
             instanciada: (hora) => `\\color{blue} graus( \\color{red} ${hora} \\color{blue}) \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`,
+            cancelarUnidade: (hora) => `\\color{blue} graus( \\color{red} ${hora} \\color{blue}) \\color{black} = \\color{red} ${parseInt(hora)} \\cancel{h}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1 \\cancel{h}~}`,
             resolvidaParcialmente:   (hora) => `\\color{blue} graus(\\color{red} ${hora} \\color{blue}) \\color{black} = \\color{blue} ${parseInt(hora)} \\cdot 30°`,
             resolvida:   (hora) => `\\color{blue} graus(\\color{red} ${hora} \\color{blue}) \\color{black} = \\color{blue} ${parseInt(hora) * 30}°`
 
@@ -789,16 +790,14 @@ export class Fase4 extends Fase{
 
                     const novaEquacao = novoEstado.novaEquacao;
 
-                    console.log(novaEquacao);
-
                     if(novaEquacao && estado.etapa == 1){
                         const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
 
-                        const mudarSidenote = fase.animacaoDialogo("Clique para resolvê-la", fase.informacao.sidenote)
+                        const mudarSidenote = fase.animacaoDialogo("Clique para resolver a equação", fase.informacao.sidenote)
 
                         fase.animar(mudarSidenote)
 
-                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase, null, equacoes.resolvidaParcialmente(estado.valor))
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase, null, equacoes.cancelarUnidade(estado.valor))
 
                         this.addInputs(resolverEquacao);
 
@@ -808,9 +807,30 @@ export class Fase4 extends Fase{
                     else if(novaEquacao && estado.etapa == 2){
                         const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
 
-                        const mudarSidenote = fase.animacaoDialogo("Continue assim", fase.informacao.sidenote)
+                        const mudarDialogo  = fase.animacaoDialogo("Podemos cancelar a unidade hora")
+                        const mudarSidenote = fase.animacaoDialogo("Clique para resolver a equação", fase.informacao.sidenote)
 
-                        fase.animar(mudarSidenote)
+                        fase.animar(mudarDialogo)
+                        fase.animar(mudarSidenote);
+
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase, null, equacoes.resolvidaParcialmente(estado.valor))
+
+                        resolverEquacao.tamanhoFonte = 1.7;
+
+                        this.addInputs(resolverEquacao);
+
+                        estado.etapa++;
+                    }
+
+                    else if(novaEquacao && estado.etapa == 3){
+                        const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
+
+                        const mudarDialogo = fase.animacaoDialogo("Agora multiplicamos 30 graus para cada hora");
+
+                        const mudarSidenote = fase.animacaoDialogo("Clique uma última vez", fase.informacao.sidenote)
+
+                        fase.animar(mudarSidenote);
+                        fase.animar(mudarDialogo);
 
                         const resolverEquacao = new ResolverEquacao(objetoEquacao, fase, null, equacoes.resolvida(estado.valor))
 
@@ -821,25 +841,29 @@ export class Fase4 extends Fase{
                         estado.etapa++;
                     }
 
-                    else if(novaEquacao && estado.etapa == 3){
+                    else if(novaEquacao && estado.etapa == 4){
+                        fase.debug = false
 
-                        const sidenote = "Então " + estado.valor + " tem " + 30* parseInt(estado.valor) + "°";
+                        const dialogo = "Então " + estado.valor + " tem " + 30* parseInt(estado.valor) + "°";
 
-                        const mudarSidenote = fase.animacaoDialogo(sidenote, fase.informacao.sidenote);
+                        const mudarDialogo = fase.animacaoDialogo(dialogo).setDelay(50);
 
-                        const apagarEquacao = apagarCSS2(fase.whiteboard.equacoes[0], fase.whiteboard.scene);
+                        const mudarSidenote = fase.animacaoDialogo("Conseguimos o resultado: ", fase.informacao.sidenote)
 
-                        const animacao = new AnimacaoSimultanea(mudarSidenote, apagarEquacao)
-                                        .setOnTermino(() => {
-                                                estado.etapa++;
-                                                this.update({});
-                                        })
+                        const apagarEquacao = apagarCSS2(fase.whiteboard.equacoes[0], fase.whiteboard.scene).filler(300);
+
+                        const moverPonteiro = fase.moverPonteiro(fase.angle.degrees, 30 * parseInt(estado.valor));
+
+                        const animacao = new AnimacaoSimultanea(mudarSidenote, mudarDialogo, apagarEquacao, moverPonteiro)
+                                         .setOnTermino(() => this.update({}))
 
                         fase.animar(animacao);
 
+                        estado.etapa++;
+
                     }
 
-                    else if(estado.etapa == 4){
+                    else if(estado.etapa == 5){
 
                         fase.whiteboard.removerTodasEquacoes();
 
@@ -848,19 +872,26 @@ export class Fase4 extends Fase{
                         valor = fase.createMathJaxTextBox("\\color{red}" + estado.valor, [0,0,0], 2);
 
                         fase.whiteboard.adicionarEquacao({html: funcao.texto.element});
-                        fase.whiteboard.adicionarEquacao({html: valor.element});
+
+                        valor = fase.whiteboard.adicionarEquacao({html: valor.element}); //Elemento clonado na lousa retornado
 
                         valor  = new ElementoCSS2D(valor, fase.whiteboard);
 
                         const juntarEquacoes = new JuntarEquacoes(valor, [funcao], fase, null, equacoes.instanciada(estado.valor));
 
                         this.addInputs(juntarEquacoes);
+
+                        const sidenote = "Então quantos graus tem " + estado.valor + "?";
+
+                        const mudarSidenote = fase.animacaoDialogo(sidenote, fase.informacao.sidenote).setDelay(50);
+
                         
-                        const mostrarEquacao = apagarCSS2(funcao.texto).reverse().filler(70);
-                        const mostrarValor   = apagarCSS2(funcao.texto).reverse().filler(70);
+                        const mostrarEquacao = apagarCSS2(funcao.texto).reverse().filler(100);
+                        const mostrarValor   = apagarCSS2(valor.texto).reverse().filler(100);
 
                         fase.animar(mostrarEquacao);
                         fase.animar(mostrarValor);
+                        fase.animar(mudarSidenote);
 
                         estado.etapa = 1;
                     }

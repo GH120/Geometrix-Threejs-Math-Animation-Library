@@ -753,20 +753,34 @@ export class Fase4 extends Fase{
                 .setOnStart(() => fase.scene.add(textbox3))
                 .filler(200)
                 .setDuration(200)
-            ),
+            )
+            .setDelay(100),
 
-            new MostrarTexto(textbox3).setOnStart(() => textbox3.mudarTexto(resultadoParcial1, 2)).setDelay(200),
-            new MostrarTexto(textbox3).reverse().setDuration(100),
-            new MostrarTexto(textbox3).setOnStart(() => textbox3.mudarTexto(resultadoParcial2, 1.3)).setDelay(200),
-            new MostrarTexto(textbox3).reverse().setDuration(100),
-            new MostrarTexto(textbox3).setOnStart(() => textbox3.mudarTexto(resultado, 2)).setDelay(200),
+            apagarCSS2(textbox3).reverse().setOnStart(() => textbox3.mudarTexto(resultadoParcial1, 2)).setDelay(200),
+            apagarCSS2(textbox3).setDuration(100),
+            apagarCSS2(textbox3).reverse().setOnStart(() => textbox3.mudarTexto(resultadoParcial2, 1.3)).setDelay(200),
+            apagarCSS2(textbox3).setDuration(100),
+            apagarCSS2(textbox3).reverse().setOnStart(() => textbox3.mudarTexto(resultado, 2)).setDelay(200),
         )
         .setOnStart(() => fase.whiteboard.ativar(false));
 
 
-        fase.informacoes.aula4dialogo1 = textbox3;
+        fase.informacao.aula4dialogo1 = textbox3;
 
         return new AnimacaoSimultanea(dialogo, animacao);
+    }
+
+    aula4dialogo2(dialogo){
+
+        //Coloco que a equação anterior implica que dado uma razão 
+        //Mostra as duas formas de usar a razão para conseguir o valor
+        //Finalmente mostramos a forma de fração da regra de 3
+    }
+
+    aula4dialogo3(dialogo){
+
+        //Usamos a razão da fórmula anterior para fazer funções para resolver equações
+        //Mostra como usar uma carta para verificar razão
     }
 
     moverTracejado(tracejado, filler){

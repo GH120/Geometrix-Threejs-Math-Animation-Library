@@ -61,10 +61,12 @@ export class Angle extends Objeto{
             vetor2 = vetor;
         }
 
+        this.sentidoHorario = sentidoHorario;
+
         
         this.vetor1 = vetor1;
         this.vetor2 = vetor2;
-        this.angulo = vetor1.angleTo(vetor2);
+        this.angulo = (!sentidoHorario)? Math.PI * 2 - vetor1.angleTo(vetor2) : vetor1.angleTo(vetor2);
 
         return this;
     }
@@ -79,28 +81,92 @@ export class Angle extends Objeto{
         let last = [...center];
 
         //Numero de segmentos de triangulos a serem desenhados
-        const segmentos = Math.round(this.angulo*180/Math.PI);
+        const segmentos = 30;
 
-        if(this.chosen) console.log(segmentos)
+        if(!this.sentidoHorario && this.revolucaoCompleta){
 
-        for (let i = 0; i <= segmentos; i++) {
-
-            const vetor = new THREE.Vector3(0,0,0);
-            
-            //Interpola entre os dois vetores para conseguir o novo ponto
-            vetor.lerpVectors(this.vetor2, this.vetor1, i/segmentos).normalize();
-
-            const x = center[0] - vetor.x*this.angleRadius;
-            const y = center[1] - vetor.y*this.angleRadius;
-            const z = center[2];
-
-            //Desenha o triângulo (posição do centro, posição anterior, posição atual)
-            sectorVertices.push(...center);
-            sectorVertices.push(...last);
-            sectorVertices.push(x, y, z);
-
-            last = [x,y,z];
+            const quat3 = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0,1,0));
+            const quat4 = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0,-1,0));
+    
+            //Para se tiver mais de 180°
+            for (let i = 0; i <= segmentos; i++) {
+    
+                const t = i/segmentos;
+    
+                const quat = new THREE.Quaternion();
+                quat.slerpQuaternions(quat4, quat3, t);
+    
+                const vetor = new THREE.Vector3(-1, 0, 0).applyQuaternion(quat).normalize();
+    
+    
+                const x = center[0] - vetor.x*this.angleRadius;
+                const y = center[1] - vetor.y*this.angleRadius;
+                const z = center[2];
+    
+                //Desenha o triângulo (posição do centro, posição anterior, posição atual)
+                sectorVertices.push(x, y, z);
+                sectorVertices.push(...last);
+                sectorVertices.push(...center);
+    
+                last = [x,y,z];
+            }
+    
+            // Quaternions para interpolação
+            const quat1 = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), this.vetor1.clone().negate());
+            const quat2 = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), this.vetor2);
+    
+            for (let i = 0; i <= segmentos; i++) {
+    
+                const t = i/segmentos;
+    
+                const quat = new THREE.Quaternion();
+                quat.slerpQuaternions(quat1, quat2, t);
+    
+                const vetor = new THREE.Vector3(-1, 0, 0).applyQuaternion(quat).normalize();
+    
+    
+                const x = center[0] - vetor.x*this.angleRadius;
+                const y = center[1] - vetor.y*this.angleRadius;
+                const z = center[2];
+    
+                //Desenha o triângulo (posição do centro, posição anterior, posição atual)
+                sectorVertices.push(...center);
+                sectorVertices.push(...last);
+                sectorVertices.push(x, y, z);
+    
+                last = [x,y,z];
+            }
         }
+
+        else {
+             // Quaternions para interpolação
+             const quat1 = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), this.vetor1);
+             const quat2 = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), this.vetor2);
+     
+             for (let i = 0; i <= segmentos; i++) {
+     
+                 const t = i/segmentos;
+     
+                 const quat = new THREE.Quaternion();
+                 quat.slerpQuaternions(quat2, quat1, t);
+     
+                 const vetor = new THREE.Vector3(1, 0, 0).applyQuaternion(quat).normalize();
+     
+     
+                 const x = center[0] - vetor.x*this.angleRadius;
+                 const y = center[1] - vetor.y*this.angleRadius;
+                 const z = center[2];
+     
+                 //Desenha o triângulo (posição do centro, posição anterior, posição atual)
+                 sectorVertices.push(...center);
+                 sectorVertices.push(...last);
+                 sectorVertices.push(x, y, z);
+     
+                 last = [x,y,z];
+             }
+        }
+
+        
 
         sectorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(sectorVertices, 3));
 

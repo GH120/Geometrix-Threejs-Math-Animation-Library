@@ -85,6 +85,8 @@ export class Fase4 extends Fase{
 
         this.angle = new Angle([circulo, this.ponto2, this.ponto1]).render();
 
+        this.angle.revolucaoCompleta = true;
+
 
         const tracejadoPonto1 = new Tracejado(circulo.position, this.ponto1.position);
 
@@ -863,7 +865,7 @@ export class Fase4 extends Fase{
 
                     }
 
-                    else if(estado.etapa == 5){
+                    else if(estado.etapa == 5 && estado.equacoesResolvidas < 6){
 
                         fase.whiteboard.removerTodasEquacoes();
 
@@ -894,11 +896,18 @@ export class Fase4 extends Fase{
                         fase.animar(mudarSidenote);
 
                         estado.etapa = 1;
+                        estado.equacoesResolvidas++;
+                    }
+
+                    else if(estado.etapa == 5 && estado.equacoesResolvidas >= 6){
+
+                        //Move para a próxima parte 
                     }
                })
                .setEstadoInicial({
                     valor: valor,
-                    etapa: 1
+                    etapa: 1,
+                    equacoesResolvidas: 0
                })
 
     }

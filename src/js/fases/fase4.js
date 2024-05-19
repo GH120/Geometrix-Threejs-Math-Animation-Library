@@ -358,7 +358,7 @@ export class Fase4 extends Fase{
             simultanea.animacoes = animacoes;
         })
 
-        simultanea.frames = 240;
+        simultanea.frames = this.tracejados.length*1.4;
 
         return new AnimacaoSimultanea(dialogue, simultanea);
     }
@@ -989,7 +989,7 @@ export class Fase4 extends Fase{
                 const dialogo2 = fase.animacaoDialogo(`Agora, consegue mostrar quanto vale 5 horas?`);
 
                 const animacao2 = new AnimacaoSequencial(dialogo2).setOnStart(() => {
-                                                                            // fase.Configuracao1();
+                                                                            fase.Configuracao1();
                                                                         });
 
                 const animacao = new AnimacaoSequencial(dialogo1,mostrarEquacao,animacao2).setCheckpointAll(false);

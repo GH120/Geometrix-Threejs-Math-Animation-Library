@@ -34,3 +34,13 @@
     -webkit-user-select: none;
     touch-action: manipulation;
     }
+
+
+@font-face {
+    font-family: 'Bangers';
+    src: local('Bangers'), url(../../assets/Bangers.ttf) format('ttf')
+}
+
+.textoPrincipal{
+    font-family: 'Bangers';
+}

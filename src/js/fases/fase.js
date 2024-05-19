@@ -94,11 +94,13 @@ export class Fase {
     setupTextBox(){
         // Create a parent element to hold the spans
         const container = document.createElement('p');
-        container.style.fontFamily = "Courier New, monospace";
-        container.style.fontSize = "25px";
+        container.style.fontFamily = "Bangers";
+        container.style.fontSize = "30px";
         container.style.fontWeight ="italic";
         container.style.display = 'inline-block';
         console.log('SETUPTEXTBOX CONTAINER', container)
+
+        container.classList.add("textoPrincipal");
 
         // Create the CSS2DObject using the container
         const cPointLabel = new CSS2DObject(container);       

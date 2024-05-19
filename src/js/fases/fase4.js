@@ -57,7 +57,7 @@ export class Fase4 extends Fase{
         this.createOutputs();
         this.aula1();
 
-        this.text.position.copy(new THREE.Vector3(0,3.7,0))
+        this.text.position.copy(new THREE.Vector3(0,3.9,0))
 
         this.problema = 10
 

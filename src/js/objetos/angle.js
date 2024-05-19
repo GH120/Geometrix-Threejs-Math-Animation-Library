@@ -66,7 +66,7 @@ export class Angle extends Objeto{
         
         this.vetor1 = vetor1;
         this.vetor2 = vetor2;
-        this.angulo = (!sentidoHorario)? Math.PI * 2 - vetor1.angleTo(vetor2) : vetor1.angleTo(vetor2);
+        this.angulo = (!sentidoHorario && this.revolucaoCompleta)? Math.PI * 2 - vetor1.angleTo(vetor2) : vetor1.angleTo(vetor2);
 
         return this;
     }

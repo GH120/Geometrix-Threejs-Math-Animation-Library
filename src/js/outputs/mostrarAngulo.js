@@ -47,6 +47,8 @@ export class MostrarAngulo extends Output{
                         .multiplyScalar(this.distanciaTextoParaAngulo * angulo.angleRadius)
                         .applyMatrix4(new THREE.Matrix4().extractRotation(angulo.mesh.matrixWorld));
 
+            if(!angulo.sentidoHorario && angulo.revolucaoCompleta) vetor.negate();
+
             const position = this.angulo.getPosition();
 
             if(this.fase){

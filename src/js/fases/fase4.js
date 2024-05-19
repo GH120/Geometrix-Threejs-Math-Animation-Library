@@ -61,7 +61,7 @@ export class Fase4 extends Fase{
 
         this.problema = 10
 
-        this.debug = true;
+        this.debug = false;
     }
 
     //Objetos básicos
@@ -696,7 +696,7 @@ export class Fase4 extends Fase{
     }
 
     createOutputs(){
-        this.mostrarAngulo    = new MostrarAngulo(this.angle);
+        this.mostrarAngulo    = new MostrarAngulo(this.angle, 1.5);
         this.colorirPonto     = new ColorirOnHover(this.ponto2,0xaa0000,0xffff33).setCanvas(this);
         this.colorirTracejado = new ColorirOnHover(this.ponto2.tracejado, 0xaa0000, 0xffff33).setCanvas(this);
 
@@ -858,6 +858,7 @@ export class Fase4 extends Fase{
 
                         const animacao = new AnimacaoSimultanea(mudarSidenote, mudarDialogo, apagarEquacao, moverPonteiro)
                                          .setOnTermino(() => this.update({}))
+                                         .setDelay(100)
 
                         fase.animar(animacao);
 
@@ -883,16 +884,14 @@ export class Fase4 extends Fase{
 
                         this.addInputs(juntarEquacoes);
 
-                        const sidenote = "Então quantos graus tem " + estado.valor + "?";
-
-                        const mudarSidenote = fase.animacaoDialogo(sidenote, fase.informacao.sidenote).setDelay(50);
-
-                        
+                        const mudarSidenote = fase.animacaoDialogo("Arraste o valor para a função", fase.informacao.sidenote).setDelay(50);
+                        const mudarDialogo  = fase.animacaoDialogo("Então quantos graus tem " + estado.valor + "?");
                         const mostrarEquacao = apagarCSS2(funcao.texto).reverse().filler(100);
                         const mostrarValor   = apagarCSS2(valor.texto).reverse().filler(100);
 
                         fase.animar(mostrarEquacao);
                         fase.animar(mostrarValor);
+                        fase.animar(mudarDialogo);
                         fase.animar(mudarSidenote);
 
                         estado.etapa = 1;
@@ -990,14 +989,12 @@ export class Fase4 extends Fase{
                 const dialogo2 = fase.animacaoDialogo(`Agora, consegue mostrar quanto vale 5 horas?`);
 
                 const animacao2 = new AnimacaoSequencial(dialogo2).setOnStart(() => {
-                                                                            fase.Configuracao1();
+                                                                            // fase.Configuracao1();
                                                                         });
 
-                const animacao = new AnimacaoSequencial(dialogo1,mostrarEquacao,animacao2);
+                const animacao = new AnimacaoSequencial(dialogo1,mostrarEquacao,animacao2).setCheckpointAll(false);
 
                 animacao.setOnTermino(() => fase.whiteboard.ativar(false));
-
-                animacao.setNome("Execução Principal");
 
                 fase.animar(animacao)
             }

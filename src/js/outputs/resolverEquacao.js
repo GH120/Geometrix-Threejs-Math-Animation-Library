@@ -85,7 +85,10 @@ export default class ResolverEquacao extends Output{
                                   .setOnTermino(() => null)
                                   .setDuration(50)
 
+        //Refatorar: mover para o removeFromScene da equação
         fase.whiteboard.removerEquacao(equacao.texto);
+
+        fase.scene.remove(equacao.hitbox);
 
 
         const animacao = new AnimacaoSimultanea(

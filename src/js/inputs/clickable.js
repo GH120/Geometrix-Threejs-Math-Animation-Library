@@ -10,18 +10,7 @@ export class Clickable extends Input{
     
     this.dragging = false;
 
-    //Output mudar cursor
-    const hover = new Hoverable({}, camera, container);
-
-    hover.object = object;
-    
-    hover.addObserver(
-      new Output()
-      .setUpdateFunction(estado => {
-        if(estado.dentro) camera.fase.settings.setCursor('pointer')
-        else camera.fase.settings.setCursor('default')
-      })
-  )
+    this.outputMudarCursor(object, camera, container)
 
     // Add event listeners for mouse down, move, and up events
     window.addEventListener('click', this.onClick.bind(this), false);
@@ -36,6 +25,28 @@ export class Clickable extends Input{
     //Notifica todos os observadores da nova posição
     this.notify({clicado: selecionado});
     
+  }
+
+  outputMudarCursor(object, camera, container){
+
+    const hoverable = this;
+
+    //Output mudar cursor
+    const hover = new Hoverable({}, camera, container);
+
+    hover.object = object;
+
+    this.mudarCursor = new Output([hover])
+                      .setUpdateFunction(function(novoEstado) {
+
+                        if(!hoverable.observers.length) return;
+
+                        if(novoEstado.dentro) camera.fase.settings.setCursor('pointer')
+                        else camera.fase.settings.setCursor(this.estado.cursorInicial)
+                      })
+                      .setEstadoInicial({
+                        cursorInicial: camera.fase.settings.tipo
+                      })
   }
 }
 
@@ -58,4 +69,6 @@ export class MultipleClickable extends Input{
         this.notify({clicados: selecionados});
         
       }
+
+      
 }

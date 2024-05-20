@@ -70,14 +70,16 @@ const LevelScreen = () => {
     }
   };
 
+  const settings = {fase, whiteboard, setCursor: (tipo) => {setCursor(tipo); settings.tipo = tipo}, tipo: cursor}
+
   return (
       <div
       className="App"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       >
-        {levelLoad && <Navbar settings={{fase, whiteboard, setCursor}}/>}
-        <div className='container de tudo' style={{ cursor: cursor}} ref={refContainer}></div>
+        {levelLoad && <Navbar settings={settings}/>}
+        <div className='container de tudo' style={{cursor:cursor}} ref={refContainer}></div>
       </div>
 
   )

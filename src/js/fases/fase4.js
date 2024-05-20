@@ -892,28 +892,6 @@ export class Fase4 extends Fase{
                 .setOnStart(() => circulo.addToScene(this.scene))
     }
 
-    criarHueOnHover(elementoCSS2d){
-
-        return new Output()
-               .addInputs(elementoCSS2d.hoverable, elementoCSS2d.draggable)
-               .setUpdateFunction(function(novoEstado){
-
-                    const elemento = elementoCSS2d.texto.element.children[0]
-
-                    const estado = this.estado;
-
-                    if(novoEstado.dragging != undefined) estado.dragging = novoEstado.dragging;
-
-                    if(novoEstado.dentro){
-                        
-                        elemento.style.backgroundColor = ' drop-shadow(1px 1px 2px red)';
-                    }
-                    else{
-                        elemento.style.backdropFilter = '';
-                    }
-               })
-    }
-
     //Criação dos controles, input e output
     createInputs(){
 
@@ -982,8 +960,6 @@ export class Fase4 extends Fase{
 
         console.log(funcao, valor);
 
-        this.Configuracao4({equacoesHover:[valor]});
-
 
         //Criar controle de juntar funcao com valores
 
@@ -992,22 +968,6 @@ export class Fase4 extends Fase{
         juntar.equacaoResultante = equacoes.instanciada("5h");
 
         this.controleEquacoes("5h", funcao).addInputs(juntar);
-    }
-
-    Configuracao4(informacao){
-
-        const fase = this;
-
-        fase.informacao = {...fase.informacao, ...informacao};
-
-
-        for(const equacao of fase.informacao.equacoesHover){
-
-            if(!equacao.hoverable) new Hoverable(equacao, fase.whiteboard.camera, fase.whiteboard);
-            if(!equacao.draggable) new Draggable(equacao, fase.whiteboard.camera, fase.whiteboard);
-            
-            this.criarHueOnHover(equacao);
-        }
     }
 
     controleEquacoes(valor, funcao){
@@ -1048,8 +1008,6 @@ export class Fase4 extends Fase{
 
                         this.addInputs(resolverEquacao);
 
-                        fase.Configuracao4({equacoesHover: [objetoEquacao]});
-
                         estado.etapa++;
                     }
 
@@ -1067,8 +1025,6 @@ export class Fase4 extends Fase{
                         resolverEquacao.tamanhoFonte = 1.7;
 
                         this.addInputs(resolverEquacao);
-
-                        fase.Configuracao4({equacoesHover: [objetoEquacao]});
 
                         estado.etapa++;
                     }
@@ -1088,8 +1044,6 @@ export class Fase4 extends Fase{
                         resolverEquacao.tamanhoFonte = 1.7
 
                         this.addInputs(resolverEquacao);
-
-                        fase.Configuracao4({equacoesHover: [objetoEquacao]});
 
                         estado.etapa++;
                     }
@@ -1144,8 +1098,6 @@ export class Fase4 extends Fase{
                         fase.animar(mudarDialogo);
                         fase.animar(mudarSidenote);
 
-                        fase.Configuracao4({equacoesHover: [valor]});
-
                         estado.etapa = 1;
                         estado.equacoesResolvidas++;
                     }
@@ -1180,8 +1132,6 @@ export class Fase4 extends Fase{
                             const juntarEquacoes = new JuntarEquacoes(valor, [funcao], fase, null, equacoes.instanciada(estado.valor));
 
                             this.addInputs(juntarEquacoes);
-
-                            fase.Configuracao4({equacoesHover: [valor]});
 
                             fase.animar(apagarCSS2(funcao.texto).reverse())
 

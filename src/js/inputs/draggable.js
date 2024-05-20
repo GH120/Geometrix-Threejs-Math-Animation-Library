@@ -35,8 +35,6 @@ export class Draggable extends Input{
     
     this.dragging = true;
 
-    this.mudarCursor.update({dragging:true})
-
     const aindaContinuaSegurando = () => (this.dragging)? this.simulateMouseMove(): clearInterval(this.checkInterval)
 
     // Start an interval to periodically check if mouse is still down
@@ -65,9 +63,8 @@ export class Draggable extends Input{
 
   onMouseUp() {
     this.dragging = false;
-    this.mudarCursor.update({dragging:false})
 
-    this.notify({position:this.lastPosition, dragging:false})
+    this.notify({position:this.lastPosition, dragging:false});
   }
 
   simulateMouseMove() {
@@ -91,22 +88,31 @@ export class Draggable extends Input{
 
     hover.object = object;
 
-    this.mudarCursor = new Output([hover])
+    this.mudarCursor = new Output([hover, this])
                       .setUpdateFunction(function(novoEstado){
 
                         const estado = this.estado;
 
+                        if(!draggable.observers.length) return;
+
                         if(!camera.fase.settings) return;
 
-                        if(novoEstado.dragging != undefined) estado.parar = novoEstado.dragging;
+                        if(novoEstado.dentro   != undefined) estado.dentro = novoEstado.dentro;
+                        if(novoEstado.dragging != undefined) estado.parar  = novoEstado.dragging;
 
-                        if(estado.parar) return;
+                        if(estado.parar) {
+                          camera.fase.settings.setCursor('grabbing');
+                          return;
+                        }
 
-                        if(novoEstado.dentro && draggable.observers.length) camera.fase.settings.setCursor('grab')
+                        if(estado.dentro) {
+                          camera.fase.settings.setCursor('grab')
+                        }
                         else camera.fase.settings.setCursor('default')
                       })
                       .setEstadoInicial({
-                        parar:false
+                        parar:false,
+                        dentro:false
                       })
   }
 }

@@ -51,7 +51,10 @@ function Navbar(props) {
     setEquationMenuOpen(!EquationMenuOpen);
   };
 
-  settings.ativarMenuCartas = (ativo) => setCardsMenuOpen(ativo);
+  settings.ativarMenuCartas = (ativo) => {
+    setCardsMenuOpen(ativo);
+  }
+
 
   settings.toggleEquationMenu = toggleEquationMenu;
 

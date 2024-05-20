@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import './style.css'; // Importe o arquivo de estilo
 import { Whiteboard } from '../../js/cards/whiteboard';
@@ -10,6 +10,18 @@ function MenuEquacoes(props) {
 
   const equationWindowRef = useRef(null);
 
+  const [cursor, setCursor] = useState('default');
+
+  const applyCursorStyle = (element, cursorStyle) => {
+    if (element) {
+      element.style.cursor = cursorStyle;
+      const children = element.querySelectorAll('*');
+      children.forEach(child => {
+        child.style.cursor = cursorStyle;
+        child.style.pointerEvents = 'auto';
+      });
+    }
+  };
     useEffect(() => {
         const whiteboard  = new Whiteboard(equationWindowRef.current);
 
@@ -22,7 +34,7 @@ function MenuEquacoes(props) {
         if(fase){
             fase.whiteboard = whiteboard;
 
-            fase.whiteboard.settings = fase.settings; //Gambiarra para poder usar settings nos inputs, refatorar depois
+            fase.whiteboard.settings = {setCursor: (tipo) => {setCursor(tipo); fase.whiteboard.settings.tipo = tipo; console.log(fase.whiteboard.settings)}, tipo: cursor}; //Gambiarra para poder usar settings nos inputs, refatorar depois
 
             console.log("funcionou", fase.whiteboard)
 
@@ -35,8 +47,10 @@ function MenuEquacoes(props) {
         };
     }, []);
 
+    applyCursorStyle(equationWindowRef.current, cursor);
+
     return (
-        <div ref={equationWindowRef} className="whiteboard-container"></div>
+        <div ref={equationWindowRef} style={{cursor: cursor, pointerEvents: 'auto'}} className="whiteboard-container"></div>
     );
 }
 

@@ -486,7 +486,7 @@ export class Fase4 extends Fase{
 
         //Animar incrementação 
         const equacoes = {
-           proporcao: (fator) => ` ( \\color{red} ${fator}~ \\cdot ~ \\color{red} 1 \\color{red} )\\color{red} ~h ~ \\color{black} ~tem~ (\\color{blue} ~${fator}~ \\cdot \\color{blue} ~30 \\color{blue}) \\color{blue} ° `,
+           proporcao: (fator) => ` \\color{red} \\frac{\\uparrow ${fator}h}{1h}~ \\color{black} =  \\color{blue}\\frac{\\uparrow ${30*fator}°}{30°} \\color{black} = ${fator} `,
         }
 
         const equacao = this.createMathJaxTextBox(equacoes.proporcao(2), [5,0,0], 1);
@@ -696,9 +696,18 @@ export class Fase4 extends Fase{
         const anim1 = this.aula4dialogo1(dialogo[1])
         const anim2 = this.aula4dialogo2(dialogo[2])
         const anim3 = dialogo[3]
+        const anim4 = dialogo[4]
+        const anim5 = dialogo[5]
 
 
-        const animacao = new AnimacaoSequencial(anim0, anim1, anim2, anim3);
+        const animacao = new AnimacaoSequencial(
+                            anim0, 
+                            anim1, 
+                            anim2, 
+                            anim3,
+                            anim4,
+                            anim5
+                        );
 
         fase.animar(animacao);
     }
@@ -883,6 +892,28 @@ export class Fase4 extends Fase{
                 .setOnStart(() => circulo.addToScene(this.scene))
     }
 
+    criarHueOnHover(elementoCSS2d){
+
+        return new Output()
+               .addInputs(elementoCSS2d.hoverable, elementoCSS2d.draggable)
+               .setUpdateFunction(function(novoEstado){
+
+                    const elemento = elementoCSS2d.texto.element.children[0]
+
+                    const estado = this.estado;
+
+                    if(novoEstado.dragging != undefined) estado.dragging = novoEstado.dragging;
+
+                    if(novoEstado.dentro){
+                        
+                        elemento.style.filter = ' drop-shadow(1px 1px 2px red)';
+                    }
+                    else{
+                        elemento.style.filter = '';
+                    }
+               })
+    }
+
     //Criação dos controles, input e output
     createInputs(){
 
@@ -951,6 +982,8 @@ export class Fase4 extends Fase{
 
         console.log(funcao, valor);
 
+        this.Configuracao4({equacoesHover:[valor]});
+
 
         //Criar controle de juntar funcao com valores
 
@@ -959,6 +992,22 @@ export class Fase4 extends Fase{
         juntar.equacaoResultante = equacoes.instanciada("5h");
 
         this.controleEquacoes("5h", funcao).addInputs(juntar);
+    }
+
+    Configuracao4(informacao){
+
+        const fase = this;
+
+        fase.informacao = {...fase.informacao, ...informacao};
+
+
+        for(const equacao of fase.informacao.equacoesHover){
+
+            if(!equacao.hoverable) new Hoverable(equacao, fase.whiteboard.camera, fase.whiteboard);
+            if(!equacao.draggable) new Draggable(equacao, fase.whiteboard.camera, fase.whiteboard);
+            
+            this.criarHueOnHover(equacao);
+        }
     }
 
     controleEquacoes(valor, funcao){
@@ -999,6 +1048,8 @@ export class Fase4 extends Fase{
 
                         this.addInputs(resolverEquacao);
 
+                        fase.Configuracao4({equacoesHover: [objetoEquacao]});
+
                         estado.etapa++;
                     }
 
@@ -1016,6 +1067,8 @@ export class Fase4 extends Fase{
                         resolverEquacao.tamanhoFonte = 1.7;
 
                         this.addInputs(resolverEquacao);
+
+                        fase.Configuracao4({equacoesHover: [objetoEquacao]});
 
                         estado.etapa++;
                     }
@@ -1035,6 +1088,8 @@ export class Fase4 extends Fase{
                         resolverEquacao.tamanhoFonte = 1.7
 
                         this.addInputs(resolverEquacao);
+
+                        fase.Configuracao4({equacoesHover: [objetoEquacao]});
 
                         estado.etapa++;
                     }
@@ -1089,6 +1144,8 @@ export class Fase4 extends Fase{
                         fase.animar(mudarDialogo);
                         fase.animar(mudarSidenote);
 
+                        fase.Configuracao4({equacoesHover: [valor]});
+
                         estado.etapa = 1;
                         estado.equacoesResolvidas++;
                     }
@@ -1105,30 +1162,37 @@ export class Fase4 extends Fase{
                         estado.hora  = estado.horarios.splice(Math.round(Math.random() * (estado.horarios.length - 1)), 1)[0]; //Escolhe uma e remove do array
                         estado.valor = `${estado.hora}h`;
 
-                        fase.whiteboard.adicionarTexto(funcao.texto);
-
-                        valor = fase.createMathJaxTextBox("\\color{red}" + estado.valor, [0,0,0], 2);
-                        
-                        fase.whiteboard.adicionarTexto(valor); //Elemento clonado na lousa retornado
-
-                        valor  = new ElementoCSS2D(valor, fase.whiteboard);
-
-                        const juntarEquacoes = new JuntarEquacoes(valor, [funcao], fase, null, equacoes.instanciada(estado.valor));
-
-                        this.addInputs(juntarEquacoes);
-
 
                         const mudarDialogo = fase.animacoesDialogo(
                             "Podemos usar essa razão para calcular até valores quebrados de horas",
                             `Por exemplo, quantos graus teriam ${estado.hora} horas?`
                         )
-                        .setOnTermino(() => this.update({}))
+                        .setOnTermino(() => {
+
+                            fase.whiteboard.adicionarTexto(funcao.texto);
+
+                            valor = fase.createMathJaxTextBox("\\color{red}" + estado.valor, [0,0,0], 2);
+                            
+                            fase.whiteboard.adicionarTexto(valor); //Elemento clonado na lousa retornado
+
+                            valor  = new ElementoCSS2D(valor, fase.whiteboard);
+
+                            const juntarEquacoes = new JuntarEquacoes(valor, [funcao], fase, null, equacoes.instanciada(estado.valor));
+
+                            this.addInputs(juntarEquacoes);
+
+                            fase.Configuracao4({equacoesHover: [valor]});
+
+                            fase.animar(apagarCSS2(funcao.texto).reverse())
+
+                            this.update({})
+                        })
                         .setCheckpointAll(true)
+                        .setNome("dialogo");
 
                         //Fazer parte de minutos: criar outra razão, quebra a hora em minutos e aplica ela depois soma em fração de horas
 
                         fase.animar(mudarDialogo);
-                        fase.animar(apagarCSS2(funcao.texto).reverse())
 
                         estado.etapa = 1;
                         estado.etapaFracao = true;

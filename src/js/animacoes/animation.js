@@ -69,6 +69,17 @@ export default class Animacao {
         return this;
     }
 
+    interpolacaoComum(){
+        this.setValorFinal(1);
+        this.setValorInicial(0);
+        this.setInterpolacao((a,b,c) => a*(1-c) + b*c);
+        this.voltarAoInicio(false);
+        this.setCurva(() => curvas.easeInOutSine);
+        this.setDuration(30)
+
+        return this;
+    }
+
     /** Usado no update da fase para determinar se substitui animação com mesmo nome
      * Funciona como um identificador para apenas uma thread com esse nome executar no update
     */
@@ -506,3 +517,10 @@ export const animacaoIndependente = (funcao = () => null,duracao=300, delay=0) =
                                                                 .setOnStart(funcao)
                                                                 .setCheckpoint(false)
                                                                 .setDelay(100)
+
+
+
+//Creditos: https://easings.net/pt-br
+export const curvas = {
+    easeInOutSine: x => -(Math.cos(Math.PI * x) - 1) / 2
+}

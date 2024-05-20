@@ -209,6 +209,9 @@ export class Fase {
             elementoDiv.children[0].style.height = `${fontsize*text.length/10}em`;
             elementoDiv.children[0].style.color  = 'black';
 
+            cPointLabel.tamanhoFonte = fontsize;
+            cPointLabel.text = text;
+
             return cPointLabel;
         }
 

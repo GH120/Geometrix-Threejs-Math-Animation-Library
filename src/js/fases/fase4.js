@@ -66,7 +66,7 @@ export class Fase4 extends Fase{
 
         this.problema = 10
 
-        this.debug = true;
+        this.debug = false;
     }
 
     //Objetos básicos
@@ -997,6 +997,8 @@ export class Fase4 extends Fase{
                     const novaEquacao = novoEstado.novaEquacao;
 
                     if(novaEquacao && estado.etapa == 1){
+
+                        this.debug = false;
 
                         const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
 

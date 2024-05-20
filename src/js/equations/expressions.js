@@ -8,6 +8,8 @@ import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
 import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages'
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 
+import * as THREE from 'three'
+
 //DEPRECATED: FALTOU MODIFICAR PARA USAR MATHJAX FULL
 
 //Cria elementos css2d que renderizam MathJax a partir de um texto input
@@ -26,7 +28,7 @@ export class MathJaxTextBox extends CSS2DObject{
         
         this.html = mathjax.document('', { InputJax: tex, OutputJax: svg });
 
-        this.position.copy(position);
+        this.position.copy(new THREE.Vector3(...position));
 
         // Função auxiliar para mudar texto renderizado pelo mathjax dinamicamente
         this.mudarTexto(inputTex, tamanhoDaFonte);

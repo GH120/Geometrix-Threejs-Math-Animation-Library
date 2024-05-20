@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import Animacao from "./animation";
 import { Objeto } from '../objetos/objeto';
 
+/**Refatorar depois, lógica muito confusa */
 export default class DesenharMalha extends Animacao{
 
     constructor(objeto, scene){

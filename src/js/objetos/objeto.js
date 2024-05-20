@@ -17,6 +17,9 @@ export class Objeto{
     }
 
     removeFromScene(){
+
+        if(!this.scene) return;
+
         this.scene.remove(this.mesh);
 
         //Não abrange grupos recursives, cuidado

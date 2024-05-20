@@ -21,6 +21,9 @@ function MenuEquacoes(props) {
 
         if(fase){
             fase.whiteboard = whiteboard;
+
+            fase.whiteboard.settings = fase.settings; //Gambiarra para poder usar settings nos inputs, refatorar depois
+
             console.log("funcionou", fase.whiteboard)
 
             fase.appendOperadoresAJanelaEquacao(equationWindowRef.current);

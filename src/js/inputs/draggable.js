@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { Input } from './Input';
+import { Hoverable } from './hoverable';
+import { Output } from '../outputs/Output';
 
 export class Draggable extends Input{
 
@@ -15,6 +17,9 @@ export class Draggable extends Input{
 
     this.dragging = false;
 
+    this.outputMudarCursor(object, camera, container);
+
+
     // Add event listeners for mouse down, move, and up events
     window.addEventListener('mousedown', this.onMouseDown.bind(this), false);
     window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
@@ -29,6 +34,8 @@ export class Draggable extends Input{
     if (!point) return;
     
     this.dragging = true;
+
+    this.mudarCursor.update({dragging:true})
 
     const aindaContinuaSegurando = () => (this.dragging)? this.simulateMouseMove(): clearInterval(this.checkInterval)
 
@@ -58,6 +65,8 @@ export class Draggable extends Input{
 
   onMouseUp() {
     this.dragging = false;
+    this.mudarCursor.update({dragging:false})
+
     this.notify({position:this.lastPosition, dragging:false})
   }
 
@@ -71,5 +80,33 @@ export class Draggable extends Input{
     });
 
     this.onMouseMove(event);
+  }
+
+  outputMudarCursor(object, camera, container){
+
+    const draggable = this;
+
+    //Output mudar cursor
+    const hover = new Hoverable({}, camera, container);
+
+    hover.object = object;
+
+    this.mudarCursor = new Output([hover])
+                      .setUpdateFunction(function(novoEstado){
+
+                        const estado = this.estado;
+
+                        if(!camera.fase.settings) return;
+
+                        if(novoEstado.dragging != undefined) estado.parar = novoEstado.dragging;
+
+                        if(estado.parar) return;
+
+                        if(novoEstado.dentro && draggable.observers.length) camera.fase.settings.setCursor('grab')
+                        else camera.fase.settings.setCursor('default')
+                      })
+                      .setEstadoInicial({
+                        parar:false
+                      })
   }
 }

@@ -70,6 +70,8 @@ export class Fase {
         console.log('SETUPTEXTBOX CONTAINER', container)
 
         camera.position.z = 150;
+
+        camera.fase = this; //Gambiarra para poder acessar a fase nos inputs, preguiça de refatorar
         
         this.frames = [];
         this.animacoes = [];

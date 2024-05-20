@@ -29,6 +29,7 @@ const LevelScreen = () => {
   const [levelLoad, setLevelLoad] = useState(false);
   const [fase, setFase] = useState(null);
   const [whiteboard, setWhiteboard] = useState(null);
+  const [cursor, setCursor] = useState('pointer');
 
   // ====== INICIANDO FASE ========
   useEffect(() => {
@@ -75,8 +76,8 @@ const LevelScreen = () => {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       >
-        {levelLoad && <Navbar settings={{fase, whiteboard}}/>}
-        <div className='container de tudo' ref={refContainer}></div>
+        {levelLoad && <Navbar settings={{fase, whiteboard, setCursor}}/>}
+        <div className='container de tudo' style={{ cursor: cursor}} ref={refContainer}></div>
       </div>
 
   )

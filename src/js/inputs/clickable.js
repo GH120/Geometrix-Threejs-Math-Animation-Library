@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { Input } from './Input';
+import { Hoverable } from './hoverable';
+import { Output } from '../outputs/Output';
 
 export class Clickable extends Input{
 
@@ -7,6 +9,19 @@ export class Clickable extends Input{
     super(object,camera, container);
     
     this.dragging = false;
+
+    //Output mudar cursor
+    const hover = new Hoverable({}, camera, container);
+
+    hover.object = object;
+    
+    hover.addObserver(
+      new Output()
+      .setUpdateFunction(estado => {
+        if(estado.dentro) camera.fase.settings.setCursor('pointer')
+        else camera.fase.settings.setCursor('default')
+      })
+  )
 
     // Add event listeners for mouse down, move, and up events
     window.addEventListener('click', this.onClick.bind(this), false);

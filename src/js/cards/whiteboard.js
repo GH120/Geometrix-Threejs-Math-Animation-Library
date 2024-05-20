@@ -85,6 +85,8 @@ export class Whiteboard {
         this.canvas         = renderer.domElement;
         this.dimensoes      = {width: width, height: height}
 
+        camera.fase = this; //Gambiarra para acessar o canvas no input, refatorar depois
+
 
         
 

@@ -906,10 +906,10 @@ export class Fase4 extends Fase{
 
                     if(novoEstado.dentro){
                         
-                        elemento.style.filter = ' drop-shadow(1px 1px 2px red)';
+                        elemento.style.backgroundColor = ' drop-shadow(1px 1px 2px red)';
                     }
                     else{
-                        elemento.style.filter = '';
+                        elemento.style.backdropFilter = '';
                     }
                })
     }

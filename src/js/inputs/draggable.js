@@ -39,6 +39,9 @@ export class Draggable extends Input{
 
     // Start an interval to periodically check if mouse is still down
     this.checkInterval = setInterval(aindaContinuaSegurando, 100); // Check every 0.1 seconds
+
+    this.mudarCursor.update({dragging:true})
+
   }
 
   onMouseMove(event) {
@@ -53,6 +56,7 @@ export class Draggable extends Input{
 
       //Notifica todos os observadores da nova posição, metodo do Input
       this.notify({position: colision.point, dragging:true});
+
     }
 
     this.lastClientX = event.clientX;
@@ -63,8 +67,12 @@ export class Draggable extends Input{
 
   onMouseUp() {
     this.dragging = false;
+    
+    this.mudarCursor.update({dragging:false, dentro:false})
 
     this.notify({position:this.lastPosition, dragging:false});
+
+
   }
 
   simulateMouseMove() {
@@ -88,7 +96,7 @@ export class Draggable extends Input{
 
     hover.object = object;
 
-    this.mudarCursor = new Output([hover, this])
+    this.mudarCursor = new Output([hover])
                       .setUpdateFunction(function(novoEstado){
 
                         const estado = this.estado;

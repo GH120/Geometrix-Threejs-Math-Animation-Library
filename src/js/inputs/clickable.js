@@ -45,7 +45,7 @@ export class Clickable extends Input{
                         else camera.fase.settings.setCursor(this.estado.cursorInicial)
                       })
                       .setEstadoInicial({
-                        cursorInicial: camera.fase.settings.tipo
+                        cursorInicial: 'default'
                       })
   }
 }

@@ -18,7 +18,7 @@ function MenuEquacoes(props) {
       const children = element.querySelectorAll('*');
       children.forEach(child => {
         child.style.cursor = cursorStyle;
-        child.style.pointerEvents = 'auto';
+        child.style.pointerEvents = (props.hidden)? 'none' : 'auto';
       });
     }
   };
@@ -50,7 +50,7 @@ function MenuEquacoes(props) {
     applyCursorStyle(equationWindowRef.current, cursor);
 
     return (
-        <div ref={equationWindowRef} style={{cursor: cursor, pointerEvents: 'auto'}} className="whiteboard-container"></div>
+        <div ref={equationWindowRef} style={{cursor: cursor, pointerEvents: (props.hidden)? 'none' : 'auto'}} className="whiteboard-container"></div>
     );
 }
 

@@ -66,7 +66,7 @@ export class Fase4 extends Fase{
 
         this.problema = 10
 
-        this.debug = false;
+        this.debug = true;
     }
 
     //Objetos básicos
@@ -1064,6 +1064,7 @@ export class Fase4 extends Fase{
                         const animacao = new AnimacaoSimultanea(mudarSidenote, mudarDialogo, apagarEquacao, moverPonteiro)
                                          .setOnTermino(() => this.update({}))
                                          .setDelay(100)
+                                         .setOnStart(() => this.debug = false);
 
                         fase.animar(animacao);
 
@@ -1107,9 +1108,9 @@ export class Fase4 extends Fase{
                     //Começa a multiplicação com frações
                     else if(estado.etapa == 5 && estado.equacoesResolvidas >= 3 && !estado.etapaFracao){
 
-                        this.debug = false
+                        this.debug = false;
 
-                        estado.horarios = new Array(10).fill(0).map((e,i) => Math.round(Math.random() * 240)/20)
+                        estado.horarios = new Array(10).fill(0).map((e,i) => Math.round(Math.random() * 11) + Math.round(1 + Math.random() * 18)/20)
                         
                         fase.whiteboard.removerTodasEquacoes();
 

@@ -68,9 +68,9 @@ export class Draggable extends Input{
   onMouseUp() {
     this.dragging = false;
     
-    this.mudarCursor.update({dragging:false, dentro:false})
-
     this.notify({position:this.lastPosition, dragging:false});
+    
+    this.mudarCursor.update({dragging:false})
 
 
   }
@@ -100,6 +100,7 @@ export class Draggable extends Input{
                       .setUpdateFunction(function(novoEstado){
 
                         const estado = this.estado;
+                        
 
                         
                         if(novoEstado.dentro   != undefined) 
@@ -118,19 +119,21 @@ export class Draggable extends Input{
                             setCursor('grab');
 
                             setTimeout(() => {
-                              if(!estado.dentro || !draggable.observers.length)
+                              if((!estado.dentro && !estado.segurando) || !draggable.observers.length)
                                 setCursor('default')
-                            }, 150);
+                            }, 500);
 
                           }
 
                           else setCursor('default');
                         }
-
-                        if(!draggable.observers.length) soltarObjeto()
-
                         if(!camera.fase.settings) return;
-                        if     (estado.segurando) setCursor('grabbing')
+
+                        if(!draggable.observers.length) {
+                          if(estado.segurando || estado.dentro) soltarObjeto()
+                        }
+
+                        else if(estado.segurando) setCursor('grabbing')
                         else if(estado.dentro)    setCursor('grab')
                         else                      soltarObjeto()
                       

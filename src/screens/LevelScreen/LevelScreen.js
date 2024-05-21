@@ -29,7 +29,7 @@ const LevelScreen = () => {
   const [levelLoad, setLevelLoad] = useState(false);
   const [fase, setFase] = useState(null);
   const [whiteboard, setWhiteboard] = useState(null);
-  const [cursor, setCursor] = useState('pointer');
+  const [cursor, setCursor] = useState('default');
 
   // ====== INICIANDO FASE ========
   useEffect(() => {

@@ -39,10 +39,15 @@ export class Clickable extends Input{
     this.mudarCursor = new Output([hover])
                       .setUpdateFunction(function(novoEstado) {
 
-                        if(!hoverable.observers.length) return;
+                        const setCursor = camera.fase.settings.setCursor;
 
-                        if(novoEstado.dentro) camera.fase.settings.setCursor('pointer')
-                        else camera.fase.settings.setCursor(this.estado.cursorInicial)
+                        if(!hoverable.observers.length) 
+                          return setCursor(this.estado.cursorInicial);
+
+                        if(novoEstado.dentro) 
+                          setCursor('pointer')
+                        else 
+                          setCursor(this.estado.cursorInicial)
                       })
                       .setEstadoInicial({
                         cursorInicial: 'default'

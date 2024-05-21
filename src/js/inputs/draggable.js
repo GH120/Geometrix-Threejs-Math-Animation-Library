@@ -101,26 +101,44 @@ export class Draggable extends Input{
 
                         const estado = this.estado;
 
-                        if(!draggable.observers.length) return;
+                        
+                        if(novoEstado.dentro   != undefined) 
+                            estado.dentro     = novoEstado.dentro;
+                        if(novoEstado.dragging != undefined) 
+                            estado.segurando  = novoEstado.dragging;
+
+                        const setCursor = (cursor) => {
+                          camera.fase.settings.setCursor(cursor);
+                          estado.cursor = cursor;
+                        }
+
+                        const soltarObjeto = () => {
+
+                          if(estado.cursor == 'grabbing'){
+                            setCursor('grab');
+
+                            setTimeout(() => {
+                              if(!estado.dentro || !draggable.observers.length)
+                                setCursor('default')
+                            }, 150);
+
+                          }
+
+                          else setCursor('default');
+                        }
+
+                        if(!draggable.observers.length) soltarObjeto()
 
                         if(!camera.fase.settings) return;
-
-                        if(novoEstado.dentro   != undefined) estado.dentro = novoEstado.dentro;
-                        if(novoEstado.dragging != undefined) estado.parar  = novoEstado.dragging;
-
-                        if(estado.parar) {
-                          camera.fase.settings.setCursor('grabbing');
-                          return;
-                        }
-
-                        if(estado.dentro) {
-                          camera.fase.settings.setCursor('grab')
-                        }
-                        else camera.fase.settings.setCursor('default')
+                        if     (estado.segurando) setCursor('grabbing')
+                        else if(estado.dentro)    setCursor('grab')
+                        else                      soltarObjeto()
+                      
                       })
                       .setEstadoInicial({
-                        parar:false,
-                        dentro:false
+                        segurando:false,
+                        dentro:false,
+                        cursor: 'default'
                       })
   }
 }

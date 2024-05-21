@@ -27,6 +27,41 @@ import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages'
 import { Operations } from '../equations/operations';
 import { AnimacaoSequencial } from '../animacoes/animation';
 
+
+
+class FrameRateCalculator{
+
+    constructor(){
+        this.tempo = 0;
+        this.framesDesdeUltimaMedida = 1;
+
+        this.media = 0;
+    }
+
+    calcular(tempo){
+
+        const tempoAntigo = this.tempo;
+        const framesDesdeUltimaMedida = this.framesDesdeUltimaMedida;
+
+        this.tempo = tempo;
+        this.framesDesdeUltimaMedida = 1;
+
+        const frameRate = 1000 * framesDesdeUltimaMedida/ (tempo - tempoAntigo);
+
+        this.media = this.media * 0.9 + frameRate*0.1;
+
+        return frameRate;
+    }
+
+    sample(iteracoes, tempo){
+
+        if(this.framesDesdeUltimaMedida < iteracoes) 
+            this.framesDesdeUltimaMedida++;
+        else 
+            return {atual: this.calcular(tempo), media: this.media};
+    }
+
+}
 export class Fase {
 
     
@@ -82,6 +117,8 @@ export class Fase {
         this.controleDaCarta = null;
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
         this.informacao = {}
+
+        this.calculadorFrameRate = new FrameRateCalculator();
     }
     
 
@@ -333,7 +370,13 @@ export class Fase {
         const scene         = this.scene;
         const camera        = this.camera;
 
-        function animate() {
+        const frameRate = this.calculadorFrameRate;
+
+        function animate(time) {
+
+            const resultado = frameRate.sample(30, time);
+
+            if(resultado) console.log(`fps médio: ${resultado.media}, fps instantâneo: ${resultado.media}`);
 
             if(fase.stop) return;
 

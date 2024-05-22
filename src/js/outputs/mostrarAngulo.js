@@ -62,8 +62,6 @@ export class MostrarAngulo extends Output{
 
                 const dimensoesTexto = ponto1.clone().sub(ponto2);
 
-                console.log(dimensoesTexto)
-
                 position.sub(dimensoesTexto.multiplyScalar(0.5))
             }
 

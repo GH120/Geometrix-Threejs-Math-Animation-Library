@@ -15,10 +15,11 @@ export class Hoverable extends Input {
   onMouseMove(event) {
 
     const isInside = !!this.intersectouObjeto(event,this.object);
-
+    
+    
     //Ignora se continua no mesmo estado
     if(this.isInside == isInside) return;
-
+    
     //Manda os observadores atualizarem
     this.notify({dentro: isInside});
 

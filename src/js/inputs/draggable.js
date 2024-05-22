@@ -66,11 +66,12 @@ export class Draggable extends Input{
   }
 
   onMouseUp() {
+    if(this.dragging) this.mudarCursor.update({dragging:false});
+    
     this.dragging = false;
     
     this.notify({position:this.lastPosition, dragging:false});
     
-    this.mudarCursor.update({dragging:false})
 
 
   }
@@ -96,42 +97,57 @@ export class Draggable extends Input{
 
     hover.object = object;
 
+    // hover.addObserver({update: (estado) => alert(estado.dentro)})
+
     this.mudarCursor = new Output([hover])
                       .setUpdateFunction(function(novoEstado){
 
                         const estado = this.estado;
-                        
 
+                        const setCursor = (cursor) => {
+                          camera.fase.settings.setCursor(cursor);
+                          this.estado.cursor = cursor;
+
+                          console.log(cursor)
+                        }
+
+                        const soltarObjeto = () => {
+
+                          console.log({...estado}, novoEstado)
+
+                          if(estado.ativo){
+                            setCursor('grab');
+
+                            const soltar = () => (!estado.dentro && !estado.segurando) || !draggable.observers.length
+
+                            setTimeout(() => {
+
+                              alert("soltar:" + soltar() + ", dentro:" + estado.dentro)
+                              if((soltar()))
+                                setCursor('default')
+                            }, 500);
+
+                            estado.ativo = false;
+
+                          }
+
+                          else setCursor('default');
+                        }
+
+                        
+                        if(!draggable.observers.length) {
+                          if(estado.ativo) soltarObjeto();
+                          return;
+                        }
+
+                        if(novoEstado.segurando) estado.ativo = true;
                         
                         if(novoEstado.dentro   != undefined) 
                             estado.dentro     = novoEstado.dentro;
                         if(novoEstado.dragging != undefined) 
                             estado.segurando  = novoEstado.dragging;
 
-                        const setCursor = (cursor) => {
-                          camera.fase.settings.setCursor(cursor);
-                          estado.cursor = cursor;
-                        }
-
-                        const soltarObjeto = () => {
-
-                          if(estado.cursor == 'grabbing'){
-                            setCursor('grab');
-
-                            setTimeout(() => {
-                              if((!estado.dentro && !estado.segurando) || !draggable.observers.length)
-                                setCursor('default')
-                            }, 500);
-
-                          }
-
-                          else setCursor('default');
-                        }
                         if(!camera.fase.settings) return;
-
-                        if(!draggable.observers.length) {
-                          if(estado.segurando || estado.dentro) soltarObjeto()
-                        }
 
                         else if(estado.segurando) setCursor('grabbing')
                         else if(estado.dentro)    setCursor('grab')
@@ -141,6 +157,7 @@ export class Draggable extends Input{
                       .setEstadoInicial({
                         segurando:false,
                         dentro:false,
+                        ativo: false,
                         cursor: 'default'
                       })
   }

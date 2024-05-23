@@ -66,7 +66,8 @@ export class Fase4 extends Fase{
 
         this.problema = 10
 
-        this.debug = true;
+        this.debug = false;
+        this.mostrarFrameRate = true;
     }
 
     //Objetos básicos
@@ -967,10 +968,11 @@ export class Fase4 extends Fase{
 
         juntar.equacaoResultante = equacoes.instanciada("5h");
 
-        this.controleEquacoes("5h", funcao).addInputs(juntar);
+        this.controleEquacoes("5h", funcao, this.informacao.sidenote)
+            .addInputs(juntar);
     }
 
-    controleEquacoes(valor, funcao){
+    controleEquacoes(valor, funcao, sidenote){
 
         //Refatorar depois a parte das equações, esse trabalho aqui é desnecessário
         const equacoes = {
@@ -1002,7 +1004,7 @@ export class Fase4 extends Fase{
 
                         const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
 
-                        const mudarSidenote = fase.animacaoDialogo("Clique para resolver a equação", fase.informacao.sidenote)
+                        const mudarSidenote = fase.animacaoDialogo("Clique para resolver a equação", estado.sidenote)
 
                         fase.animar(mudarSidenote)
 
@@ -1017,7 +1019,7 @@ export class Fase4 extends Fase{
                         const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
 
                         const mudarDialogo  = fase.animacaoDialogo("Podemos cancelar a unidade hora")
-                        const mudarSidenote = fase.animacaoDialogo("Clique para resolver a equação", fase.informacao.sidenote)
+                        const mudarSidenote = fase.animacaoDialogo("Clique para resolver a equação", estado.sidenote)
 
                         fase.animar(mudarDialogo)
                         fase.animar(mudarSidenote);
@@ -1036,7 +1038,7 @@ export class Fase4 extends Fase{
 
                         const mudarDialogo = fase.animacaoDialogo("Agora multiplicamos 30 graus para cada hora");
 
-                        const mudarSidenote = fase.animacaoDialogo("Clique uma última vez", fase.informacao.sidenote)
+                        const mudarSidenote = fase.animacaoDialogo("Clique uma última vez", estado.sidenote)
 
                         fase.animar(mudarSidenote);
                         fase.animar(mudarDialogo);
@@ -1055,7 +1057,7 @@ export class Fase4 extends Fase{
 
                         const mudarDialogo = fase.animacaoDialogo(dialogo).setDelay(50);
 
-                        const mudarSidenote = fase.animacaoDialogo("Conseguimos o resultado: ", fase.informacao.sidenote)
+                        const mudarSidenote = fase.animacaoDialogo("Conseguimos o resultado: ", estado.sidenote)
 
                         const apagarEquacao = apagarCSS2(fase.whiteboard.equacoes[0], fase.whiteboard.scene).filler(300);
 
@@ -1091,7 +1093,7 @@ export class Fase4 extends Fase{
 
                         this.addInputs(juntarEquacoes);
 
-                        const mudarSidenote = fase.animacaoDialogo("Arraste o valor para a função", fase.informacao.sidenote).setDelay(50);
+                        const mudarSidenote = fase.animacaoDialogo("Arraste o valor para a função", estado.sidenote).setDelay(50);
                         const mudarDialogo  = fase.animacaoDialogo("Então quantos graus tem " + estado.valor + "?");
                         const mostrarEquacao = apagarCSS2(funcao.texto).reverse().filler(100);
                         const mostrarValor   = apagarCSS2(valor.texto).reverse().filler(100);
@@ -1154,7 +1156,7 @@ export class Fase4 extends Fase{
 
                     else if(estado.etapa == 5 && estado.equacoesResolvidas >= 3 && estado.etapaFracao){
 
-                        fase.scene.remove(fase.informacao.sidenote);
+                        fase.scene.remove(estado.sidenote);
 
                         fase.aula4();
                     }
@@ -1168,7 +1170,7 @@ export class Fase4 extends Fase{
                     horarios: [2,3,4,6,7,8,9,10,11,12],
                     hora: parseInt(valor),
                     etapaFracao: false,
-                    sidenote: null
+                    sidenote: sidenote
                })
 
     }

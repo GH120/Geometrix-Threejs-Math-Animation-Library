@@ -1,16 +1,17 @@
-import { SplineCurve, Vector2 } from "three";
+import * as THREE from 'three'
 import Animacao, { curvas } from "./animation";
 
-class SimularMovimento extends Animacao{
+export default class SimularMovimento extends Animacao{
 
-    constructor(objeto, trajetoria = new SplineCurve([])){
+    constructor(objeto, trajetoria){
         super(objeto);
 
-        const points = this.generateRandomPoints(10, 5);
+        const points = this.generateRandomPoints(3, 0.01);
 
-        this.trajetoria = new THREE.CatmullRomCurve3(points);
+        this.trajetoria = new THREE.CatmullRomCurve3(points, true);
 
         this.interpolacaoComum();
+        this.setDuration(10000)
     }
 
     generateRandomPoints(numPoints, radius) {
@@ -20,8 +21,7 @@ class SimularMovimento extends Animacao{
             const r = radius * Math.sqrt(Math.random());  // Uniform distribution within a circle
             const x = r * Math.cos(angle);
             const y = (Math.random() - 0.5) * 2;  // Spread points randomly along the y-axis
-            const z = r * Math.sin(angle);
-            points.push(new THREE.Vector3(x, y, z));
+            points.push(new THREE.Vector3(x, y, 0));
         }
         return points;
     }
@@ -30,14 +30,14 @@ class SimularMovimento extends Animacao{
 
         const ponto = this.trajetoria.getPoint(peso);
 
-        ponto.add(this.objeto.getPosition());
+        ponto.add(this.centroOrbita);
 
-        this.objeto.mesh.position.copy(ponto);
+        this.objeto.draggable.notify({dragging:true, position: ponto});
+    
     }
 
-    curva(x){
-        return curvas.easeInOutBounce(x);
+    onStart(){
+        this.centroOrbita = this.objeto.getPosition();
     }
-
 
 }

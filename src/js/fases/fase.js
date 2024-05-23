@@ -26,6 +26,7 @@ import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
 import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages'
 import { Operations } from '../equations/operations';
 import { AnimacaoSequencial } from '../animacoes/animation';
+import MostrarTexto from '../animacoes/MostrarTexto';
 
 
 
@@ -393,12 +394,12 @@ export class Fase {
         animate();
     }
 
-    animacaoDialogo(texto, target = null){
-        return new TextoAparecendo(target? target : this.text.element)
+    animacaoDialogo(texto, target = this.text){
+        return new MostrarTexto(target? target : this.text.element)
                                   .setOnStart(
-                                    () => this.changeText(texto, target)
+                                    () => target.element.textContent = texto
                                   )
-                                  .setValorFinal(100)
+                                  .setValorFinal(25* texto.length)
     }
 
     animacoesDialogo(...textos){

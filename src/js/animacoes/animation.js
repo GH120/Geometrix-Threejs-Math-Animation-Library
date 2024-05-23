@@ -74,7 +74,7 @@ export default class Animacao {
         this.setValorInicial(0);
         this.setInterpolacao((a,b,c) => a*(1-c) + b*c);
         this.voltarAoInicio(false);
-        this.setCurva(() => curvas.easeInOutSine);
+        this.setCurva(curvas.easeInOutSine);
         this.setDuration(30)
 
         return this;

@@ -60,7 +60,7 @@ export class ApagarPoligono extends AnimacaoSimultanea{
 
     ignorarObjetos(objetos){
 
-        this.animacoes = this.animacoes.filter(animacao => !objetos.includes(animacao.objetos))
+        this.animacoes = this.animacoes.filter(animacao => !objetos.includes(animacao.objeto))
 
         return this;
     }

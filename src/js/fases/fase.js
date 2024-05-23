@@ -119,6 +119,7 @@ export class Fase {
         this.informacao = {}
 
         this.calculadorFrameRate = new FrameRateCalculator();
+        this.mostrarFrameRate = false;
     }
     
 
@@ -376,7 +377,8 @@ export class Fase {
 
             const resultado = frameRate.sample(30, time);
 
-            // if(resultado) console.log(`fps médio: ${resultado.media}, fps instantâneo: ${resultado.media}`);
+            if(resultado && fase.mostrarFrameRate) 
+                console.log(`fps médio: ${resultado.media}, fps instantâneo: ${resultado.atual}`);
 
             if(fase.stop) return;
 

@@ -66,7 +66,10 @@ export class Draggable extends Input{
   }
 
   onMouseUp() {
-    if(this.dragging) this.mudarCursor.update({dragging:false});
+
+    if(!this.dragging) return;
+
+    this.mudarCursor.update({dragging:false});
     
     this.dragging = false;
     
@@ -97,18 +100,15 @@ export class Draggable extends Input{
 
     hover.object = object;
 
-    // hover.addObserver({update: (estado) => alert(estado.dentro)})
-
     this.mudarCursor = new Output([hover])
                       .setUpdateFunction(function(novoEstado){
 
                         const estado = this.estado;
 
+                        //Funções auxiliares
                         const setCursor = (cursor) => {
                           camera.fase.settings.setCursor(cursor);
                           this.estado.cursor = cursor;
-
-                          console.log(cursor)
                         }
 
                         const soltarObjeto = () => {
@@ -134,22 +134,27 @@ export class Draggable extends Input{
                           else setCursor('default');
                         }
 
+                        //Caso não tenha carregado o setup 
+                        if(!camera.fase.settings) 
+                          return estado.ativo = false;
                         
+                        //Caso não tenha mais outputs
                         if(!draggable.observers.length) {
                           if(estado.ativo) soltarObjeto();
-                          return;
+                          return estado.ativo = false;
                         }
 
-                        if(novoEstado.segurando) estado.ativo = true;
+                        //Lógica de mudar estado
+                        if(novoEstado.segurando) estado.ativo = true; //Desativa no soltarObjeto
                         
                         if(novoEstado.dentro   != undefined) 
                             estado.dentro     = novoEstado.dentro;
                         if(novoEstado.dragging != undefined) 
                             estado.segurando  = novoEstado.dragging;
 
-                        if(!camera.fase.settings) return;
 
-                        else if(estado.segurando) setCursor('grabbing')
+                        //Consequência de mudar estado
+                             if(estado.segurando) setCursor('grabbing')
                         else if(estado.dentro)    setCursor('grab')
                         else                      soltarObjeto()
                       

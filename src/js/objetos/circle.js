@@ -94,6 +94,7 @@ export default class Circle extends Objeto{
         this.mesh.position.copy(this.centro);
     }
 
+    //EXTREMAMENTE INEFICIENTE, MAIOR GARGALO DE PERFOMANCE
     update(){
         if (this.scene) {
 

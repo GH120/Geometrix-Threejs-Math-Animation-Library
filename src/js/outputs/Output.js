@@ -2,8 +2,9 @@
 export class Output{
 
     constructor(observed = []){
-        this.observers = [];
         this.estado    = {};
+        this.observers = [];
+        this.backup    = [];
         this.observed  = observed; //Inputs ou Outputs que avisam esse daqui
 
         for(const watched of observed) watched.observers.push(this);
@@ -90,5 +91,19 @@ export class Output{
     setName(name){
         this.name = name;
         return this;
+    }
+    
+    
+    ativar(on){
+
+        if(on){
+          this.observed = [...this.backup];
+        }
+        else{
+          this.backup   = [...this.observed];
+          this.removeInputs();
+        }
+
+        
     }
 }

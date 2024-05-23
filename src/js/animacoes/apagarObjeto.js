@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import Animacao from './animation'
 
-export const apagarObjeto = (objeto) => new Animacao()
+export const apagarObjeto = (objeto) => new Animacao(objeto)
                                         .setValorInicial(1)
                                         .setValorFinal(0)
                                         .setInterpolacao((inicial,final,peso) => inicial*(1-peso) + final*peso)

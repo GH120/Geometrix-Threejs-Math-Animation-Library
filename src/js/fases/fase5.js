@@ -56,7 +56,7 @@ export class Fase5  extends Fase{
         //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
         //Mostrar que a soma dos 
 
-        this.debug = false;
+        this.debug = true;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -85,6 +85,12 @@ export class Fase5  extends Fase{
 
         this.objetos.push(this.triangulo);
     }
+
+
+    ////////////////////////////////////////////////////////////////////////
+    /////////////////////////Dialogos Principais////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
+
 
     aula1(){
 
@@ -391,8 +397,12 @@ export class Fase5  extends Fase{
 
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    /////////////////////////Dialogos Auxiliares////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
+
     //Mover isso para um caso do controle de fluxo?
-    juntarEquacoes(){
+    juntarEquacoesDialogo(){
 
         const fase = this;
 
@@ -405,91 +415,9 @@ export class Fase5  extends Fase{
         fase.animar(animacao)
     }
 
-    controleEquacoes(){
-
-        const fase = this;
-
-        const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
-        const equacao2 = new ElementoCSS2D(fase.whiteboard.equacoes[1], fase.whiteboard);
-
-        const angulos = fase.informacao.equacoes.flatMap(equacao => equacao.angulos);
-
-        const temp = angulos[2]; angulos[2] = angulos[3]; angulos[3] = temp;
-
-        const soma = angulos.reduce((equacao, angulo) => new Addition(equacao, angulo));
-        const equacao = new Equality(soma, new Addition(new Variable('90°'), new Variable('90°')));
-
-        const juncao1 = new JuntarEquacoes(equacao1, [equacao2], fase);
-        const juncao2 = new JuntarEquacoes(equacao2, [equacao1], fase);
-
-        juncao1.equacaoNova = new CSS2DObject(equacao.html);
-        juncao2.equacaoNova = new CSS2DObject(equacao.html);
-
-
-        return new Output()
-               .addInputs(juncao1, juncao2)
-               .setUpdateFunction(function(novoEstado){
-
-                    const estado = this.estado;
-
-                    if(novoEstado.novaEquacao && estado.etapa == 0){
-
-                        const objetoEquacao = new ElementoCSS2D(novoEstado.novaEquacao, fase.whiteboard)
-                        
-                        const resultado = new Equality(soma, new Variable("180°"));
-
-                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase);
-
-                        resolverEquacao.equacaoNova = new CSS2DObject(resultado.html);
-
-                        this.addInputs(resolverEquacao);
-
-                        estado.etapa++;
-
-                        return;
-                    }
-
-                    if(novoEstado.novaEquacao && estado.etapa == 1){
-
-                        //Mostrar dois subangulos se juntando para formar o angulo selecionado
-                        //Mostrar que a soma dos três angulos é 180°
-
-                        const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado)
-
-                        const anguloSelecionado = new Variable(Math.round(fase.triangulo.angles[indice].degrees) + "°")
-                        
-                        const novaEquacao = new Equality(
-                                                new Addition(
-                                                    new Addition(
-                                                        angulos[0], 
-                                                        anguloSelecionado
-                                                    ), 
-                                                    angulos[2]
-                                                ),
-                                                new Variable("180°"));
-
-                        const objetoEquacao = new ElementoCSS2D(novoEstado.novaEquacao, fase.whiteboard)
-
-                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase);
-
-                        resolverEquacao.equacaoNova = new CSS2DObject(novaEquacao.html);
-
-                        this.addInputs(resolverEquacao);
-
-                        estado.etapa++;
-
-                        const angulosSelecionados = fase.informacao.equacoes.flatMap(equacao => equacao.angulosObjetos);
-
-                        fase.animar(fase.mostrarEApagar180Graus(fase.informacao.verticeSelecionado, angulosSelecionados))
-
-                        return;
-
-                    }
-               })
-               .setEstadoInicial({
-                    etapa: 0
-               })
-    }
+    ////////////////////////////////////////////////////////////////////////
+    /////////////////////////Configurações//////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
 
     createInputs(){
         //Inputs
@@ -750,6 +678,9 @@ export class Fase5  extends Fase{
         fase.resetarInputs();
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    /////////////////////////Outputs e Controles////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
 
     criarMovimentacaoDeAngulo = (angle) => {
 
@@ -1209,6 +1140,10 @@ export class Fase5  extends Fase{
 
                     const estado = this.estado;
 
+                    if(novoEstado.arrastarVertices){
+                        fase.arrastarVerticesDialogo();
+                    }
+
                     if(novoEstado.terminadoDialogo && estado.etapa == "inicio"){
                         estado.etapa = "esperando";
                         fase.Configuracao1();
@@ -1230,7 +1165,7 @@ export class Fase5  extends Fase{
 
                     if(novoEstado.juntarEquacoes){
                         estado.etapa = "juntarEquações"
-                        fase.juntarEquacoes();
+                        fase.juntarEquacoesDialogo();
                         return;
                     }
                })
@@ -1238,6 +1173,131 @@ export class Fase5  extends Fase{
                     etapa: "inicio"
                })
     }
+    
+    controleEquacoes(){
+        
+        const fase = this;
+
+        const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
+        const equacao2 = new ElementoCSS2D(fase.whiteboard.equacoes[1], fase.whiteboard);
+
+        const angulos = fase.informacao.equacoes.flatMap(equacao => equacao.angulos);
+
+        const temp = angulos[2]; angulos[2] = angulos[3]; angulos[3] = temp;
+
+        const soma = angulos.reduce((equacao, angulo) => new Addition(equacao, angulo));
+        const equacao = new Equality(soma, new Addition(new Variable('90°'), new Variable('90°')));
+
+        const juncao1 = new JuntarEquacoes(equacao1, [equacao2], fase);
+        const juncao2 = new JuntarEquacoes(equacao2, [equacao1], fase);
+
+        juncao1.equacaoNova = new CSS2DObject(equacao.html);
+        juncao2.equacaoNova = new CSS2DObject(equacao.html);
+
+
+        return new Output()
+                .addInputs(juncao1, juncao2)
+                .setUpdateFunction(function(novoEstado){
+
+                    const estado = this.estado;
+
+                    if(novoEstado.novaEquacao && estado.etapa == 0){
+
+                        const objetoEquacao = new ElementoCSS2D(novoEstado.novaEquacao, fase.whiteboard)
+                        
+                        const resultado = new Equality(soma, new Variable("180°"));
+
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase);
+
+                        resolverEquacao.equacaoNova = new CSS2DObject(resultado.html);
+                        
+                        resolverEquacao.ativar(false);
+
+                        this.addInputs(resolverEquacao);
+
+                        estado.etapa++;
+
+                        
+                        const angulosSelecionados = fase.informacao.equacoes.flatMap(equacao => equacao.angulosObjetos);
+
+                        const mostrarEApagar180Graus = fase.mostrarEApagar180Graus(fase.informacao.verticeSelecionado, angulosSelecionados)
+
+                        const triangulos = [fase.subtriangulo1, fase.subtriangulo2, fase.triangulo];
+
+                        const angles = [
+                            fase.subtriangulo1.angles[0], 
+                            fase.subtriangulo2.angles[0], 
+                            fase.subtriangulo1.angles[1], 
+                            fase.subtriangulo2.angles[2]
+                        ]
+
+                        const apagarTriangulos  = new AnimacaoSimultanea()
+                                                    .setAnimacoes(triangulos.map(
+                                                        triangulo => new ApagarPoligono(triangulo)
+                                                                     .ignorarObjetos(angles)
+                                                                     .setOnTermino(() => null)
+                                                    ))
+                        const mostrarTriangulos = new AnimacaoSimultanea()
+                                                    .setAnimacoes(triangulos.map(
+                                                        triangulo => new ApagarPoligono(triangulo)
+                                                        .ignorarObjetos(angles)
+                                                        .reverse()
+                                                    ))
+
+
+                        const animacao = new AnimacaoSequencial(
+                            apagarTriangulos,
+                            mostrarEApagar180Graus,
+                            mostrarTriangulos
+                        )
+
+                        fase.animar(animacao.setOnTermino(() => resolverEquacao.ativar(false)));
+
+
+                        return;
+                    }
+
+                    if(novoEstado.novaEquacao && estado.etapa == 1){
+
+                        //Mostrar dois subangulos se juntando para formar o angulo selecionado
+                        //Mostrar que a soma dos três angulos é 180°
+
+                        const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado)
+
+                        const anguloSelecionado = new Variable(Math.round(fase.triangulo.angles[indice].degrees) + "°")
+                        
+                        const novaEquacao = new Equality(
+                                                new Addition(
+                                                    new Addition(
+                                                        angulos[0], 
+                                                        anguloSelecionado
+                                                    ), 
+                                                    angulos[2]
+                                                ),
+                                                new Variable("180°"));
+
+                        const objetoEquacao = new ElementoCSS2D(novoEstado.novaEquacao, fase.whiteboard)
+
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase);
+
+                        resolverEquacao.equacaoNova = new CSS2DObject(novaEquacao.html);
+
+                        this.addInputs(resolverEquacao);
+
+                        estado.etapa++;
+
+                        return;
+
+                    }
+                })
+                .setEstadoInicial({
+                    etapa: 0
+                })
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    /////////////////////////     Animações     ////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
 
     animacaoGirarAngulo(angle){
 
@@ -1351,7 +1411,8 @@ export class Fase5  extends Fase{
                             desenharTracejado, 
                             mostrarTriangulo, 
                             mostrarTriangulo2
-                        );
+                        )
+                        .setOnTermino(()=> tracejado.removeFromScene());
 
         animacao.setOnTermino(() => {
             fase.triangulo.angles.map(angle=> angle.material.visible = false);
@@ -1360,123 +1421,8 @@ export class Fase5  extends Fase{
 
         return animacao;
     }
+
     
-    update(){
-
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-        if(this.debug) super.update();
-
-        super.update();
-
-        if(!this.progresso) this.progresso = "start";
-
-        const problemaAtual = this.problemas[this.progresso];
-
-        if(problemaAtual.satisfeito(this)){
-
-            problemaAtual.consequencia(this);
-
-            this.progresso = problemaAtual.proximo(this);
-
-            // const proximoProblema = this.problemas[this.progresso];
-
-
-            // proximoProblema.estado.informacao = this.informacao;
-        }
-    }
-
-    problemas = {
-
-        start: {
-            satisfeito: () => true,
-
-            consequencia: (fase) => {
-                fase.aula1();
-
-                fase.Configuracao0();
-
-                fase.controleFluxo  = fase.controleGeral(); 
-            },
-
-            proximo: () => "clicouVertice",
-
-            estado: new Estado(this, "setupObjects", null, "start", {})
-        },
-
-        clicouVertice: {
-            satisfeito: (fase) => fase.controleFluxo.estado.etapa == "arraste",
-
-            consequencia: (fase) => fase.aula2(),
-
-            proximo: (fase) => "arrastouVertice",
-
-        },
-
-        arrastouVertice: {
-            satisfeito: (fase) => !!fase.jaArrastouVertice,
-
-            consequencia: (fase) => {
-                
-                const dialogo = ["Arrastando esses dois vértices, pode-se criar qualquer triângulo",
-                                 "Ou seja, o que vamos fazer a seguir vale para todo triângulo...",
-                                 "Perceba os buracos entre o ângulo e o tracejado",
-                                 "Eles parecem caber outros ângulos não é?",
-                                 "Tente arrastar os ângulos do triângulo até esses buracos"]
-
-                const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0]));
-                const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1])).setDelay(50);
-                const anim3 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[2]));
-                const anim4 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[3]));
-                const anim5 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[4]));
-
-                fase.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5));
-
-
-            },
-
-            proximo: (fase) => 180,
-
-            // estado: new Estado(this, "setupObjects", "Configuracao2", "arrastouVertice", {})
-        },
-
-        180: {
-            //Se dois outputs de arraste tiverem finalizado(posições corretas), então 180° está satisfeito
-            satisfeito: (fase) => fase.outputDragAngle.filter(output => output.estado.finalizado).length == 2,
-
-            consequencia: (fase) => {
-
-                fase.animar180Graus();
-
-                fase.Configuracao4();
-
-            },
-
-            proximo: (fase) => "finalizado",
-
-            // estado: new Estado(this, "setupObjects", "Configuracao3", "180", {})
-        },
-
-        finalizado:{
-            satisfeito: () => false,
-
-            // estado: new Estado(this, "setupObjects", null, "finalizado", {})
-        }
-    }
-
-    //Funções, outputs etc. usados nos problemas
-
     mostrarEApagar180Graus(vertice, angulos){
 
         this.debug = false;
@@ -1927,5 +1873,118 @@ export class Fase5  extends Fase{
         }
 
     }
+    
+    update(){
 
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+
+        super.update();
+
+        if(!this.progresso) this.progresso = "start";
+
+        const problemaAtual = this.problemas[this.progresso];
+
+        if(problemaAtual.satisfeito(this)){
+
+            problemaAtual.consequencia(this);
+
+            this.progresso = problemaAtual.proximo(this);
+
+            // const proximoProblema = this.problemas[this.progresso];
+
+
+            // proximoProblema.estado.informacao = this.informacao;
+        }
+    }
+
+    problemas = {
+
+        start: {
+            satisfeito: () => true,
+
+            consequencia: (fase) => {
+                fase.aula1();
+
+                fase.Configuracao0();
+
+                fase.controleFluxo  = fase.controleGeral(); 
+            },
+
+            proximo: () => "clicouVertice",
+
+            estado: new Estado(this, "setupObjects", null, "start", {})
+        },
+
+        clicouVertice: {
+            satisfeito: (fase) => fase.controleFluxo.estado.etapa == "arraste",
+
+            consequencia: (fase) => fase.aula2(),
+
+            proximo: (fase) => "arrastouVertice",
+
+        },
+
+        arrastouVertice: {
+            satisfeito: (fase) => !!fase.jaArrastouVertice,
+
+            consequencia: (fase) => {
+                
+                const dialogo = ["Arrastando esses dois vértices, pode-se criar qualquer triângulo",
+                                 "Ou seja, o que vamos fazer a seguir vale para todo triângulo...",
+                                 "Perceba os buracos entre o ângulo e o tracejado",
+                                 "Eles parecem caber outros ângulos não é?",
+                                 "Tente arrastar os ângulos do triângulo até esses buracos"]
+
+                const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0]));
+                const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1])).setDelay(50);
+                const anim3 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[2]));
+                const anim4 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[3]));
+                const anim5 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[4]));
+
+                fase.animar(new AnimacaoSequencial(anim1,anim2,anim3,anim4,anim5));
+
+
+            },
+
+            proximo: (fase) => 180,
+
+            // estado: new Estado(this, "setupObjects", "Configuracao2", "arrastouVertice", {})
+        },
+
+        180: {
+            //Se dois outputs de arraste tiverem finalizado(posições corretas), então 180° está satisfeito
+            satisfeito: (fase) => fase.outputDragAngle.filter(output => output.estado.finalizado).length == 2,
+
+            consequencia: (fase) => {
+
+                fase.animar180Graus();
+
+                fase.Configuracao4();
+
+            },
+
+            proximo: (fase) => "finalizado",
+
+            // estado: new Estado(this, "setupObjects", "Configuracao3", "180", {})
+        },
+
+        finalizado:{
+            satisfeito: () => false,
+
+            // estado: new Estado(this, "setupObjects", null, "finalizado", {})
+        }
+    }  
 }

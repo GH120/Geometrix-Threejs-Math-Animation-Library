@@ -140,7 +140,7 @@ export class Draggable extends Input{
                         
                         //Caso não tenha mais outputs
                         if(!draggable.observers.length) {
-                          if(estado.ativo) soltarObjeto();
+                          if(estado.cursor =='grabbing') soltarObjeto();
                           return estado.ativo = false;
                         }
 

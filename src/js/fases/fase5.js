@@ -57,7 +57,7 @@ export class Fase5  extends Fase{
         //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
         //Mostrar que a soma dos 
 
-        this.debug = true;
+        this.debug = false;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -128,7 +128,7 @@ export class Fase5  extends Fase{
 
         const mostrarSidenote = new MostrarTexto(sidenote);
 
-        const moverVertice = new SimularMovimento(fase.triangulo.vertices[1])
+        const moverVertice = new SimularMovimento(fase.triangulo.vertices[0], null, 0.3, 5)
 
 
         return new AnimacaoSimultanea(dialogo, mostrarSidenote, moverVertice);

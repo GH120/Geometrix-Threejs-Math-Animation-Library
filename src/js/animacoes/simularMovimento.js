@@ -3,24 +3,28 @@ import Animacao, { curvas } from "./animation";
 
 export default class SimularMovimento extends Animacao{
 
-    constructor(objeto, trajetoria){
+    constructor(objeto, trajetoria, raio=0.25, quantidadeDePontos=3){
         super(objeto);
 
-        const points = this.generateRandomPoints(3, 0.01);
+        const points = [
+            new THREE.Vector3(0,0,0),
+            ...this.generateRandomPoints(quantidadeDePontos, raio),
+            new THREE.Vector3(0,0,0)
+        ]
 
         this.trajetoria = new THREE.CatmullRomCurve3(points, true);
 
         this.interpolacaoComum();
-        this.setDuration(10000)
+        this.setDuration(300)
     }
 
     generateRandomPoints(numPoints, radius) {
         const points = [];
         for (let i = 0; i < numPoints; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const r = radius * Math.sqrt(Math.random());  // Uniform distribution within a circle
+            const r = radius * Math.sqrt(Math.sqrt(Math.random()));  // Uniform distribution within a circle
             const x = r * Math.cos(angle);
-            const y = (Math.random() - 0.5) * 2;  // Spread points randomly along the y-axis
+            const y = r * Math.sin(angle)  // Spread points randomly along the y-axis
             points.push(new THREE.Vector3(x, y, 0));
         }
         return points;
@@ -38,6 +42,10 @@ export default class SimularMovimento extends Animacao{
 
     onStart(){
         this.centroOrbita = this.objeto.getPosition();
+    }
+
+    curva(x){
+        return curvas.curvaPeriodica(curvas.easeInOutBounce(x), 10);
     }
 
 }

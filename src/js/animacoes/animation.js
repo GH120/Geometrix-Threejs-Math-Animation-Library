@@ -544,5 +544,7 @@ export const curvas = {
         : (1 + curvas.easeOutBounce(2 * x - 1)) / 2;
     },
 
-    curvaPeriodica: (curva, voltas) => x => curva(Math.sin(x * Math.PI * voltas))
+    curvaPeriodica: (curva, voltas) => x => curva(Math.sin(x * Math.PI * voltas)),
+
+    decrescimentoLinear: (curva) => x => (1-x) * curva(x)
 }

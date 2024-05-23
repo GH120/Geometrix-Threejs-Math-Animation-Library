@@ -393,13 +393,23 @@ export class Fase {
         }
         animate();
     }
+    animacaoDialogo(texto, target = null){
+        return new TextoAparecendo(target? target : this.text.element)
+                                  .setOnStart(
+                                    () => this.changeText(texto, target)
+                                  )
+                                  .setValorFinal(100)
+    }
 
-    animacaoDialogo(texto, target = this.text){
+
+    animacaoMostrarDialogo(texto, target = this.text){
+        
         return new MostrarTexto(target? target : this.text.element)
                                   .setOnStart(
                                     () => target.element.textContent = texto
                                   )
                                   .setValorFinal(25* texto.length)
+    
     }
 
     animacoesDialogo(...textos){

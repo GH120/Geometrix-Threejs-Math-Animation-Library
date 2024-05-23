@@ -124,9 +124,9 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
-        const sidenote = fase.createTextBox('', fase.triangulo.vertices[1].getPosition().toArray(), 17, true);
+        const sidenote = fase.createTextBox('', fase.triangulo.vertices[1].getPosition().toArray(), 3, true);
 
-        const mostrarSidenote = new MostrarTexto(sidenote);
+        const mostrarSidenote = new MostrarTexto(sidenote, fase.scene);
 
         const moverVertice = new SimularMovimento(fase.triangulo.vertices[0], null, 0.3, 5)
 

@@ -3,12 +3,12 @@ import Animacao, { curvas } from "./animation";
 
 export default class SimularMovimento extends Animacao{
 
-    constructor(objeto, trajetoria, raio=0.25, quantidadeDePontos=3){
+    constructor(objeto, trajetoria, raio=0.5, quantidadeDePontos=3){
         super(objeto);
 
         const points = [
             new THREE.Vector3(0,0,0),
-            ...this.generateRandomPoints(quantidadeDePontos, raio),
+            ...(trajetoria)? trajetoria : this.generateRandomPoints(quantidadeDePontos, raio),
             new THREE.Vector3(0,0,0)
         ]
 
@@ -45,7 +45,7 @@ export default class SimularMovimento extends Animacao{
     }
 
     curva(x){
-        return curvas.curvaPeriodica(curvas.easeInOutBounce(x), 10);
+        return curvas.easeInOutBounce(x)
     }
 
 }

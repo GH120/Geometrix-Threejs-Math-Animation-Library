@@ -18,7 +18,7 @@ import FixarAoCirculo from '../outputs/fixarAoCirculo';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
-import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente } from '../animacoes/animation';
+import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente, curvas } from '../animacoes/animation';
 import { colorirAngulo } from '../animacoes/colorirAngulo';
 import { Tracejado } from '../objetos/tracejado';
 import MostrarTracejado from '../animacoes/mostrarTracejado';
@@ -42,6 +42,7 @@ import JuntarEquacoes from '../outputs/juntarEquacoes';
 import { Output } from '../outputs/Output';
 import ResolverEquacao from '../outputs/resolverEquacao';
 import { PopInAngles } from '../animacoes/PopInAngles';
+import SimularMovimento from '../animacoes/simularMovimento';
   
 
 //Consertar conflito de paralelismo do diálogo da equação fração
@@ -255,12 +256,18 @@ export class Fase4 extends Fase{
                                             pontoDoCirculo.updateObservers();
                                         })
                                         .setOnTermino(() => {
+
+                                            //Poderia transformar em animação independente?
                                             const texto = this.createMathJaxTextBox("Ponteiro~arrastável", 
                                                                                     pontoDoCirculo.position.clone()
                                                                                                            .add(new THREE.Vector3(1, 0, 0))
                                                                                                            .toArray(), 
                                                                                     5           
                                                                                   );
+
+                                            const trajetoria = [new THREE.Vector3(1,1,0), new THREE.Vector3(1,-1,0)]
+
+                                            const simularMovimento = new SimularMovimento(pontoDoCirculo,trajetoria).setDuration(75).setCurva(curvas.easeInOutBounce)
 
                                             const mostrarTexto = new MostrarTexto(texto)
                                                                 .setCurva(x => {
@@ -278,7 +285,7 @@ export class Fase4 extends Fase{
                                                                     this.ponto2.hoverable.observers.map(observer => observer.update({dentro:false}))
                                                                 });
 
-                                            this.animar(mostrarTexto)
+                                            this.animar(new AnimacaoSimultanea(mostrarTexto, simularMovimento.filler(20)));
 
                                         })
         

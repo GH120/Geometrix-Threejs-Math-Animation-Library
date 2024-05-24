@@ -43,6 +43,7 @@ import { Output } from '../outputs/Output';
 import ResolverEquacao from '../outputs/resolverEquacao';
 import { PopInAngles } from '../animacoes/PopInAngles';
 import SimularMovimento from '../animacoes/simularMovimento';
+import { Objeto } from '../objetos/objeto';
   
 
 //Consertar conflito de paralelismo do diálogo da equação fração
@@ -398,7 +399,7 @@ export class Fase4 extends Fase{
                     fase.circulo.removeFromScene();
                     fase.scene.add(gltf.scene);
 
-                    fase.relogio = relogio;
+                    fase.relogio = Objeto.fromMesh(relogio);
                 },
             );
 
@@ -690,6 +691,8 @@ export class Fase4 extends Fase{
 
     aula4(){
 
+        this.Configuracao4();
+
         const fase = this;
 
         const dialogo = [
@@ -698,7 +701,7 @@ export class Fase4 extends Fase{
             "Conseguimos usar uma dessas grandezas (hora) e a razão entre elas para descobrir a outra (graus)",
             "Chamamos tal regra de 'Regra de 3', como muitos conhecem",
             "Vamos transformar ela em uma carta que poderá utilizar em outros problemas",
-            "Basta arrastá-la para a tela e procurar duas grandezas diretamente proporcionais"
+            "Basta arrastá-la para a tela e clicar no relógio"
         ]
         .map(linha => fase.animacaoDialogo(linha));
 
@@ -706,7 +709,7 @@ export class Fase4 extends Fase{
         const anim1 = this.aula4dialogo1(dialogo[1])
         const anim2 = this.aula4dialogo2(dialogo[2])
         const anim3 = dialogo[3]
-        const anim4 = dialogo[4]
+        const anim4 = dialogo[4].setOnTermino(()=> fase.settings.ativarMenuCartas(true))
         const anim5 = dialogo[5]
 
 
@@ -985,18 +988,20 @@ export class Fase4 extends Fase{
 
         const fase = this;
 
-        const graus = Math.round(fase.angle.degrees); 
-        const hora  = graus/30 + "h";
+        const graus = () => Math.round(fase.angle.degrees); 
+        const hora  = () => Math.round(graus()/30*100)/100 + "h";
 
+        //Refatorar isso em atributos de uma classe Equação?
         const informacaoNova = {
             objetosProporcionais:[
                 {
                     objeto: fase.relogio,
-                    nome: Math.round(fase.angle.degrees)/30 + "h",
-                    valor: Math.round(fase.angles.degrees),
-                    equacao: `\\color{red} ${hora} \\color{black} tem \\color{blue} ${graus}°`,
+                    nome: hora,
+                    valor: graus,
+                    equacao: () => `\\color{red} ${hora()} \\color{black}~tem~\\color{blue} ${graus()}°`,
                     position: [6, 0, 0 ],
-                    tamanhoFonte: 2
+                    tamanhoFonte: 2,
+                    compativelCom: (informacao) => informacao.nome.slice(-1) == 'h'
                 }
             ]
         }

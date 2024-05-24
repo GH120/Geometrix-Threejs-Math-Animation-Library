@@ -1,4 +1,8 @@
+import MostrarTexto from "./MostrarTexto";
 import Animacao, { AnimacaoSequencial } from "./animation";
+import * as THREE from 'three';
+import MoverTexto from "./moverTexto";
+
 
 export default class MoverEquacao extends AnimacaoSequencial{
 
@@ -64,7 +68,7 @@ export default class MoverEquacao extends AnimacaoSequencial{
                                 .setValorFinal(3000)
                                 .setOnStart(() => {
                                     fase.scene.add(elementoCSS2);
-                                    fase.whiteboard.adicionarEquacao(equacao)
+                                    this.elementoClone = fase.whiteboard.adicionarEquacao(equacao)
                                 });
 
         const moverEquacaoParaDiv = new MoverTexto(elementoCSS2)

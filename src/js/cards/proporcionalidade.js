@@ -13,6 +13,8 @@ import InsideElipse from "../outputs/insideElipse";
 import MostrarTexto from "../animacoes/MostrarTexto";
 import MoverEquacao from "../animacoes/moverEquacao";
 import { Clickable } from "../inputs/clickable";
+import ElementoCSS2D from "../objetos/elementocss2d";
+import JuntarEquacoes from "../outputs/juntarEquacoes";
 
 export default class Proporcionalidade {
 
@@ -38,14 +40,9 @@ export default class Proporcionalidade {
     //Se tiver qualquer objeto interativo na cena
     accept(){
 
+        const fase = this.fase;
+
         const objetosProporcionais = fase.informacao.objetosProporcionais;
-
-
-        for(const objetoInfo of objetosProporcionais){
-
-            this.controleSelecionarObjeto(objetoInfo);
-            
-        }
 
         alert(` Objetos proporcionais ${(objetosProporcionais.length)? "existem" : "não existem"}`);
 
@@ -57,6 +54,24 @@ export default class Proporcionalidade {
         // Criar novo output para selecionar lado e arrastar ele
 
         const fase = this.fase;
+
+        const objetosProporcionais = fase.informacao.objetosProporcionais;
+
+        this.controleEquacoes = this.criarControleEquacoes();
+
+        this.clicarObjetos = []
+
+        for(const objetoInfo of objetosProporcionais){
+
+            this.clicarObjetos.push(this.controleSelecionarObjeto(objetoInfo));
+            
+        }
+
+        const mudarDialogo = fase.animacaoDialogo('Clique em objetos para extrair suas propriedades');
+
+        mudarDialogo.setNome('Dialogo Carta');
+
+        fase.animar(mudarDialogo);
 
 
 
@@ -72,99 +87,59 @@ export default class Proporcionalidade {
 
 
     //Transformar em controle geral
-    // controleArrastarLados(){
+    controleGeral(){
 
-    //     const carta = this;
+        const carta = this;
+        const fase  = this.fase;
 
-    //     const paralelogramo = this.paralelogramoSelecionado;
+        return new Output()
+               .addInputs(...this.clicarObjetos, this.controleEquacoes)
+               .setUpdateFunction(function(novoEstado){
 
-    //     //Outputs auxiliares
+                    const estado = this.estado;
 
-    //     carta.colorirArestas = [
-    //         this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xe828282),
-    //         this.criarColorirArestaSelecionada(paralelogramo.edges[0], 0xffff00),
-    //         this.criarColorirArestaSelecionada(paralelogramo.edges[3], 0xe828282),
-    //         this.criarColorirArestaSelecionada(paralelogramo.edges[1], 0xffff00)
-    //     ];
+                    if(novoEstado.objetoSelecionado){
+                        //Criar equação com as informações obtidas
 
-    //     const moverLadosLaterais  = this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
-    //     const moverLadosVerticais = this.criarMoverLados(paralelogramo.edges[3], paralelogramo.edges[1]);
+                        const equacao1   = novoEstado.objetoSelecionado;
+
+                        const equacaoObjeto = new ElementoCSS2D(informacoes.equacao);
 
 
-    //     const dialogos = {
-    //         primeiroLadoMovido1: `Temos agora três lados conhecidos, `,
-    //         primeiroLadoMovido2: `Use o mesmo raciocinio com o lado restante para obter seu valor`,
-    //         ultimoLadoMovido: `Muito bem, agora conhecemos todos os lados`
-    //     }
+                        equacao1.equacaoObjeto = equacaoObjeto;
 
-    //     //Controle propriamente dito
-    //     return new Output()
-    //            .setName('Controle Arraste') 
-    //            .addInputs(moverLadosLaterais, moverLadosVerticais)
-    //            .setUpdateFunction(function(novoEstado){
 
-    //                 const estado = this.estado;
+                        for(const equacao2 of estado.equacoes){
+
+                            //Refatorar
+                            //Lida apenas com equacões sendo compatíveis apenas em pares
+                            //Tratar o caso depois de equações em mais de um par
+                            if(equacao2.compativelCom(equacao1) && equacao1.compativelCom(equacao2)){
+
+ 
+                                equacao1.juntarEquacoes = new JuntarEquacoes(equacao1.equacaoObjeto, [equacao2.equacaoObjeto], fase); 
+                                // if(!equacao2.juntarEquacoes) 
+                                equacao2.juntarEquacoes = new JuntarEquacoes(equacao2.equacaoObjeto, [equacao1.equacaoObjeto], fase)
+
+                                estado.juntarEquacoes.push(equacao1.juntarEquacoes, equacao2.juntarEquacoes);
+                                
+                                carta.controleEquacoes.addInputs(equacao1, equacao2);
+                                
+                            }
+                        }
+
+                        estado.equacoes.push(equacaoObjeto);
+
+                    }
+
+                    //Criar um verificador para ver se equação poderá ser juntada com outra
                     
-    //                 const lado       = novoEstado.ladoOriginal; 
-    //                 const ladoOposto = novoEstado.ladoSelecionado;
-    //                 const ultimaPosicao = novoEstado.ultimaPosicaoDoLadoOriginal;
-
-    //                 //Desativa todos os outputs como mover lado e colorir
-    //                 lado.removeAllOutputs();
-    //                 ladoOposto.removeAllOutputs();
-
-    //                 carta.colorirArestas.map(arestaColorida => arestaColorida.update({dentro:false}));
-
-    //                 estado.ladosConhecidos++;
-
-    //                 const avisarSeControleTerminou = () => this.notify({execucaoTerminada: estado.ladosConhecidos == paralelogramo.numeroVertices})
-
-    //                 //Só anima comentário depois de executar as animações da equação
-    //                 //Quando terminado diálogo, notifica termino dessa execução
-    //                 carta.criarEquacao(lado, ladoOposto, ultimaPosicao)
-    //                      .setOnStart(
-    //                         () => animarComentario(estado.ladosConhecidos)
-    //                              .setOnTermino(avisarSeControleTerminou)
-    //                      )
-    //                      .setOnTermino(() =>{
-    //                          this.notify({}) //Atualiza o valor das aresta que tem esse controle como input
-    //                      })
-    //            })
-    //            .setEstadoInicial({
-    //                 ladosConhecidos: paralelogramo.edges.filter(aresta => aresta.variable.value).length
-    //             })
-
-    //     //Funções auxiliares:
-
-    //     //Função para ser rodada no término do criarEquacao
-    //     function animarComentario(ladosConhecidos){
-
-    //         let animacaoDialogo;
-
-    //         if(ladosConhecidos == 3){
-                
-    //             animacaoDialogo = new AnimacaoSequencial(
-    //                                 carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
-    //                                 carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
-    //                             );
-
-    //             animacaoDialogo.setNome("Dialogo Carta");
-
-    //             carta.fase.animar(animacaoDialogo);
-    //         }
-
-    //         if(ladosConhecidos == 4){
-                
-    //             animacaoDialogo = carta.fase.animacaoDialogo(dialogos.ultimoLadoMovido);
-
-    //             animacaoDialogo.setNome("Dialogo Carta");
-
-    //             carta.fase.animar(animacaoDialogo);
-    //         }
-
-    //         return animacaoDialogo;
-    //     }
-    // }
+               })
+               .setEstadoInicial({
+                    equacoes:[],
+                    juntarEquacoes:[]
+               })
+    }
 
     //Controle selecionar objeto, retorna equação
   
@@ -178,7 +153,7 @@ export default class Proporcionalidade {
 
         const fase = this.fase;
 
-        if(!informacao.objeto.clickable) new Clickable(informacao.objeto);
+        if(!informacao.objeto.clickable) new Clickable(informacao.objeto, fase.camera);
 
         return new Output()
                .addInputs(informacao.objeto.clickable)
@@ -190,15 +165,20 @@ export default class Proporcionalidade {
                     if(novoEstado.clicado && !estado.ativado){
                         //Retorna novo valor equação css2d
 
-                        const equacao = informacao.equacao;
+                        const equacao = informacao.equacao();
                         const posicao = informacao.posicao;
                         const tamanhoFonte = informacao.tamanhoFonte
 
                         const equationBox = fase.createMathJaxTextBox(equacao, posicao, tamanhoFonte);
 
-                        fase.animar(new MoverEquacao(equationBox, fase, equacao, null, 60,60,60));
+                        const moverEquacao = new MoverEquacao(equationBox, fase, null, null, 60,60,60)
+
+                        fase.animar(moverEquacao);
 
                         estado.ativado = true;
+
+                        this.notify({objetoSelecionado: {...informacao, equacao: moverEquacao.elementoClone}})
+
                     }
                })
     }
@@ -206,4 +186,17 @@ export default class Proporcionalidade {
 
     //Controle juntar equações e verificar razão
     //Junto duas equações e retorno a razão entre elas
+
+    criarControleEquacoes(){
+
+        return new Output()
+               .setUpdateFunction(function(novoEstado){
+
+                    if(novoEstado.novaEquacao){
+                        //Realizar lógica de incluir mais coisas 
+                        alert("funcionando");
+                        console.log(novoEstado.novaEquacao)
+                    }
+               })
+    }
 }

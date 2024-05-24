@@ -17,11 +17,12 @@ import { LadoParalogramo } from '../../js/cards/ladoParalelogramo';
 import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
 import { AnguloParalogramo } from '../../js/cards/anguloParalelogramo';
 import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
+import Proporcionalidade from '../../js/cards/proporcionalidade';
 
 const cartas = [
-  { tipo: LadoParalogramo,   imagem: imagemParalelogramoLado },
-  { tipo: AnguloParalogramo, imagem: imagemAnguloParalelogramo},
-  { tipo: LadoParalogramo,   imagem: imagemParalelogramoLado },
+  { tipo: Proporcionalidade,   imagem: imagemParalelogramoLado },
+  { tipo: Proporcionalidade, imagem: imagemAnguloParalelogramo},
+  { tipo: Proporcionalidade,   imagem: imagemParalelogramoLado },
   // Adicione mais cartas conforme necessário
 ];
 

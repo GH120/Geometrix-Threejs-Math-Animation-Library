@@ -7,6 +7,9 @@ import  MoverVertice  from '../outputs/moverVertice';
 import { MostrarBissetriz } from '../outputs/mostrarBissetriz';
 import { Clickable, MultipleClickable } from '../inputs/clickable';
 
+import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
+import Proporcionalidade from '../../js/cards/proporcionalidade';
+
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
@@ -27,6 +30,7 @@ import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages'
 import { Operations } from '../equations/operations';
 import { AnimacaoSequencial } from '../animacoes/animation';
 import MostrarTexto from '../animacoes/MostrarTexto';
+
 
 
 
@@ -124,6 +128,8 @@ export class Fase {
             objetosProporcionais: [] //Usado pela carta Proporcionalidade
         }
     }
+
+    cartas = [];
     
 
     //Onde toda a lógica da fase é realizada, a sequência de animações/texto

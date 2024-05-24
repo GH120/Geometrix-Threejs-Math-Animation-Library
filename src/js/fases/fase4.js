@@ -44,6 +44,9 @@ import ResolverEquacao from '../outputs/resolverEquacao';
 import { PopInAngles } from '../animacoes/PopInAngles';
 import SimularMovimento from '../animacoes/simularMovimento';
 import { Objeto } from '../objetos/objeto';
+import Proporcionalidade from '../cards/proporcionalidade';
+
+import imagemProporcionalidade from '../../assets/Proporcionalidade.png'
   
 
 //Consertar conflito de paralelismo do diálogo da equação fração
@@ -71,6 +74,13 @@ export class Fase4 extends Fase{
         this.debug = false;
         this.mostrarFrameRate = false;
     }
+
+    cartas = [
+        { tipo: Proporcionalidade,   imagem: imagemProporcionalidade },
+        { tipo: Proporcionalidade,   imagem: imagemProporcionalidade },
+        { tipo: Proporcionalidade,   imagem: imagemProporcionalidade },
+        // Adicione mais cartas conforme necessário
+    ];
 
     //Objetos básicos
     setupObjects(){

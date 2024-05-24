@@ -19,13 +19,6 @@ import { AnguloParalogramo } from '../../js/cards/anguloParalelogramo';
 import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
 import Proporcionalidade from '../../js/cards/proporcionalidade';
 
-const cartas = [
-  { tipo: Proporcionalidade,   imagem: imagemParalelogramoLado },
-  { tipo: Proporcionalidade, imagem: imagemAnguloParalelogramo},
-  { tipo: Proporcionalidade,   imagem: imagemParalelogramoLado },
-  // Adicione mais cartas conforme necessário
-];
-
 function Navbar(props) {
   const [FaseMenuOpen, setFaseMenuOpen] = useState(false);
   const [CardsMenuOpen, setCardsMenuOpen] = useState(false);
@@ -82,7 +75,7 @@ function Navbar(props) {
         <MenuFaseNovo />
       </Modal>
       <div className={`navbar-links ${CardsMenuOpen ? 'open' : ''}`}>
-        <CartasContainer cartas={cartas} settings={settings} mostrarCartas={CardsMenuOpen} />
+        <CartasContainer cartas={settings.fase.cartas} settings={settings} mostrarCartas={CardsMenuOpen} />
       </div>
 
       <div className={`navbar-links ${EquationMenuOpen ? 'open' : ''}`}>

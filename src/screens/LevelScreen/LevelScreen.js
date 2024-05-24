@@ -14,10 +14,10 @@ import { PrimeiraFase } from '../../js/fases/PrimeiraFase';
 const fases = {
   '1' : Fase4,
   '2' : Fase5,
-  '3' : Fase6,
+  '3' : PrimeiraFase,
   '4' : PrimeiraFase,
-  '5' : Fase5,
-  '6' : Fase6,
+  '5' : Fase4,
+  '6' : Fase5,
   '7' : PrimeiraFase,
   '8' : PrimeiraFase
 }

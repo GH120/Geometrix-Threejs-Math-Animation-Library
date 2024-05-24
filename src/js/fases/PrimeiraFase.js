@@ -31,6 +31,12 @@ import ElementoCSS2D from "../objetos/elementocss2d";
 import MostrarValorAresta from "../outputs/mostrarValorAresta";
 import MostrarNomeVertice from "../outputs/mostrarNomeVertice";
 import JuntarEquacoes from "../outputs/juntarEquacoes";
+import { LadoParalogramo } from "../cards/ladoParalelogramo";
+import { AnguloParalogramo } from "../cards/anguloParalelogramo";
+import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
+import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
+
+
 
 export class PrimeiraFase extends Fase{
 
@@ -60,6 +66,13 @@ export class PrimeiraFase extends Fase{
         //Generalizar a parte de juntar equações
         //Transformar todo array em vetor do threejs, muito propício a falha 
     }
+
+    cartas = [
+        { tipo: LadoParalogramo,     imagem: imagemParalelogramoLado },
+        { tipo: AnguloParalogramo,   imagem: imagemAnguloParalelogramo},
+        { tipo: LadoParalogramo,     imagem: imagemParalelogramoLado },
+        // Adicione mais cartas conforme necessário
+    ];
 
     //Objetos básicos
     setupObjects(){

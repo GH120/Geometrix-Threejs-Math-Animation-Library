@@ -400,6 +400,8 @@ export class Fase4 extends Fase{
                     fase.scene.add(gltf.scene);
 
                     fase.relogio = Objeto.fromMesh(relogio);
+
+                    fase.Configuracao4();
                 },
             );
 
@@ -690,8 +692,6 @@ export class Fase4 extends Fase{
     }
 
     aula4(){
-
-        this.Configuracao4();
 
         const fase = this;
 
@@ -1213,6 +1213,57 @@ export class Fase4 extends Fase{
 
     }
 
+    criarControleGeral(){
+
+        const fase = this;
+
+        return new Output()
+               .setUpdateFunction(function(novoEstado){
+
+                    const estado = this.estado;
+
+                    if(novoEstado.objetoSelecionado && estado.etapa == 0){
+                        
+                        const mudarDialogo = fase.animacaoDialogo('Muito bem, mova o ponteiro do relógio para conseguir outra medição');
+
+                        this.addInputs(fase.ponto2.draggable);
+
+                        fase.animar(mudarDialogo);
+
+                        estado.etapa++;
+                    }
+
+                    else if(estado.etapa == 1 && novoEstado.dragging == false){
+
+                        estado.etapa++
+
+                        const mudarDialogo = fase.animacaoDialogo('Escolha qualquer hora e clique novamente no relógio');
+
+                        fase.animar(mudarDialogo);
+
+                        fase.controleDaCarta.estado.clicarObjetos.map(clicar => clicar.ativar(true))
+
+                        console.log(fase.controleDaCarta.estado.clicarObjetos);
+
+                    }
+               })
+               .setEstadoInicial({
+                    etapa:0
+               })
+    }
+
+    //REFATORAR GAMBIARRA
+    //Controle da carta proporcionalidade avisa quando acionar
+    //Se tiver obtido horas do relógio, roda um diálogo e reativa o click do relógio
+    adicionarControleDaCarta(controle){
+        super.adicionarControleDaCarta(controle);
+
+        controle.addObserver(this.criarControleGeral());
+
+        return this;
+    }
+
+
     update(){
         // this.atualizarOptions();
 
@@ -1541,5 +1592,4 @@ export class Fase4 extends Fase{
 
         
     }
-
 }

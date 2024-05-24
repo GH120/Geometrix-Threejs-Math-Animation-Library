@@ -115,7 +115,7 @@ export class Fase {
         this.animationControler = new AnimationControler(null,this,null,null,null);
         this.operadores = new Operations(null,this);
         this.dimensoes  = {width: width, height: height}
-        this.controleDaCarta = null;
+        this.controleDaCarta = null; //Serve para o controle da carta poder avisar os controles da fase
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
         this.calculadorFrameRate = new FrameRateCalculator();
         this.mostrarFrameRate = false;

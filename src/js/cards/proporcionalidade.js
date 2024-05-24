@@ -67,6 +67,10 @@ export default class Proporcionalidade {
             
         }
 
+        this.controle = this.controleGeral();
+
+        this.fase.adicionarControleDaCarta(this.controle); //Refatorar
+
         const mudarDialogo = fase.animacaoDialogo('Clique em objetos para extrair suas propriedades');
 
         mudarDialogo.setNome('Dialogo Carta');
@@ -103,7 +107,7 @@ export default class Proporcionalidade {
 
                         const equacao1   = novoEstado.objetoSelecionado;
 
-                        const equacaoObjeto = new ElementoCSS2D(informacoes.equacao);
+                        const equacaoObjeto = new ElementoCSS2D(equacao1.equacao, fase.whiteboard);
 
 
                         equacao1.equacaoObjeto = equacaoObjeto;
@@ -130,6 +134,8 @@ export default class Proporcionalidade {
 
                         estado.equacoes.push(equacaoObjeto);
 
+                        this.notify({objetoSelecionado: novoEstado.objetoSelecionado});
+
                     }
 
                     //Criar um verificador para ver se equação poderá ser juntada com outra
@@ -137,6 +143,7 @@ export default class Proporcionalidade {
                })
                .setEstadoInicial({
                     equacoes:[],
+                    clicarObjetos: this.clicarObjetos,
                     juntarEquacoes:[]
                })
     }
@@ -161,7 +168,6 @@ export default class Proporcionalidade {
 
                     const estado = this.estado;
 
-
                     if(novoEstado.clicado && !estado.ativado){
                         //Retorna novo valor equação css2d
 
@@ -175,9 +181,9 @@ export default class Proporcionalidade {
 
                         fase.animar(moverEquacao);
 
-                        estado.ativado = true;
+                        this.ativar(false);
 
-                        this.notify({objetoSelecionado: {...informacao, equacao: moverEquacao.elementoClone}})
+                        moverEquacao.setOnTermino(() => this.notify({objetoSelecionado: {...informacao, equacao: moverEquacao.elementoClone}}))
 
                     }
                })

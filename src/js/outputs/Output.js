@@ -97,7 +97,7 @@ export class Output{
     ativar(on){
 
         if(on){
-          this.observed = [...this.backup];
+          this.addInputs(...this.backup);
         }
         else{
           this.backup   = [...this.observed];

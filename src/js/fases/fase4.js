@@ -991,6 +991,9 @@ export class Fase4 extends Fase{
         const graus = () => Math.round(fase.angle.degrees); 
         const hora  = () => Math.round(graus()/30*100)/100 + "h";
 
+        const horaAtual = hora();
+        const grausAtuais = graus();
+
         //Refatorar isso em atributos de uma classe Equação?
         const informacaoNova = {
             objetosProporcionais:[
@@ -1001,7 +1004,8 @@ export class Fase4 extends Fase{
                     equacao: () => `\\color{red} ${hora()} \\color{black}~tem~\\color{blue} ${graus()}°`,
                     position: [6, 0, 0 ],
                     tamanhoFonte: 2,
-                    compativelCom: (informacao) => informacao.nome().slice(-1) == 'h'
+                    compativelCom: (informacao) => informacao.nome().slice(-1) == 'h',
+                    equacaoResultante: (informacao) => `\\color{purple} RAZ \\tilde AO =  \\frac{\\color{blue}${grausAtuais}°}{\\color{red}${horaAtual}} \\color{black} = \\frac{\\color{blue}${informacao.valor()}°}{\\color{red}${informacao.nome()}}`
                 }
             ]
         }

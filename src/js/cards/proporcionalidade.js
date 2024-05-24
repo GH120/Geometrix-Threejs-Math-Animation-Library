@@ -120,10 +120,12 @@ export default class Proporcionalidade {
                             //Tratar o caso depois de equações em mais de um par
                             if(equacao2.compativelCom(equacao1) && equacao1.compativelCom(equacao2)){
 
+                                const equacaoResultante = equacao1.equacaoResultante(equacao2);
+
  
-                                equacao1.juntarEquacoes = new JuntarEquacoes(equacao1.equacaoObjeto, [equacao2.equacaoObjeto], fase); 
+                                equacao1.juntarEquacoes = new JuntarEquacoes(equacao1.equacaoObjeto, [equacao2.equacaoObjeto], fase, null, equacaoResultante); 
                                 // if(!equacao2.juntarEquacoes) 
-                                equacao2.juntarEquacoes = new JuntarEquacoes(equacao2.equacaoObjeto, [equacao1.equacaoObjeto], fase)
+                                equacao2.juntarEquacoes = new JuntarEquacoes(equacao2.equacaoObjeto, [equacao1.equacaoObjeto], fase, null, equacaoResultante);
 
                                 estado.juntarEquacoes.push(equacao1.juntarEquacoes, equacao2.juntarEquacoes);
                                 

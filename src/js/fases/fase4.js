@@ -68,7 +68,7 @@ export class Fase4 extends Fase{
 
         this.problema = 10
 
-        this.debug = true;
+        this.debug = false;
         this.mostrarFrameRate = false;
     }
 
@@ -266,9 +266,7 @@ export class Fase4 extends Fase{
                                                                                     5           
                                                                                   );
 
-                                            const trajetoria = [new THREE.Vector3(1,1,0), new THREE.Vector3(1,-1,0)]
-
-                                            const simularMovimento = new SimularMovimento(pontoDoCirculo,trajetoria).setDuration(75).setCurva(curvas.easeInOutBounce)
+                                            const simularMovimento = this.moverPonteiro(120, 150).setCurva(curvas.decrescimentoLinear(curvas.curvaPeriodica(x => x, 10)))
 
                                             const mostrarTexto = new MostrarTexto(texto)
                                                                 .setCurva(x => {
@@ -414,6 +412,8 @@ export class Fase4 extends Fase{
     aula2(){
 
         const fase = this;
+
+        this.debug = false;
 
         //Veja, quanto mais horas maior a quantidade de graus, pois elas são ** proporcionais **
         //Por isso que se 1 hora tem 30°, então 5 horas tem 5 vezes o tanto de graus (Mostra animação incrementando a hora e somando 30°)
@@ -598,6 +598,7 @@ export class Fase4 extends Fase{
 
         const equacoes = {
             formula: '\\color{purple} {RAZ \\tilde{A}O} = \\color{black} \\frac {\\color{blue} graus}{\\color{red} hora} \\color{black} = \\frac{\\color{blue} 30°}{\\color{red} 1h}',
+            simplificada: `\\color{blue} graus \\color{black} = \\color{red} hora \\color{blue} \\cdot \\color{purple} {RAZ \\tilde{A}O}`,
             fatorada: `\\color{blue} graus \\color{black} = \\color{red} hora \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`,
             instanciada: (hora) => `\\color{blue} graus \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`
         } 
@@ -612,12 +613,22 @@ export class Fase4 extends Fase{
         const mudarEquacao = new AnimacaoSequencial(
                                 new MostrarTexto(equacaoInicial)
                                 .setValorInicial(400)
-                                .setValorFinal(140)
-                                .setOnTermino(() => equacaoInicial.mudarTexto(equacoes.fatorada, 0.9)),
+                                .setValorFinal(0)
+                                .setOnTermino(() => equacaoInicial.mudarTexto(equacoes.simplificada, 0.9)),
                                 new MostrarTexto(equacaoInicial)
-                                .setValorInicial(170)
+                                .setValorInicial(0)
                                 .setValorFinal(400)
         )
+
+        const mudarEquacao2 = new AnimacaoSequencial(
+            new MostrarTexto(equacaoInicial)
+            .setValorInicial(400)
+            .setValorFinal(0)
+            .setOnTermino(() => equacaoInicial.mudarTexto(equacoes.fatorada, 0.9)),
+            new MostrarTexto(equacaoInicial)
+            .setValorInicial(0)
+            .setValorFinal(400)
+       )
 
         const moverEquacao = animacaoIndependente(
                                 () =>{
@@ -634,12 +645,14 @@ export class Fase4 extends Fase{
 
         //Criar objeto que contem equação na whiteboard, quando arrastar para perto uma variável hora retornar uma resposta
 
+        this.debug = false;
 
         const animacao = new AnimacaoSimultanea(
                             dialogo, 
                             new AnimacaoSequencial(
                                 aparecerEquacao,
                                 mudarEquacao,
+                                mudarEquacao2,
                                 moverEquacao
                             )
                         );
@@ -1309,9 +1322,6 @@ export class Fase4 extends Fase{
     update(){
         // this.atualizarOptions();
 
-        super.update();
-        super.update();
-        super.update();
         super.update();
         if(this.debug) super.update();
         if(this.debug) super.update();

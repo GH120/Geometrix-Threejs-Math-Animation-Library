@@ -67,8 +67,8 @@ export class Fase4 extends Fase{
 
         this.problema = 10
 
-        this.debug = false;
-        this.mostrarFrameRate = true;
+        this.debug = true;
+        this.mostrarFrameRate = false;
     }
 
     //Objetos básicos
@@ -397,6 +397,8 @@ export class Fase4 extends Fase{
                     gltf.scene.add(light);
                     fase.circulo.removeFromScene();
                     fase.scene.add(gltf.scene);
+
+                    fase.relogio = relogio;
                 },
             );
 
@@ -979,6 +981,30 @@ export class Fase4 extends Fase{
             .addInputs(juntar);
     }
 
+    Configuracao4(){
+
+        const fase = this;
+
+        const graus = Math.round(fase.angle.degrees); 
+        const hora  = graus/30 + "h";
+
+        const informacaoNova = {
+            objetosProporcionais:[
+                {
+                    objeto: fase.relogio,
+                    nome: Math.round(fase.angle.degrees)/30 + "h",
+                    valor: Math.round(fase.angles.degrees),
+                    equacao: `\\color{red} ${hora} \\color{black} tem \\color{blue} ${graus}°`,
+                    position: [6, 0, 0 ],
+                    tamanhoFonte: 2
+                }
+            ]
+        }
+
+        this.informacao.objetosProporcionais = informacaoNova.objetosProporcionais;
+        
+    }
+
     controleEquacoes(valor, funcao, sidenote){
 
         //Refatorar depois a parte das equações, esse trabalho aqui é desnecessário
@@ -1244,9 +1270,11 @@ export class Fase4 extends Fase{
 
             consequencia(fase){
 
-                // if(this.debug){
-                //     fase.aula4();
-                // } 
+                if(fase.debug){
+                    fase.aula4();
+                    alert("yes")
+                    return;
+                } 
 
                 fase.Configuracao2();
 

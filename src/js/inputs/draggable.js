@@ -105,6 +105,8 @@ export class Draggable extends Input{
 
                         const estado = this.estado;
 
+                        console.log({...estado})
+
                         //Funções auxiliares
                         const setCursor = (cursor) => {
                           camera.fase.settings.setCursor(cursor);
@@ -117,15 +119,14 @@ export class Draggable extends Input{
 
                           if(estado.ativo){
                             setCursor('grab');
-
                             const soltar = () => (!estado.dentro && !estado.segurando) || !draggable.observers.length
 
                             setTimeout(() => {
 
-                              alert("soltar:" + soltar() + ", dentro:" + estado.dentro)
                               if((soltar()))
                                 setCursor('default')
-                            }, 500);
+
+                            }, 250);
 
                             estado.ativo = false;
 
@@ -136,16 +137,18 @@ export class Draggable extends Input{
 
                         //Caso não tenha carregado o setup 
                         if(!camera.fase.settings) 
-                          return estado.ativo = false;
+                          // return estado.ativo = false;
                         
                         //Caso não tenha mais outputs
                         if(!draggable.observers.length) {
                           if(estado.cursor =='grabbing') soltarObjeto();
-                          return estado.ativo = false;
+                          // return estado.ativo = false;
                         }
 
                         //Lógica de mudar estado
-                        if(novoEstado.segurando) estado.ativo = true; //Desativa no soltarObjeto
+                        if(novoEstado.dragging) {
+                          estado.ativo = true; //Desativa no soltarObjeto
+                        }
                         
                         if(novoEstado.dentro   != undefined) 
                             estado.dentro     = novoEstado.dentro;

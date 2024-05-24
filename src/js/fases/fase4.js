@@ -1001,7 +1001,7 @@ export class Fase4 extends Fase{
                     equacao: () => `\\color{red} ${hora()} \\color{black}~tem~\\color{blue} ${graus()}°`,
                     position: [6, 0, 0 ],
                     tamanhoFonte: 2,
-                    compativelCom: (informacao) => informacao.nome.slice(-1) == 'h'
+                    compativelCom: (informacao) => informacao.nome().slice(-1) == 'h'
                 }
             ]
         }
@@ -1241,9 +1241,11 @@ export class Fase4 extends Fase{
 
                         fase.animar(mudarDialogo);
 
-                        fase.controleDaCarta.estado.clicarObjetos.map(clicar => clicar.ativar(true))
+                        const clicarObjetos = fase.controleDaCarta.estado.clicarObjetos;
 
-                        console.log(fase.controleDaCarta.estado.clicarObjetos);
+                        const ativarClick = () => clicarObjetos.map(clicar => clicar.ativar(true));
+
+                        setTimeout(ativarClick, 500)
 
                     }
                })

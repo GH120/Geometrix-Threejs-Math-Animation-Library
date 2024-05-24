@@ -127,12 +127,12 @@ export default class Proporcionalidade {
 
                                 estado.juntarEquacoes.push(equacao1.juntarEquacoes, equacao2.juntarEquacoes);
                                 
-                                carta.controleEquacoes.addInputs(equacao1, equacao2);
+                                carta.controleEquacoes.addInputs(equacao1.juntarEquacoes, equacao2.juntarEquacoes);
                                 
                             }
                         }
 
-                        estado.equacoes.push(equacaoObjeto);
+                        estado.equacoes.push(equacao1);
 
                         this.notify({objetoSelecionado: novoEstado.objetoSelecionado});
 

@@ -148,7 +148,7 @@ export class Fase4 extends Fase{
                          "Esse giro é o chamado ângulo,",
                          "Por padrão, dividimos o círculo em 360 partes, em graus",
                          "e o ângulo é medido neles.",
-                         "Quantos graus tem uma hora no relógio?"]
+                         "Arraste o ponteiro para apontar para 1 hora"]
 
         //Desenha o círculo
         const circulo         = this.circulo;
@@ -413,6 +413,8 @@ export class Fase4 extends Fase{
 
     aula2(){
 
+        const fase = this;
+
         //Veja, quanto mais horas maior a quantidade de graus, pois elas são ** proporcionais **
         //Por isso que se 1 hora tem 30°, então 5 horas tem 5 vezes o tanto de graus (Mostra animação incrementando a hora e somando 30°)
         //Então chamamos de **razão** o valor de proporção, que nesse caso é 30°/1 hora '30 graus para cada hora' (adiciona razão na whiteboard)
@@ -450,7 +452,7 @@ export class Fase4 extends Fase{
                             anim6
                         )
 
-        this.animar(animacao)
+        this.animar(this.aula4dialogo1(fase.equacaoUmaHora, fase.equacaocincoHoras).setOnTermino(() => this.animar(animacao)))
 
 
 
@@ -595,9 +597,9 @@ export class Fase4 extends Fase{
         //Usamos essa razão para calcular graus a partir da hora (transforma razão em função graus(hora) = hora * razao)
 
         const equacoes = {
-            formula: '\\color{blue} graus( \\color{red} {hora} \\color{blue}) \\color{black} = \\color{red} {hora} \\cdot \\color{purple} {RAZ \\tilde{A}O}',
-            fatorada: '\\color{blue} graus( \\color{red} hora \\color{blue}) \\color{black} = \\color{red} hora  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}',
-            instanciada: (hora) => `\\color{blue} graus( \\color{red} ${hora} \\color{blue}) \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`
+            formula: '\\color{purple} {RAZ \\tilde{A}O} = \\color{black} \\frac {\\color{blue} graus}{\\color{red} hora} \\color{black} = \\frac{\\color{blue} 30°}{\\color{red} 1h}',
+            fatorada: `\\color{blue} graus \\color{black} = \\color{red} hora \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`,
+            instanciada: (hora) => `\\color{blue} graus \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`
         } 
 
         const equacaoInicial = this.createMathJaxTextBox(equacoes.formula, [5, 0, 0], 1);
@@ -725,17 +727,17 @@ export class Fase4 extends Fase{
         fase.animar(animacao);
     }
 
-    aula4dialogo1(dialogo){
+    aula4dialogo1(textbox1, textbox2){
 
         const fase = this;
 
-        const textbox1 = fase.createMathJaxTextBox(`\\color{red}~5~horas \\color{black} ~tem~ \\color{blue} ~150°`, [5.5,2,0], 2);
-        const textbox2 = fase.createMathJaxTextBox(`\\color{red} ~10~ horas~ \\color{black} ~tem~ \\color{blue} ~300°`, [5.5,-2,0], 2);
-        const textbox3 = fase.createMathJaxTextBox(`\\color{red} \\frac{10~ horas~}{5~horas~}~ \\color{black} = \\color{blue} \\frac{300°}{150°}`, [5.5,0,0], 2);
+        // const textbox1 = fase.createMathJaxTextBox(`\\color{red}~5~horas \\color{black} ~tem~ \\color{blue} ~150°`, [5.5,2,0], 2);
+        // const textbox2 = fase.createMathJaxTextBox(`\\color{red} ~10~ horas~ \\color{black} ~tem~ \\color{blue} ~300°`, [5.5,-2,0], 2);
+        const textbox3 = fase.createMathJaxTextBox(`\\color{red} \\frac{5~ horas~}{1~horas~}~ \\color{black} = \\color{blue} \\frac{150°}{30°}`, [5.5,0,0], 2);
 
-        const resultadoParcial1 = `\\color{red} \\frac{10~ \\cancel{horas}~}{5~\\cancel{horas}~}~ \\color{black} = \\color{blue} \\frac{~300 \\cancel{°}}{150 \\cancel{°}}`
+        const resultadoParcial1 = `\\color{red} \\frac{5~ \\cancel{horas}~}{1~\\cancel{horas}~}~ \\color{black} = \\color{blue} \\frac{~150 \\cancel{°}}{30 \\cancel{°}}`
 
-        const resultadoParcial2 = ` \\displaylines{ \\color{red}\\frac{\\uparrow 10}{5}~ \\color{black}=   \\color{blue}\\frac{\\uparrow 300}{150} \\color{black} = 2 \\Rightarrow \\\\ proproç\\tilde{a}o ~cresce ~linearmente \\Rightarrow}`
+        const resultadoParcial2 = ` \\displaylines{ \\Large{\\color{red}\\frac{\\uparrow 5}{1}~ \\color{black}=   \\color{blue}\\frac{\\uparrow 150}{30} \\color{black} = 5} \\Rightarrow \\\\ crescem ~no ~mesmo~ ritmo: \\\\ \\color{red} 5~ vezes~ as ~horas~ \\\\ \\Rightarrow \\\\  \\color{blue} 5~ vezes~ os ~graus}`
         const resultado = `\\displaylines{\\color{red} \\Huge{~horas~} \\\\ ~s\\tilde{a}o \\\\  \\underline{~DIRETAMENTE~ PROPORCIONAIS~} \\color{black} \\\\   aos \\\\ \\color{blue} \\Huge{~graus}~\\color{black}}`
 
         const mostrarTexto1 = new MostrarTexto(textbox1, fase.scene).setValorFinal(300);
@@ -761,10 +763,10 @@ export class Fase4 extends Fase{
 
 
         const animacao = new AnimacaoSequencial(
-            new AnimacaoSimultanea(
-                mostrarTexto1, 
-                mostrarTexto2
-            ),
+            // new AnimacaoSimultanea(
+            //     mostrarTexto1, 
+            //     mostrarTexto2
+            // ),
             new AnimacaoSimultanea(
                 moverTexto1,
                 moverTexto2,
@@ -783,25 +785,30 @@ export class Fase4 extends Fase{
                 .filler(200)
                 .setDuration(200)
             )
-            .setDelay(50),
+            .setDelay(50)
+            .setOnTermino(()=> fase.debug = false),
 
             apagarCSS2(textbox3).reverse().setOnStart(() => textbox3.mudarTexto(resultadoParcial1, 1.5)).setDelay(200),
-            apagarCSS2(textbox3).setDuration(100),
-            apagarCSS2(textbox3).reverse().setOnStart(() => textbox3.mudarTexto(resultadoParcial2, 1.3)).setDelay(200),
-            apagarCSS2(textbox3).setDuration(100),
-            apagarCSS2(textbox3).reverse().setOnStart(() => textbox3.mudarTexto(resultado, 1.5)).setDelay(200),
+            
+            new AnimacaoSequencial(
+                apagarCSS2(textbox3).setDuration(100),
+                apagarCSS2(textbox3).reverse().setOnStart(() => textbox3.mudarTexto(resultadoParcial2, 0.8)).setDelay(200)
+            ),
+            new AnimacaoSequencial(
+                apagarCSS2(textbox3).setDuration(100),
+                apagarCSS2(textbox3).reverse().setOnStart(() => textbox3.mudarTexto(resultado, 1.5)).setDelay(200),
+            ),
+            apagarCSS2(textbox3, fase.scene)
         )
-        .setOnStart(() => fase.whiteboard.ativar(false));
+        .setOnStart(() => fase.whiteboard.ativar(false))
 
 
         fase.informacao.aula4dialogo1 = {textbox:textbox3};
 
-        return new AnimacaoSimultanea(dialogo, animacao);
+        return animacao;
     }
 
     aula4dialogo2(dialogo){
-
-        this.debug = false;
 
         const fase = this;
 
@@ -855,6 +862,19 @@ export class Fase4 extends Fase{
 
         //Usamos a razão da fórmula anterior para fazer funções para resolver equações
         //Mostra como usar uma carta para verificar razão
+    }
+
+    final(){
+
+        const fase = this;
+
+        const dialogo = [
+            "Com isso, temos uma breve recaptulação de proporcionalidade",
+            "Vamos ver mais alguns conceitos na fase seguinte...",
+            "Para nos prepararmos para semelhança, a ultima fase"
+        ]
+
+        fase.animar(fase.animacoesDialogo(...dialogo));
     }
 
     moverTracejado(tracejado, filler){
@@ -971,9 +991,6 @@ export class Fase4 extends Fase{
         const funcao = new ElementoCSS2D(informacao.funcao, this.whiteboard);
         const valor  = new ElementoCSS2D(informacao.valor,  this.whiteboard);
 
-        console.log(funcao, valor);
-
-
         //Criar controle de juntar funcao com valores
 
         const juntar = new JuntarEquacoes(valor,[funcao], this);
@@ -986,6 +1003,8 @@ export class Fase4 extends Fase{
 
     Configuracao4(){
 
+        this.Configuracao1();
+
         const fase = this;
 
         const graus = () => Math.round(fase.angle.degrees); 
@@ -993,6 +1012,13 @@ export class Fase4 extends Fase{
 
         const horaAtual = hora();
         const grausAtuais = graus();
+
+        const estadosResolucaoEquacao = [
+            (informacao ) => ` \\frac{\\color{red}${informacao.nome()}}{\\color{red}${horaAtual}} \\color{black} = \\frac{\\color{blue}${informacao.valor()}°}{\\color{blue}${grausAtuais}°}? \\Rightarrow`,
+            (informacao ) => ` \\color{red} ${Math.round(parseFloat(informacao.nome())/parseFloat(horaAtual) * 100)/100} \\color{black} = \\color{blue} ${informacao.valor()/grausAtuais} \\Rightarrow cresce~igualmente \\Rightarrow`,
+            (           ) => `\\color{red} Horas \\color{black}~são~proporcionais~aos~\\color{blue} graus \\Rightarrow`,
+            (informacao ) => `com ~ \\color{purple} RAZ \\tilde AO =  \\frac{\\color{blue}${grausAtuais}°}{\\color{red}${horaAtual}} \\color{black} = \\frac{\\color{blue}${informacao.valor()}°}{\\color{red}${informacao.nome()}}`
+        ]
 
         //Refatorar isso em atributos de uma classe Equação?
         const informacaoNova = {
@@ -1005,7 +1031,8 @@ export class Fase4 extends Fase{
                     position: [6, 0, 0 ],
                     tamanhoFonte: 2,
                     compativelCom: (informacao) => informacao.nome().slice(-1) == 'h',
-                    equacaoResultante: (informacao) => `\\color{purple} RAZ \\tilde AO =  \\frac{\\color{blue}${grausAtuais}°}{\\color{red}${horaAtual}} \\color{black} = \\frac{\\color{blue}${informacao.valor()}°}{\\color{red}${informacao.nome()}}`
+                    equacaoResultante: (informacao) => estadosResolucaoEquacao[0](informacao),
+                    estadosResolucaoEquacao: estadosResolucaoEquacao
                 }
             ]
         }
@@ -1018,13 +1045,12 @@ export class Fase4 extends Fase{
 
         //Refatorar depois a parte das equações, esse trabalho aqui é desnecessário
         const equacoes = {
-            formula: '\\color{blue} graus( \\color{red} {hora} \\color{blue}) \\color{black} = \\color{red} {hora} \\cdot \\color{purple} {RAZ \\tilde{A}O}',
-            fatorada: '\\color{blue} graus( \\color{red} hora \\color{blue}) \\color{black} = \\color{red} hora  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}',
-            instanciada: (hora) => `\\color{blue} graus( \\color{red} ${hora} \\color{blue}) \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`,
-            cancelarUnidade: (hora) => `\\color{blue} graus( \\color{red} ${hora} \\color{blue}) \\color{black} = \\color{red} ${parseFloat(hora)} \\cancel{h}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1 \\cancel{h}~}`,
-            resolvidaParcialmente:   (hora) => `\\color{blue} graus(\\color{red} ${hora} \\color{blue}) \\color{black} = \\color{blue} ${parseFloat(hora)} \\cdot 30°`,
-            resolvida:   (hora) => `\\color{blue} graus(\\color{red} ${hora} \\color{blue}) \\color{black} = \\color{blue} ${parseFloat(hora) * 30}°`
-
+            formula: '\\color{purple} {RAZ \\tilde{A}O} = \\color{black} \\frac {\\color{blue} graus}{\\color{red} hora} \\color{black} = \\frac{\\color{blue} 30°}{\\color{red} 1h}',
+            fatorada: `\\color{blue} graus \\color{black} = \\color{red} hora \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`,
+            instanciada: (hora) => `\\color{blue} graus \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`,
+            cancelarUnidade: (hora) => `\\color{blue} graus \\color{black} = \\color{red} ${parseFloat(hora)} \\cancel{h}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1 \\cancel{h}~}`,
+            resolvidaParcialmente:   (hora) => `\\color{blue} graus \\color{black} = \\color{blue} ${parseFloat(hora)} \\cdot 30°`,
+            resolvida:   (hora) => `\\color{blue} graus \\color{black} = \\color{blue} ${parseFloat(hora) * 30}°`
         } 
 
         const fase = this;
@@ -1145,63 +1171,73 @@ export class Fase4 extends Fase{
                         fase.animar(mudarDialogo);
                         fase.animar(mudarSidenote);
 
+                        fase.scene.remove(estado.sidenote);
+
                         estado.etapa = 1;
                         estado.equacoesResolvidas++;
                     }
+                    else if(estado.etapa == 5){
 
-                    //Começa a multiplicação com frações
-                    else if(estado.etapa == 5 && estado.equacoesResolvidas >= 3 && !estado.etapaFracao){
-
-                        this.debug = false;
-
-                        estado.horarios = new Array(10).fill(0).map((e,i) => Math.round(Math.random() * 11) + Math.round(1 + Math.random() * 18)/20)
-                        
-                        fase.whiteboard.removerTodasEquacoes();
-
-                        estado.hora  = estado.horarios.splice(Math.round(Math.random() * (estado.horarios.length - 1)), 1)[0]; //Escolhe uma e remove do array
-                        estado.valor = `${estado.hora}h`;
-
-
-                        const mudarDialogo = fase.animacoesDialogo(
-                            "Podemos usar essa razão para calcular até valores quebrados de horas",
-                            `Por exemplo, quantos graus teriam ${estado.hora} horas?`
-                        )
-                        .setOnTermino(() => {
-
-                            fase.whiteboard.adicionarTexto(funcao.texto);
-
-                            valor = fase.createMathJaxTextBox("\\color{red}" + estado.valor, [0,0,0], 2);
-                            
-                            fase.whiteboard.adicionarTexto(valor); //Elemento clonado na lousa retornado
-
-                            valor  = new ElementoCSS2D(valor, fase.whiteboard);
-
-                            const juntarEquacoes = new JuntarEquacoes(valor, [funcao], fase, null, equacoes.instanciada(estado.valor));
-
-                            this.addInputs(juntarEquacoes);
-
-                            fase.animar(apagarCSS2(funcao.texto).reverse())
-
-                            this.update({})
-                        })
-                        .setCheckpointAll(true)
-                        .setNome("dialogo");
-
-                        //Fazer parte de minutos: criar outra razão, quebra a hora em minutos e aplica ela depois soma em fração de horas
-
-                        fase.animar(mudarDialogo);
-
-                        estado.etapa = 1;
-                        estado.etapaFracao = true;
-                        estado.equacoesResolvidas = 0;
-                    }
-
-                    else if(estado.etapa == 5 && estado.equacoesResolvidas >= 3 && estado.etapaFracao){
+                        fase.whiteboard.ativar(false);
 
                         fase.scene.remove(estado.sidenote);
 
-                        fase.aula4();
+                        fase.final();
                     }
+
+                    // //Começa a multiplicação com frações
+                    // else if(estado.etapa == 5 && estado.equacoesResolvidas >= 3 && !estado.etapaFracao){
+
+                    //     this.debug = false;
+
+                    //     estado.horarios = new Array(10).fill(0).map((e,i) => Math.round(Math.random() * 11) + Math.round(1 + Math.random() * 18)/20)
+                        
+                    //     fase.whiteboard.removerTodasEquacoes();
+
+                    //     estado.hora  = estado.horarios.splice(Math.round(Math.random() * (estado.horarios.length - 1)), 1)[0]; //Escolhe uma e remove do array
+                    //     estado.valor = `${estado.hora}h`;
+
+
+                    //     const mudarDialogo = fase.animacoesDialogo(
+                    //         "Podemos usar essa razão para calcular até valores quebrados de horas",
+                    //         `Por exemplo, quantos graus teriam ${estado.hora} horas?`
+                    //     )
+                    //     .setOnTermino(() => {
+
+                    //         fase.whiteboard.adicionarTexto(funcao.texto);
+
+                    //         valor = fase.createMathJaxTextBox("\\color{red}" + estado.valor, [0,0,0], 2);
+                            
+                    //         fase.whiteboard.adicionarTexto(valor); //Elemento clonado na lousa retornado
+
+                    //         valor  = new ElementoCSS2D(valor, fase.whiteboard);
+
+                    //         const juntarEquacoes = new JuntarEquacoes(valor, [funcao], fase, null, equacoes.instanciada(estado.valor));
+
+                    //         this.addInputs(juntarEquacoes);
+
+                    //         fase.animar(apagarCSS2(funcao.texto).reverse())
+
+                    //         this.update({})
+                    //     })
+                    //     .setCheckpointAll(true)
+                    //     .setNome("dialogo");
+
+                    //     //Fazer parte de minutos: criar outra razão, quebra a hora em minutos e aplica ela depois soma em fração de horas
+
+                    //     fase.animar(mudarDialogo);
+
+                    //     estado.etapa = 1;
+                    //     estado.etapaFracao = true;
+                    //     estado.equacoesResolvidas = 0;
+                    // }
+
+                    // else if(estado.etapa == 5 && estado.equacoesResolvidas >= 3 && estado.etapaFracao){
+
+                    //     fase.scene.remove(estado.sidenote);
+
+                    //     fase.aula4();
+                    // }
 
 
                })
@@ -1274,6 +1310,9 @@ export class Fase4 extends Fase{
         // this.atualizarOptions();
 
         super.update();
+        super.update();
+        super.update();
+        super.update();
         if(this.debug) super.update();
         if(this.debug) super.update();
         if(this.debug) super.update();
@@ -1332,26 +1371,15 @@ export class Fase4 extends Fase{
 
             consequencia(fase){
 
-                if(fase.debug){
-                    fase.aula4();
-                    alert("yes")
-                    return;
-                } 
-
                 fase.Configuracao2();
 
                 const dialogo1 = fase.animacaoDialogo(`Uma hora tem 30°, como acabou de demonstrar`);
 
-                fase.equacaoUmaHora = fase.createMathJaxTextBox(`\\color{red}{1~h}~\\color{black}{tem}~\\color{blue}{30°}`, [4,2.5,0], 1);
+                fase.equacaoUmaHora = fase.createMathJaxTextBox(`\\color{red}{1~h}~\\color{black}{tem}~\\color{blue}{30°}`, [5.5,2,0], 1);
 
-                const mostrarEquacao = fase.moverEquacao({
-                    elementoCSS2: fase.equacaoUmaHora,
-                    duration1: 100,
-                    duration2: 50,
-                    delaydoMeio: 50,
-                });
+                const mostrarEquacao = new MostrarTexto(fase.equacaoUmaHora, fase.scene);
 
-                const dialogo2 = fase.animacaoDialogo(`Agora, consegue mostrar quanto vale 5 horas?`);
+                const dialogo2 = fase.animacaoDialogo(`Agora, arraste para 5 horas`);
 
                 const animacao2 = new AnimacaoSequencial(dialogo2).setOnStart(() => {
                                                                             fase.Configuracao1();
@@ -1377,14 +1405,9 @@ export class Fase4 extends Fase{
 
                 fase.Configuracao2();
 
-                fase.equacaocincoHoras = fase.createMathJaxTextBox(`\\color{red}{5~h}~\\color{black}{tem}~\\color{blue}{150°}`, [4,2.5,0], 1);
+                fase.equacaocincoHoras = fase.createMathJaxTextBox(`\\color{red}{5~h}~\\color{black}{tem}~\\color{blue}{150°}`, [5.5,-2,0], 1);
 
-                const mostrarEquacao = fase.moverEquacao({
-                                            elementoCSS2: fase.equacaocincoHoras,
-                                            duration1: 100,
-                                            duration2: 50,
-                                            delaydoMeio: 50,
-                                        });
+                const mostrarEquacao = new MostrarTexto(fase.equacaocincoHoras, fase.scene);
 
                 const dialogo1 = `5 horas tem 150°, como acabou de demonstrar`
 
@@ -1399,6 +1422,7 @@ export class Fase4 extends Fase{
                 const animacao = new AnimacaoSequencial(animacao1,mostrarEquacao,animacao2, new AnimacaoSimultanea(mostrarHora));
 
                 fase.animar(animacao.setOnTermino(() => fase.progresso = 3));
+
             }
         },
 

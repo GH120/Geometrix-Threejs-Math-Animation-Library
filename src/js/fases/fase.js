@@ -260,6 +260,10 @@ export class Fase {
 
         return cPointLabel.mudarTexto(inputTex, tamanhoDaFonte);
     }
+    
+    createSidenote(texto, tamanho=17){
+        return this.createTextBox(texto, [-5.6, 0.6, 0], tamanho, false);
+    }
 
     
     //Muda o conteúdo da caixa de texto
@@ -396,6 +400,14 @@ export class Fase {
         animate();
     }
     animacaoDialogo(texto, target = null){
+
+        if(target != null){
+            return new AnimacaoSequencial(
+                new MostrarTexto(target, (target.scene)? null : this.scene)
+            )
+            .setOnStart(() => target.element.textContent = texto);
+        }
+
         return new TextoAparecendo(target? target : this.text.element)
                                   .setOnStart(
                                     () => this.changeText(texto, target)

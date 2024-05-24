@@ -15,6 +15,7 @@ import MoverEquacao from "../animacoes/moverEquacao";
 import { Clickable } from "../inputs/clickable";
 import ElementoCSS2D from "../objetos/elementocss2d";
 import JuntarEquacoes from "../outputs/juntarEquacoes";
+import ResolverEquacao from "../outputs/resolverEquacao";
 
 export default class Proporcionalidade {
 
@@ -51,9 +52,13 @@ export default class Proporcionalidade {
 
     process(){
 
+
         // Criar novo output para selecionar lado e arrastar ele
 
         const fase = this.fase;
+
+        fase.debug = false;
+
 
         const objetosProporcionais = fase.informacao.objetosProporcionais;
 
@@ -127,9 +132,19 @@ export default class Proporcionalidade {
                                 // if(!equacao2.juntarEquacoes) 
                                 equacao2.juntarEquacoes = new JuntarEquacoes(equacao2.equacaoObjeto, [equacao1.equacaoObjeto], fase, null, equacaoResultante);
 
+                                //Wrapper que avisa mais informações para o controle quando o juntar equações notificar mudança
+                                const avisarMaisInformacoes = (equationInfo) => new Output()
+                                                                              .addInputs(equationInfo.juntarEquacoes)
+                                                                              .setUpdateFunction(function(novoEstado) {
+                                                                                this.notify({
+                                                                                    equationInfo:equationInfo, 
+                                                                                    novaEquacao: novoEstado.novaEquacao
+                                                                                })
+                                                                               });
+
+                                carta.controleEquacoes.addInputs(avisarMaisInformacoes(equacao1), avisarMaisInformacoes(equacao2))
+
                                 estado.juntarEquacoes.push(equacao1.juntarEquacoes, equacao2.juntarEquacoes);
-                                
-                                carta.controleEquacoes.addInputs(equacao1.juntarEquacoes, equacao2.juntarEquacoes);
                                 
                             }
                         }
@@ -141,12 +156,16 @@ export default class Proporcionalidade {
                     }
 
                     //Criar um verificador para ver se equação poderá ser juntada com outra
+                    if(novoEstado.novaEquacao){
+
+                    }
                     
                })
                .setEstadoInicial({
                     equacoes:[],
                     clicarObjetos: this.clicarObjetos,
-                    juntarEquacoes:[]
+                    juntarEquacoes:[],
+                    estadosResolucaoEquacao: [] 
                })
     }
 
@@ -197,14 +216,96 @@ export default class Proporcionalidade {
 
     criarControleEquacoes(){
 
+        const fase = this.fase;
+
+        const sidenote = fase.createSidenote('');
+
+
+        //Quando tiver a parte de expressões mathjax funcional,
+        //Vamos adicionar inputs do usuário para auxiliá-lo a resolver
+        //Se ele acertar os valores das variáveis ele é recompensado
+        //REFARTORAR EXPRESSÕES, EM STANDBY POR ENQUANTO
         return new Output()
                .setUpdateFunction(function(novoEstado){
 
-                    if(novoEstado.novaEquacao){
-                        //Realizar lógica de incluir mais coisas 
-                        alert("funcionando");
-                        console.log(novoEstado.novaEquacao)
+                    console.log(novoEstado)
+
+                    const estado = this.estado;
+
+                    if(novoEstado.equationInfo) estado.equationInfo = novoEstado.equationInfo;
+
+                    //Mais informações sobre a equação como valor, nome, resultados...
+                    const equationInfo = estado.equationInfo
+
+                    //Refatorar depois a parte das equações, esse trabalho aqui é desnecessário
+                    const equacoes = equationInfo.estadosResolucaoEquacao;
+
+
+                    const novaEquacao = novoEstado.novaEquacao;
+
+                    if(novaEquacao && estado.etapa == 1){
+
+                        this.debug = false;
+
+                        const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
+
+                        const mudarSidenote = fase.animacaoDialogo("Clique para resolver a equação", estado.sidenote)
+
+                        fase.animar(mudarSidenote)
+
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase, null, equacoes[1](equationInfo))
+
+                        this.addInputs(resolverEquacao);
+
+                        estado.etapa++;
                     }
+
+                    else if(novaEquacao && estado.etapa == 2){
+                        const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
+
+                        const mudarDialogo  = fase.animacaoDialogo("Podemos cancelar a unidade hora")
+                        const mudarSidenote = fase.animacaoDialogo("Clique para resolver a equação", estado.sidenote)
+
+                        fase.animar(mudarDialogo)
+                        fase.animar(mudarSidenote);
+
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase, null, equacoes[2](equationInfo))
+
+                        resolverEquacao.tamanhoFonte = 1.7;
+
+                        this.addInputs(resolverEquacao);
+
+                        estado.etapa++;
+                    }
+
+                    else if(novaEquacao && estado.etapa == 3){
+                        const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
+
+                        const mudarDialogo = fase.animacaoDialogo("Agora multiplicamos 30 graus para cada hora");
+
+                        const mudarSidenote = fase.animacaoDialogo("Clique uma última vez", estado.sidenote)
+
+                        fase.animar(mudarSidenote);
+                        fase.animar(mudarDialogo);
+
+                        const resolverEquacao = new ResolverEquacao(objetoEquacao, fase, null, equacoes[3](equationInfo))
+
+                        resolverEquacao.tamanhoFonte = 1.7
+
+                        this.addInputs(resolverEquacao);
+
+                        estado.etapa++;
+                    }
+
+
                })
+               .setEstadoInicial({
+                    etapa: 1,
+                    equacoesResolvidas: 0,
+                    sidenote: sidenote,
+                    equationInfo: null //Não tem informações inicialmente sobre a equação a ser resolvida
+               })
+
     }
+
 }

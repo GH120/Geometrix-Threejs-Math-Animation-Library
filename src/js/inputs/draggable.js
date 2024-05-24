@@ -105,8 +105,6 @@ export class Draggable extends Input{
 
                         const estado = this.estado;
 
-                        console.log({...estado})
-
                         //Funções auxiliares
                         const setCursor = (cursor) => {
                           camera.fase.settings.setCursor(cursor);
@@ -114,8 +112,6 @@ export class Draggable extends Input{
                         }
 
                         const soltarObjeto = () => {
-
-                          console.log({...estado}, novoEstado)
 
                           if(estado.ativo){
                             setCursor('grab');

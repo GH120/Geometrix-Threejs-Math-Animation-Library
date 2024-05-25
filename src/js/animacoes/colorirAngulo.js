@@ -29,3 +29,12 @@ export const colorirAngulo = (angulo) =>    new Animacao(angulo)
                                                     this.objeto.update();
 
                                                 });
+
+export const colorirTextoCSS2D = (texto, corInicial, corFinal) => 
+                                       colorirAngulo(texto)
+                                       .setValorInicial(corInicial)
+                                       .setValorFinal(corFinal)
+                                       .setUpdateFunction((valor) => {
+
+                                            texto.element.style.color = valor;
+                                       })

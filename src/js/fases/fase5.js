@@ -12,7 +12,7 @@ import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
 import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente, curvas } from '../animacoes/animation';
-import { colorirAngulo } from '../animacoes/colorirAngulo';
+import { colorirAngulo, colorirTextoCSS2D } from '../animacoes/colorirAngulo';
 import { Tracejado } from '../objetos/tracejado';
 import MostrarTracejado from '../animacoes/mostrarTracejado';
 import { Divisao } from '../animacoes/divisao';
@@ -511,7 +511,7 @@ export class Fase5  extends Fase{
         return animacao;
     }
 
-    transformar180GrausEmFormula(){
+    transformar180GrausEmFormula(equacaoAtual){
 
         const fase = this;
 
@@ -522,24 +522,56 @@ export class Fase5  extends Fase{
         
         const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
 
-        const anguloDividido = fase.triangulo.vertices[indice];
+        const anguloDividido = fase.triangulo.angles[indice];
 
         const subangulos = [fase.subtriangulo1.angles[0], fase.subtriangulo2.angles[0]]
 
-        const mostrarAnguloOriginal = apagarObjeto(anguloDividido)
-                                      .reverse()
-                                      .setOnStart(() => {
-                                        anguloDividido.addToScene(fase.scene)
+        const angulos = [fase.subtriangulo1.angles[1] , anguloDividido , fase.subtriangulo2.angles[1]];
 
-                                        console.log(anguloDividido);
-
-                                        anguloDividido.mesh.position.z = 0.08
-                                      })
+        const mostrarAnguloOriginal =   new AnimacaoSimultanea(
+                                            apagarObjeto(anguloDividido)
+                                            .reverse()
+                                            .setOnStart(() => {
+                                              anguloDividido.addToScene(fase.scene)
+      
+                                              anguloDividido.mesh.position.z = 0.08
+                                            })
+      
+                                            .setOnTermino(()=>{
+                                              subangulos.map(subangulo => subangulo.removeFromScene());
+                                            }),
+                                            subangulos[0].mostrarAngulo.animacao(false),
+                                            subangulos[1].mostrarAngulo.animacao(false),
+                                            anguloDividido.mostrarAngulo.animacao(true)
+                                        )
+                                       
 
         //Transformar partes da equação em angulos
         //Colorir essas partes enquanto mostra os angulos sendo coloridos
 
-        const animacao = new AnimacaoSequencial(mostrarAnguloOriginal, );
+        const valores = equacaoAtual.nodes.filter(node => node.type == "variable" || node.type == "value")
+                                          .slice(0,3);
+
+        const substituirAngulos = valores.map((valor, indice) => substituirVariavel(valor, 'Ângulo ' + (indice + 1)));
+
+        const girarAngulos = angulos.map(angulo => fase.animacaoGirarAngulo(angulo));
+
+        const colorirValores = valores.map((valor, i) => colorirTextoCSS2D(valor, 0x000000, angulos[i].material.color.getHex()));
+
+        const substituirAngulosAnim = new AnimacaoSequencial(
+                                        ...substituirAngulos.map(
+                                            (substituir, i) => 
+                                                new AnimacaoSimultanea(
+                                                    substituir, 
+                                                    girarAngulos[i], 
+                                                    colorirValores[i]
+                                                )
+                                        )
+                                    );
+
+        const dialogo1 = fase.animacaoDialogo(dialogo[0])
+
+        const animacao = new AnimacaoSequencial(mostrarAnguloOriginal,dialogo1,substituirAngulosAnim);
 
         fase.animar(animacao);
     }
@@ -1316,8 +1348,6 @@ export class Fase5  extends Fase{
         const soma = angulos.reduce((equacao, angulo) => new Addition(equacao, angulo));
         const equacao = new Equality(soma, new Addition(new Variable('90°'), new Variable('90°')));
 
-        this.informacao.equacaoAtual = equacao;
-
         const juncao1 = new JuntarEquacoes(equacao1, [equacao2], fase);
         const juncao2 = new JuntarEquacoes(equacao2, [equacao1], fase);
 
@@ -1346,6 +1376,8 @@ export class Fase5  extends Fase{
                         const resolverEquacao = new ResolverEquacao(objetoEquacao, fase);
 
                         resolverEquacao.equacaoNova = new CSS2DObject(resultado.html);
+
+                        estado.equacaoAtual = resultado;
                         
 
                         this.addInputs(resolverEquacao);
@@ -1375,6 +1407,8 @@ export class Fase5  extends Fase{
                                                     angulos[2]
                                                 ),
                                                 new Variable("180°"));
+
+                        estado.equacaoAtual = novaEquacao;
 
                         const objetoEquacao = new ElementoCSS2D(novoEstado.novaEquacao, fase.whiteboard)
 
@@ -1415,13 +1449,14 @@ export class Fase5  extends Fase{
                         fase.animar(apagarSidenote);
 
                         //Mostrar dois subangulos se juntando para formar o angulo selecionado
-                        fase.transformar180GrausEmFormula(sidenote)
+                        fase.transformar180GrausEmFormula(estado.equacaoAtual)
                         
                     }
                 })
                 .setEstadoInicial({
                     etapa: 0,
-                    sidenote: sidenote
+                    sidenote: sidenote,
+                    equacaoAtual: equacao
                 })
     }
 
@@ -1429,6 +1464,7 @@ export class Fase5  extends Fase{
     /////////////////////////     Animações     ////////////////////////////
     ////////////////////////////////////////////////////////////////////////
 
+    //Gira pra cima e pra baixo, volta ao início
     animacaoGirarAngulo(angle){
 
         const quaternionInicial = new THREE.Quaternion();
@@ -1703,6 +1739,7 @@ export class Fase5  extends Fase{
         return moveAngulo;
     }
 
+    //Gira 90°, não volta
     girarAngulo(angulo){
 
         const anguloInicial = angulo;

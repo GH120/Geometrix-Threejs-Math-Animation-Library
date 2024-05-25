@@ -21,8 +21,11 @@ export default class MoverVertice extends Output{
         // console.log(point, "funciona")
 
         // console.log(point);
+        
+        if(this.nome == 'roberto') console.log(this.vertice.getPosition(), point)
 
         if(!point) return;
+
 
         // this.getFocos();
 

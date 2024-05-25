@@ -276,7 +276,11 @@ export class Fase4 extends Fase{
                                                                                     5           
                                                                                   );
 
-                                            const simularMovimento = this.moverPonteiro(120, 150).setCurva(curvas.decrescimentoLinear(curvas.curvaPeriodica(x => x, 10)))
+                                            const simularMovimento = this.moverPonteiro(120, 150)
+                                                                    .setCurva(curvas.decrescimentoLinear(curvas.curvaPeriodica(x => x, 10)));
+
+                                            const moverSetinha = new SimularMovimento(this.ponto2)
+                                                                    .mostrarSetinha(this.scene, true)
 
                                             const mostrarTexto = new MostrarTexto(texto)
                                                                 .setCurva(x => {
@@ -294,7 +298,7 @@ export class Fase4 extends Fase{
                                                                     this.ponto2.hoverable.observers.map(observer => observer.update({dentro:false}))
                                                                 });
 
-                                            this.animar(new AnimacaoSimultanea(mostrarTexto, simularMovimento.filler(20)));
+                                            this.animar(new AnimacaoSimultanea(mostrarTexto, moverSetinha, simularMovimento.filler(200)));
 
                                         })
         
@@ -1509,6 +1513,7 @@ export class Fase4 extends Fase{
                     this.ponto2.position = posicao;
                     this.ponto2.update(); //Refatorar circulo, update deve ser apenas update
                     this.ponto2.updateObservers();
+                    this.ponto2.draggable.notify({dragging: true, position: posicao})
                 });
 
     }

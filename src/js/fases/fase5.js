@@ -11,7 +11,7 @@ import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import * as dat from 'dat.gui';
 import * as THREE from 'three';
 import { TextoAparecendo } from '../animacoes/textoAparecendo';
-import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente } from '../animacoes/animation';
+import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente, curvas } from '../animacoes/animation';
 import { colorirAngulo } from '../animacoes/colorirAngulo';
 import { Tracejado } from '../objetos/tracejado';
 import MostrarTracejado from '../animacoes/mostrarTracejado';
@@ -39,6 +39,7 @@ import JuntarEquacoes from '../outputs/juntarEquacoes';
 import ResolverEquacao from '../outputs/resolverEquacao';
 import MetalicSheen from '../animacoes/metalicSheen';
 import SimularMovimento from '../animacoes/simularMovimento';
+import Bracket from '../objetos/bracket';
 
 export class Fase5  extends Fase{
 
@@ -76,9 +77,9 @@ export class Fase5  extends Fase{
         this.resetObjects();
 
         this.triangulo = new Poligono([
-            [-1,-1,0],
-            [1,2.5,0],
-            [4,1.6,0]
+            [-3,-2,0],
+            [1,1.5,0],
+            [4,-2,0]
         ])
         .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.7})
         .render()
@@ -124,14 +125,36 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
-        const sidenote = fase.createTextBox('', fase.triangulo.vertices[1].getPosition().toArray(), 3, true);
+        const trajetoria = [new THREE.Vector3(-3,2,0), new THREE.Vector3(-10, 1, 0)]
 
-        const mostrarSidenote = new MostrarTexto(sidenote, fase.scene);
+        const moverVertice = new SimularMovimento(fase.triangulo.vertices[2], trajetoria, 0.3, 5)
+                            .setCurva(curvas.easeOutCircle)
+                            .setDuration(1000)
+                            .comSetinha(fase.scene);
 
-        const moverVertice = new SimularMovimento(fase.triangulo.vertices[0], null, 0.3, 5)
+        const bracket = new Bracket(0.2, new THREE.Vector3(4.2, -2, 0), new THREE.Vector3(4.2, 1.5,0)).addToScene(fase.scene);
+        
+        const desenharChave  = bracket.animacao().manterExecucao(true);
+
+        const sidenote = fase.createMathJaxTextBox('\\displaylines{Vertices~ arrastáveis \\\\ tente~arrastar~eles \\\\ ~para ~formar ~outros~ triângulos}', [6,0, 0], 2);
+        
+        const mostrarSidenote = new MostrarTexto(sidenote, fase.scene)
+                                .setDelay(300)
+                                .setOnTermino(() => {
+                                    desenharChave.manterExecucao(false);
+                                    fase.scene.remove(sidenote);
+                                })
+                                .filler(200);
 
 
-        return new AnimacaoSimultanea(dialogo, mostrarSidenote, moverVertice);
+        return new AnimacaoSimultanea(
+            dialogo, 
+            new AnimacaoSimultanea(
+                desenharChave,
+                mostrarSidenote
+            ),
+            moverVertice
+        );
     }
 
     aula2(){

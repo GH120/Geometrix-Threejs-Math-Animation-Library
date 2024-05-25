@@ -65,18 +65,18 @@ export default class SimularMovimento extends Animacao{
     }
 
     mostrarSetinha(scene, removeOnTermino=false){
-        const dir = new THREE.Vector3( 1, 2, 0 );
+        const dir = new THREE.Vector3( -1, 2, 0 );
 
         //normalize the direction vector (convert to vector of length 1)
         dir.normalize();
         
         const origin = new THREE.Vector3( 0, 0, 0 );
         const length = 0.3;
-        const hex = 0xff0000;
+        const hex = 0x000000;
 
         const group = new THREE.Group();
 
-        const arrowMesh = new THREE.ArrowHelper( dir, origin, length, hex , 0.5*length, 0.3*length);
+        const arrowMesh = new THREE.ArrowHelper( dir, origin, length, hex , 0.75*length, 0.5*length);
 
         arrowMesh.position.copy(dir.clone().negate().multiplyScalar(length));
 

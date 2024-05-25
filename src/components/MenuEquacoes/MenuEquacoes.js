@@ -34,7 +34,7 @@ function MenuEquacoes(props) {
         if(fase){
             fase.whiteboard = whiteboard;
 
-            fase.whiteboard.settings = {setCursor: (tipo) => {setCursor(tipo); fase.whiteboard.settings.tipo = tipo; console.log(fase.whiteboard.settings)}, tipo: cursor}; //Gambiarra para poder usar settings nos inputs, refatorar depois
+            fase.whiteboard.settings = {setCursor: (tipo) => {setCursor(tipo); fase.whiteboard.settings.tipo = tipo}, tipo: cursor}; //Gambiarra para poder usar settings nos inputs, refatorar depois
 
             // console.log("funcionou", fase.whiteboard)
 

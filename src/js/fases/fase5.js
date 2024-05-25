@@ -40,6 +40,8 @@ import ResolverEquacao from '../outputs/resolverEquacao';
 import MetalicSheen from '../animacoes/metalicSheen';
 import SimularMovimento from '../animacoes/simularMovimento';
 import Bracket from '../objetos/bracket';
+import { apagarCSS2 } from '../animacoes/apagarCSS2';
+import {substituirVariavel} from '../animacoes/substituirVariavel';
 
 export class Fase5  extends Fase{
 
@@ -62,7 +64,11 @@ export class Fase5  extends Fase{
 
         this.aceitaControleDeAnimacao = true;
 
-        this.informacao = {}
+        this.informacao = {
+            verticeSelecionado: null,
+            criarTracejadoSelecionado: null,
+            angulosInvisiveis: null 
+        }
 
     }
 
@@ -136,10 +142,10 @@ export class Fase5  extends Fase{
         
         const desenharChave  = bracket.animacao().manterExecucao(true);
 
-        const sidenote = fase.createMathJaxTextBox('\\displaylines{Vertices~ arrastáveis \\\\ tente~arrastar~eles \\\\ ~para ~formar ~outros~ triângulos}', [6,0, 0], 2);
+        const sidenote = fase.createMathJaxTextBox('\\displaylines{Vertices~ arrastáveis \\\\ tente~arrastar~eles \\\\ ~para ~formar ~qualquer~ triângulo}', [6,0, 0], 1.5);
         
         const mostrarSidenote = new MostrarTexto(sidenote, fase.scene)
-                                .setDelay(300)
+                                .setDelay(900)
                                 .setOnTermino(() => {
                                     desenharChave.manterExecucao(false);
                                     fase.scene.remove(sidenote);
@@ -153,7 +159,7 @@ export class Fase5  extends Fase{
                 desenharChave,
                 mostrarSidenote
             ),
-            moverVertice
+            moverVertice.filler(480)
         );
     }
 
@@ -468,6 +474,75 @@ export class Fase5  extends Fase{
 
         return new AnimacaoSimultanea(removerSubtriangulo1, removerSubtriangulo2);
     }   
+
+    dialogoMostrando180Graus(){
+
+        const fase = this;
+
+        const angulosSelecionados = fase.informacao.equacoes.flatMap(equacao => equacao.angulosObjetos);
+
+        const mostrarEApagar180Graus = fase.mostrarEApagar180Graus(fase.informacao.verticeSelecionado, angulosSelecionados)
+
+        const triangulos = [fase.triangulo];
+
+        const apagarTriangulos  = new AnimacaoSimultanea()
+                                    .setAnimacoes(triangulos.map(
+                                        triangulo => new ApagarPoligono(triangulo)
+                                                        .ignorarObjetos(triangulo.angles)
+                                                        .setOnTermino(() => null)
+                                                        .setDuration(50)
+                                    ))
+        const mostrarTriangulos = new AnimacaoSimultanea()
+                                    .setAnimacoes(triangulos.map(
+                                        triangulo => new ApagarPoligono(triangulo)
+                                                    .ignorarObjetos(triangulo.angles)
+                                                    .reverse()
+                                                    .setDuration(50)
+                                    ))
+
+        const mudarDialogo  = fase.animacaoDialogo("Veja que esses ângulos somam 180°");
+        
+
+        const animacao = new AnimacaoSequencial(
+            new AnimacaoSimultanea(apagarTriangulos, mudarDialogo, mostrarEApagar180Graus),
+            mostrarTriangulos,
+        )
+
+        return animacao;
+    }
+
+    transformar180GrausEmFormula(){
+
+        const fase = this;
+
+        const dialogo = [
+            "Podemos generalizar isso para qualquer triângulo",
+            "Temos assim a fórmula na lousa"
+        ]
+        
+        const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
+
+        const anguloDividido = fase.triangulo.vertices[indice];
+
+        const subangulos = [fase.subtriangulo1.angles[0], fase.subtriangulo2.angles[0]]
+
+        const mostrarAnguloOriginal = apagarObjeto(anguloDividido)
+                                      .reverse()
+                                      .setOnStart(() => {
+                                        anguloDividido.addToScene(fase.scene)
+
+                                        console.log(anguloDividido);
+
+                                        anguloDividido.mesh.position.z = 0.08
+                                      })
+
+        //Transformar partes da equação em angulos
+        //Colorir essas partes enquanto mostra os angulos sendo coloridos
+
+        const animacao = new AnimacaoSequencial(mostrarAnguloOriginal, );
+
+        fase.animar(animacao);
+    }
 
     ////////////////////////////////////////////////////////////////////////
     /////////////////////////Configurações//////////////////////////////////
@@ -1212,7 +1287,6 @@ export class Fase5  extends Fase{
                     if(novoEstado.trianguloDividido){
 
                         estado.etapa = "mostrarIgualdade";
-                        alert("começou")
                         fase.aula3();
                         return;
                     }
@@ -1242,6 +1316,8 @@ export class Fase5  extends Fase{
         const soma = angulos.reduce((equacao, angulo) => new Addition(equacao, angulo));
         const equacao = new Equality(soma, new Addition(new Variable('90°'), new Variable('90°')));
 
+        this.informacao.equacaoAtual = equacao;
+
         const juncao1 = new JuntarEquacoes(equacao1, [equacao2], fase);
         const juncao2 = new JuntarEquacoes(equacao2, [equacao1], fase);
 
@@ -1261,6 +1337,8 @@ export class Fase5  extends Fase{
 
                     if(novoEstado.novaEquacao && estado.etapa == 0){
 
+                        fase.debug = false;
+
                         const objetoEquacao = new ElementoCSS2D(novoEstado.novaEquacao, fase.whiteboard)
                         
                         const resultado = new Equality(soma, new Variable("180°"));
@@ -1269,7 +1347,6 @@ export class Fase5  extends Fase{
 
                         resolverEquacao.equacaoNova = new CSS2DObject(resultado.html);
                         
-                        resolverEquacao.ativar(false);
 
                         this.addInputs(resolverEquacao);
 
@@ -1277,17 +1354,12 @@ export class Fase5  extends Fase{
 
                         const mudarSidenote = fase.animacaoDialogo("Clique mais uma vez", estado.sidenote)
 
+                        fase.animar(mudarSidenote);
 
 
-                        fase.animar(mudarSidenote.setOnDelay(() => resolverEquacao.ativar(true)));
-
-
-                        return;
                     }
 
-                    if(novoEstado.novaEquacao && estado.etapa == 1){
-
-                        //Mostrar dois subangulos se juntando para formar o angulo selecionado
+                    else if(novoEstado.novaEquacao && estado.etapa == 1){
                         //Mostrar que a soma dos três angulos é 180°
 
                         const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado)
@@ -1310,43 +1382,41 @@ export class Fase5  extends Fase{
 
                         resolverEquacao.equacaoNova = new CSS2DObject(novaEquacao.html);
 
+                        resolverEquacao.ativar(false);
+
                         this.addInputs(resolverEquacao);
 
                         estado.etapa++;
 
-                        const angulosSelecionados = fase.informacao.equacoes.flatMap(equacao => equacao.angulosObjetos);
+                        //Transformar isso em dialogo auxiliar?
+                        const dialogoMostrando180graus = fase.dialogoMostrando180Graus()
+                                                             .setOnTermino(() => {
+                                                                resolverEquacao.ativar(true)
 
-                        const mostrarEApagar180Graus = fase.mostrarEApagar180Graus(fase.informacao.verticeSelecionado, angulosSelecionados)
+                                                                const mudarSidenote = fase.animacaoDialogo("Clique mais uma vez", estado.sidenote)
 
-                        const triangulos = [fase.triangulo];
-
-                        const apagarTriangulos  = new AnimacaoSimultanea()
-                                                    .setAnimacoes(triangulos.map(
-                                                        triangulo => new ApagarPoligono(triangulo)
-                                                                     .ignorarObjetos(triangulo.angles)
-                                                                     .setOnTermino(() => null)
-                                                                     .setDuration(50)
-                                                    ))
-                        const mostrarTriangulos = new AnimacaoSimultanea()
-                                                    .setAnimacoes(triangulos.map(
-                                                        triangulo => new ApagarPoligono(triangulo)
-                                                                    .ignorarObjetos(triangulo.angles)
-                                                                    .reverse()
-                                                                    .setDuration(50)
-                                                    ))
-
-                        const mudarDialogo  = fase.animacaoDialogo("Veja que esses ângulos somam 180°");
+                                                                fase.animar(mudarSidenote);
+                                                            });
                         
+                        fase.animar(dialogoMostrando180graus);
 
-                        const animacao = new AnimacaoSequencial(
-                            new AnimacaoSimultanea(apagarTriangulos, mudarDialogo, mostrarEApagar180Graus),
-                            mostrarTriangulos.setOnTermino(() => resolverEquacao.ativar(true)),
-                        )
+                        const apagarSidenote = new MostrarTexto(sidenote).reverse();
 
-                        fase.animar(animacao);
+                        fase.animar(apagarSidenote);
 
-                        return;
+                    }
 
+                    else if(novoEstado.novaEquacao && estado.etapa == 2){
+
+                        alert("yes")
+
+                        const apagarSidenote = apagarCSS2(sidenote, fase.scene);
+
+                        fase.animar(apagarSidenote);
+
+                        //Mostrar dois subangulos se juntando para formar o angulo selecionado
+                        fase.transformar180GrausEmFormula(sidenote)
+                        
                     }
                 })
                 .setEstadoInicial({
@@ -1940,6 +2010,35 @@ export class Fase5  extends Fase{
     
     update(){
 
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
+        if(this.debug) super.update();
         if(this.debug) super.update();
         if(this.debug) super.update();
         if(this.debug) super.update();

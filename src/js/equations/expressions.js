@@ -11,6 +11,7 @@ import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import * as THREE from 'three'
 
 //DEPRECATED: FALTOU MODIFICAR PARA USAR MATHJAX FULL
+//FUNCIONALIDADES QUEBRADAS, FEITO ANTES DE PORTAR PARA O REACT
 
 //Cria elementos css2d que renderizam MathJax a partir de um texto input
 export class MathJaxTextBox extends CSS2DObject{
@@ -97,15 +98,17 @@ class Expression{
         }
     }
 
-    update(window){
+    update(){
 
-        console.log(window)
-        console.log(window.children)
-        console.log(window.children[0])
+        console.log(this);
 
-        window.children[0].removeChild(this.element);
+       this.element.innerHTML = this.html.innerHTML;
 
-        window.children[0].appendChild(this.html);
+       if(this.right) this.right.update();
+
+       if(this.left) this.left.update();
+
+       return this;
     }
 
     get copy(){

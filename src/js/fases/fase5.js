@@ -1279,7 +1279,7 @@ export class Fase5  extends Fase{
 
 
 
-                        fase.animar(mudarSidenote.setOnTermino(() => resolverEquacao.ativar(true)));
+                        fase.animar(mudarSidenote.setOnDelay(() => resolverEquacao.ativar(true)));
 
 
                         return;

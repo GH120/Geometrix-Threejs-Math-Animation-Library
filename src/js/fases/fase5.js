@@ -556,7 +556,7 @@ export class Fase5  extends Fase{
 
         const girarAngulos = angulos.map(angulo => fase.animacaoGirarAngulo(angulo));
 
-        const colorirValores = valores.map((valor, i) => colorirTextoCSS2D(valor, 0x000000, angulos[i].material.color.getHex()));
+        const colorirValores = valores.map((valor, i) => colorirTextoCSS2D(valor, 0x000000, angulos[i].mesh.material.color.getHex()));
 
         const substituirAngulosAnim = new AnimacaoSequencial(
                                         ...substituirAngulos.map(
@@ -1467,8 +1467,8 @@ export class Fase5  extends Fase{
     //Gira pra cima e pra baixo, volta ao início
     animacaoGirarAngulo(angle){
 
-        const quaternionInicial = new THREE.Quaternion();
-        const quaternionFinal   = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,-1), 0.3);
+        const quaternionInicial = angle.mesh.quaternion.clone();
+        const quaternionFinal   = angle.mesh.quaternion.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,-1), 0.3));
 
         function easeInOutBack(x) {
             const c1 = 1.70158;

@@ -411,7 +411,8 @@ export class Fase {
             return new AnimacaoSequencial(
                 new MostrarTexto(target, (target.scene)? null : this.scene)
             )
-            .setOnStart(() => target.element.textContent = texto);
+            .setOnStart(() => target.element.textContent = texto)
+            .setCheckpointAll(false);
         }
 
         return new TextoAparecendo(target? target : this.text.element)

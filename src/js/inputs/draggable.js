@@ -133,12 +133,12 @@ export class Draggable extends Input{
 
                         //Caso não tenha carregado o setup 
                         if(!camera.fase.settings) 
-                          // return estado.ativo = false;
+                          return estado.ativo = false;
                         
                         //Caso não tenha mais outputs
                         if(!draggable.observers.length) {
                           if(estado.cursor =='grabbing') soltarObjeto();
-                          // return estado.ativo = false;
+                          return estado.ativo = false;
                         }
 
                         //Lógica de mudar estado

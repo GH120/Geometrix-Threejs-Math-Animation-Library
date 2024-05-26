@@ -60,7 +60,7 @@ export class Fase5  extends Fase{
         //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
         //Mostrar que a soma dos 
 
-        this.debug = true;
+        this.debug = false;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -164,8 +164,6 @@ export class Fase5  extends Fase{
     }
 
     aula2(){
-
-        // this.debug = false;
 
         const fase = this;
 
@@ -327,7 +325,7 @@ export class Fase5  extends Fase{
 
         novoTriangulo.angles.map(angle => angle.material.color = triangulo.angles[0].material.color);
 
-        const aparecerTriangulo = new ApagarPoligono(novoTriangulo)
+        const aparecerTriangulo = new ApagarPoligono(novoTriangulo,false)
                                         .reverse()
                                         .setOnStart(() => {
                                             novoTriangulo.addToScene(this.scene);
@@ -449,7 +447,6 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
-        fase.Configuracao5()
 
         const dialogo = ['Arraste os vértices do triângulo'];
 
@@ -502,14 +499,14 @@ export class Fase5  extends Fase{
 
         const apagarTriangulos  = new AnimacaoSimultanea()
                                     .setAnimacoes(triangulos.map(
-                                        triangulo => new ApagarPoligono(triangulo)
+                                        triangulo => new ApagarPoligono(triangulo,false)
                                                         .ignorarObjetos(triangulo.angles)
                                                         .setOnTermino(() => null)
                                                         .setDuration(50)
                                     ))
         const mostrarTriangulos = new AnimacaoSimultanea()
                                     .setAnimacoes(triangulos.map(
-                                        triangulo => new ApagarPoligono(triangulo)
+                                        triangulo => new ApagarPoligono(triangulo,false)
                                                     .ignorarObjetos(triangulo.angles)
                                                     .reverse()
                                                     .setDuration(50)
@@ -605,17 +602,27 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
+        this.debug = false;
+
         const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
 
-        const tracejado = fase.outputClickVertice[indice];
+        const criarTracejado = fase.outputClickVertice[indice];
 
-        tracejado.update({clicado: true});
+        criarTracejado.estado.tracejado.removeFromScene();
+        criarTracejado.estado.tracejado2.removeFromScene();
+
+        fase.Configuracao5();
+
+        fase.triangulo.angles.map(angle => angle.update());
+        fase.triangulo.angles.map(angle => angle.material = new THREE.MeshBasicMaterial({color:0xff0000}));
+
+        fase.whiteboard.ativar(false);
+
+        // console.log(fase.triangulo.angles)
 
         const angulosAuxiliares = [this.subtriangulo1.angles[1], this.subtriangulo2.angles[1]];
 
         const angulosOriginais  = fase.triangulo.angles.filter((angulo, numero) => numero != indice);
-
-        console.log(angulosOriginais);
 
         const apagarAngulos   = new AnimacaoSimultanea()
                                     .setAnimacoes(angulosAuxiliares.map(angulo => apagarObjeto(angulo, fase.scene)));
@@ -624,12 +631,27 @@ export class Fase5  extends Fase{
                                     .setAnimacoes(angulosOriginais.map(angulo => apagarObjeto(angulo).reverse()))
 
         const desaparecerGraus = new AnimacaoSimultanea()
-                                     .setAnimacoes(angulosAuxiliares.map(angulo => angulo.mostrarAngulo.animacao(false)));
+                                     .setAnimacoes(angulosAuxiliares.map(angulo => fase.mostrarGrausDesaparecendo(angulo)));
 
         const aparecerGraus = new AnimacaoSimultanea()
                                       .setAnimacoes(angulosOriginais.map(angulo => fase.mostrarGrausAparecendo(angulo)));
 
-        return new AnimacaoSimultanea(apagarAngulos, aparecerAngulos, desaparecerGraus, aparecerGraus);
+        //Em alguma animação apagar o material ficou com opacidade 0, resetando
+        const atualizarMaterialDosAngulos = () => {
+            fase.triangulo.angles.map(angle => angle.update());
+            fase.triangulo.angles.map(angle => angle.material = new THREE.MeshBasicMaterial({color:0xff0000}));
+            fase.triangulo.angles.map(angle => angle.mesh.material = new THREE.MeshBasicMaterial({color:0xff0000}));
+        }
+
+        atualizarMaterialDosAngulos();
+
+        return new AnimacaoSimultanea(
+                    apagarAngulos, 
+                    aparecerAngulos, 
+                    desaparecerGraus, 
+                    aparecerGraus
+              )
+              .setOnTermino(atualizarMaterialDosAngulos)
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -1138,6 +1160,9 @@ export class Fase5  extends Fase{
 
                             estado.arraste = true;
 
+                            estado.tracejado = tracejado;
+                            estado.tracejado2 = tracejado2;
+
 
                             return;
                         }
@@ -1159,6 +1184,9 @@ export class Fase5  extends Fase{
 
                             tracejado2 = new Tracejado(outros_dois[0].getPosition().sub(vetorTracejado1.clone()), outros_dois[0].getPosition().add(vetorTracejado1.clone()))
                             tracejado2.addToScene(fase.scene);
+
+                            estado.tracejado = tracejado;
+                            estado.tracejado2 = tracejado2;
 
                             animacaoTracejado(tracejado, posicao.clone(), vetorTracejado1.clone());
                             animacaoTracejado(tracejado2, posicao2, vetorTracejado2);
@@ -1429,8 +1457,6 @@ export class Fase5  extends Fase{
 
                     if(novoEstado.novaEquacao && estado.etapa == 0){
 
-                        fase.debug = false;
-
                         const objetoEquacao = new ElementoCSS2D(novoEstado.novaEquacao, fase.whiteboard)
                         
                         const resultado = new Equality(soma, new Variable("180°"));
@@ -1591,7 +1617,7 @@ export class Fase5  extends Fase{
 
         subtriangulo1.angles.map(angle => angle.material.color = 0x0000aa);
 
-        const mostrarTriangulo = new ApagarPoligono(subtriangulo1)
+        const mostrarTriangulo = new ApagarPoligono(subtriangulo1,false)
                                     .reverse()
                                     .setOnStart(() => subtriangulo1.addToScene(this.scene));
 
@@ -1603,7 +1629,7 @@ export class Fase5  extends Fase{
 
         subtriangulo2.angles.map(angle => angle.material.color = 0x00b7eb);
 
-        const mostrarTriangulo2 = new ApagarPoligono(subtriangulo2)
+        const mostrarTriangulo2 = new ApagarPoligono(subtriangulo2,false)
                                     .reverse()
                                     .setOnStart(() => subtriangulo2.addToScene(this.scene));
 
@@ -1649,8 +1675,6 @@ export class Fase5  extends Fase{
 
     
     mostrarEApagar180Graus(vertice, angulos){
-
-        this.debug = false;
 
         const fase = this;
 

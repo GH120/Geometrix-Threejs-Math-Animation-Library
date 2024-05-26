@@ -3,7 +3,7 @@ import { apagarObjeto } from "./apagarObjeto";
 
 export class ApagarPoligono extends AnimacaoSimultanea{
 
-    constructor(poligono, apagarNoTermino=true){
+    constructor(poligono, apagarNoTermino=false){
 
         super();
 
@@ -63,10 +63,6 @@ export class ApagarPoligono extends AnimacaoSimultanea{
     ignorarObjetos(objetos){
 
         this.animacoes = this.animacoes.filter(animacao => !objetos.includes(animacao.objeto))
-
-        console.log(this.animacoes, objetos)
-
-        alert("parar")
 
         return this;
     }

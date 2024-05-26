@@ -447,6 +447,16 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
+        const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
+
+        const criarTracejado = fase.outputCriarTracejado[indice];
+
+        criarTracejado.estado.ativado = false;
+        criarTracejado.estado.tracejado.removeFromScene();
+        criarTracejado.estado.tracejado2.removeFromScene();
+        
+        fase.Configuracao5();
+
 
         const dialogo = ['Arraste os vértices do triângulo'];
 
@@ -606,12 +616,6 @@ export class Fase5  extends Fase{
 
         const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
 
-        const criarTracejado = fase.outputClickVertice[indice];
-
-        criarTracejado.update({clicado:true});
-        
-        fase.Configuracao5();
-
         fase.triangulo.angles.map(angle => angle.update());
         fase.triangulo.angles.map(angle => angle.material = new THREE.MeshBasicMaterial({color:0xff0000}));
 
@@ -676,7 +680,7 @@ export class Fase5  extends Fase{
         const fase = this;
 
         //Outputs
-        this.outputClickVertice   = this.triangulo.vertices.map(vertex =>   this.criarTracejado(vertex))
+        this.outputCriarTracejado   = this.triangulo.vertices.map(vertex =>   this.criarTracejado(vertex))
         this.outputDragAngle      = this.triangulo.angles.map(  angle =>    this.criarMovimentacaoDeAngulo(angle))
         this.outputEscolheuErrado = this.triangulo.angles.map(  angle =>    this.outputAnguloErrado(angle))
         this.outputMoverVertice   = this.triangulo.vertices.map(vertice => new MoverVertice(vertice));
@@ -753,7 +757,7 @@ export class Fase5  extends Fase{
 
             const vertice = vertices[i];
 
-            fase.outputClickVertice[i].addInputs(vertice.clickable)
+            vertice.clickable.addObserver(fase.outputCriarTracejado[i])
         }
 
         //Reseta o estado do output, nenhum ângulo selecionado
@@ -993,16 +997,17 @@ export class Fase5  extends Fase{
             const doubleClick = this.doubleClickVertice[i];
 
             doubleClick.removeInputs();
+            doubleClick.removeObservers();
             doubleClick.addInputs(vertice.clickable);
+            doubleClick.addObserver(fase.outputCriarTracejado[i])
 
-            doubleClick.addObserver(fase.outputClickVertice[i])
+            const mostrarAngulo = this.outputMostrarAngulo[i];
+            mostrarAngulo.addInputs(vertice.draggable);
 
             //Para transicionar caso o tracejado seja ativado
             fase.controleFluxo.removeInputs();
-            fase.controleFluxo.addInputs(fase.outputClickVertice[i]);
-        }
-
-        vertices.forEach((vertice, index) => {
+            fase.controleFluxo.addInputs(fase.outputCriarTracejado[i]);
+        
 
             const dentroDeUmaElipse = InsideElipse.fromObjeto(
                                                     vertice, 
@@ -1015,7 +1020,7 @@ export class Fase5  extends Fase{
                                                     fase.scene
                                     );
 
-            fase.outputColorirVertice[index].addInputs(dentroDeUmaElipse);
+            fase.outputColorirVertice[i].addInputs(dentroDeUmaElipse);
             fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable))
 
             const atualizarTriangulo = new Output()
@@ -1028,16 +1033,12 @@ export class Fase5  extends Fase{
                                       })
                                 
             //Output criar tracejado continua no vértice selecionado, para desligar
-            if(vertice == verticeSelecionado){ 
-                verticeSelecionado.clickable.addObserver(criarTracejado);
-                return;
-            }
 
-            vertice.draggable.addObserver(fase.outputMoverVertice[index]);
+            vertice.draggable.addObserver(fase.outputMoverVertice[i]);
 
             //Vértice arrastado notifica esse criarTracejado
             vertice.draggable.addObserver(criarTracejado);
-        })
+        }
 
 
 
@@ -1221,21 +1222,7 @@ export class Fase5  extends Fase{
         //Para usar nas funções auxiliares
         const fase = this;
 
-        // pegar outros dois vertices:
-        const outros_dois = this.triangulo.vertices.filter((vertice) => vertice != vertex);
-
-        let ativado = false;
-        let tracejado  = null;
-        let tracejado2 = null;
-        let desenharTracejado = null;
-
-        let trianguloInvisivel1 = null;
-        let trianguloInvisivel2 = null;
-
-        let anguloInvisivel1 = null;
-        let anguloInvisivel2 = null;
-        
-
+        //Refatorar depois, muito bagunçado
         return new Output()
                 .setUpdateFunction(
                     function(novoEstado){
@@ -1245,103 +1232,91 @@ export class Fase5  extends Fase{
                         const estado = this.estado;
 
 
-                        //Se um dos outros vértices tiver sendo arrastado, remove tudo e desenha de novo
-                        if(estado.dragging){
+                        //Se um dos outros vértices estiver sendo arrastado, remove tudo e desenha de novo
+                        if(estado.dragging && estado.ativado){
 
-                            desenharTracejado.stop = true;
-                            tracejado2.removeFromScene();
-                            tracejado.removeFromScene(fase.scene)
-                            anguloInvisivel1.removeFromScene(fase.scene)
-                            anguloInvisivel2.removeFromScene(fase.scene)
+                            estado.desenharTracejado.stop = true;
+                            estado.tracejado2.removeFromScene();
+                            estado.tracejado.removeFromScene(fase.scene)
+                            estado.anguloInvisivel1.removeFromScene(fase.scene)
+                            estado.anguloInvisivel2.removeFromScene(fase.scene)
 
                             const posicao = vertex.mesh.position.clone();
-                            const vetorTracejado1 = outros_dois[0].mesh.position.clone().sub(outros_dois[1].mesh.position.clone());
-                            const vetorTracejado2 = outros_dois[1].mesh.position.clone().sub(outros_dois[0].mesh.position.clone());
+                            const vetorTracejado1 = estado.verticesNaoSelecionados[0].mesh.position.clone().sub(estado.verticesNaoSelecionados[1].mesh.position.clone());
+                            const vetorTracejado2 = estado.verticesNaoSelecionados[1].mesh.position.clone().sub(estado.verticesNaoSelecionados[0].mesh.position.clone());
 
                             //Funções auxiliares, estão logo abaixo do return
-                            criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2);
-                            // updateDegrees();
+                            criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2, estado);
 
-                            // ativarMoverOutrosVertices(this);
+                            estado.tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1.multiplyScalar(3)), posicao.clone().add(vetorTracejado1.multiplyScalar(3)))
 
-                            //Transformar isso num output composto?
-                            fase.Configuracao2({
-                                verticeSelecionado: vertex, 
-                                criarTracejadoSelecionado: this,
-                                sentido:vetorTracejado1,
-                                angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
-                            });
+                            estado.tracejado.addToScene(fase.scene);
 
-                            tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1.multiplyScalar(3)), posicao.clone().add(vetorTracejado1.multiplyScalar(3)))
+                            estado.tracejado2 = new Tracejado(estado.verticesNaoSelecionados[0].getPosition().sub(vetorTracejado1.multiplyScalar(3)), estado.verticesNaoSelecionados[0].getPosition().add(vetorTracejado1.multiplyScalar(3)))
 
-                            tracejado.addToScene(fase.scene);
-
-                            tracejado2 = new Tracejado(outros_dois[0].getPosition().sub(vetorTracejado1.multiplyScalar(3)), outros_dois[0].getPosition().add(vetorTracejado1.multiplyScalar(3)))
-
-                            tracejado2.addToScene(fase.scene);
+                            estado.tracejado2.addToScene(fase.scene);
 
                             estado.arraste = true;
 
-                            estado.tracejado = tracejado;
-                            estado.tracejado2 = tracejado2;
+                            estado.tracejado = estado.tracejado;
+                            estado.tracejado2 = estado.tracejado2;
 
                             this.notify({
                                 tracejadoAtivado: true,
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
                                 sentido: vetorTracejado1,
-                                angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
+                                angulosInvisiveis: [estado.anguloInvisivel1, estado.anguloInvisivel2]
                             });
 
 
                             return;
                         }
 
-                        if (estado.clicado && !ativado){
+                        if (estado.clicado && !estado.ativado){
 
-                            ativado = !ativado
+                            estado.ativado = !estado.ativado
 
                             const posicao = vertex.getPosition();
-                            const posicao2 = outros_dois[0].getPosition();
-                            const vetorTracejado1 = outros_dois[0].mesh.position.clone().sub(outros_dois[1].mesh.position.clone());
-                            const vetorTracejado2 = outros_dois[1].mesh.position.clone().sub(outros_dois[0].mesh.position.clone());
+                            const posicao2 = estado.verticesNaoSelecionados[0].getPosition();
+                            const vetorTracejado1 = estado.verticesNaoSelecionados[0].mesh.position.clone().sub(estado.verticesNaoSelecionados[1].mesh.position.clone()).normalize().multiplyScalar(10);
+                            const vetorTracejado2 = estado.verticesNaoSelecionados[1].mesh.position.clone().sub(estado.verticesNaoSelecionados[0].mesh.position.clone()).normalize().multiplyScalar(10);
 
                             //Funções auxiliares, estão logo abaixo do return
-                            criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2);
+                            criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2, estado);
 
-                            tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1), posicao.clone().add(vetorTracejado1))
-                            tracejado.addToScene(fase.scene);
+                            estado.tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1), posicao.clone().add(vetorTracejado1))
+                            estado.tracejado.addToScene(fase.scene);
 
-                            tracejado2 = new Tracejado(outros_dois[0].getPosition().sub(vetorTracejado1.clone()), outros_dois[0].getPosition().add(vetorTracejado1.clone()))
-                            tracejado2.addToScene(fase.scene);
+                            estado.tracejado2 = new Tracejado(estado.verticesNaoSelecionados[0].getPosition().sub(vetorTracejado1.clone()), estado.verticesNaoSelecionados[0].getPosition().add(vetorTracejado1.clone()))
+                            estado.tracejado2.addToScene(fase.scene);
 
-                            estado.tracejado = tracejado;
-                            estado.tracejado2 = tracejado2;
+                            estado.tracejado = estado.tracejado;
+                            estado.tracejado2 = estado.tracejado2;
 
-                            animacaoTracejado(tracejado, posicao.clone(), vetorTracejado1.clone());
-                            animacaoTracejado(tracejado2, posicao2, vetorTracejado2);
+                            animacaoTracejado(estado.tracejado, posicao.clone(), vetorTracejado1.clone(), estado);
+                            animacaoTracejado(estado.tracejado2, posicao2, vetorTracejado2, estado);
 
                             this.notify({
                                 tracejadoAtivado: true,
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
                                 sentido: vetorTracejado1,
-                                angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
+                                angulosInvisiveis: [estado.anguloInvisivel1, estado.anguloInvisivel2]
                             });
 
 
                         } else if (estado.clicado) {
 
-                            ativado = !ativado
+                            estado.ativado = !estado.ativado
                             
-                            desenharTracejado.stop = true;
-                            tracejado.removeFromScene(fase.scene)
-                            tracejado2.removeFromScene(fase.scene)
-                            anguloInvisivel1.removeFromScene(fase.scene)
-                            anguloInvisivel2.removeFromScene(fase.scene)
+                            estado.desenharTracejado.stop = true;
+                            estado.tracejado.removeFromScene(fase.scene)
+                            estado.tracejado2.removeFromScene(fase.scene)
+                            estado.anguloInvisivel1.removeFromScene(fase.scene)
+                            estado.anguloInvisivel2.removeFromScene(fase.scene)
                             
-                            fase.triangulo.removeFromScene();
-                            fase.triangulo.addToScene(fase.scene);
+                            fase.triangulo.update();
 
                             this.notify({
                                 tracejadoAtivado: false,
@@ -1349,10 +1324,22 @@ export class Fase5  extends Fase{
 
                         }
 
-                        estado.ativado = ativado; //Sinaliza se o output foi ativado
+                        estado.ativado = estado.ativado; //Sinaliza se o output foi ativado
                         estado.clicado = false;
                     }
                 )
+
+                .setEstadoInicial({
+                    ativado :false,
+                    tracejado  : null,
+                    tracejado2 : null,
+                    desenharTracejado : null,
+                    trianguloInvisivel1 : null,
+                    trianguloInvisivel2 : null,
+                    anguloInvisivel1 : null,
+                    anguloInvisivel2 : null,
+                    verticesNaoSelecionados: this.triangulo.vertices.filter((vertice) => vertice != vertex)
+                })
 
         //Funções auxiliares
         //SEMPRE USAR "FASE" AO INVÉS DE THIS
@@ -1361,9 +1348,9 @@ export class Fase5  extends Fase{
         //isso não acontece com as setinhas
 
         //Cria os inputs das hitboxes invisíveis
-        function criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2) {
-            const vtov1 = outros_dois[0].mesh.position.clone().sub(posicao);
-            const vtov2 = outros_dois[1].mesh.position.clone().sub(posicao);
+        function criarHitboxAngulos(posicao, vetorTracejado1, vetorTracejado2, estado) {
+            const vtov1 = estado.verticesNaoSelecionados[0].mesh.position.clone().sub(posicao);
+            const vtov2 = estado.verticesNaoSelecionados[1].mesh.position.clone().sub(posicao);
 
             const posVtov1 = vtov1.clone().normalize().add(posicao);
             const posVtov2 = vtov2.clone().normalize().add(posicao);
@@ -1371,46 +1358,46 @@ export class Fase5  extends Fase{
             const posVtracejado1 = vetorTracejado1.clone().normalize().add(posicao);
             const posVtracejado2 = vetorTracejado2.clone().normalize().add(posicao);
 
-            trianguloInvisivel1 = new Triangle();
-            trianguloInvisivel1.positions = [posicao, posVtov1, posVtracejado1].map((vetor) => vetor.toArray());
+            estado.trianguloInvisivel1 = new Triangle();
+            estado.trianguloInvisivel1.positions = [posicao, posVtov1, posVtracejado1].map((vetor) => vetor.toArray());
             
-            trianguloInvisivel2 = new Triangle();
-            trianguloInvisivel2.positions = [posicao, posVtov2, posVtracejado2].map((vetor) => vetor.toArray());
+            estado.trianguloInvisivel2 = new Triangle();
+            estado.trianguloInvisivel2.positions = [posicao, posVtov2, posVtracejado2].map((vetor) => vetor.toArray());
 
-            trianguloInvisivel1.render();
-            trianguloInvisivel2.render();
+            estado.trianguloInvisivel1.render();
+            estado.trianguloInvisivel2.render();
 
-            anguloInvisivel1 = new Angle(trianguloInvisivel1.vertices);
-            anguloInvisivel2 = new Angle(trianguloInvisivel2.vertices);
-            anguloInvisivel1.angleRadius = 1;
-            anguloInvisivel2.angleRadius = 1;
+            estado.anguloInvisivel1 = new Angle(estado.trianguloInvisivel1.vertices);
+            estado.anguloInvisivel2 = new Angle(estado.trianguloInvisivel2.vertices);
+            estado.anguloInvisivel1.angleRadius = 1;
+            estado.anguloInvisivel2.angleRadius = 1;
 
-            anguloInvisivel1.render();
-            anguloInvisivel1.addToScene(fase.scene);
-            anguloInvisivel2.render();
-            anguloInvisivel2.addToScene(fase.scene)
-
-
-            anguloInvisivel1.mesh.visible = false;
-            anguloInvisivel2.mesh.visible = false;
+            estado.anguloInvisivel1.render();
+            estado.anguloInvisivel1.addToScene(fase.scene);
+            estado.anguloInvisivel2.render();
+            estado.anguloInvisivel2.addToScene(fase.scene)
 
 
-            fase.hoverInvisivel1 = new Hoverable(anguloInvisivel1, fase.camera)
-            fase.hoverInvisivel2 = new Hoverable(anguloInvisivel2, fase.camera)
+            estado.anguloInvisivel1.mesh.visible = false;
+            estado.anguloInvisivel2.mesh.visible = false;
+
+
+            fase.hoverInvisivel1 = new Hoverable(estado.anguloInvisivel1, fase.camera)
+            fase.hoverInvisivel2 = new Hoverable(estado.anguloInvisivel2, fase.camera)
         }
 
         //Anima o desenhar tracejado
-        function animacaoTracejado(tracejado, posicao, vetorTracejado1){
+        function animacaoTracejado(tracejado, posicao, vetorTracejado1, estado){
 
             // animação
-            desenharTracejado = new Animacao(tracejado)
+            estado.desenharTracejado = new Animacao(tracejado)
                 .setValorInicial(0)
-                .setValorFinal(2)
+                .setValorFinal(10)
                 .setDuration(50)
                 .setInterpolacao((inicial, final, peso) => inicial * (1 - peso) + final*peso)
                 .setUpdateFunction((progresso) => {
-                    tracejado.origem = posicao.clone().sub(vetorTracejado1.clone().multiplyScalar(progresso))
-                    tracejado.destino = posicao.clone().add(vetorTracejado1.clone().multiplyScalar(progresso))
+                    tracejado.origem = posicao.clone().sub(vetorTracejado1.clone().normalize().multiplyScalar(progresso))
+                    tracejado.destino = posicao.clone().add(vetorTracejado1.clone().normalize().multiplyScalar(progresso))
                     tracejado.update();
                 })
                 .setCurva((x) => x < 0.5
@@ -1419,7 +1406,7 @@ export class Fase5  extends Fase{
                 )
                 .voltarAoInicio(false);
             
-            fase.animar(desenharTracejado);
+            fase.animar(estado.desenharTracejado);
         }
 
         function updateDegrees(){
@@ -1513,7 +1500,7 @@ export class Fase5  extends Fase{
         const fase = this;
 
         return new Output()
-               .addInputs(...fase.outputClickVertice)
+               .addInputs(...fase.outputCriarTracejado)
                .setUpdateFunction(function(novoEstado){
 
                     const estado = this.estado;
@@ -1901,7 +1888,7 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
-        const index   = fase.outputClickVertice.map((output,indice) => (output.estado.ativado)? indice : -1)
+        const index   = fase.outputCriarTracejado.map((output,indice) => (output.estado.ativado)? indice : -1)
                                                .filter(indice => indice != -1)[0];
 
         const angulos = fase.triangulo.angles.filter(angulo => angulo.index != index)
@@ -1932,7 +1919,7 @@ export class Fase5  extends Fase{
                         "Se um círculo tem 360°, então quantos graus tem metade de um círculo?"]
         
         //Clica automaticamente no vértice, desligando seu output e resetando o triângulo
-        const desligarTracejado = () => fase.outputClickVertice.forEach(output => (output.ativado)? output.update({clicado:true}) : null);
+        const desligarTracejado = () => fase.outputCriarTracejado.forEach(output => (output.ativado)? output.update({clicado:true}) : null);
 
         const anim1 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[0])).setDelay(200)
         const anim2 = new TextoAparecendo(fase.text.element).setOnStart(() => fase.changeText(dialogo[1])).setDelay(100)

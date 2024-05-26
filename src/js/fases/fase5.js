@@ -457,6 +457,8 @@ export class Fase5  extends Fase{
         
         fase.Configuracao5();
 
+        fase.controleFluxo.estado.etapa = 'aula4'
+
 
         const dialogo = ['Arraste os vértices do triângulo'];
 
@@ -758,6 +760,8 @@ export class Fase5  extends Fase{
             const vertice = vertices[i];
 
             vertice.clickable.addObserver(fase.outputCriarTracejado[i])
+            
+            fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable))
         }
 
         //Reseta o estado do output, nenhum ângulo selecionado
@@ -981,12 +985,12 @@ export class Fase5  extends Fase{
 
         fase.informacao = {...fase.informacao, ...informacao};
 
-        const verticeSelecionado = fase.informacao.verticeSelecionado;
-        const criarTracejado     = fase.informacao.criarTracejadoSelecionado;        
-
         //Ligações feitas: click vertice => cria tracejado
 
         const vertices = fase.triangulo.vertices;
+
+        //Para transicionar caso o tracejado seja ativado
+        fase.controleFluxo.removeInputs();
 
         //Liga o vertice double click ao output criar tracejado
         //Pipeline: clickable -> doubleClick -> criarTracejado 
@@ -1004,8 +1008,6 @@ export class Fase5  extends Fase{
             const mostrarAngulo = this.outputMostrarAngulo[i];
             mostrarAngulo.addInputs(vertice.draggable);
 
-            //Para transicionar caso o tracejado seja ativado
-            fase.controleFluxo.removeInputs();
             fase.controleFluxo.addInputs(fase.outputCriarTracejado[i]);
         
 
@@ -1037,7 +1039,9 @@ export class Fase5  extends Fase{
             vertice.draggable.addObserver(fase.outputMoverVertice[i]);
 
             //Vértice arrastado notifica esse criarTracejado
-            vertice.draggable.addObserver(criarTracejado);
+            vertice.draggable.addObserver(this.outputCriarTracejado[0]);
+            vertice.draggable.addObserver(this.outputCriarTracejado[1]);
+            vertice.draggable.addObserver(this.outputCriarTracejado[2]);
         }
 
 
@@ -1231,9 +1235,15 @@ export class Fase5  extends Fase{
 
                         const estado = this.estado;
 
+                        estado.contadorAtualizacao++;
+
 
                         //Se um dos outros vértices estiver sendo arrastado, remove tudo e desenha de novo
                         if(estado.dragging && estado.ativado){
+                            
+                            if(estado.contadorAtualizacao < 5) return;
+
+                            estado.contadorAtualizacao = 0;
 
                             estado.desenharTracejado.stop = true;
                             estado.tracejado2.removeFromScene();
@@ -1338,7 +1348,8 @@ export class Fase5  extends Fase{
                     trianguloInvisivel2 : null,
                     anguloInvisivel1 : null,
                     anguloInvisivel2 : null,
-                    verticesNaoSelecionados: this.triangulo.vertices.filter((vertice) => vertice != vertex)
+                    verticesNaoSelecionados: this.triangulo.vertices.filter((vertice) => vertice != vertex),
+                    contadorAtualizacao: 0
                 })
 
         //Funções auxiliares
@@ -1505,6 +1516,10 @@ export class Fase5  extends Fase{
 
                     const estado = this.estado;
 
+                    alert(estado.etapa)
+
+                    console.log({...estado})
+
                     if(novoEstado.arrastarVertices){
                         fase.arrastarVerticesDialogo();
                     }
@@ -1536,6 +1551,8 @@ export class Fase5  extends Fase{
                     }
 
                     if(novoEstado.tracejadoAtivado == false){
+
+                        alert(estado.etapa)
                         
                         if(estado.etapa == "aula4") 
                             fase.Configuracao5(novoEstado);

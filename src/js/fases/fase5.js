@@ -611,11 +611,11 @@ export class Fase5  extends Fase{
 
         tracejado.update({clicado: true});
 
-        const anguloSelecionado = fase.triangulo.angles[indice];
-
         const angulosAuxiliares = [this.subtriangulo1.angles[1], this.subtriangulo2.angles[1]];
 
-        const angulosOriginais  = fase.triangulo.angles.filter(angulo => angulo != anguloSelecionado)
+        const angulosOriginais  = fase.triangulo.angles.filter((angulo, numero) => numero != indice);
+
+        console.log(angulosOriginais);
 
         const apagarAngulos   = new AnimacaoSimultanea()
                                     .setAnimacoes(angulosAuxiliares.map(angulo => apagarObjeto(angulo, fase.scene)));
@@ -623,7 +623,13 @@ export class Fase5  extends Fase{
         const aparecerAngulos = new AnimacaoSimultanea()
                                     .setAnimacoes(angulosOriginais.map(angulo => apagarObjeto(angulo).reverse()))
 
-        return new AnimacaoSimultanea(apagarAngulos, aparecerAngulos)
+        const desaparecerGraus = new AnimacaoSimultanea()
+                                     .setAnimacoes(angulosAuxiliares.map(angulo => angulo.mostrarAngulo.animacao(false)));
+
+        const aparecerGraus = new AnimacaoSimultanea()
+                                      .setAnimacoes(angulosOriginais.map(angulo => fase.mostrarGrausAparecendo(angulo)));
+
+        return new AnimacaoSimultanea(apagarAngulos, aparecerAngulos, desaparecerGraus, aparecerGraus);
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -890,7 +896,9 @@ export class Fase5  extends Fase{
 
     Configuracao5(){
 
-        this.outputClickVertice.map(output => output.ativar(false));
+        // this.outputClickVertice.map(output => output.ativar(false));
+
+        this.Configuracao0();
     }
 
     ////////////////////////////////////////////////////////////////////////

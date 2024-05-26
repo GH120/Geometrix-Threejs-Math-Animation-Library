@@ -12,6 +12,8 @@ export class Clickable extends Input{
 
     this.outputMudarCursor(object, camera, container)
 
+    this.numeroClicks = 0;
+
     // Add event listeners for mouse down, move, and up events
     window.addEventListener('click', this.onClick.bind(this), false);
   }
@@ -52,6 +54,40 @@ export class Clickable extends Input{
                       .setEstadoInicial({
                         cursorInicial: 'default'
                       })
+  }
+}
+
+//Recebe inputs do Clickable e retorna clicado apenas se pressionou duas vezes
+//Pode substituir clickable em outros outputs adicionando esse como output: clickable -> doubleClick -> output
+export class DoubleClick extends Output{
+
+  constructor(objeto){
+
+    super();
+
+    this.setEstadoInicial({
+      numeroClicks:0
+    });
+  }
+
+  update(novoEstado){
+
+      const estado = this.estado;
+
+      if(!novoEstado.clicado) return;
+
+      estado.numeroClicks++;
+
+      setTimeout(() => estado.numeroClicks = 0, 500);
+
+      if(estado.numeroClicks >= 2){
+
+        estado.numeroClicks = 0;
+
+        this.notify({clicado: true, doubleClick:true})
+
+        alert("yes")
+      }
   }
 }
 

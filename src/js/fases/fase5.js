@@ -5,7 +5,7 @@ import { ColorirIsoceles } from '../outputs/colorirIsoceles';
 import { MostrarTipo } from '../outputs/mostrarTipo';
 import  MoverVertice  from '../outputs/moverVertice';
 import { MostrarBissetriz } from '../outputs/mostrarBissetriz';
-import { Clickable, MultipleClickable } from '../inputs/clickable';
+import { Clickable, DoubleClick, MultipleClickable } from '../inputs/clickable';
 import {CSS2DObject} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 import * as dat from 'dat.gui';
@@ -60,7 +60,7 @@ export class Fase5  extends Fase{
         //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
         //Mostrar que a soma dos 
 
-        this.debug = false;
+        this.debug = true;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -608,9 +608,8 @@ export class Fase5  extends Fase{
 
         const criarTracejado = fase.outputClickVertice[indice];
 
-        criarTracejado.estado.tracejado.removeFromScene();
-        criarTracejado.estado.tracejado2.removeFromScene();
-
+        criarTracejado.update({clicado:true});
+        
         fase.Configuracao5();
 
         fase.triangulo.angles.map(angle => angle.update());
@@ -673,6 +672,9 @@ export class Fase5  extends Fase{
     }
 
     createOutputs(){
+
+        const fase = this;
+
         //Outputs
         this.outputClickVertice   = this.triangulo.vertices.map(vertex =>   this.criarTracejado(vertex))
         this.outputDragAngle      = this.triangulo.angles.map(  angle =>    this.criarMovimentacaoDeAngulo(angle))
@@ -680,6 +682,7 @@ export class Fase5  extends Fase{
         this.outputMoverVertice   = this.triangulo.vertices.map(vertice => new MoverVertice(vertice));
         this.outputColorirVertice = this.triangulo.vertices.map(vertice => new ColorirOnHover(vertice, 0x8c8c8c, 0xffff00, this));
         this.outputMostrarAngulo  = this.triangulo.angles.map(angle => new MostrarAngulo(angle, 1.4).addToFase(this));
+        this.doubleClickVertice   = this.triangulo.vertices.map(vertex => new DoubleClick(vertex, fase.camera));
     }
 
     resetarInputs(){
@@ -689,7 +692,6 @@ export class Fase5  extends Fase{
 
         vertices.map(vertice => vertice.removeAllOutputs());
         angles.map(  angle => angle.removeAllOutputs());
-
     }
 
     Configuracao0(){
@@ -745,17 +747,64 @@ export class Fase5  extends Fase{
 
         const vertices = fase.triangulo.vertices;
 
-        //Liga o vertice.clickable input ao output
+        //Liga o vertice double click ao output criar tracejado
+        //Pipeline: clickable -> doubleClick -> criarTracejado 
         for (let i = 0; i < 3; ++i) {
 
             const vertice = vertices[i];
 
-            vertice.clickable.addObserver(fase.outputClickVertice[i])
+            fase.outputClickVertice[i].addInputs(vertice.clickable)
         }
 
         //Reseta o estado do output, nenhum ângulo selecionado
         fase.outputDragAngle.map(output => output.estado = {});
     }
+
+    Configuracao1b(informacao){
+
+        const fase = this;
+
+        fase.resetarInputs();
+
+        fase.informacao = {...fase.informacao, ...informacao};
+
+        const verticeSelecionado = fase.informacao.verticeSelecionado;
+        const criarTracejado     = fase.informacao.criarTracejadoSelecionado;
+        const angulosInvisiveis  = fase.informacao.angulosInvisiveis;
+
+        const vertices           = fase.triangulo.vertices;
+        const angles             = fase.triangulo.angles;
+
+        //Para cada vértice diferente do selecionado, vertice.draggable:
+        //adiciona output moverVertice, atualizar triângulo e atualizar criarTracejado
+
+        vertices.forEach((vertice, index) => {
+            
+            //Output criar tracejado continua no vértice selecionado, para desligar
+            if(vertice == verticeSelecionado){ 
+                verticeSelecionado.clickable.addObserver(criarTracejado);
+                return;
+            }
+
+            vertice.draggable.addObserver(fase.outputMoverVertice[index]);
+
+
+            const atualizarTriangulo = new Output()
+                                      .setUpdateFunction(estado => {
+                                            if(estado.dragging) 
+                                                fase.triangulo.update();
+                                      })
+
+            //Vértice arrastado atualiza triângulo
+            vertice.draggable.addObserver(atualizarTriangulo);
+
+            //Vértice arrastado notifica esse criarTracejado
+            vertice.draggable.addObserver(criarTracejado);
+        })
+
+
+    }
+    
 
     Configuracao2(informacao){
 
@@ -916,11 +965,84 @@ export class Fase5  extends Fase{
         fase.resetarInputs();
     }
 
-    Configuracao5(){
+    //Configurações que ligam inputs aos outputs
+    //Basicamente os controles de cada estado da fase
+    Configuracao5(informacao){
 
-        // this.outputClickVertice.map(output => output.ativar(false));
+        const fase = this;
 
-        this.Configuracao0();
+        fase.resetarInputs();
+
+        fase.controleFluxo.estado.etapa = 'aula4';
+
+        fase.informacao = {...fase.informacao, ...informacao};
+
+        const verticeSelecionado = fase.informacao.verticeSelecionado;
+        const criarTracejado     = fase.informacao.criarTracejadoSelecionado;        
+
+        //Ligações feitas: click vertice => cria tracejado
+
+        const vertices = fase.triangulo.vertices;
+
+        //Liga o vertice double click ao output criar tracejado
+        //Pipeline: clickable -> doubleClick -> criarTracejado 
+        for (let i = 0; i < 3; ++i) {
+
+            const vertice = vertices[i];
+
+            const doubleClick = this.doubleClickVertice[i];
+
+            doubleClick.removeInputs();
+            doubleClick.addInputs(vertice.clickable);
+
+            doubleClick.addObserver(fase.outputClickVertice[i])
+
+            //Para transicionar caso o tracejado seja ativado
+            fase.controleFluxo.removeInputs();
+            fase.controleFluxo.addInputs(fase.outputClickVertice[i]);
+        }
+
+        vertices.forEach((vertice, index) => {
+
+            const dentroDeUmaElipse = InsideElipse.fromObjeto(
+                                                    vertice, 
+                                                    {
+                                                        get origem(){ return vertice.getPosition()},
+                                                        get destino(){ return vertice.getPosition()}
+                                                    },
+                                                    1, 
+                                                    fase.camera, 
+                                                    fase.scene
+                                    );
+
+            fase.outputColorirVertice[index].addInputs(dentroDeUmaElipse);
+            fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable))
+
+            const atualizarTriangulo = new Output()
+                                      .addInputs(vertice.draggable)
+                                      .setUpdateFunction(estado => {
+
+                                            if(estado.dragging){
+                                                fase.triangulo.update()
+                                            } 
+                                      })
+                                
+            //Output criar tracejado continua no vértice selecionado, para desligar
+            if(vertice == verticeSelecionado){ 
+                verticeSelecionado.clickable.addObserver(criarTracejado);
+                return;
+            }
+
+            vertice.draggable.addObserver(fase.outputMoverVertice[index]);
+
+            //Vértice arrastado notifica esse criarTracejado
+            vertice.draggable.addObserver(criarTracejado);
+        })
+
+
+
+        //Reseta o estado do output, nenhum ângulo selecionado
+        fase.outputDragAngle.map(output => output.estado = {});
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -1163,6 +1285,14 @@ export class Fase5  extends Fase{
                             estado.tracejado = tracejado;
                             estado.tracejado2 = tracejado2;
 
+                            this.notify({
+                                tracejadoAtivado: true,
+                                verticeSelecionado: vertex, 
+                                criarTracejadoSelecionado: this,
+                                sentido: vetorTracejado1,
+                                angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
+                            });
+
 
                             return;
                         }
@@ -1191,15 +1321,13 @@ export class Fase5  extends Fase{
                             animacaoTracejado(tracejado, posicao.clone(), vetorTracejado1.clone());
                             animacaoTracejado(tracejado2, posicao2, vetorTracejado2);
 
-                            //Transformar isso num output composto?
-                            fase.Configuracao2({
+                            this.notify({
+                                tracejadoAtivado: true,
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
                                 sentido: vetorTracejado1,
                                 angulosInvisiveis: [anguloInvisivel1, anguloInvisivel2]
-                            })
-
-                            this.notify({tracejadoAtivado: true});
+                            });
 
 
                         } else if (estado.clicado) {
@@ -1212,13 +1340,12 @@ export class Fase5  extends Fase{
                             anguloInvisivel1.removeFromScene(fase.scene)
                             anguloInvisivel2.removeFromScene(fase.scene)
                             
-                            //Reseta outputs para sua configuração inicial
-                            fase.Configuracao1({})
-                            
                             fase.triangulo.removeFromScene();
                             fase.triangulo.addToScene(fase.scene);
 
-                            this.notify({tracejadoAtivado: true});
+                            this.notify({
+                                tracejadoAtivado: false,
+                            });
 
                         }
 
@@ -1396,14 +1523,37 @@ export class Fase5  extends Fase{
                     }
 
                     if(novoEstado.terminadoDialogo && estado.etapa == "inicio"){
-                        estado.etapa = "esperando";
+                        estado.etapa = "aula1";
                         fase.Configuracao1();
                         return;
                     }
                     
-                    if(novoEstado.tracejadoAtivado && estado.etapa == "esperando"){
-                        estado.etapa = "arraste";
+                    if(novoEstado.tracejadoAtivado){
+
+                        //Transformar isso num output composto?
+                        if(estado.etapa == "aula4") 
+                            fase.Configuracao2(novoEstado)
+                        else{
+
+                            fase.Configuracao1b(novoEstado);
+
+                            if(estado.etapa == "aula1"){
+
+                                estado.etapa = "aula2"
+
+                                fase.aula2();
+                            }
+                        }                        
+
                         return;
+                    }
+
+                    if(novoEstado.tracejadoAtivado == false){
+                        
+                        if(estado.etapa == "aula4") 
+                            fase.Configuracao5(novoEstado);
+                        else
+                            fase.Configuracao1();
                     }
 
                     if(novoEstado.trianguloDividido){

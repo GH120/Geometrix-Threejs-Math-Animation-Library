@@ -36,5 +36,8 @@ export const colorirTextoCSS2D = (texto, corInicial, corFinal) =>
                                        .setValorFinal(corFinal)
                                        .setUpdateFunction((valor) => {
 
-                                            texto.element.style.color = valor;
+                                            const hex = valor.toString(16);
+
+                                            texto.element.style.color = '0x' + '00000'.slice(0, 6 - hex.length) + hex;
+
                                        })

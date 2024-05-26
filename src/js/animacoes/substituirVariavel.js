@@ -6,11 +6,11 @@ export const substituirVariavel = (variavel, valor) =>
         new MostrarTexto(variavel)
         .setValorFinal(100)
         .reverse()
-        .setDuration(90)
+        .setDuration(30)
         .setOnTermino(() => variavel.element.textContent = valor),
         new MostrarTexto(variavel)
         .setValorFinal(100)
-        .setDuration(90)
+        .setDuration(30)
     )
     .setCheckpointAll(false)
     

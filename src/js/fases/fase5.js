@@ -445,6 +445,21 @@ export class Fase5  extends Fase{
 
     }
 
+    aula4(){
+
+        const fase = this;
+
+        fase.Configuracao5()
+
+        const dialogo = ['Arraste os vértices do triângulo'];
+
+
+        const animacao = new AnimacaoSimultanea(fase.reverterTriangulo(), fase.animacaoDialogo(dialogo[0]))
+
+
+        fase.animar(animacao);
+    }
+
     ////////////////////////////////////////////////////////////////////////
     /////////////////////////Dialogos Auxiliares////////////////////////////
     ////////////////////////////////////////////////////////////////////////
@@ -517,7 +532,8 @@ export class Fase5  extends Fase{
 
         const dialogo = [
             "Podemos generalizar isso para qualquer triângulo",
-            "Temos assim a fórmula na lousa"
+            "Temos assim a fórmula na lousa",
+            "Vamos testar para outros triângulos?"
         ]
         
         const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
@@ -569,11 +585,45 @@ export class Fase5  extends Fase{
                                         )
                                     );
 
-        const dialogo1 = fase.animacaoDialogo(dialogo[0])
+        const dialogo1 = fase.animacaoDialogo(dialogo[0]);
+        const dialogo2 = fase.animacaoDialogo(dialogo[1]);
+        const dialogo3 = fase.animacaoDialogo(dialogo[2]);
 
-        const animacao = new AnimacaoSequencial(mostrarAnguloOriginal,dialogo1,substituirAngulosAnim);
+        const animacao = new AnimacaoSequencial(
+                            mostrarAnguloOriginal,
+                            dialogo1,
+                            substituirAngulosAnim, 
+                            dialogo2,
+                            dialogo3
+                        )
+                        .setOnTermino(() => fase.aula4())
 
         fase.animar(animacao);
+    }
+
+    reverterTriangulo(){
+
+        const fase = this;
+
+        const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
+
+        const tracejado = fase.outputClickVertice[indice];
+
+        tracejado.update({clicado: true});
+
+        const anguloSelecionado = fase.triangulo.angles[indice];
+
+        const angulosAuxiliares = [this.subtriangulo1.angles[1], this.subtriangulo2.angles[1]];
+
+        const angulosOriginais  = fase.triangulo.angles.filter(angulo => angulo != anguloSelecionado)
+
+        const apagarAngulos   = new AnimacaoSimultanea()
+                                    .setAnimacoes(angulosAuxiliares.map(angulo => apagarObjeto(angulo, fase.scene)));
+
+        const aparecerAngulos = new AnimacaoSimultanea()
+                                    .setAnimacoes(angulosOriginais.map(angulo => apagarObjeto(angulo).reverse()))
+
+        return new AnimacaoSimultanea(apagarAngulos, aparecerAngulos)
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -609,9 +659,8 @@ export class Fase5  extends Fase{
         const vertices = this.triangulo.vertices;
         const angles   = this.triangulo.angles;
 
-        vertices.map(vertice => vertice.draggable.removeObservers());
-        vertices.map(vertice => vertice.clickable.removeObservers());
-        angles.map(  angle => angle.draggable.removeObservers());
+        vertices.map(vertice => vertice.removeAllOutputs());
+        angles.map(  angle => angle.removeAllOutputs());
 
     }
 
@@ -837,6 +886,11 @@ export class Fase5  extends Fase{
         fase.informacao = {...fase.informacao, ...informacao};
 
         fase.resetarInputs();
+    }
+
+    Configuracao5(){
+
+        this.outputClickVertice.map(output => output.ativar(false));
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -1441,8 +1495,6 @@ export class Fase5  extends Fase{
                     }
 
                     else if(novoEstado.novaEquacao && estado.etapa == 2){
-
-                        alert("yes")
 
                         const apagarSidenote = apagarCSS2(sidenote, fase.scene);
 

@@ -489,7 +489,19 @@ export class Fase5  extends Fase{
 
         const dialogo = ['Arraste os ângulos para os buracos do tracejado']
 
-        fase.animar(fase.animacaoDialogo());
+        fase.animar(fase.animacaoDialogo(dialogo[0]));
+    }
+
+    aula4c(){
+        
+        const fase = this;
+
+        const dialogo = [
+            'Esse triângulo tem 180°, como queriamos provar',
+            'Vamos testar para outro exemplo?'
+        ]
+
+        fase.animar(fase.animacoesDialogo(...dialogo));
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -1655,8 +1667,15 @@ export class Fase5  extends Fase{
                         return;
                     }
 
+                    else if(estado.triangulosProvados >= 2){
+                        alert("terminado")
+                    }
+
                     else if(estado.angulosArrastados >= 2){
                         fase.Configuracao4();
+                        fase.aula4c();
+                        estado.angulosArrastados = 0;
+                        estado.triangulosProvados++;
                     }
 
                     else if(novoEstado.alvo == 'arrasteAngulo'){
@@ -1672,7 +1691,8 @@ export class Fase5  extends Fase{
                })
                .setEstadoInicial({
                     etapa: "inicio",
-                    angulosArrastados:0
+                    angulosArrastados:0,
+                    triangulosProvados: 0
                })
     }
     

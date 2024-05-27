@@ -151,12 +151,11 @@ export class Angle extends Objeto{
                  quat.slerpQuaternions(quat2, quat1, t);
      
                  const vetor = new THREE.Vector3(1, 0, 0).applyQuaternion(quat).normalize();
-     
-     
+
                  const x = center[0] - vetor.x*this.angleRadius;
                  const y = center[1] - vetor.y*this.angleRadius;
                  const z = center[2];
-     
+
                  //Desenha o triângulo (posição do centro, posição anterior, posição atual)
                  sectorVertices.push(...center);
                  sectorVertices.push(...last);

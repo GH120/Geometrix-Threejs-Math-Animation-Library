@@ -70,6 +70,8 @@ export class Fase5  extends Fase{
             angulosInvisiveis: null 
         }
 
+        console.log(this.triangulo)
+
     }
 
     resetObjects(){
@@ -447,6 +449,8 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
+        fase.Configuracao5a();
+
         const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
 
         const criarTracejado = fase.outputCriarTracejado[indice];
@@ -454,11 +458,6 @@ export class Fase5  extends Fase{
         criarTracejado.estado.ativado = false;
         criarTracejado.estado.tracejado.removeFromScene();
         criarTracejado.estado.tracejado2.removeFromScene();
-        
-        fase.Configuracao5();
-
-        fase.controleFluxo.estado.etapa = 'aula4'
-
 
         const dialogo = ['Arraste os vértices do triângulo'];
 
@@ -467,6 +466,30 @@ export class Fase5  extends Fase{
 
 
         fase.animar(animacao);
+    }
+
+    aula4a(){
+
+        const fase = this;
+
+        fase.Configuracao5a();
+
+        const dialogo = ['Agora tente clicar duas vezes em qualquer vértice'];
+
+
+        const animacao = new AnimacaoSimultanea(fase.animacaoDialogo(dialogo[0]))
+
+
+        fase.animar(animacao);
+    }
+    
+    aula4b(){
+        
+        const fase = this;
+
+        const dialogo = ['Arraste os ângulos para os buracos do tracejado']
+
+        fase.animar(fase.animacaoDialogo());
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -808,6 +831,8 @@ export class Fase5  extends Fase{
 
             //Vértice arrastado notifica esse criarTracejado
             vertice.draggable.addObserver(criarTracejado);
+
+            fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable))
         })
 
 
@@ -825,6 +850,7 @@ export class Fase5  extends Fase{
         const verticeSelecionado = fase.informacao.verticeSelecionado;
         const criarTracejado     = fase.informacao.criarTracejadoSelecionado;
         const angulosInvisiveis  = fase.informacao.angulosInvisiveis;
+        const anguloSelecionado  = fase.triangulo.angles[fase.triangulo.vertices.indexOf(verticeSelecionado)]
 
         const vertices           = fase.triangulo.vertices;
         const angles             = fase.triangulo.angles;
@@ -854,12 +880,15 @@ export class Fase5  extends Fase{
 
             //Vértice arrastado notifica esse criarTracejado
             vertice.draggable.addObserver(criarTracejado);
+
+            fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable))
         })
 
         //angle.draggable => outputDragAngle
         angles.forEach((angle, index) => {
-            angle.draggable.addObserver(fase.outputDragAngle[index])
-        })
+                if(angle != anguloSelecionado) 
+                    angle.draggable.addObserver(fase.outputDragAngle[index])
+              })
 
         //invisivel.hoverable => outputDragAngle
         //invisivel.hoverable => outputErrado
@@ -867,10 +896,12 @@ export class Fase5  extends Fase{
         //As combinações angulo real invisivel corretas são ligadas ao outputDragAngle
         //As combinações erradas são ligadas ao output escolheu errado
         fase.outputDragAngle.forEach((arraste,index) => {
-
+            
             //Apenas liga se o ângulo for o mesmo
             const angle             = fase.triangulo.angles[index];
             const escolheuErrado    = fase.outputEscolheuErrado[index];
+
+            if(angle == anguloSelecionado) return;
 
             angulosInvisiveis.forEach(anguloInvisivel => {
 
@@ -1050,6 +1081,21 @@ export class Fase5  extends Fase{
         fase.outputDragAngle.map(output => output.estado = {});
     }
 
+    Configuracao5a(informacao){
+
+        const fase = this;
+
+        fase.Configuracao0();
+
+        fase.informacao = {...fase.informacao, ...informacao};
+
+        fase.outputMedirDistanciaArraste = fase.triangulo.vertices.map(vertice => fase.medirDistanciaArraste(vertice, 300));
+
+        fase.controleFluxo.addInputs(...fase.outputMedirDistanciaArraste);
+
+        
+    }
+
     ////////////////////////////////////////////////////////////////////////
     /////////////////////////Outputs e Controles////////////////////////////
     ////////////////////////////////////////////////////////////////////////
@@ -1117,9 +1163,14 @@ export class Fase5  extends Fase{
                             // animarMudarDeCor(copia);
                             // animarMudarDeCor(angle);
 
+                            //MUDAR PARA CONTROLE DE FLUXO
                             //Muda os outputs que o angulo aceita( não pode ser mais arrastado)
                             //Adiciona um output que atualiza a copia no arraste
-                            fase.Configuracao3({anguloSelecionado: angle, copiaDoAngulo: copia});
+                            this.notify({
+                                anguloSelecionado: angle,
+                                copiaDoAngulo: copia,
+                                alvo: 'arrasteAngulo'
+                            })
 
                             return;
                         }
@@ -1503,6 +1554,41 @@ export class Fase5  extends Fase{
         }
     }
 
+    medirDistanciaArraste(vertice, limite=0){
+
+        return new Output()
+                   .addInputs(vertice.draggable)
+                   .setUpdateFunction(function(novoEstado){
+
+                        const estado = this.estado;
+
+                        console.log(estado.distanciaPercorrida)
+
+                        if(novoEstado.dragging){
+
+                            const distanciaPercorrida = novoEstado.position.clone()
+                                                                           .sub(estado.position)
+                                                                           .length();
+
+                            estado.distanciaPercorrida += distanciaPercorrida;
+                            
+                        }
+
+                        if(estado.distanciaPercorrida >= limite){
+                            
+                            this.notify({
+                                distancia: estado.distanciaPercorrida,
+                                limiteAtingido: true,
+                                alvo: 'medirDistancia'
+                            });
+                        }
+                   })
+                   .setEstadoInicial({
+                        position: vertice.getPosition(),
+                        distanciaPercorrida: 0
+                   })
+    }
+
     //Controla a mudança do fluxo dos problemas
     controleGeral(){
 
@@ -1516,25 +1602,23 @@ export class Fase5  extends Fase{
 
                     const estado = this.estado;
 
-                    alert(estado.etapa)
-
-                    console.log({...estado})
-
                     if(novoEstado.arrastarVertices){
                         fase.arrastarVerticesDialogo();
                     }
 
-                    if(novoEstado.terminadoDialogo && estado.etapa == "inicio"){
+                    else if(novoEstado.terminadoDialogo && estado.etapa == "inicio"){
                         estado.etapa = "aula1";
                         fase.Configuracao1();
                         return;
                     }
                     
-                    if(novoEstado.tracejadoAtivado){
+                    else if(novoEstado.tracejadoAtivado){
 
                         //Transformar isso num output composto?
-                        if(estado.etapa == "aula4") 
+                        if(estado.etapa == "aula4") {
                             fase.Configuracao2(novoEstado)
+                            fase.aula4b();
+                        }
                         else{
 
                             fase.Configuracao1b(novoEstado);
@@ -1550,31 +1634,45 @@ export class Fase5  extends Fase{
                         return;
                     }
 
-                    if(novoEstado.tracejadoAtivado == false){
+                    else if(novoEstado.tracejadoAtivado == false){
 
-                        alert(estado.etapa)
-                        
                         if(estado.etapa == "aula4") 
                             fase.Configuracao5(novoEstado);
                         else
                             fase.Configuracao1();
                     }
 
-                    if(novoEstado.trianguloDividido){
+                    else if(novoEstado.trianguloDividido){
 
                         estado.etapa = "mostrarIgualdade";
                         fase.aula3();
                         return;
                     }
 
-                    if(novoEstado.juntarEquacoes){
+                    else if(novoEstado.juntarEquacoes){
                         estado.etapa = "juntarEquações"
                         fase.juntarEquacoesDialogo();
                         return;
                     }
+
+                    else if(estado.angulosArrastados >= 2){
+                        fase.Configuracao4();
+                    }
+
+                    else if(novoEstado.alvo == 'arrasteAngulo'){
+                        estado.angulosArrastados++;
+                        fase.Configuracao3(novoEstado);
+                    }
+
+                    else if(novoEstado.alvo == 'medirDistancia'){
+                        fase.aula4a();
+                        fase.Configuracao5({});
+                        estado.etapa = 'aula4';
+                    }
                })
                .setEstadoInicial({
-                    etapa: "inicio"
+                    etapa: "inicio",
+                    angulosArrastados:0
                })
     }
     

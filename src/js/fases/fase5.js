@@ -952,21 +952,20 @@ export class Fase5  extends Fase{
 
         fase.Configuracao2({}); //Passa nenhuma informação nova, usa a mesma configuração
 
-        if(!fase.informacao.copiasDosAngulos) fase.informacao.copiasDosAngulos = [];
-
         fase.informacao = {...fase.informacao, ...informacao};
 
-        const angle              = fase.informacao.anguloSelecionado;
-        let   copiaDoAngulo      = fase.informacao.copiaDoAngulo;
+        const angulo              = fase.informacao.anguloSelecionado;
+        const copiaDoAngulo      = fase.informacao.copiaDoAngulo;
         const verticeSelecionado = fase.informacao.verticeSelecionado;
-
-        fase.informacao.copiasDosAngulos.push(copiaDoAngulo);
-
-        angle.copiaDoAngulo = copiaDoAngulo;
         
+        angulo.copiaDoAngulo = copiaDoAngulo;
 
-        fase.informacao.copiasDosAngulos.forEach(copia => {
+        fase.informacao.copiasDosAngulos.push({angulo: angulo, copia: copiaDoAngulo});
 
+        fase.informacao.copiasDosAngulos.forEach(copiaInfo => {
+
+            let copia = copiaInfo.copia;
+            let angle = copiaInfo.angulo;
             
             //Output atualiza a copia
             const atualizarCopia = new Output().setUpdateFunction((estado) => {
@@ -990,6 +989,8 @@ export class Fase5  extends Fase{
                     copia.mesh.position.copy(verticeSelecionado.mesh.position)
                     
                     copia.mesh.quaternion.copy(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI))
+
+                    copiaInfo.copia = copia;
                 }
             })
 

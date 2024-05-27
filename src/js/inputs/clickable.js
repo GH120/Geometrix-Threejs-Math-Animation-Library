@@ -86,7 +86,6 @@ export class DoubleClick extends Output{
 
         this.notify({clicado: true, doubleClick:true})
 
-        alert("yes")
       }
   }
 }

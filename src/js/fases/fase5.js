@@ -851,6 +851,7 @@ export class Fase5  extends Fase{
     }
     
 
+    //Problema: indo direto para aula4c
     Configuracao2(informacao){
 
         const fase = this;
@@ -925,7 +926,9 @@ export class Fase5  extends Fase{
                     anguloInvisivel.hoverable.addObserver(escolheuErrado) // se não for, liga para o output "ERRADO"
                     angle.draggable.addObserver(escolheuErrado);
                 }
-            })
+            });
+
+            fase.controleFluxo.addInputs(arraste); //Arrastar ângulo avisa o controle de fluxo
         })
 
 
@@ -1123,8 +1126,6 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
-        let copia  = null;
-
         return new Output()
                .setUpdateFunction(
                     function(estadoNovo){
@@ -1152,7 +1153,7 @@ export class Fase5  extends Fase{
                         if(estado.valido && !estado.dragging){
                             estado.finalizado = true;
 
-                            copia = angle.copia().render();
+                            estado.copia = angle.copia().render();
 
                             const invisivel = angle.correspondente;
 
@@ -1164,9 +1165,9 @@ export class Fase5  extends Fase{
                             const posicaoFinal = posicaoVerticeInvisivel
 
 
-                            copia.addToScene(fase.scene)
-                            moverAnguloAnimacao(copia, estado.position.clone(), posicaoFinal);
-                            girarAngulo(copia);
+                            estado.copia.addToScene(fase.scene)
+                            moverAnguloAnimacao(estado.copia, estado.position.clone(), posicaoFinal);
+                            girarAngulo(estado.copia);
 
                             //Retorna o ângulo a sua posição original
                             moverAnguloAnimacao(angle, angle.getPosition(), angle.position);
@@ -1180,7 +1181,7 @@ export class Fase5  extends Fase{
                             //Adiciona um output que atualiza a copia no arraste
                             this.notify({
                                 anguloSelecionado: angle,
-                                copiaDoAngulo: copia,
+                                copiaDoAngulo: estado.copia,
                                 alvo: 'arrasteAngulo'
                             })
 
@@ -1196,6 +1197,10 @@ export class Fase5  extends Fase{
                         estado.valido = false;
                     }
                )
+
+               .setEstadoInicial({
+                    copia: null
+               })
 
         //Funções auxiliares
         function moverAnguloAnimacao(angle, origem, destino){
@@ -1618,6 +1623,28 @@ export class Fase5  extends Fase{
                         fase.arrastarVerticesDialogo();
                     }
 
+                    else if(estado.triangulosProvados >= 2){
+                        alert("terminado")
+                    }
+
+                    else if(estado.angulosArrastados >= 2){
+                        fase.Configuracao4();
+                        fase.aula4c();
+                        estado.angulosArrastados = 0;
+                        estado.triangulosProvados++;
+                    }
+
+                    else if(novoEstado.alvo == 'arrasteAngulo'){
+                        estado.angulosArrastados++;
+                        fase.Configuracao3(novoEstado);
+                    }
+
+                    else if(novoEstado.alvo == 'medirDistancia'){
+                        fase.aula4a();
+                        fase.Configuracao5({});
+                        estado.etapa = 'aula4';
+                    }
+
                     else if(novoEstado.terminadoDialogo && estado.etapa == "inicio"){
                         estado.etapa = "aula1";
                         fase.Configuracao1();
@@ -1665,28 +1692,6 @@ export class Fase5  extends Fase{
                         estado.etapa = "juntarEquações"
                         fase.juntarEquacoesDialogo();
                         return;
-                    }
-
-                    else if(estado.triangulosProvados >= 2){
-                        alert("terminado")
-                    }
-
-                    else if(estado.angulosArrastados >= 2){
-                        fase.Configuracao4();
-                        fase.aula4c();
-                        estado.angulosArrastados = 0;
-                        estado.triangulosProvados++;
-                    }
-
-                    else if(novoEstado.alvo == 'arrasteAngulo'){
-                        estado.angulosArrastados++;
-                        fase.Configuracao3(novoEstado);
-                    }
-
-                    else if(novoEstado.alvo == 'medirDistancia'){
-                        fase.aula4a();
-                        fase.Configuracao5({});
-                        estado.etapa = 'aula4';
                     }
                })
                .setEstadoInicial({

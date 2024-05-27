@@ -60,7 +60,7 @@ export class Fase5  extends Fase{
         //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
         //Mostrar que a soma dos 
 
-        this.debug = true;
+        this.debug = false;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -449,7 +449,7 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
-        fase.Configuracao5a();
+        fase.Configuracao0b();
 
         const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
 
@@ -472,7 +472,7 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
-        fase.Configuracao5a();
+        fase.Configuracao0b();
 
         const dialogo = ['Agora tente clicar duas vezes em qualquer vértice'];
 
@@ -1032,7 +1032,7 @@ export class Fase5  extends Fase{
 
     //Configurações que ligam inputs aos outputs
     //Basicamente os controles de cada estado da fase
-    Configuracao5(informacao){
+    Configuracao1c(informacao){
 
         const fase = this;
 
@@ -1111,7 +1111,7 @@ export class Fase5  extends Fase{
         fase.outputDragAngle.map(output => output.estado = {});
     }
 
-    Configuracao5a(informacao){
+    Configuracao0b(informacao){
 
         const fase = this;
 
@@ -1662,7 +1662,7 @@ export class Fase5  extends Fase{
 
                     else if(novoEstado.alvo == 'medirDistancia'){
                         fase.aula4a();
-                        fase.Configuracao5({});
+                        fase.Configuracao1c({});
                         estado.etapa = 'aula4';
 
                     }
@@ -1697,8 +1697,9 @@ export class Fase5  extends Fase{
 
                     else if(novoEstado.tracejadoAtivado == false){
 
+                        //Mudar para vericar não etapa mas um checkpoint
                         if(estado.etapa == "aula4") 
-                            fase.Configuracao5(novoEstado);
+                            fase.Configuracao1c(novoEstado);
                         else
                             fase.Configuracao1();
                     }

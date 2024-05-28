@@ -60,7 +60,7 @@ export class Fase5  extends Fase{
         //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
         //Mostrar que a soma dos 
 
-        this.debug = true;
+        this.debug = false;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -69,8 +69,6 @@ export class Fase5  extends Fase{
             criarTracejadoSelecionado: null,
             angulosInvisiveis: null 
         }
-
-        console.log(this.triangulo)
 
     }
 
@@ -459,7 +457,7 @@ export class Fase5  extends Fase{
         criarTracejado.estado.tracejado.removeFromScene();
         criarTracejado.estado.tracejado2.removeFromScene();
 
-        const dialogo = ['Arraste os vértices do triângulo'];
+        const dialogo = ['Arraste os vértices para formar qualquer triângulo que quiser'];
 
 
         const animacao = new AnimacaoSimultanea(fase.reverterTriangulo(), fase.animacaoDialogo(dialogo[0]))
@@ -512,6 +510,19 @@ export class Fase5  extends Fase{
         fase.animar(animacao);
 
         return animacao;
+    }
+
+    final(){
+
+        const fase = this;
+
+        const dialogo = [
+            "Muito bem, com isso deve estar convencido dessa propriedade fundamental,",
+            "A soma dos ângulos internos de um triângulo é 180°, para qualquer triângulo",
+            "Vamos usar esse raciocínio na proxima fase onde veremos semelhança"
+        ]
+
+        fase.animar(fase.animacoesDialogo(...dialogo));
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -655,55 +666,6 @@ export class Fase5  extends Fase{
         fase.animar(animacao);
     }
 
-    reverterTriangulo(){
-
-        const fase = this;
-
-        this.debug = false;
-
-        const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
-
-        fase.triangulo.angles.map(angle => angle.update());
-        fase.triangulo.angles.map(angle => angle.material = new THREE.MeshBasicMaterial({color:0xff0000}));
-
-        fase.whiteboard.ativar(false);
-
-        // console.log(fase.triangulo.angles)
-
-        const angulosAuxiliares = [this.subtriangulo1.angles[1], this.subtriangulo2.angles[1]];
-
-        const angulosOriginais  = fase.triangulo.angles.filter((angulo, numero) => numero != indice);
-
-        const apagarAngulos   = new AnimacaoSimultanea()
-                                    .setAnimacoes(angulosAuxiliares.map(angulo => apagarObjeto(angulo, fase.scene)));
-
-        const aparecerAngulos = new AnimacaoSimultanea()
-                                    .setAnimacoes(angulosOriginais.map(angulo => apagarObjeto(angulo).reverse()))
-
-        const desaparecerGraus = new AnimacaoSimultanea()
-                                     .setAnimacoes(angulosAuxiliares.map(angulo => fase.mostrarGrausDesaparecendo(angulo)));
-
-        const aparecerGraus = new AnimacaoSimultanea()
-                                      .setAnimacoes(angulosOriginais.map(angulo => fase.mostrarGrausAparecendo(angulo)));
-
-        //Em alguma animação apagar o material ficou com opacidade 0, resetando
-        const atualizarMaterialDosAngulos = () => {
-            fase.triangulo.angles.map(angle => angle.update());
-            fase.triangulo.angles.map(angle => angle.material = new THREE.MeshBasicMaterial({color:0xff0000}));
-            fase.triangulo.angles.map(angle => angle.mesh.material = new THREE.MeshBasicMaterial({color:0xff0000}));
-        }
-
-        atualizarMaterialDosAngulos();
-
-        return new AnimacaoSimultanea(
-                    apagarAngulos, 
-                    aparecerAngulos, 
-                    desaparecerGraus, 
-                    aparecerGraus
-              )
-              .setOnTermino(atualizarMaterialDosAngulos)
-    }
-
     ////////////////////////////////////////////////////////////////////////
     /////////////////////////Configurações//////////////////////////////////
     ////////////////////////////////////////////////////////////////////////
@@ -784,6 +746,22 @@ export class Fase5  extends Fase{
 
     }
 
+    Configuracao0b(informacao){
+
+        const fase = this;
+
+
+        fase.Configuracao0();
+
+        fase.informacao = {...fase.informacao, ...informacao};
+
+        fase.outputMedirDistanciaArraste = fase.triangulo.vertices.map(vertice => fase.medirDistanciaArraste(vertice, 300));
+
+        fase.controleFluxo.addInputs(...fase.outputMedirDistanciaArraste);
+
+        
+    }
+
     //Configurações que ligam inputs aos outputs
     //Basicamente os controles de cada estado da fase
             //Configurações que ligam inputs aos outputs
@@ -791,9 +769,6 @@ export class Fase5  extends Fase{
     Configuracao1(){
 
         const fase = this;
-
-        alert("configuração 1")
-
 
         fase.resetarInputs();
 
@@ -877,184 +852,6 @@ export class Fase5  extends Fase{
 
 
     }
-    
-
-    //Problema: indo direto para aula4c
-    Configuracao2(informacao){
-
-        const fase = this;
-
-        fase.resetarInputs();
-        fase.controleFluxo.removeInputs();
-
-
-        fase.informacao = {...fase.informacao, ...informacao};
-
-        const verticeSelecionado = fase.informacao.verticeSelecionado;
-        const criarTracejado     = fase.informacao.criarTracejadoSelecionado;
-        const angulosInvisiveis  = fase.informacao.angulosInvisiveis;
-        const anguloSelecionado  = fase.triangulo.angles[fase.triangulo.vertices.indexOf(verticeSelecionado)]
-
-        const vertices           = fase.triangulo.vertices;
-        const angles             = fase.triangulo.angles;
-
-        //Para cada vértice diferente do selecionado, vertice.draggable:
-        //adiciona output moverVertice, atualizar triângulo e atualizar criarTracejado
-
-        vertices.forEach((vertice, index) => {
-            
-            //Output criar tracejado continua no vértice selecionado, para desligar
-            if(vertice == verticeSelecionado){ 
-                const doubleClick = this.doubleClickVertice[index];
-
-                doubleClick.removeInputs();
-                doubleClick.removeObservers();
-                doubleClick.addInputs(vertice.clickable);
-                doubleClick.addObserver(fase.outputCriarTracejado[index]);
-
-                fase.controleFluxo.addInputs(fase.outputCriarTracejado[index]);
-                return;
-            }
-
-            vertice.draggable.addObserver(fase.outputMoverVertice[index]);
-
-
-            const atualizarTriangulo = new Output()
-                                      .setUpdateFunction(estado => {
-                                            if(estado.dragging) 
-                                                fase.triangulo.update();
-                                      })
-
-            //Vértice arrastado atualiza triângulo
-            vertice.draggable.addObserver(atualizarTriangulo);
-
-            //Vértice arrastado notifica esse criarTracejado
-            vertice.draggable.addObserver(criarTracejado);
-
-            fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable))
-        })
-
-        //angle.draggable => outputDragAngle
-        angles.forEach((angle, index) => {
-                if(angle != anguloSelecionado) 
-                    angle.draggable.addObserver(fase.outputDragAngle[index])
-              })
-
-        //invisivel.hoverable => outputDragAngle
-        //invisivel.hoverable => outputErrado
-        //Liga os hoverables dos angulos invisíveis ao arraste
-        //As combinações angulo real invisivel corretas são ligadas ao outputDragAngle
-        //As combinações erradas são ligadas ao output escolheu errado
-        fase.outputDragAngle.forEach((arraste,index) => {
-            
-            //Apenas liga se o ângulo for o mesmo
-            const angle             = fase.triangulo.angles[index];
-            const escolheuErrado    = fase.outputEscolheuErrado[index];
-
-            if(angle == anguloSelecionado) return;
-
-            angulosInvisiveis.forEach(anguloInvisivel => {
-
-                if(angle.igual(anguloInvisivel)) {
-                    anguloInvisivel.hoverable.addObserver(arraste); //liga o input hoverable do angulo invisivel ao output drag do angulo real
-                    angle.correspondente = anguloInvisivel;
-                }
-                else{
-                    anguloInvisivel.hoverable.addObserver(escolheuErrado) // se não for, liga para o output "ERRADO"
-                    angle.draggable.addObserver(escolheuErrado);
-                }
-            });
-
-            fase.controleFluxo.addInputs(arraste); //Arrastar ângulo avisa o controle de fluxo
-        })
-
-    }
-
-    Configuracao3(informacao){
-
-        const fase = this;
-
-        fase.resetarInputs();
-
-
-        fase.Configuracao2({}); //Passa nenhuma informação nova, usa a mesma configuração
-
-        fase.informacao = {...fase.informacao, ...informacao};
-
-        const angulo              = fase.informacao.anguloSelecionado;
-        const copiaDoAngulo      = fase.informacao.copiaDoAngulo;
-        const verticeSelecionado = fase.informacao.verticeSelecionado;
-        
-        angulo.copiaDoAngulo = copiaDoAngulo;
-
-        fase.informacao.copiasDosAngulos.push({angulo: angulo, copia: copiaDoAngulo});
-
-        fase.informacao.copiasDosAngulos.forEach(copiaInfo => {
-
-            let copia = copiaInfo.copia;
-            let angle = copiaInfo.angulo;
-            
-            //Output atualiza a copia
-            const atualizarCopia = new Output().setUpdateFunction((estado) => {
-                    if(estado.dragging){
-
-                        
-                    const previousPosition = copia.getPosition();
-                    
-                    copia.removeFromScene();
-
-                    const material = copia.mesh.material.clone();
-
-                    copia = angle.copia();
-
-                    angle.copiaDoAngulo = copia;
-
-                    copia.material = material;
-
-                    copia.render().addToScene(fase.scene)
-
-                    copia.mesh.position.copy(verticeSelecionado.mesh.position)
-                    
-                    copia.mesh.quaternion.copy(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI))
-
-                    copiaInfo.copia = copia;
-                }
-            })
-
-            const deletarCopia = new Output()
-                                .setUpdateFunction(function(estado){
-                                    if(estado.tracejadoAtivado == false){
-                                        this.removeInputs();
-
-                                        copia.removeFromScene();
-
-
-                                        //Por que isso? analisar depois...
-                                        angle.material = new THREE.MeshBasicMaterial({color: 0xff0000});
-                                        
-                                        angle.update();
-                                        
-                                        atualizarCopia.removeInputs();
-                                    }
-                                })
-                                .addInputs(fase.informacao.criarTracejadoSelecionado)
-
-            // fase.outputMoverVertice.map(output => output.removeInputs());
-            fase.triangulo.vertices.map(vertice => vertice.draggable.addObserver(atualizarCopia)); //Atualiza copia ao mover vértice
-            fase.outputEscolheuErrado[angle.index].removeInputs(); //Não consegue errar mais pois já está selecionado
-        })
-    }
-
-    Configuracao4(informacao){
-
-        const fase = this;
-
-
-
-        fase.informacao = {...fase.informacao, ...informacao};
-
-        fase.resetarInputs();
-    }
 
     //Configurações que ligam inputs aos outputs
     //Basicamente os controles de cada estado da fase
@@ -1136,22 +933,214 @@ export class Fase5  extends Fase{
         //Reseta o estado do output, nenhum ângulo selecionado
         fase.outputDragAngle.map(output => output.estado = {});
     }
+    
 
-    Configuracao0b(informacao){
+    //Problema: indo direto para aula4c
+    Configuracao2(informacao){
+
+        const fase = this;
+
+        fase.resetarInputs();
+        fase.controleFluxo.removeInputs();
+
+
+        fase.informacao = {...fase.informacao, ...informacao};
+
+        const verticeSelecionado = fase.informacao.verticeSelecionado;
+        const criarTracejado     = fase.informacao.criarTracejadoSelecionado;
+        const angulosInvisiveis  = fase.informacao.angulosInvisiveis;
+        const anguloSelecionado  = fase.triangulo.angles[fase.triangulo.vertices.indexOf(verticeSelecionado)]
+
+        const vertices           = fase.triangulo.vertices;
+        const angles             = fase.triangulo.angles;
+
+        //Para cada vértice diferente do selecionado, vertice.draggable:
+        //adiciona output moverVertice, atualizar triângulo e atualizar criarTracejado
+
+        vertices.forEach((vertice, index) => {
+            
+            //Output criar tracejado continua no vértice selecionado, para desligar
+            if(vertice == verticeSelecionado){ 
+                const doubleClick = this.doubleClickVertice[index];
+
+                doubleClick.removeInputs();
+                doubleClick.removeObservers();
+                doubleClick.addInputs(vertice.clickable);
+                doubleClick.addObserver(fase.outputCriarTracejado[index]);
+
+                fase.controleFluxo.addInputs(fase.outputCriarTracejado[index]);
+                return;
+            }
+
+            vertice.draggable.addObserver(fase.outputMoverVertice[index]);
+
+
+            const atualizarTriangulo = new Output()
+                                      .setUpdateFunction(estado => {
+                                            if(estado.dragging) 
+                                                fase.triangulo.update();
+                                      })
+
+            //Vértice arrastado atualiza triângulo
+            vertice.draggable.addObserver(atualizarTriangulo);
+
+            //Vértice arrastado notifica esse criarTracejado
+            vertice.draggable.addObserver(criarTracejado);
+
+            fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable))
+        })
+
+        //angle.draggable => outputDragAngle
+        //angle.draggable => mostrarAngulo
+        angles.forEach((angle, index) => {
+                if(angle != anguloSelecionado) {
+                    angle.draggable.addObserver(fase.outputDragAngle[index])
+                    // angle.draggable.addObserver(fase.outputMostrarAngulo[index]) fazer depois...
+                }
+              })
+
+        //invisivel.hoverable => outputDragAngle
+        //invisivel.hoverable => outputErrado
+        //Liga os hoverables dos angulos invisíveis ao arraste
+        //As combinações angulo real invisivel corretas são ligadas ao outputDragAngle
+        //As combinações erradas são ligadas ao output escolheu errado
+        fase.outputDragAngle.forEach((arraste,index) => {
+            
+            //Apenas liga se o ângulo for o mesmo
+            const angle             = fase.triangulo.angles[index];
+            const escolheuErrado    = fase.outputEscolheuErrado[index];
+
+            if(angle == anguloSelecionado) return;
+
+            angulosInvisiveis.forEach(anguloInvisivel => {
+
+                if(angle.igual(anguloInvisivel)) {
+                    anguloInvisivel.hoverable.addObserver(arraste); //liga o input hoverable do angulo invisivel ao output drag do angulo real
+                    angle.correspondente = anguloInvisivel;
+                }
+                else{
+                    anguloInvisivel.hoverable.addObserver(escolheuErrado) // se não for, liga para o output "ERRADO"
+                    angle.draggable.addObserver(escolheuErrado);
+                }
+            });
+
+            fase.controleFluxo.addInputs(arraste); //Arrastar ângulo avisa o controle de fluxo
+        })
+
+    }
+
+    Configuracao2b(informacao){
+
+        const fase = this;
+
+        fase.resetarInputs();
+
+
+        fase.Configuracao2({}); //Passa nenhuma informação nova, usa a mesma configuração
+
+        fase.informacao = {...fase.informacao, ...informacao};
+
+        const angulo              = fase.informacao.anguloSelecionado;
+        const copiaDoAngulo       = fase.informacao.copiaDoAngulo;
+        const verticeSelecionado  = fase.informacao.verticeSelecionado;
+        
+        angulo.copiaDoAngulo = copiaDoAngulo;
+
+        fase.informacao.copiasDosAngulos.push({angulo: angulo, copia: copiaDoAngulo});
+
+        fase.informacao.copiasDosAngulos.forEach(copiaInfo => {
+
+            let copia = copiaInfo.copia;
+            let angle = copiaInfo.angulo;
+
+            //FAZER DEPOIS
+            const updateMostrarAngulo = new Output()
+                                        .setUpdateFunction(function(novoEstado){
+
+                                            //O mostrar angulo do vértice agora aponta para a cópia
+                                            if(novoEstado.atualizando){
+                                                copia.mostrarAngulo = angle.mostrarAngulo;
+                                                angle.mostrarAngulo.angulo = copia;
+
+                                                copia.mostrarAngulo.update({});
+                                            }
+                                            else{
+                                                //O mostrar angulo volta ao normal
+                                                copia.mostrarAngulo = null;
+                                                angle.mostrarAngulo.angulo = angle;
+                                                angle.mostrarAngulo.update({});
+                                            }
+                                        })
+            
+            //Output atualiza a copia
+            const atualizarCopia = new Output()
+                                  .setUpdateFunction(function(estado){
+                                        if(estado.dragging){
+
+                                            
+                                            const previousPosition = copia.getPosition();
+                                            
+                                            copia.removeFromScene();
+
+                                            const material = copia.mesh.material.clone();
+
+                                            copia = angle.copia();
+
+                                            angle.copiaDoAngulo = copia;
+
+                                            copia.material = material;
+
+                                            copia.render().addToScene(fase.scene)
+
+                                            copia.mesh.position.copy(verticeSelecionado.mesh.position)
+                                            
+                                            copia.mesh.quaternion.copy(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI))
+
+                                            copiaInfo.copia = copia;
+
+                                            this.notify({atualizando: true})
+                                        }
+                                })
+                                // .addObserver(updateMostrarAngulo)
+
+            const deletarCopia = new Output()
+                                .setUpdateFunction(function(estado){
+                                    if(estado.tracejadoAtivado == false){
+                                        this.removeInputs();
+
+                                        copia.removeFromScene();
+
+                                        //Por que isso? analisar depois...
+                                        angle.material = new THREE.MeshBasicMaterial({color: 0xff0000});
+                                        
+                                        angle.update();
+                                        
+                                        atualizarCopia.removeInputs();
+
+                                        this.notify({copiaDeletada: true});
+                                    }
+                                })
+                                .addInputs(fase.informacao.criarTracejadoSelecionado)
+                                // .addObserver(updateMostrarAngulo)
+
+
+            // fase.outputMoverVertice.map(output => output.removeInputs());
+            fase.triangulo.vertices.map(vertice => vertice.draggable.addObserver(atualizarCopia)); //Atualiza copia ao mover vértice
+            fase.outputEscolheuErrado[angle.index].removeInputs(); //Não consegue errar mais pois já está selecionado
+        })
+    }
+
+    Configuracao4(informacao){
 
         const fase = this;
 
 
-        fase.Configuracao0();
 
         fase.informacao = {...fase.informacao, ...informacao};
 
-        fase.outputMedirDistanciaArraste = fase.triangulo.vertices.map(vertice => fase.medirDistanciaArraste(vertice, 300));
-
-        fase.controleFluxo.addInputs(...fase.outputMedirDistanciaArraste);
-
-        
+        fase.resetarInputs();
     }
+
 
     ////////////////////////////////////////////////////////////////////////
     /////////////////////////Outputs e Controles////////////////////////////
@@ -1347,9 +1336,6 @@ export class Fase5  extends Fase{
 
                         estado.contadorAtualizacao++;
 
-                        console.log({...estado});
-
-
                         //Se um dos outros vértices estiver sendo arrastado, remove tudo e desenha de novo
                         if(estado.dragging && estado.ativado){
                             
@@ -1382,7 +1368,6 @@ export class Fase5  extends Fase{
                             estado.tracejado2 = estado.tracejado2;
 
                             this.notify({
-                                tracejadoAtivado: true,
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
                                 sentido: vetorTracejado1,
@@ -1627,7 +1612,6 @@ export class Fase5  extends Fase{
 
                         const estado = this.estado;
 
-                        console.log(estado.distanciaPercorrida)
 
                         if(novoEstado.dragging){
 
@@ -1673,7 +1657,8 @@ export class Fase5  extends Fase{
                     }
 
                     else if(estado.triangulosProvados >= 2){
-                        alert("terminado");
+                        fase.final();
+                        fase.Configuracao4();
                     }
 
                     else if(estado.angulosArrastados >= 2){
@@ -1693,7 +1678,7 @@ export class Fase5  extends Fase{
 
                     else if(novoEstado.alvo == 'arrasteAngulo'){
                         estado.angulosArrastados++;
-                        fase.Configuracao3(novoEstado);
+                        fase.Configuracao2b(novoEstado);
                         this.update({}); //Verifica angulos arrastados >= 2
                     }
 
@@ -2011,6 +1996,53 @@ export class Fase5  extends Fase{
         return animacao;
     }
 
+    reverterTriangulo(){
+
+        const fase = this;
+
+        this.debug = false;
+
+        const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
+
+        fase.triangulo.angles.map(angle => angle.update());
+        fase.triangulo.angles.map(angle => angle.material = new THREE.MeshBasicMaterial({color:0xff0000}));
+
+        fase.whiteboard.ativar(false);
+
+        const angulosAuxiliares = [this.subtriangulo1.angles[1], this.subtriangulo2.angles[1]];
+
+        const angulosOriginais  = fase.triangulo.angles.filter((angulo, numero) => numero != indice);
+
+        const apagarAngulos   = new AnimacaoSimultanea()
+                                    .setAnimacoes(angulosAuxiliares.map(angulo => apagarObjeto(angulo, fase.scene)));
+
+        const aparecerAngulos = new AnimacaoSimultanea()
+                                    .setAnimacoes(angulosOriginais.map(angulo => apagarObjeto(angulo).reverse()))
+
+        const desaparecerGraus = new AnimacaoSimultanea()
+                                     .setAnimacoes(angulosAuxiliares.map(angulo => fase.mostrarGrausDesaparecendo(angulo)));
+
+        const aparecerGraus = new AnimacaoSimultanea()
+                                      .setAnimacoes(angulosOriginais.map(angulo => fase.mostrarGrausAparecendo(angulo)));
+
+        //Em alguma animação apagar o material ficou com opacidade 0, resetando
+        const atualizarMaterialDosAngulos = () => {
+            fase.triangulo.angles.map(angle => angle.update());
+            fase.triangulo.angles.map(angle => angle.material = new THREE.MeshBasicMaterial({color:0xff0000}));
+            fase.triangulo.angles.map(angle => angle.mesh.material = new THREE.MeshBasicMaterial({color:0xff0000}));
+        }
+
+        atualizarMaterialDosAngulos();
+
+        return new AnimacaoSimultanea(
+                    apagarAngulos, 
+                    aparecerAngulos, 
+                    desaparecerGraus, 
+                    aparecerGraus
+              )
+              .setOnTermino(atualizarMaterialDosAngulos)
+    }
+
     
     mostrarEApagar180Graus(vertice, angulos){
 
@@ -2229,7 +2261,6 @@ export class Fase5  extends Fase{
                                 .setOnStart(() => {
                                     mostrarAngulo.update({dentro:true});
 
-                                    console.log(mostrarAngulo, mostrarAngulo.text.elemento.element, angle.degrees)
                                 })
 
         if(!mostrarEdesaparecer){
@@ -2376,8 +2407,6 @@ export class Fase5  extends Fase{
             var context = canvas.getContext('2d');
             context.font = '18px Courier New, monospace'
 
-            console.log(context.measureText(equacao.element.textContent))
-
             const medidas = context.measureText(equacao.element.textContent)
 
             const width = medidas.width;
@@ -2388,7 +2417,6 @@ export class Fase5  extends Fase{
 
             const point = fase.pixelToCoordinates(fase.width/2 + offset, fase.height/2 - 18); //18 é o tamanho da fonte em pixeis
 
-            console.log(point)
 
             //VERIFICAR BUGS, MODIFICAR CENTRO DA CÂMERA PROVAVELMENTE É DESVIO
             return new THREE.Vector3(point.x,point.y - 1, 0); // por algum motivo o y é 1 se for metade da altura
@@ -2404,7 +2432,6 @@ export class Fase5  extends Fase{
             fase.scene.add(novoElemento);
 
 
-            // console.log(novoElemento)
 
             
             const spline = [

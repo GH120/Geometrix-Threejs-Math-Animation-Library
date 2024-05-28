@@ -60,7 +60,7 @@ export class Fase5  extends Fase{
         //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
         //Mostrar que a soma dos 
 
-        this.debug = false;
+        this.debug = true;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -1665,10 +1665,12 @@ export class Fase5  extends Fase{
                         estado.angulosArrastados = 0;
                         estado.triangulosProvados++;
 
+                        fase.Configuracao4({});
+
                         const atualizar = () => {
                             this.removeInputs();
                             fase.informacao.criarTracejadoSelecionado.update({clicado: true});
-                            fase.Configuracao1c();
+                            fase.aula4();
                             this.update({}) //Verifica triangulosProvados >= 2
                         }
 

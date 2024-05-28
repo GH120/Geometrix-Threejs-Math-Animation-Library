@@ -60,7 +60,7 @@ export class Fase5  extends Fase{
         //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
         //Mostrar que a soma dos 
 
-        this.debug = false;
+        this.debug = true;
 
         this.aceitaControleDeAnimacao = true;
 
@@ -499,9 +499,19 @@ export class Fase5  extends Fase{
         const dialogo = [
             'Esse triângulo tem 180°, como queriamos provar',
             'Vamos testar para outro exemplo?'
-        ]
+        ].map(linha => fase.animacaoDialogo(linha));
 
-        fase.animar(fase.animacoesDialogo(...dialogo));
+        const mostrar180 = fase.mostrarEApagar180Graus(fase.informacao.verticeSelecionado, fase.triangulo.angles)
+
+
+        const anim1 = new AnimacaoSimultanea(dialogo[0], mostrar180);
+        const anim2 = dialogo[1];
+
+        const animacao = new AnimacaoSequencial(anim1, anim2);
+
+        fase.animar(animacao);
+
+        return animacao;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -782,6 +792,8 @@ export class Fase5  extends Fase{
 
         const fase = this;
 
+        alert("configuração 1")
+
 
         fase.resetarInputs();
 
@@ -813,6 +825,8 @@ export class Fase5  extends Fase{
 
 
         fase.resetarInputs();
+        fase.controleFluxo.removeInputs();
+
 
         fase.informacao.copiasDosAngulos = [];
 
@@ -832,7 +846,14 @@ export class Fase5  extends Fase{
             
             //Output criar tracejado continua no vértice selecionado, para desligar
             if(vertice == verticeSelecionado){ 
-                verticeSelecionado.clickable.addObserver(criarTracejado);
+                const doubleClick = this.doubleClickVertice[index];
+
+                doubleClick.removeInputs();
+                doubleClick.removeObservers();
+                doubleClick.addInputs(vertice.clickable);
+                doubleClick.addObserver(fase.outputCriarTracejado[index])
+
+                fase.controleFluxo.addInputs(fase.outputCriarTracejado[index]);
                 return;
             }
 
@@ -864,6 +885,7 @@ export class Fase5  extends Fase{
         const fase = this;
 
         fase.resetarInputs();
+        fase.controleFluxo.removeInputs();
 
 
         fase.informacao = {...fase.informacao, ...informacao};
@@ -883,7 +905,14 @@ export class Fase5  extends Fase{
             
             //Output criar tracejado continua no vértice selecionado, para desligar
             if(vertice == verticeSelecionado){ 
-                verticeSelecionado.clickable.addObserver(criarTracejado);
+                const doubleClick = this.doubleClickVertice[index];
+
+                doubleClick.removeInputs();
+                doubleClick.removeObservers();
+                doubleClick.addInputs(vertice.clickable);
+                doubleClick.addObserver(fase.outputCriarTracejado[index]);
+
+                fase.controleFluxo.addInputs(fase.outputCriarTracejado[index]);
                 return;
             }
 
@@ -910,8 +939,6 @@ export class Fase5  extends Fase{
                 if(angle != anguloSelecionado) 
                     angle.draggable.addObserver(fase.outputDragAngle[index])
               })
-
-        fase.controleFluxo.removeInputs();
 
         //invisivel.hoverable => outputDragAngle
         //invisivel.hoverable => outputErrado
@@ -996,7 +1023,7 @@ export class Fase5  extends Fase{
 
             const deletarCopia = new Output()
                                 .setUpdateFunction(function(estado){
-                                    if(estado.clicado){
+                                    if(estado.tracejadoAtivado == false){
                                         this.removeInputs();
 
                                         copia.removeFromScene();
@@ -1010,9 +1037,8 @@ export class Fase5  extends Fase{
                                         atualizarCopia.removeInputs();
                                     }
                                 })
-                                .addInputs(verticeSelecionado.clickable)
+                                .addInputs(fase.informacao.criarTracejadoSelecionado)
 
-            verticeSelecionado.clickable.addObserver(deletarCopia) //Deleta a copia ao desativar o criarTracejado
             // fase.outputMoverVertice.map(output => output.removeInputs());
             fase.triangulo.vertices.map(vertice => vertice.draggable.addObserver(atualizarCopia)); //Atualiza copia ao mover vértice
             fase.outputEscolheuErrado[angle.index].removeInputs(); //Não consegue errar mais pois já está selecionado
@@ -1629,6 +1655,7 @@ export class Fase5  extends Fase{
     }
 
     //Controla a mudança do fluxo dos problemas
+    //REFATORAR: criar depois um controle para transição entre configurações
     controleGeral(){
 
         //Inputs: os 3 criarTracejados -> quando um deles atualiza, notifica esse output também
@@ -1646,25 +1673,34 @@ export class Fase5  extends Fase{
                     }
 
                     else if(estado.triangulosProvados >= 2){
+                        alert("terminado");
                     }
 
                     else if(estado.angulosArrastados >= 2){
-                        fase.Configuracao4();
-                        fase.aula4c();
                         estado.angulosArrastados = 0;
                         estado.triangulosProvados++;
+
+                        const atualizar = () => {
+                            this.removeInputs();
+                            fase.informacao.criarTracejadoSelecionado.update({clicado: true});
+                            fase.Configuracao1c();
+                            this.update({}) //Verifica triangulosProvados >= 2
+                        }
+
+                        fase.aula4c().setOnTermino(atualizar);
+
                     }
 
                     else if(novoEstado.alvo == 'arrasteAngulo'){
                         estado.angulosArrastados++;
                         fase.Configuracao3(novoEstado);
+                        this.update({}); //Verifica angulos arrastados >= 2
                     }
 
                     else if(novoEstado.alvo == 'medirDistancia'){
                         fase.aula4a();
                         fase.Configuracao1c({});
                         estado.etapa = 'aula4';
-
                     }
 
                     else if(novoEstado.terminadoDialogo && estado.etapa == "inicio"){
@@ -1698,8 +1734,10 @@ export class Fase5  extends Fase{
                     else if(novoEstado.tracejadoAtivado == false){
 
                         //Mudar para vericar não etapa mas um checkpoint
-                        if(estado.etapa == "aula4") 
+                        if(estado.etapa == "aula4"){
+                            estado.angulosArrastados = 0;
                             fase.Configuracao1c(novoEstado);
+                        } 
                         else
                             fase.Configuracao1();
                     }
@@ -1720,7 +1758,7 @@ export class Fase5  extends Fase{
                .setEstadoInicial({
                     etapa: "inicio",
                     angulosArrastados:0,
-                    triangulosProvados: 0
+                    triangulosProvados: 0,
                })
     }
     

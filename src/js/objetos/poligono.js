@@ -280,6 +280,10 @@ export class Poligono extends Objeto{
         return renderizouVertices && verticesNaCena;
     }
 
+    isTriangulo(){
+        return true;
+    }
+
     get centro(){
 
         if(!this.vertices) 

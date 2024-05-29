@@ -35,11 +35,20 @@ export class MostrarAngulo extends Output{
 
         if (onHover) {
 
+
             const elemento = this.text.elemento;
 
             const angulo = this.angulo;
 
-            elemento.element.textContent = `${(angulo.degrees).toFixed()}°`;
+            const isVariable = this.angulo.variable.nome;
+
+            if(!isVariable){
+                elemento.element.textContent = `${(angulo.degrees).toFixed()}°`;
+            }
+            else{
+                elemento.element.textContent = isVariable;
+            }
+                
 
             const vetor = new THREE.Vector3(0,0,0)
                         .lerpVectors(angulo.vetor2,     angulo.vetor1,      0.5)

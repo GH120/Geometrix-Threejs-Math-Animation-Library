@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import InsideElipse from "../outputs/insideElipse";
 import MostrarTexto from "../animacoes/MostrarTexto";
 
-export class LadoParalogramo {
+export class CriarTriangulo {
 
 
     constructor(whiteboard){
@@ -48,14 +48,10 @@ export class LadoParalogramo {
     accept(){
 
         const paralelogramo    = this.paralelogramoSelecionado
+        
+        alert(`Poligono ${(paralelogramo)? "encontrado" : "não encontrado"}`);
 
-        const todosLadosConhecidos = paralelogramo.edges.filter(edge => edge.variable.value).length == paralelogramo.edges.length;
-
-        alert(`paralelogramo ${(paralelogramo)? "encontrado" : "não encontrado"}`);
-
-        alert(`paralelogramo ${(!todosLadosConhecidos) ? "retângulo: ACEITO" : "não retângulo: REJEITADO"}`);
-
-        return paralelogramo && !todosLadosConhecidos;
+        return paralelogramo;
     }
 
     process(){
@@ -64,22 +60,14 @@ export class LadoParalogramo {
 
         const fase = this.fase;
 
-        fase.adicionarControleDaCarta(this.controleArrastarLados());
+        //Pede para o usuário escolher os vértices do triângulo
 
-        const dialogo = new AnimacaoSequencial(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um conhecido para seu oposto e veja o que acontece"));
-        
-        dialogo.setNome("Dialogo Carta")
+        const dialogo = ["Clique nos vértices para desenhar o triângulo"]
 
-        dialogo.setOnStart(  () => this.colorirArestas.map(colorir => colorir.update({dentro: true})));
-        dialogo.setOnTermino(() => this.colorirArestas.map(colorir => colorir.update({dentro: false})));
+        fase.animar(fase.animacaoDialogo(dialogo[0]));
+        //Cria o triângulo baseado nos vértices escolhidos
 
-        fase.animar(dialogo)
-
-        
-        //Transformar isso em uma pilha?
-        //Fase agora lida com esse controle
-        // Retorna uma equação de igualdade dos lados
-        // Mudar texto da caixa de diálogos para ensinar jogador
+        //Criar outputs para todos os vértices
     }
 
 
@@ -110,4 +98,175 @@ export class LadoParalogramo {
     //Output clicar nos vertices criar Tracejado
     //Cria triângulo e manda de volta para os objetos da fase
     //Adiciona essa carta na pilha quando terminar a execução
+
+    controleGeral(){
+
+
+        return new Output()
+               .setUpdateFunction(function(novoEstado){
+
+                    const estado = this.estado;
+
+                    if(novoEstado.dentro){
+
+                        const vertice = novoEstado.alvo;
+
+                        if(estado.verticesSelecionados.includes(vertice)){
+
+                        }
+                    }
+               })
+               .setEstadoInicial({
+                    verticesSelecionados: []
+               })
+    }
+
+    //Transformar em um output só:
+    selecionarVertice(vertice){
+
+        const fase = this;
+        
+        return new Output()
+               .setUpdateFunction(function(estadoNovo){
+
+                    this.estado = {...this.estado, ...estadoNovo};
+
+                    const estado = this.estado;
+
+
+
+                    if(estado.clicado){
+
+                        console.log("aquiiii",vertice,fase.informacao.verticesUsados.includes(vertice))
+
+
+                        const cor = corAleatoria()
+
+                        fase.Configuracao2({
+                            VerticesSelecionados: [vertice, ],
+                            cor: cor,
+                            trianguloAtual: fase.informacao.trianguloAtual+1
+                        });
+
+                         vertice.mesh.material = new THREE.MeshBasicMaterial({color:cor});
+
+                    }
+               })
+
+        //Funções auxiliares
+        //Essa função vai ser usada para escolher a cor do novo triângulo a ser criado
+        //Isso inclui tanto seus vértices quanto suas arestas
+        function corAleatoria() {   
+
+            const inteiroAleatorio = (fator) => Math.round(Math.random() * fator);
+
+            return [0xff0000,0x00ff00,0x0000ff]
+                    .map(cor => inteiroAleatorio(cor))
+                    .reduce((a,b) => a + b);
+            
+        } 
+    }
+
+    //Adiciona vértices ao triângulo sendo construido
+    adicionarVertice(vertice){
+
+        const fase = this;
+
+        return new Output()
+               .setUpdateFunction(function(estadoNovo){
+
+                    this.estado = {...this.estado, ...estadoNovo};
+
+                    const estado = this.estado;
+
+                    const selecionados = fase.informacao.VerticesSelecionados;
+
+                    const cor = fase.informacao.cor;
+                
+                    //Adiciona vértice ao triangulo a ser formado
+                    if(estado.clicado){
+
+                        vertice.mesh.material = new THREE.MeshBasicMaterial({color:cor});
+
+                        fase.Configuracao2b({
+                            VerticesSelecionados: [...selecionados, vertice]
+                        })
+                    }
+
+                    //Três vértices selecionados, então triangulo está pronto para ser desenhado
+                    if(selecionados.length >= 3){
+
+                        const triangulo = desenharTriangulo();
+
+                        fase.Configuracao3({
+                            trianguloDesenhado: triangulo
+                        });
+
+                    }
+               })
+
+        function desenharTriangulo(){
+
+            const vertices  = fase.informacao.VerticesSelecionados;
+
+            const posicoes  = vertices.map(vertice => vertice.getPosition())
+
+            //Verifica se está no sentido anti-horário
+            const v1 = new THREE.Vector3().copy(posicoes[1]).sub(posicoes[0]);
+            const v2 = new THREE.Vector3().copy(posicoes[2]).sub(posicoes[0]);
+            const crossProduct = v1.cross(v2);
+
+            if(crossProduct.z < 0){
+                const temporario = posicoes[1];
+                posicoes[1] = posicoes[0];
+                posicoes[0] = temporario
+            }
+
+            //Constrói a malha
+            const cor      = fase.informacao.cor;
+            const geometry = new THREE.BufferGeometry().setFromPoints(posicoes);
+            const material = new THREE.MeshBasicMaterial({ color: cor });  
+
+            const trianguloTransparente = new THREE.Mesh(geometry, material);
+            
+            fase.scene.add(trianguloTransparente);
+
+            const animarAparecendo = apagarObjeto(Objeto.fromMesh(trianguloTransparente))
+                                    .reverse()
+                                    .setDuration(100)
+                                    .setValorFinal(0.5)
+
+            fase.animar(animarAparecendo)
+
+            return trianguloTransparente;
+        }
+    }
+
+    removerVertice(vertice){
+        
+    }
+
+    desenharTracejado(vertice, tracejado){
+
+        //Input hover do plano, diz a posição do mouse
+
+        const fase = this;
+
+        return new Output()
+               .setUpdateFunction(function(novoEstado){
+
+                    this.estado = {...this.estado, novoEstado};
+
+                    const estado = novoEstado;
+
+                    //Pega tracejado e desenha ele do vértice até a posição do mouse
+                    //Desenha um tracejado desse vértice até o ponto
+
+                    tracejado.origem  = vertice.getPosition();
+
+                    tracejado.destino = estado.position;
+
+                    tracejado.update();
+               })
+    }
 }

@@ -81,7 +81,7 @@ export class AnguloParalogramo {
     //Torna eles hoverable e adiciona um output quando estiverem em cima
     trigger(fase){
 
-        const paralelogramos = fase.objetos;
+        const paralelogramos = fase.objetos.filter(objeto => objeto.numeroVertices == 4);
 
         this.fase = fase;
 

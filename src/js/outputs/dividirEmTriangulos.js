@@ -90,6 +90,8 @@ export default class DividirEmTriangulos extends Output{
 
         const finalizados = this.estado.verticesUsados;
 
+        this.estado.VerticesSelecionados = [];
+
 
         var index = 0;
         for(const vertice of this.poligono.vertices){
@@ -214,12 +216,7 @@ export default class DividirEmTriangulos extends Output{
             vertice.update();
         });
 
-        estado.VerticesSelecionados = [];
-
-
         this.notify({...estado, trianguloCompleto: true});
-
-
 
         this.Configuracao1();
     }

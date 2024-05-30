@@ -149,8 +149,6 @@ export class CriarTriangulo {
 
     handleTermino(estado){
 
-        console.log(this)
-
         const fase = this.fase;
 
         const apagarTriangulos = new AnimacaoSimultanea()
@@ -165,12 +163,10 @@ export class CriarTriangulo {
 
         const lateral = this.checkSentidoTriangulo(estado.VerticesSelecionados);
 
-        const horizontal = !lateral;
-
         this.createTriangulos(estado.VerticesSelecionados);
                     
         //Botar isso para o controle interface entre carta e fase
-        if(horizontal){
+        if(lateral){
             fase.cartas = [{tipo: AnguloParalogramo, imagem: imagemAnguloParalelogramo}];
         }
         else{
@@ -186,7 +182,7 @@ export class CriarTriangulo {
 
         const verticesIndices = verticesSelecionados.map(vertice => this.poligonoSelecionado.vertices.indexOf(vertice));
 
-        const triangulosAceitos = [[0,1,4], [1,2,3]];
+        const triangulosAceitos = [[0,1,3], [1,2,3]];
 
         const valeParaTodos = (a,b) => a && b;
         const valeParaAlgum = (a,b) => a || b;
@@ -219,17 +215,23 @@ export class CriarTriangulo {
             verticeProximo(indiceOposto)
         ];
 
-        const triangulo1 = new Poligono(verticesSelecionados.map(v => v.getPosition().toArray())).render();
-        const triangulo2 = new Poligono(verticesOpostos.map(v => v.getPosition().toArray())).render();
+        const triangulo1 = new Poligono(verticesSelecionados.map(v => v.getPosition().toArray()))
+                                .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
+                                .render();
+        const triangulo2 = new Poligono(verticesOpostos.map(v => v.getPosition().toArray()))
+                                .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
+                                .render();
  
 
         const mostrarTriangulo1 = new ApagarPoligono(triangulo1)
                                 .reverse()
-                                .setOnStart(() => triangulo1.addToScene(triangulo1.scene));
+                                .setOnStart(() => triangulo1.addToScene(this.fase.scene));
 
         const mostrarTriangulo2 = new ApagarPoligono(triangulo2)
                                 .reverse()
-                                .setOnStart(() => triangulo1.addToScene(triangulo1.scene));
+                                .setOnStart(() => triangulo2.addToScene(this.fase.scene));
+
+        console.log(triangulo1, triangulo2);
 
         const animacao = new AnimacaoSimultanea(mostrarTriangulo1, mostrarTriangulo2);
 

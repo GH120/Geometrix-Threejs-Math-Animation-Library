@@ -71,9 +71,7 @@ export class PrimeiraFase extends Fase{
 
     cartas = [
         { tipo: LadoParalogramo,     imagem: imagemParalelogramoLado },
-        { tipo: AnguloParalogramo,   imagem: imagemAnguloParalelogramo},
-        { tipo: CriarTriangulo,     imagem: imagemParalelogramoLado },
-        { tipo: SomaDosAngulosTriangulo, imagem: imagemAnguloParalelogramo}
+        { tipo: CriarTriangulo,      imagem: imagemAnguloParalelogramo },
         // Adicione mais cartas conforme necessário
     ];
 

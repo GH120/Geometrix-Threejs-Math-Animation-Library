@@ -10,6 +10,12 @@ import * as THREE from 'three';
 import InsideElipse from "../outputs/insideElipse";
 import MostrarTexto from "../animacoes/MostrarTexto";
 import DividirEmTriangulos from "../outputs/dividirEmTriangulos";
+import { Objeto } from "../objetos/objeto";
+import { apagarObjeto } from "../animacoes/apagarObjeto";
+import { AnguloParalogramo } from "./anguloParalelogramo";
+import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
+import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
+import { SomaDosAngulosTriangulo } from "./somaDosAngulos";
 
 export class CriarTriangulo {
 
@@ -23,6 +29,11 @@ export class CriarTriangulo {
         this.c = null;
 
         this.outputs = [];
+    }
+
+    dialogos = {
+        inicio: "Clique nos vértices para dividir o polígono em triângulos",
+        fim: "Agora novas cartas podem ser usadas nos triângulos criados"
     }
 
     //Quando a carta for arrastada, pega os triângulos da scene
@@ -48,7 +59,7 @@ export class CriarTriangulo {
     
     accept(){
 
-        const paralelogramo    = this.paralelogramoSelecionado
+        const paralelogramo    = this.poligonoSelecionado
         
         alert(`Poligono ${(paralelogramo)? "encontrado" : "não encontrado"}`);
 
@@ -63,11 +74,14 @@ export class CriarTriangulo {
 
         //Pede para o usuário escolher os vértices do triângulo
 
-        const dialogo = ["Clique nos vértices para desenhar o triângulo"]
+        fase.animar(fase.animacaoDialogo(this.dialogos.inicio));
 
-        fase.animar(fase.animacaoDialogo(dialogo[0]));
 
-        new DividirEmTriangulos(this.paralelogramoSelecionado, this.fase);
+        this.controle = this.controleGeral();
+
+        this.dividirEmTriangulos = new DividirEmTriangulos(this.poligonoSelecionado, this.fase);
+
+        this.controle.addInputs(this.dividirEmTriangulos);
         //Cria o triângulo baseado nos vértices escolhidos
 
         //Criar outputs para todos os vértices
@@ -88,7 +102,7 @@ export class CriarTriangulo {
 
                                 this.estado.valido = novoEstado.dentro && paralelogramoRenderizado;
 
-                                carta.paralelogramoSelecionado = paralelogramo;
+                                carta.poligonoSelecionado = paralelogramo;
 
                             })
                             .addInputs(paralelogramo.hoverable);
@@ -104,23 +118,74 @@ export class CriarTriangulo {
 
     controleGeral(){
 
+        const fase  = this.fase;
+        const carta = this;
 
+
+        //Só suporta um triângulo desenhado
         return new Output()
                .setUpdateFunction(function(novoEstado){
 
-                    const estado = this.estado;
+                    if(novoEstado.trianguloCompleto){
 
-                    if(novoEstado.dentro){
+                        console.log(carta, fase);
 
-                        const vertice = novoEstado.alvo;
 
-                        if(estado.verticesSelecionados.includes(vertice)){
+                        const dialogo = carta.fase.animacaoDialogo(carta.dialogos.fim);
 
-                        }
+                        fase.animar(dialogo);
+
+                        carta.handleTermino(novoEstado);
                     }
+                    
                })
                .setEstadoInicial({
-                    verticesSelecionados: []
+                    triangulosDesenhados: 0
                })
+    }
+
+    handleTermino(estado){
+
+        console.log(this)
+
+        const fase = this.fase;
+
+        const apagarTriangulos = new AnimacaoSimultanea()
+                                    .setAnimacoes(
+                                        estado.triangulosAtivos
+                                       .map(triangulo => apagarObjeto(triangulo)
+                                                         .setOnTermino(() => triangulo.removeFromScene())
+                                        )
+                                    );
+
+        this.fase.animar(apagarTriangulos);
+
+        const verticesIndices = estado.VerticesSelecionados.map(vertice => this.poligonoSelecionado.vertices.indexOf(vertice));
+
+        const triangulosAceitos = [[0,1,4], [1,2,3]];
+
+        const valeParaTodos = (a,b) => a && b;
+        const valeParaAlgum = (a,b) => a || b;
+
+        const lateral = triangulosAceitos
+                        .map(
+                            trianguloAceito => verticesIndices.map(indice => trianguloAceito.includes(indice))
+                                                              .reduce(valeParaTodos, true)
+                        )
+                        .reduce(valeParaAlgum, false);
+
+
+        const horizontal = !lateral;
+                    
+        //Botar isso para o controle interface entre carta e fase
+        if(horizontal){
+            fase.cartas = [{tipo: AnguloParalogramo, imagem: imagemAnguloParalelogramo}];
+        }
+        else{
+            fase.cartas = [{tipo: SomaDosAngulosTriangulo, imagem: imagemParalelogramoLado}];
+        }
+
+        fase.settings.ativarMenuCartas(false);
+        fase.settings.ativarMenuCartas(true);
     }
 }

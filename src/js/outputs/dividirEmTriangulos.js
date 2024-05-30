@@ -19,7 +19,7 @@ export default class DividirEmTriangulos extends Output{
         this.createInputs();
 
         this.setEstadoInicial({
-            trianguloAtual: null, 
+            trianguloAtual: 0, 
             triangulosAtivos: [],
             VerticesSelecionados: [],
             verticesUsados: [],
@@ -217,6 +217,9 @@ export default class DividirEmTriangulos extends Output{
         estado.VerticesSelecionados = [];
 
 
+        this.notify({...estado, trianguloCompleto: true});
+
+
 
         this.Configuracao1();
     }
@@ -346,11 +349,11 @@ export default class DividirEmTriangulos extends Output{
             const geometry = new THREE.BufferGeometry().setFromPoints(posicoes);
             const material = new THREE.MeshBasicMaterial({ color: cor });  
 
-            const trianguloTransparente = new THREE.Mesh(geometry, material);
+            const trianguloTransparente = Objeto.fromMesh(new THREE.Mesh(geometry, material));
             
-            fase.scene.add(trianguloTransparente);
+            trianguloTransparente.addToScene(fase.scene);
 
-            const animarAparecendo = apagarObjeto(Objeto.fromMesh(trianguloTransparente))
+            const animarAparecendo = apagarObjeto(trianguloTransparente)
                                     .reverse()
                                     .setDuration(100)
                                     .setValorFinal(0.5)

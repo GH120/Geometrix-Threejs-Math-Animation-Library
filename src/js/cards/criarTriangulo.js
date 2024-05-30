@@ -16,6 +16,9 @@ import { AnguloParalogramo } from "./anguloParalelogramo";
 import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
 import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
 import { SomaDosAngulosTriangulo } from "./somaDosAngulos";
+import { Triangle } from "../objetos/triangle";
+import { Poligono } from "../objetos/poligono";
+import { ApagarPoligono } from "../animacoes/apagarPoligono";
 
 export class CriarTriangulo {
 
@@ -160,7 +163,28 @@ export class CriarTriangulo {
 
         this.fase.animar(apagarTriangulos);
 
-        const verticesIndices = estado.VerticesSelecionados.map(vertice => this.poligonoSelecionado.vertices.indexOf(vertice));
+        const lateral = this.checkSentidoTriangulo(estado.VerticesSelecionados);
+
+        const horizontal = !lateral;
+
+        this.createTriangulos(estado.VerticesSelecionados);
+                    
+        //Botar isso para o controle interface entre carta e fase
+        if(horizontal){
+            fase.cartas = [{tipo: AnguloParalogramo, imagem: imagemAnguloParalelogramo}];
+        }
+        else{
+            fase.cartas = [{tipo: SomaDosAngulosTriangulo, imagem: imagemParalelogramoLado}];
+        }
+
+        fase.settings.ativarMenuCartas(false);
+        fase.settings.ativarMenuCartas(true);
+    }
+
+    //Verifica o tipo de corte diagonal do triângulo
+    checkSentidoTriangulo(verticesSelecionados){
+
+        const verticesIndices = verticesSelecionados.map(vertice => this.poligonoSelecionado.vertices.indexOf(vertice));
 
         const triangulosAceitos = [[0,1,4], [1,2,3]];
 
@@ -174,18 +198,43 @@ export class CriarTriangulo {
                         )
                         .reduce(valeParaAlgum, false);
 
+        return lateral;
+    }
 
-        const horizontal = !lateral;
-                    
-        //Botar isso para o controle interface entre carta e fase
-        if(horizontal){
-            fase.cartas = [{tipo: AnguloParalogramo, imagem: imagemAnguloParalelogramo}];
-        }
-        else{
-            fase.cartas = [{tipo: SomaDosAngulosTriangulo, imagem: imagemParalelogramoLado}];
-        }
+    createTriangulos(verticesSelecionados){
 
-        fase.settings.ativarMenuCartas(false);
-        fase.settings.ativarMenuCartas(true);
+        const verticeOposto = this.poligonoSelecionado.vertices.filter(vertice => !verticesSelecionados.includes(vertice))[0];
+
+        const indiceOposto = this.poligonoSelecionado.vertices.indexOf(verticeOposto);
+
+        const numeroVertices = this.poligonoSelecionado.numeroVertices;
+
+
+        const verticeProximo = (indice)  => this.poligonoSelecionado.vertices[(indice + 1) % numeroVertices];
+        const verticeAnterior = (indice) => this.poligonoSelecionado.vertices[(indice + numeroVertices - 1) % numeroVertices];
+
+        const verticesOpostos = [
+            verticeAnterior(indiceOposto), 
+            verticeOposto, 
+            verticeProximo(indiceOposto)
+        ];
+
+        const triangulo1 = new Poligono(verticesSelecionados.map(v => v.getPosition().toArray())).render();
+        const triangulo2 = new Poligono(verticesOpostos.map(v => v.getPosition().toArray())).render();
+ 
+
+        const mostrarTriangulo1 = new ApagarPoligono(triangulo1)
+                                .reverse()
+                                .setOnStart(() => triangulo1.addToScene(triangulo1.scene));
+
+        const mostrarTriangulo2 = new ApagarPoligono(triangulo2)
+                                .reverse()
+                                .setOnStart(() => triangulo1.addToScene(triangulo1.scene));
+
+        const animacao = new AnimacaoSimultanea(mostrarTriangulo1, mostrarTriangulo2);
+
+        this.fase.animar(animacao);
+
+        this.fase.objetos.push(triangulo1, triangulo2);
     }
 }

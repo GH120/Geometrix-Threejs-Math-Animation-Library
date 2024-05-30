@@ -212,7 +212,9 @@ export default class DividirEmTriangulos extends Output{
         estado.VerticesSelecionados.map(vertice => {
             vertice.material = new THREE.MeshBasicMaterial({color:0x8d8d8d});
             vertice.update();
-        })
+        });
+
+        estado.VerticesSelecionados = [];
 
 
 
@@ -227,8 +229,6 @@ export default class DividirEmTriangulos extends Output{
         const trianguloId = this.estado.trianguloAtual;
 
         const arestas     = this.estado.arestasNovas;
-
-        console.log(this.estado, arestas)
 
         arestas.map(aresta => aresta.trianguloId = trianguloId);
 
@@ -383,8 +383,6 @@ export default class DividirEmTriangulos extends Output{
 
                     tracejado.destino = estado.position;
 
-                    console.log(estado.position, {...tracejado});
-
                     tracejado.update();
                })
     }
@@ -395,9 +393,6 @@ export default class DividirEmTriangulos extends Output{
         //       click dos vértices para fixar sua cor
 
         const controle = this;
-
-        var materialAntigoAresta;
-        var materialAntigoVertex;
 
         controle.poligono.edges.map((aresta,index) => aresta.index = index)
 
@@ -438,6 +433,8 @@ export default class DividirEmTriangulos extends Output{
 
                         estado.valido = false;
                         
+                        console.log(estado.arestas, estado)
+
                         voltarCorInicial(estado.arestas);
 
                     }
@@ -450,15 +447,8 @@ export default class DividirEmTriangulos extends Output{
 
             const cor = controle.estado.cor;
 
-            console.log(vertex.material, vertex)
+            vertex.mesh.material = new THREE.MeshBasicMaterial({color:cor});
 
-            materialAntigoVertex  = 0xd828282;
-
-            vertex.material.color = cor;
-
-            vertex.update();
-
-            
         }
         //Concertar a gambiarra da aresta, as vezes não verifica aresta finalizada
 
@@ -470,30 +460,29 @@ export default class DividirEmTriangulos extends Output{
 
             arestas.map(aresta => {
 
+                console.log(aresta, arestas)
+
                 if(controle.estado.arestas.has(aresta)) return;
                 
-                materialAntigoAresta  = aresta.material.color.getHex();
+                aresta.mesh.material = new THREE.MeshBasicMaterial({color:cor});
                 
-                aresta.material.color = cor;
-                
-                aresta.update();
             })
         }
 
         function voltarCorInicial(arestas){
 
-            vertex.material.color = materialAntigoVertex;
-
-            vertex.update();
+            vertex.mesh.material = new THREE.MeshBasicMaterial({color:0x828282});
 
             if(!arestas) return;
 
 
             arestas.map(aresta => {
 
+                console.log(aresta, arestas)
+
                 if(controle.estado.arestas.has(aresta)) return;
 
-                aresta.material.color = materialAntigoAresta;
+                aresta.mesh.material = new THREE.MeshBasicMaterial({color: 0x525252})
                 
                 aresta.update();
 
@@ -519,7 +508,7 @@ export default class DividirEmTriangulos extends Output{
                 )
             )
 
-            const indices = arestasValidas.map((valida, index) => (valida)? index % 5 : -1).filter(valor => valor != -1);
+            const indices = arestasValidas.map((valida, index) => (valida)? index % controle.poligono.numeroVertices : -1).filter(valor => valor != -1);
 
             // console.log(indices, "sim")
 
@@ -528,5 +517,15 @@ export default class DividirEmTriangulos extends Output{
             return arestas;
         }
 
+    }
+    
+    removeInputs(){
+
+        this.poligono.vertices.map(vertice => vertice.removeAllOutputs());
+
+        this.plano.removeAllOutputs();
+
+
+        super.removeInputs();
     }
 }

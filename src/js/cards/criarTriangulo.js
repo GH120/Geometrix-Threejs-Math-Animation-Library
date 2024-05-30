@@ -9,6 +9,7 @@ import { Output } from "../outputs/Output";
 import * as THREE from 'three';
 import InsideElipse from "../outputs/insideElipse";
 import MostrarTexto from "../animacoes/MostrarTexto";
+import DividirEmTriangulos from "../outputs/dividirEmTriangulos";
 
 export class CriarTriangulo {
 
@@ -65,6 +66,8 @@ export class CriarTriangulo {
         const dialogo = ["Clique nos vértices para desenhar o triângulo"]
 
         fase.animar(fase.animacaoDialogo(dialogo[0]));
+
+        new DividirEmTriangulos(this.paralelogramoSelecionado, this.fase);
         //Cria o triângulo baseado nos vértices escolhidos
 
         //Criar outputs para todos os vértices
@@ -118,155 +121,6 @@ export class CriarTriangulo {
                })
                .setEstadoInicial({
                     verticesSelecionados: []
-               })
-    }
-
-    //Transformar em um output só:
-    selecionarVertice(vertice){
-
-        const fase = this;
-        
-        return new Output()
-               .setUpdateFunction(function(estadoNovo){
-
-                    this.estado = {...this.estado, ...estadoNovo};
-
-                    const estado = this.estado;
-
-
-
-                    if(estado.clicado){
-
-                        console.log("aquiiii",vertice,fase.informacao.verticesUsados.includes(vertice))
-
-
-                        const cor = corAleatoria()
-
-                        fase.Configuracao2({
-                            VerticesSelecionados: [vertice, ],
-                            cor: cor,
-                            trianguloAtual: fase.informacao.trianguloAtual+1
-                        });
-
-                         vertice.mesh.material = new THREE.MeshBasicMaterial({color:cor});
-
-                    }
-               })
-
-        //Funções auxiliares
-        //Essa função vai ser usada para escolher a cor do novo triângulo a ser criado
-        //Isso inclui tanto seus vértices quanto suas arestas
-        function corAleatoria() {   
-
-            const inteiroAleatorio = (fator) => Math.round(Math.random() * fator);
-
-            return [0xff0000,0x00ff00,0x0000ff]
-                    .map(cor => inteiroAleatorio(cor))
-                    .reduce((a,b) => a + b);
-            
-        } 
-    }
-
-    //Adiciona vértices ao triângulo sendo construido
-    adicionarVertice(vertice){
-
-        const fase = this;
-
-        return new Output()
-               .setUpdateFunction(function(estadoNovo){
-
-                    this.estado = {...this.estado, ...estadoNovo};
-
-                    const estado = this.estado;
-
-                    const selecionados = fase.informacao.VerticesSelecionados;
-
-                    const cor = fase.informacao.cor;
-                
-                    //Adiciona vértice ao triangulo a ser formado
-                    if(estado.clicado){
-
-                        vertice.mesh.material = new THREE.MeshBasicMaterial({color:cor});
-
-                        fase.Configuracao2b({
-                            VerticesSelecionados: [...selecionados, vertice]
-                        })
-                    }
-
-                    //Três vértices selecionados, então triangulo está pronto para ser desenhado
-                    if(selecionados.length >= 3){
-
-                        const triangulo = desenharTriangulo();
-
-                        fase.Configuracao3({
-                            trianguloDesenhado: triangulo
-                        });
-
-                    }
-               })
-
-        function desenharTriangulo(){
-
-            const vertices  = fase.informacao.VerticesSelecionados;
-
-            const posicoes  = vertices.map(vertice => vertice.getPosition())
-
-            //Verifica se está no sentido anti-horário
-            const v1 = new THREE.Vector3().copy(posicoes[1]).sub(posicoes[0]);
-            const v2 = new THREE.Vector3().copy(posicoes[2]).sub(posicoes[0]);
-            const crossProduct = v1.cross(v2);
-
-            if(crossProduct.z < 0){
-                const temporario = posicoes[1];
-                posicoes[1] = posicoes[0];
-                posicoes[0] = temporario
-            }
-
-            //Constrói a malha
-            const cor      = fase.informacao.cor;
-            const geometry = new THREE.BufferGeometry().setFromPoints(posicoes);
-            const material = new THREE.MeshBasicMaterial({ color: cor });  
-
-            const trianguloTransparente = new THREE.Mesh(geometry, material);
-            
-            fase.scene.add(trianguloTransparente);
-
-            const animarAparecendo = apagarObjeto(Objeto.fromMesh(trianguloTransparente))
-                                    .reverse()
-                                    .setDuration(100)
-                                    .setValorFinal(0.5)
-
-            fase.animar(animarAparecendo)
-
-            return trianguloTransparente;
-        }
-    }
-
-    removerVertice(vertice){
-        
-    }
-
-    desenharTracejado(vertice, tracejado){
-
-        //Input hover do plano, diz a posição do mouse
-
-        const fase = this;
-
-        return new Output()
-               .setUpdateFunction(function(novoEstado){
-
-                    this.estado = {...this.estado, novoEstado};
-
-                    const estado = novoEstado;
-
-                    //Pega tracejado e desenha ele do vértice até a posição do mouse
-                    //Desenha um tracejado desse vértice até o ponto
-
-                    tracejado.origem  = vertice.getPosition();
-
-                    tracejado.destino = estado.position;
-
-                    tracejado.update();
                })
     }
 }

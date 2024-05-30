@@ -36,6 +36,7 @@ import { AnguloParalogramo } from "../cards/anguloParalelogramo";
 import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
 import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
 import { SomaDosAngulosTriangulo } from "../cards/somaDosAngulos";
+import { CriarTriangulo } from "../cards/criarTriangulo";
 
 
 
@@ -71,7 +72,7 @@ export class PrimeiraFase extends Fase{
     cartas = [
         { tipo: LadoParalogramo,     imagem: imagemParalelogramoLado },
         { tipo: AnguloParalogramo,   imagem: imagemAnguloParalelogramo},
-        { tipo: LadoParalogramo,     imagem: imagemParalelogramoLado },
+        { tipo: CriarTriangulo,     imagem: imagemParalelogramoLado },
         { tipo: SomaDosAngulosTriangulo, imagem: imagemAnguloParalelogramo}
         // Adicione mais cartas conforme necessário
     ];

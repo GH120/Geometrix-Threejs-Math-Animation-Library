@@ -28,7 +28,7 @@ import { Clickable } from "../inputs/clickable";
 import MetalicSheen from "../animacoes/metalicSheen";
 import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
-import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
+import imagemGrama from '../../assets/grass_bermuda_01_alpha_4k.png'
 import { MoverGrausParaPosicaoEquacao } from "../animacoes/moverGrausParaPosicaoEquacao";
 
 //Consertar: mostrar igualdade de ângulo (valor inicial cortando delta YZW)
@@ -49,7 +49,7 @@ export class LadosProporcionais {
         this.outputs = [];
     }
 
-    static imagem = this.imagem = imagemParalelogramoLado;
+    static imagem = this.imagem = imagemGrama;
 
     dialogos = {
         inicio: "Selecione os polígonos com lados proporcionais clicando neles",
@@ -69,7 +69,7 @@ export class LadosProporcionais {
 
         for(const objeto of objetos){
 
-            if(!objeto.clickable) new Clickable(objeto);
+            if(!objeto.clickable) new Clickable(objeto, fase.camera);
             
             const controleClick = this.criarControleClick(objeto);
 
@@ -87,11 +87,7 @@ export class LadosProporcionais {
 
         const todosLadosConhecidos = false;
 
-        alert(`paralelogramo ${(paralelogramo)? "encontrado" : "não encontrado"}`);
-
-        alert(`paralelogramo com ângulos desconhecidos:${(!todosLadosConhecidos) ? " SIM - Aceito" : "NÃO - Rejeitado"}`);
-
-        return paralelogramo && !todosLadosConhecidos;
+        return true
     }
 
     process(){
@@ -121,7 +117,7 @@ export class LadosProporcionais {
                                 const estado = this.estado;
 
                                 if(novoEstado.clicado){
-                                    carta.selecionar(objeto);
+                                    // carta.selecionar(objeto);
 
                                     this.notify({objeto: objeto});
                                     this.ativar(false);
@@ -162,19 +158,19 @@ export class LadosProporcionais {
 
                         if(quantidade == 1){
 
-                            const dialogo = fase.animacaoDialogo(fase.dialogos.meio);
+                            const dialogo = fase.animacaoDialogo(carta.dialogos.meio);
 
                             fase.animar(dialogo);
                         }
                         else{
-                            const dialogo = fase.animacaoDialogo(fase.dialogos.fim);
+                            const dialogo = fase.animacaoDialogo(carta.dialogos.fim);
 
                             fase.animar(dialogo);
 
                             //Não verifica ainda se são de fato proporcionais
-                            carta.animarLadosProporcionais(estado.objetos)
+                            carta.animarLadosProporcionais(estado.objetosSelecionados)
 
-                            this.inputs.map(input => input.removeInputs()); //Remove todos os clickVertice
+                            this.observed.map(input => input.removeInputs()); //Remove todos os clickVertice
                         }
                     }
                })
@@ -187,6 +183,7 @@ export class LadosProporcionais {
     animarLadosProporcionais(objetos){
 
         const fase = this.fase;
+
 
         const equacoes = {
             ladosIguais: ` {\\color{purple} RAZÃO = 
@@ -204,7 +201,13 @@ export class LadosProporcionais {
             semelhanca: `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
         }
 
-        const dividirLados   = fase.animacaoDividirLadosIguais(...objetos);
+
+        objetos = objetos.sort((a,b) => a.edges[0].length > b.edges[0].length);
+
+        console.log(...objetos, objetos.map(objeto => objeto.edges[0].length));
+
+
+        const dividirLados   = fase.animacaoDividirLadosIguais(objetos[1], objetos[0]);
 
         fase.animar(dividirLados);
     }

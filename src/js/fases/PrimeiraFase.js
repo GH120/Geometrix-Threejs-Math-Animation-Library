@@ -871,9 +871,18 @@ export class PrimeiraFase extends Fase{
             }
 
             if(novoEstado.carta == "LadoParalelogramo"){
-                estado.cartasUsadas.push(novoEstado.carta);
 
-                this.verificarCartas();
+                if(novoEstado.completo){
+
+                    alert("YES");
+
+                    estado.cartasUsadas.push(novoEstado.carta);
+
+                    this.verificarCartas();
+
+                    this.fase.settings.ativarMenuCartas(false)
+                    this.fase.settings.ativarMenuCartas(true)
+                }
             }
         }
 
@@ -914,15 +923,19 @@ export class PrimeiraFase extends Fase{
 
             const ultimaCarta = cartasUsadas.slice(-1)[0];
 
-            const ladosProporcionais = cartasUsadas.filter(carta => carta == "LadoParalelogramo").length == 4;
+            const ladosProporcionais = cartasUsadas.filter(carta => carta === "LadoParalelogramo").length >= 2;
 
-            const angulosIguais = cartasUsadas.filter(carta => carta == "AnguloParalelogramo").length == 2;
+            const angulosIguais = cartasUsadas.filter(carta => carta === "AnguloParalelogramo").length >= 2;
 
             const cartas = [];
+
+            console.log(ladosProporcionais, this.estado.ladosProporcionais, cartasUsadas, cartasUsadas.filter(carta => carta === "LadoParalelogramo"))
 
             if(ladosProporcionais){
                 
                 if(!this.estado.ladosProporcionais) cartas.push(LadosProporcionais)
+
+                console.log(...cartas)
             }
             else{
                 cartas.push(LadoParalogramo)
@@ -934,6 +947,8 @@ export class PrimeiraFase extends Fase{
             else{
                 cartas.push(AnguloParalogramo);
             }
+
+            console.log(cartas, "cartas")
 
             this.fase.cartas = cartas;
 
@@ -1204,7 +1219,7 @@ export class PrimeiraFase extends Fase{
 
         const problema = this.problemas[this.progresso];
 
-        if(!problema) return console.log("Finalizado");
+        if(!problema) return;
 
         if(problema.satisfeito(this)){
             problema.consequencia(this);
@@ -1318,6 +1333,8 @@ export class PrimeiraFase extends Fase{
         const dividirLados = poligono1.edges.map((lado1,index) => {
 
             const lado2 = poligono2.edges[index];
+
+            console.log(lado1, lado2);
 
             const posicaoDivisao = new THREE.Vector3(4.5 + index*0.1,0,0);
 

@@ -469,6 +469,8 @@ export class AnguloParalogramo {
 
                     if(novoEstado.etapa == carta.dialogos.divisaoAnguloIgual4){
 
+                        paralelogramo.edges.map(lado => lado.material = new THREE.MeshBasicMaterial({color: 0x525252}))
+
                         const mostrarBissetriz1 = new MostrarBissetriz(
                             estado.trianguloSuperior, 
                             estado.trianguloSuperior.angles[1], 
@@ -652,6 +654,7 @@ export class AnguloParalogramo {
                         .setOnTermino(() => {
                             tracejadoBissetriz2.removeFromScene();
                             tracejadoBissetriz1.removeFromScene();
+                            tracejado.removeFromScene();
                         })
 
         const dialogo2 = new AnimacaoSimultanea(
@@ -732,10 +735,11 @@ export class AnguloParalogramo {
                 elementoCSS2: textbox, 
                 equacao: equacao,
                 duration1: 60,
-                duration2: 180,
-                delayDoMeio: 60
+                duration2: 60,
+                delayDoMeio: 30
             })
             .filler(120)
+
             .setOnTermino(() => setTimeout(() => fase.whiteboard.ativar(false), 500))
         )
         

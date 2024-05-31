@@ -124,7 +124,7 @@ export class SomaDosAngulosTriangulo {
         //     fase.animar(angulo.mostrarAngulo.animacao(true));
         // }
 
-        const moverAngulos = new MoverGrausParaPosicaoEquacao(triangulo.angles, fase);
+        const moverAngulos = new MoverGrausParaPosicaoEquacao(circularShift(triangulo.angles, 1), fase);
 
         fase.animar(dialogo);
         fase.animar(moverAngulos.setOnTermino(() => this.controle.update({ativado:true})));

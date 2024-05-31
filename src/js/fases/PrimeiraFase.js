@@ -786,6 +786,16 @@ export class PrimeiraFase extends Fase{
             if(novoEstado.equacaoResolvida){
 
                 this.lidarResolucaoEquacao();
+
+                const dialogo = [
+                    'Muito bem, verifique os ângulos do outro paralelogramo',
+                    'Se eles forem congruentes (iguais) então uma nova carta aparecerá',
+                    "Use as cartas para resolver o problema: "
+                ]
+
+                this.verificarCartas();
+
+                fase.animar(fase.animacoesDialogo(...dialogo).setOnTermino(() =>  fase.settings.ativarMenuCartas(true)));
             }
 
             //Lida com eventos das cartas abaixo
@@ -814,10 +824,7 @@ export class PrimeiraFase extends Fase{
 
                 //REFAZER DIALOGO
                 const dialogo = [
-                    "Muito bem, descobrimos um novo angulo e que dois dos restantes são iguais",
-                    "Para descobrimos x, vamos ter que usar outra propriedade já conhecida:",
-                    "A soma dos ângulos internos de um triângulo é 180°",
-                    "Para usa-la, divida o paralelogramo em dois usando a carta criar triângulo: "
+                    "Use a soma dos 180° para podermos descobrir X"
                 ]
 
                 const atualizarCartas = () => { 
@@ -894,6 +901,33 @@ export class PrimeiraFase extends Fase{
             return animacao;
         }
 
+        verificarCartas(){
+
+            const cartasUsadas = this.estado.cartasUsadas;
+
+            const ultimaCarta = cartasUsadas.slice(-1)[0];
+
+            const ladosProporcionais = cartasUsadas.filter(carta => carta == "LadoParalelogramo").length == 2;
+
+            const angulosIguais = cartasUsadas.filter(carta => carta == "AnguloParalelogramo").length == 2;
+
+            const cartas = [LadoParalogramo, AnguloParalogramo];
+
+            if(ladosProporcionais){
+                //cartas.push(ladoProporcional)
+            }
+
+            if(angulosIguais){
+                //Cartas.push(ladoProporcional)
+            }
+
+            this.fase.cartas = cartas;
+
+            // if(ladosProporcionais && angulosIguais){
+
+            // }
+        }
+
         criarEquacoes(){
 
             const fase = this.fase;
@@ -907,9 +941,11 @@ export class PrimeiraFase extends Fase{
             arraste1.tamanhoFonte = 5;
             arraste2.tamanhoFonte = 5;
 
-            const valorConhecido = this.estado.anguloConhecido.variable.value;
+            const valorConhecido = new Variable(Math.round(this.estado.anguloConhecido.degrees) + '°');
 
-            const equacao = new Equality(new Addition(valorConhecido, new Variable('x')), new Variable("180°"))
+            console.log("valor", valorConhecido);
+
+            const equacao = new Equality(new Addition(new Variable('X'), new Variable(valorConhecido)), new Variable("180°"))
     
             const textbox = new CSS2DObject(equacao.html);
 
@@ -929,7 +965,7 @@ export class PrimeiraFase extends Fase{
     
             fase.animar(new MostrarTexto(sidenote, fase.scene));
 
-            const valorConhecido = this.estado.anguloConhecido.variable.value;
+            const valorConhecido = new Variable(this.estado.anguloConhecido.variable.getValue() + '°');
 
     
             return new Output()
@@ -992,6 +1028,10 @@ export class PrimeiraFase extends Fase{
                                 equacaoResolvida: true,
                                 equacao: estado.equacao
                             })
+
+                            const mudarSidenote = apagarCSS2(sidenote, fase.scene);
+    
+                            fase.animar(mudarSidenote);
                         }
                     })
                     .setEstadoInicial({
@@ -1016,7 +1056,11 @@ export class PrimeiraFase extends Fase{
             const animacao = new AnimacaoSimultanea(...aparecerGraus)
                             .setOnStart(limparVariaveis)
 
-            limparTriangulos.setOnTermino(() => this.fase.animar(animacao));
+            limparTriangulos.setOnTermino(() => {
+                this.fase.animar(animacao);
+                this.fase.whiteboard.ativar(false);
+                this.fase.whiteboard.removerTodasEquacoes();
+            });
         }
     }
 
@@ -1212,6 +1256,7 @@ export class PrimeiraFase extends Fase{
         if(!mostrarEdesaparecer){
             aparecerTexto.setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
             aparecerTexto.setOnTermino(() => null)
+            aparecerTexto.setOnDelay(() => null)
         }
 
         return aparecerTexto;

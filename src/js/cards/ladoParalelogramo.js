@@ -11,6 +11,7 @@ import { Output } from "../outputs/Output";
 import * as THREE from 'three';
 import InsideElipse from "../outputs/insideElipse";
 import MostrarTexto from "../animacoes/MostrarTexto";
+import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
 
 export class LadoParalogramo {
 
@@ -19,12 +20,11 @@ export class LadoParalogramo {
 
         this.whiteboard = whiteboard;
 
-        this.a = null;
-        this.b = null;
-        this.c = null;
-
         this.outputs = [];
     }
+
+    static imagem = this.imagem = imagemParalelogramoLado;
+
 
     //Quando a carta for arrastada, pega os triângulos da scene
     //Torna eles hoverable e adiciona um output quando estiverem em cima

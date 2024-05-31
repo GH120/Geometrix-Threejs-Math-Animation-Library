@@ -14,11 +14,11 @@ import { Objeto } from "../objetos/objeto";
 import { apagarObjeto } from "../animacoes/apagarObjeto";
 import { AnguloParalogramo } from "./anguloParalelogramo";
 import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
-import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
 import { SomaDosAngulosTriangulo } from "./somaDosAngulos";
 import { Triangle } from "../objetos/triangle";
 import { Poligono } from "../objetos/poligono";
 import { ApagarPoligono } from "../animacoes/apagarPoligono";
+import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
 
 export class CriarTriangulo {
 
@@ -27,12 +27,10 @@ export class CriarTriangulo {
 
         this.whiteboard = whiteboard;
 
-        this.a = null;
-        this.b = null;
-        this.c = null;
-
         this.outputs = [];
     }
+
+    static imagem = this.imagem = imagemAnguloParalelogramo;
 
     dialogos = {
         inicio: "Clique nos vértices para dividir o polígono em triângulos",

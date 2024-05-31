@@ -23,6 +23,7 @@ import { Clickable } from "../inputs/clickable";
 import MetalicSheen from "../animacoes/metalicSheen";
 import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
+import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
 
 //Consertar: mostrar igualdade de ângulo (valor inicial cortando delta YZW)
 //           tamanho dos vertices (Muito pequeno)
@@ -39,13 +40,11 @@ export class AnguloParalogramo {
 
         this.whiteboard = whiteboard;
 
-        this.a = null;
-        this.b = null;
-        this.c = null;
-
         this.outputs = [];
         this.tracejados = {}
     }
+
+    static imagem = imagemAnguloParalelogramo
 
     dialogos = {
         inicio: "Vamos usar o ângulo conhecido para descobrir os restantes",

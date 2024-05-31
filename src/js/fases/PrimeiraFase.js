@@ -72,8 +72,8 @@ export class PrimeiraFase extends Fase{
     }
 
     cartas = [
-        { tipo: LadoParalogramo,     imagem: imagemParalelogramoLado },
-        { tipo: CriarTriangulo,      imagem: imagemAnguloParalelogramo },
+        LadoParalogramo,
+        CriarTriangulo
         // Adicione mais cartas conforme necessário
     ];
 
@@ -760,6 +760,10 @@ export class PrimeiraFase extends Fase{
 
             alert("yes")
 
+            if(novoEstado.reset){
+                fase.cartas = [AnguloParalogramo];
+            }
+
             if(novoEstado.repetido) 
                 this.cartaRepetida(estado);
 
@@ -772,10 +776,10 @@ export class PrimeiraFase extends Fase{
                 if(repetido) return this.notify({repetido: true});
 
                 if(tipo){
-                    fase.cartas = [{tipo: AnguloParalogramo, imagem: imagemAnguloParalelogramo}];
+                    fase.cartas = [AnguloParalogramo];
                 }
                 else{
-                    fase.cartas = [{tipo: SomaDosAngulosTriangulo, imagem: imagemParalelogramoLado}];
+                    fase.cartas = [SomaDosAngulosTriangulo];
                 }
 
                 fase.settings.ativarMenuCartas(false);
@@ -790,7 +794,7 @@ export class PrimeiraFase extends Fase{
                 //Se for a primeira carta usada na pilha
                 const primeiro = !this.estado.cartasUsadas.length;
 
-                this.limparTriangulos()
+                this.limparTriangulos();
 
                 if(primeiro){
 

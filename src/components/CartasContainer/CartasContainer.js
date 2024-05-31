@@ -29,7 +29,7 @@ function CartasContainer(props) {
             onMouseLeave={handleMouseLeave}
           >
             <Carta 
-              tipoDaCarta={carta.tipo} 
+              tipoDaCarta={carta} 
               imagem={carta.imagem}
               settings={settings} 
             />

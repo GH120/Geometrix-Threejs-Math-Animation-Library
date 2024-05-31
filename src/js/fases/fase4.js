@@ -76,9 +76,9 @@ export class Fase4 extends Fase{
     }
 
     cartas = [
-        { tipo: Proporcionalidade,   imagem: imagemProporcionalidade },
-        { tipo: Proporcionalidade,   imagem: imagemProporcionalidade },
-        { tipo: Proporcionalidade,   imagem: imagemProporcionalidade },
+        Proporcionalidade,
+        Proporcionalidade,
+        Proporcionalidade,
         // Adicione mais cartas conforme necessário
     ];
 

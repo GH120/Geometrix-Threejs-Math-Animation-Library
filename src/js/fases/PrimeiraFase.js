@@ -73,7 +73,7 @@ export class PrimeiraFase extends Fase{
 
     cartas = [
         LadoParalogramo,
-        CriarTriangulo
+        AnguloParalogramo
         // Adicione mais cartas conforme necessário
     ];
 
@@ -737,6 +737,7 @@ export class PrimeiraFase extends Fase{
 
     //Outputs abaixo
 
+    //Refazer fluxo 
     ControleGeral = class extends Output{
 
 
@@ -776,7 +777,7 @@ export class PrimeiraFase extends Fase{
                 if(repetido) return this.notify({repetido: true});
 
                 if(tipo){
-                    fase.cartas = [AnguloParalogramo];
+                    fase.cartas = [SomaDosAngulosTriangulo];
                 }
                 else{
                     fase.cartas = [SomaDosAngulosTriangulo];
@@ -787,29 +788,25 @@ export class PrimeiraFase extends Fase{
             }
 
             if(novoEstado.carta == "AnguloParalelogramo"){
-                
-                //Diria que agora falta apenas um angulo desconhecido igual nos dois lados
-                //Tente desenhar um triângulo com outra diagonal, e uma nova carta aparecerá
 
-                //Se for a primeira carta usada na pilha
-                const primeiro = !this.estado.cartasUsadas.length;
 
-                this.limparTriangulos();
+                const dialogo = [
+                    "Muito bem, descobrimos um novo angulo e que dois dos restantes são iguais",
+                    "Para descobrimos x, vamos ter que usar outra propriedade já conhecida:",
+                    "A soma dos ângulos internos de um triângulo é 180°",
+                    "Para usa-la, divida o paralelogramo em dois usando a carta criar triângulo: "
+                ]
 
-                if(primeiro){
+                const atualizarCartas = () => { 
+                    fase.cartas = [CriarTriangulo];
 
-                    const dialogo = [
-                        "Muito bem, descobrimos um novo angulo e que dois dos restantes são iguais",
-                        "Para descobrimos x, vamos ter que usar outra propriedade já conhecida:",
-                        "A soma dos ângulos internos de um triângulo é 180°",
-                        "Divida o paralelogramo em dois usando o criar triângulo: "
-                    ]
-
-                    fase.animar(fase.animacoesDialogo(...dialogo));
+                    fase.settings.ativarMenuCartas(false);
+                    fase.settings.ativarMenuCartas(true);
                 }
-                else{
 
-                }
+                const animacao = fase.animacoesDialogo(...dialogo).setOnTermino(atualizarCartas);
+
+                fase.animar(animacao);
             }
 
             if(novoEstado.carta == "SomaDosAngulosTriangulo"){
@@ -823,8 +820,8 @@ export class PrimeiraFase extends Fase{
                 if(primeiro){
 
                     const dialogo = [
-                        "Não conseguimos usar direito a fórmula pois temos muitas icognitas",
-                        "Tente criar outro tipo de triângulo e poderemos usar essa equação"
+                        "Conseguimos a soma dos ângulos do primeiro triângulo",
+                        "Faça o mesmo para o segundo"
                     ]
 
                     fase.animar(fase.animacoesDialogo(...dialogo));

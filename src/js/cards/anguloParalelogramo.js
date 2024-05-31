@@ -539,7 +539,9 @@ export class AnguloParalogramo {
 
                             this.notify({
                                 carta: "AnguloParalelogramo",
-                                triangulos: [carta.trianguloInferior, carta.trianguloSuperior]
+                                triangulos: [carta.trianguloInferior, carta.trianguloSuperior],
+                                anguloConhecido: anguloConhecido,
+                                paralelogramo: paralelogramo
                             })
                         })
                     }
@@ -601,6 +603,9 @@ export class AnguloParalogramo {
         const trianguloInferior = new Poligono(positions2)
                                     .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.3})
                                     .render();
+
+
+        trianguloInferior.scene = this.fase.scene;
         
         this.trianguloInferior = trianguloInferior;
         this.trianguloSuperior = trianguloSuperior;

@@ -78,7 +78,6 @@ export class SomaDosAngulosTriangulo {
             // if(!this.verificadorDeHover)
             const verificador = this.criarVerificadorDeHover(triangulo, fase.scene, fase.camera);
 
-            this.controle.addInputs(verificador);
         }
     }
     
@@ -128,7 +127,7 @@ export class SomaDosAngulosTriangulo {
         const moverAngulos = new MoverGrausParaPosicaoEquacao(triangulo.angles, fase);
 
         fase.animar(dialogo);
-        fase.animar(moverAngulos);
+        fase.animar(moverAngulos.setOnTermino(() => this.controle.update({ativado:true})));
 
         //Planejamento:
 
@@ -175,7 +174,7 @@ export class SomaDosAngulosTriangulo {
         return new Output()
                .setUpdateFunction(function(novoEstado){
 
-                    if(novoEstado.dentro){
+                    if(novoEstado.ativado){
                         this.notify({...novoEstado, carta: "SomaDosAngulosTriangulo"});
                     }
                })

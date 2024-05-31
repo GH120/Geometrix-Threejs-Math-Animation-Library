@@ -22,7 +22,7 @@ import Circle from "../objetos/circle";
 import DesenharMalha from "../animacoes/desenharMalha";
 import MetalicSheen from "../animacoes/metalicSheen";
 import MoverTexto from "../animacoes/moverTexto";
-import { Addition, Equality, Value, Variable } from "../equations/expressions";
+import { Addition, Equality, Minus, Value, Variable } from "../equations/expressions";
 import MostrarTexto from "../animacoes/MostrarTexto";
 import { Operations } from "../equations/operations";
 import Bracket from "../objetos/bracket";
@@ -37,6 +37,7 @@ import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
 import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
 import { SomaDosAngulosTriangulo } from "../cards/somaDosAngulos";
 import { CriarTriangulo } from "../cards/criarTriangulo";
+import ResolverEquacao from "../outputs/resolverEquacao";
 
 
 
@@ -345,7 +346,10 @@ export class PrimeiraFase extends Fase{
 
             const mudarProblema = new Output()
                                  .addInputs(arraste1, arraste2)
-                                 .setUpdateFunction(() => fase.progresso = 2)
+                                 .setUpdateFunction(() => {
+                                    fase.progresso = 2
+                                    
+                                })
         }
     }
 
@@ -432,7 +436,7 @@ export class PrimeiraFase extends Fase{
 
         const animacao = new AnimacaoSequencial(
                             primeiraLinha,
-                            segundaLinha,
+                            segundaLinha.setOnTermino(() => fase.whiteboard.removerTodasEquacoes()),
                             terceiraLinha.setOnTermino(() => animacao.setNome('Dialogo Carta')),
                             quartaLinha,
                             quintaLinha
@@ -761,12 +765,30 @@ export class PrimeiraFase extends Fase{
 
             alert("yes")
 
+            //Lida com eventos internos da própria execução
             if(novoEstado.reset){
                 fase.cartas = [AnguloParalogramo];
             }
 
             if(novoEstado.repetido) 
                 this.cartaRepetida(estado);
+
+            if(novoEstado.somarEquacoes){
+                const dialogo = [
+                    "Junte as equações na lousa"
+                ]   
+
+                this.criarEquacoes();
+
+                fase.animar(fase.animacoesDialogo(...dialogo));
+            }
+
+            if(novoEstado.equacaoResolvida){
+
+                this.lidarResolucaoEquacao();
+            }
+
+            //Lida com eventos das cartas abaixo
 
             if(novoEstado.carta == "CriarTriangulo"){
 
@@ -790,6 +812,7 @@ export class PrimeiraFase extends Fase{
             if(novoEstado.carta == "AnguloParalelogramo"){
 
 
+                //REFAZER DIALOGO
                 const dialogo = [
                     "Muito bem, descobrimos um novo angulo e que dois dos restantes são iguais",
                     "Para descobrimos x, vamos ter que usar outra propriedade já conhecida:",
@@ -807,6 +830,11 @@ export class PrimeiraFase extends Fase{
                     fase.settings.ativarMenuCartas(true);
                 }
 
+                estado.cartasUsadas.push(novoEstado.carta);
+                estado.triangulos = novoEstado.triangulos;
+                estado.anguloConhecido = novoEstado.anguloConhecido;
+                estado.paralelogramo   = novoEstado.paralelogramo;
+
                 const animacao = fase.animacoesDialogo(...dialogo).setOnTermino(atualizarCartas);
 
                 fase.animar(animacao);
@@ -816,21 +844,21 @@ export class PrimeiraFase extends Fase{
                 
                 //Diria que falta descobrir os ângulos por outra propriedade, já que a fórmula  não consegue calcular duas icognitas ao mesmo tempo
 
-                const primeiro = !this.estado.cartasUsadas.length;
+                const primeiro = this.estado.cartasUsadas.length == 2;
 
-                this.limparTriangulos();
-
-                if(primeiro){
+                if(false){
 
                     const dialogo = [
                         "Conseguimos a soma dos ângulos do primeiro triângulo",
-                        "Faça o mesmo para o segundo"
+                        "Use a carta de novo para obter a soma do segundo triângulo"
                     ]
 
                     fase.animar(fase.animacoesDialogo(...dialogo));
                 }
                 else{
 
+                    //Move etapa para soma de equações
+                    this.update({somarEquacoes: true})
                 }
             }
         }
@@ -853,13 +881,142 @@ export class PrimeiraFase extends Fase{
 
             const apagar = this.estado.triangulos.map(triangulo => new ApagarPoligono(triangulo, true));
 
-            const animacao = new AnimacaoSimultanea(...apagar);
+            const apagarGraus = this.estado.triangulos.flatMap(triangulo => triangulo.angles.map(angle => angle.mostrarAngulo.animacao(false)));
+
+            const animacao = new AnimacaoSimultanea(...apagar, ...apagarGraus);
 
             this.fase.objetos = this.fase.objetos.filter(objeto => !this.estado.triangulos.includes(objeto) )
 
             this.estado.triangulos = [];
 
             this.fase.animar(animacao);
+
+            return animacao;
+        }
+
+        criarEquacoes(){
+
+            const fase = this.fase;
+
+            const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
+            const equacao2 = new ElementoCSS2D(fase.whiteboard.equacoes[1], fase.whiteboard);
+
+            const arraste1 = new JuntarEquacoes(equacao1, [equacao2], fase);
+            const arraste2 = new JuntarEquacoes(equacao2, [equacao1], fase);
+
+            arraste1.tamanhoFonte = 5;
+            arraste2.tamanhoFonte = 5;
+
+            const valorConhecido = this.estado.anguloConhecido.variable.value;
+
+            const equacao = new Equality(new Addition(valorConhecido, new Variable('x')), new Variable("180°"))
+    
+            const textbox = new CSS2DObject(equacao.html);
+
+            arraste1.equacaoNova = textbox;
+            arraste2.equacaoNova = textbox;
+            
+
+            this.controleEquacoes(arraste1, arraste2).addObserver(this);
+
+        }
+
+        controleEquacoes(juncao1, juncao2, equacao){
+        
+            const fase = this.fase;
+
+            const sidenote = fase.createTextBox('', [-5.6, 0.6, 0], 17, false);
+    
+            fase.animar(new MostrarTexto(sidenote, fase.scene));
+
+            const valorConhecido = this.estado.anguloConhecido.variable.value;
+
+    
+            return new Output()
+                    .addInputs(juncao1, juncao2)
+                    .setUpdateFunction(function(novoEstado){
+    
+                        const estado = this.estado;
+    
+                        if(novoEstado.novaEquacao && estado.etapa == 0){
+    
+                            const objetoEquacao = new ElementoCSS2D(novoEstado.novaEquacao, fase.whiteboard)
+                            
+                            const resultado = new Equality(new Variable('X'), new Minus(new Variable('180°'), valorConhecido));
+    
+                            const resolverEquacao = new ResolverEquacao(objetoEquacao, fase);
+    
+                            resolverEquacao.equacaoNova = new CSS2DObject(resultado.html);
+    
+                            estado.equacaoAtual = resultado;
+                            
+    
+                            this.addInputs(resolverEquacao);
+    
+                            estado.etapa++;
+    
+                            const mudarSidenote = fase.animacaoDialogo("Clique para resolver a equação", estado.sidenote)
+    
+                            fase.animar(mudarSidenote);
+    
+    
+                        }
+    
+                        else if(novoEstado.novaEquacao && estado.etapa == 1){
+                            //Mostrar que a soma dos três angulos é 180°
+    
+                            const objetoEquacao = new ElementoCSS2D(novoEstado.novaEquacao, fase.whiteboard)
+    
+                            const resolverEquacao = new ResolverEquacao(objetoEquacao, fase);
+
+                            const resultado = new Equality(new Variable('X'), new Variable((180 - parseInt(valorConhecido.getValue()) + "°")))
+    
+                            resolverEquacao.equacaoNova = new CSS2DObject(resultado.html);
+    
+                            estado.equacaoAtual = resultado;
+    
+                            this.addInputs(resolverEquacao);
+    
+                            estado.etapa++;
+                            
+                            const mudarSidenote = fase.animacaoDialogo("Clique para resolver a equação", estado.sidenote)
+    
+                            fase.animar(mudarSidenote);
+    
+                        }
+                        else if (novoEstado.novaEquacao && estado.etapa == 2){
+
+                            alert("Terminado");
+
+                            this.notify({
+                                equacaoResolvida: true,
+                                equacao: estado.equacao
+                            })
+                        }
+                    })
+                    .setEstadoInicial({
+                        etapa: 0,
+                        sidenote: sidenote,
+                        equacaoAtual: equacao
+                    })
+        }
+
+        lidarResolucaoEquacao(){
+
+            const limparTriangulos  = this.limparTriangulos();
+
+            const paralelogramo = this.estado.paralelogramo;
+
+            //Limpa o nome das variáveis, para não aparecer seu nome e sim seu valor decimal no mostrarAngulo
+            const limparVariaveis = () =>  paralelogramo.angles.forEach(angles => angles.variable.nome = '');
+            
+
+            const aparecerGraus = paralelogramo.angles.map(angle => this.fase.mostrarGrausAparecendo(angle, false, false));
+
+            const animacao = new AnimacaoSimultanea(...aparecerGraus)
+                            .setOnStart(limparVariaveis)
+
+            limparTriangulos.setOnTermino(() => this.fase.animar(animacao));
         }
     }
 
@@ -983,41 +1140,7 @@ export class PrimeiraFase extends Fase{
             super.update();
             super.update();
         }
-        if(this.debug && this.debugProblem > this.progresso){
-
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-            super.update();
-        }
+       
         
         // if(options.atualizar) triangle.update();
 

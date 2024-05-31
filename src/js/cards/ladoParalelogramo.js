@@ -337,7 +337,7 @@ export class LadoParalogramo {
                                  .setOnTermino(avisarSeControleTerminou)
                          )
                          .setOnTermino(() =>{
-                             this.notify({}) //Atualiza o valor das aresta que tem esse controle como input
+                             this.notify({carta: "LadoParalelogramo"}) //Atualiza o valor das aresta que tem esse controle como input
                          })
                })
                .setEstadoInicial({

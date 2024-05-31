@@ -38,6 +38,7 @@ import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
 import { SomaDosAngulosTriangulo } from "../cards/somaDosAngulos";
 import { CriarTriangulo } from "../cards/criarTriangulo";
 import ResolverEquacao from "../outputs/resolverEquacao";
+import { LadosProporcionais } from "../cards/ladosProporcionais";
 
 
 
@@ -60,7 +61,7 @@ export class PrimeiraFase extends Fase{
         this.outputTesteClick();
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
 
-        this.debug = false;
+        this.debug = true;
         this.debugProblem = 30;
 
         this.controleFluxo = new this.ControleGeral(this);
@@ -753,7 +754,9 @@ export class PrimeiraFase extends Fase{
 
             this.setEstadoInicial({
                 cartasUsadas:[],
-                triangulos: []
+                triangulos: [],
+                ladosProporcionais: false,
+                angulosIguais: false
             })
         }
 
@@ -762,8 +765,6 @@ export class PrimeiraFase extends Fase{
             const fase = this.fase;
 
             const estado = this.estado;
-
-            alert("yes")
 
             //Lida com eventos internos da própria execução
             if(novoEstado.reset){
@@ -868,6 +869,12 @@ export class PrimeiraFase extends Fase{
                     this.update({somarEquacoes: true})
                 }
             }
+
+            if(novoEstado.carta == "LadoParalelogramo"){
+                estado.cartasUsadas.push(novoEstado.carta);
+
+                this.verificarCartas();
+            }
         }
 
         cartaRepetida(){
@@ -907,18 +914,25 @@ export class PrimeiraFase extends Fase{
 
             const ultimaCarta = cartasUsadas.slice(-1)[0];
 
-            const ladosProporcionais = cartasUsadas.filter(carta => carta == "LadoParalelogramo").length == 2;
+            const ladosProporcionais = cartasUsadas.filter(carta => carta == "LadoParalelogramo").length == 4;
 
             const angulosIguais = cartasUsadas.filter(carta => carta == "AnguloParalelogramo").length == 2;
 
-            const cartas = [LadoParalogramo, AnguloParalogramo];
+            const cartas = [];
 
             if(ladosProporcionais){
-                //cartas.push(ladoProporcional)
+                
+                if(!this.estado.ladosProporcionais) cartas.push(LadosProporcionais)
+            }
+            else{
+                cartas.push(LadoParalogramo)
             }
 
             if(angulosIguais){
                 //Cartas.push(ladoProporcional)
+            }
+            else{
+                cartas.push(AnguloParalogramo);
             }
 
             this.fase.cartas = cartas;

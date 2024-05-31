@@ -60,7 +60,7 @@ export class PrimeiraFase extends Fase{
         this.outputTesteClick();
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
 
-        this.debug = true;
+        this.debug = false;
         this.debugProblem = 30;
 
         this.controleFluxo = new this.ControleGeral(this);

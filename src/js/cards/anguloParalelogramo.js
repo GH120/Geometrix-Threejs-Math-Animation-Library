@@ -2,7 +2,7 @@ import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente 
 import { apagarCSS2 } from "../animacoes/apagarCSS2";
 import { colorirAngulo } from "../animacoes/colorirAngulo";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
-import { Addition, Equality, Square, Value } from "../equations/expressions";
+import { Addition, Equality, Square, Value, Variable } from "../equations/expressions";
 import { Draggable } from "../inputs/draggable";
 import { Hoverable } from "../inputs/hoverable";
 import { HoverPosition } from "../inputs/position";
@@ -68,10 +68,11 @@ export class AnguloParalogramo {
 
         intermediario: "Dito isso, faltam descobrir mais dois ângulos",
 
+        //MELHORAR DIALOGO
         divisaoAngulosVizinhos1: "Se nós dividirmos o paralelogramo pela outra metade, conseguimos dois triângulos iguais de novo", 
         divisaoAngulosVizinhos2: "Então esses ângulos desconhecidos são iguais não é?", //Mesma animação de tracejado para aresta central
-        divisaoAngulosVizinhos3: "Como não sabemos seus valores, chamamos eles de x", //Aparece text box para digitar o nome da variável
-        divisaoAngulosVizinhos4: "Vamos precisar de outra fórmula para descobrir x",
+        divisaoAngulosVizinhos3: "Ângulos iguais apontam para lados iguais", //Aparece text box para digitar o nome da variável
+        divisaoAngulosVizinhos4: "Y + Z é o angulo conhecido, e precisamos encontrar x",
 
 
 
@@ -537,7 +538,8 @@ export class AnguloParalogramo {
                         animacao.setOnTermino(() => {
 
                             this.notify({
-                                carta: "AnguloParalelogramo"
+                                carta: "AnguloParalelogramo",
+                                triangulos: [carta.trianguloInferior, carta.trianguloSuperior]
                             })
                         })
                     }
@@ -571,16 +573,19 @@ export class AnguloParalogramo {
 
         const proximoIndice = (i, step) => (step < 0)? (i + n + step%n) % n : (i + step) % n
 
-        const vertice              = paralelogramo.vertices[indice];
-        const verticeIntermediario = paralelogramo.vertices[proximoIndice(indice, 1)];
-        const verticeOposto        = paralelogramo.vertices[indiceOposto];
+        //Definição de objetos
+        const vertice                    = paralelogramo.vertices[indice];
+        const verticeIntermediario       = paralelogramo.vertices[proximoIndice(indice, 1)];
+        const verticeOposto              = paralelogramo.vertices[indiceOposto];
+        const verticeIntermediarioOposto = paralelogramo.vertices[proximoIndice(indice, 3)];
+
 
         const tracejado = new Tracejado(vertice.getPosition(), verticeOposto.getPosition());
 
         const desenharTracejado = new MostrarTracejado(tracejado, this.fase.scene);
 
 
-        const positions = [vertice, verticeIntermediario, verticeOposto].map(v => v.getPosition().toArray())
+        const positions = [vertice, verticeIntermediario, verticeOposto].map(v => v.getPosition().toArray());
 
         const trianguloSuperior = new Poligono(positions)
                                   .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.3})
@@ -588,10 +593,25 @@ export class AnguloParalogramo {
 
         trianguloSuperior.angles.map(angle => {
             angle.material.color = 0x0000ff
-            angle.mesh.position.z = 0.08
+            angle.mesh.position.z = 0.05
         });
 
-        const mostrarTriangulo = new ApagarPoligono(trianguloSuperior).reverse().setOnStart(() => trianguloSuperior.addToScene(fase.scene))
+        const positions2 = [vertice, verticeIntermediarioOposto ,verticeOposto].map(v => v.getPosition().toArray());
+
+        const trianguloInferior = new Poligono(positions2)
+                                    .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.3})
+                                    .render();
+        
+        this.trianguloInferior = trianguloInferior;
+        this.trianguloSuperior = trianguloSuperior;
+
+        //Começo das animações
+        const mostrarTriangulo = new ApagarPoligono(trianguloSuperior).reverse().setOnStart(() => trianguloSuperior.addToScene(fase.scene));
+
+        const substituirGraus = this.substituirGrausConhecidos(
+                                    [paralelogramo.angles[indice], paralelogramo.angles[indiceOposto]], 
+                                    [trianguloInferior, trianguloSuperior]
+                                );
 
         const dialogo1 = new AnimacaoSimultanea(
             fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos1),
@@ -601,10 +621,9 @@ export class AnguloParalogramo {
             )
         );
 
-        const anguloLateral1 = paralelogramo.angles[proximoIndice(indice, 1)];
-        const anguloLateral2 = paralelogramo.angles[proximoIndice(indice, 3)];
+        const anguloLateral1 = trianguloSuperior.angles[1];
+        const anguloLateral2 = trianguloInferior.angles[1];
 
-        const verticeIntermediarioOposto = paralelogramo.vertices[proximoIndice(indice, 3)];
 
         const mexerAngulo1 = this.animacaoGirarAngulo(anguloLateral1);
         const mexerAngulo2 = this.animacaoGirarAngulo(anguloLateral2);
@@ -622,8 +641,13 @@ export class AnguloParalogramo {
 
         const animacao2 = new AnimacaoSequencial(
                             mostrarDiagonal1,
-                            mostrarDiagonal2
+                            mostrarDiagonal2,
+
                         )
+                        .setOnTermino(() => {
+                            tracejadoBissetriz2.removeFromScene();
+                            tracejadoBissetriz1.removeFromScene();
+                        })
 
         const dialogo2 = new AnimacaoSimultanea(
             fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos2),
@@ -637,7 +661,13 @@ export class AnguloParalogramo {
         new MostrarAngulo(anguloLateral1).addToFase(fase);
         new MostrarAngulo(anguloLateral2).addToFase(fase);
 
-        const animacao3 = new AnimacaoSimultanea(anguloLateral1.mostrarAngulo.animacao(true), anguloLateral2.mostrarAngulo.animacao(true))
+        const animacao3 = new AnimacaoSequencial(
+            new AnimacaoSimultanea(
+                anguloLateral1.mostrarAngulo.animacao(true), 
+                anguloLateral2.mostrarAngulo.animacao(true)
+            ),
+            substituirGraus
+        )
 
         const dialogo3 = new AnimacaoSimultanea(
             fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos3),
@@ -652,10 +682,62 @@ export class AnguloParalogramo {
 
         this.fase.animar(animacao);
 
-
         return animacao;
     
     }
+
+    substituirGrausConhecidos(angulos, triangulos){
+
+        const fase = this.fase;
+
+        const animacoes = [];
+
+        let indice = 0;
+
+        for(const angulo of angulos){
+
+
+            const triangulo = triangulos[indice];
+
+            const novosAngulos = triangulo.angles.filter((a,i) => i != 1); //Todos os ângulos menos o do meio
+
+            const names = ['Y', "X", "Z"];
+
+            if(indice) names.reverse();
+
+            novosAngulos.map(angle => angle.variable.name = names[angle.index])
+
+            const offsetPosicional = new THREE.Vector3(-0.1,0.15,0)
+
+            animacoes.push(angulo.mostrarAngulo.animacao(false));
+
+            animacoes.push(...novosAngulos.map(angle => new MostrarAngulo(angle, 2, offsetPosicional).addToFase(fase).animacao(true).filler(100)))
+
+            indice++;
+        }
+
+        const equacao = new Equality(new Addition(new Variable('Y'), new Variable('Z')), new Variable(angulos[0].variable.getValue() + "°"));
+
+        const textbox = fase.createTextBox(equacao.html.innerText, [-5,0,0], 17, true);
+
+
+        //Passar elementocss2 ao invés da textbox?
+        animacoes.push(
+            fase.moverEquacao({
+                elementoCSS2: textbox, 
+                equacao: equacao,
+                duration1: 60,
+                duration2: 180,
+                delayDoMeio: 60
+            })
+            .filler(120)
+            .setOnTermino(() => setTimeout(() => fase.whiteboard.ativar(false), 500))
+        )
+        
+
+        return new AnimacaoSimultanea().setAnimacoes(animacoes);
+    }
+
 
     animacaoDividirParalelogramo(vertice1, vertice2, estado){
 

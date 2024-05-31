@@ -190,6 +190,13 @@ export class Variable extends Expression{
     igual(termo2){
         return this.name == termo2.name;
     }
+
+    getValue(){
+
+        if(this.value) return this.value.getValue();
+
+        return this.name;
+    }
 }
 
 export class Value extends Expression{
@@ -226,6 +233,10 @@ export class Value extends Expression{
 
     igual(termo2){
         return this.value == termo2.value;
+    }
+
+    getValue(){
+        return this.value;
     }
 }
 

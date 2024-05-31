@@ -7,7 +7,7 @@ import { Value } from '../equations/expressions';
 //REFATORAR DEPOIS, DESCULPE QUEM ESTÁ LENDO ISSO
 export class MostrarAngulo extends Output{
 
-    constructor(angle, distanciaTextoParaAngulo=2){
+    constructor(angle, distanciaTextoParaAngulo=2, offset=null){
         super();
 
         this.angulo = angle;
@@ -16,6 +16,8 @@ export class MostrarAngulo extends Output{
         this.estado  = {};
         this.createText();
         this.distanciaTextoParaAngulo = distanciaTextoParaAngulo;
+
+        this.offset = offset;
 
     }
 
@@ -66,19 +68,22 @@ export class MostrarAngulo extends Output{
 
                 const retangulo = {top:0, bottom:18, left: 0, right: 29.81 * razao};
 
+                //Errado, com razões invertidas
                 const ponto1 = this.fase.pixelToCoordinates(retangulo.top, retangulo.right);
                 const ponto2 = this.fase.pixelToCoordinates(retangulo.bottom, retangulo.left);
 
                 const dimensoesTexto = ponto1.clone().sub(ponto2);
 
                 position.sub(dimensoesTexto.multiplyScalar(0.5))
+
+                if(this.offset) position.add(this.offset);
             }
 
             const newPosition = position.sub(vetor)
 
             elemento.position.copy(newPosition)
 
-            this.angulo.variable.value = new Value(angulo.degrees.toFixed())
+            if(!isVariable.length) this.angulo.variable.value = new Value(angulo.degrees.toFixed())
 
             this.text.on = true;
         }

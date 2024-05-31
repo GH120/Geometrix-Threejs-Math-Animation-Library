@@ -696,8 +696,8 @@ export class PrimeiraFase extends Fase{
         
         fase.mostrarNomeDosVertices.forEach(mostrarNome => mostrarNome.addToScene(fase.scene));
 
-        const mostrarAngulo1 = new MostrarAngulo(fase.paralelogramo1.angles[1]).addToScene(fase.scene);
-        const mostrarAngulo2 = new MostrarAngulo(fase.paralelogramo2.angles[0]).addToScene(fase.scene);
+        const mostrarAngulo1 = new MostrarAngulo(fase.paralelogramo1.angles[1]).addToFase(fase);
+        const mostrarAngulo2 = new MostrarAngulo(fase.paralelogramo2.angles[0]).addToFase(fase);
 
         mostrarAngulo1.distanciaTextoParaAngulo = 1.2
 
@@ -798,6 +798,9 @@ export class PrimeiraFase extends Fase{
                 ]
 
                 const atualizarCartas = () => { 
+
+                    fase.objetos.push(...novoEstado.triangulos);
+
                     fase.cartas = [SomaDosAngulosTriangulo];
 
                     fase.settings.ativarMenuCartas(false);
@@ -852,6 +855,8 @@ export class PrimeiraFase extends Fase{
 
             const animacao = new AnimacaoSimultanea(...apagar);
 
+            this.fase.objetos = this.fase.objetos.filter(objeto => !this.estado.triangulos.includes(objeto) )
+
             this.estado.triangulos = [];
 
             this.fase.animar(animacao);
@@ -873,6 +878,111 @@ export class PrimeiraFase extends Fase{
 
         
 
+        if(this.debug && this.debugProblem > this.progresso){
+
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+        }
+        if(this.debug && this.debugProblem > this.progresso){
+
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+        }
+        if(this.debug && this.debugProblem > this.progresso){
+
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+            super.update();
+        }
         if(this.debug && this.debugProblem > this.progresso){
 
             super.update();

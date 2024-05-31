@@ -26,6 +26,7 @@ import MetalicSheen from "../animacoes/metalicSheen";
 import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
 import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
+import { MoverGrausParaPosicaoEquacao } from "../animacoes/moverGrausParaPosicaoEquacao";
 
 //Consertar: mostrar igualdade de ângulo (valor inicial cortando delta YZW)
 //           tamanho dos vertices (Muito pequeno)
@@ -105,26 +106,29 @@ export class SomaDosAngulosTriangulo {
         const dialogo = fase.animacaoDialogo(this.dialogos.inicio);
 
 
-        const angulosDesconhecidos = triangulo.angles.filter(angle => !angle.variable.value);
+        // const angulosDesconhecidos = triangulo.angles.filter(angle => !angle.variable.value);
 
-        for(const angulo of angulosDesconhecidos){
+        // for(const angulo of angulosDesconhecidos){
 
-            if(!angulo.MostrarAngulo) new MostrarAngulo(angulo).addToFase(this.fase);
+        //     if(!angulo.MostrarAngulo) new MostrarAngulo(angulo).addToFase(this.fase);
 
-            const vertices = circularShift(triangulo.vertices, angulo.index);
+        //     const vertices = circularShift(triangulo.vertices, angulo.index);
 
-            angulo.variable.nome = vertices.map(vertice => vertice.variable.name).join('');
+        //     angulo.variable.name = vertices.map(vertice => vertice.variable.name).join('');
 
-            alert(angulo.variable.name)
+        //     alert(angulo.variable.name)
 
-            console.log(vertices, vertices.map(vertice => vertice.variable), vertices.map(vertice => vertice.variable.name).join(''))
+        //     console.log(vertices, vertices.map(vertice => vertice.variable), vertices.map(vertice => vertice.variable.name).join(''))
 
-            this.adicionarAcento(angulo.variable.nome, 0, "\u0302");
+        //     this.adicionarAcento(angulo.variable.nome, 0, "\u0302");
 
-            fase.animar(angulo.mostrarAngulo.animacao(true));
-        }
+        //     fase.animar(angulo.mostrarAngulo.animacao(true));
+        // }
+
+        const moverAngulos = new MoverGrausParaPosicaoEquacao(triangulo.angles, fase);
 
         fase.animar(dialogo);
+        fase.animar(moverAngulos);
 
         //Planejamento:
 

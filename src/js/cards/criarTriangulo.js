@@ -221,15 +221,29 @@ export class CriarTriangulo {
         ];
 
         const triangulo1 = new Poligono(verticesSelecionados.map(v => v.getPosition().toArray()))
-                                .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
+                                .configuration({grossura:0.020, raioVertice:0.04, raioAngulo:0.2})
                                 .render()
                                 .nomearVertices(...verticesSelecionados.map(v => v.variable.name));
 
         const triangulo2 = new Poligono(verticesOpostos.map(v => v.getPosition().toArray()))
-                                .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
+                                .configuration({grossura:0.020, raioVertice:0.04, raioAngulo:0.2})
                                 .render()
                                 .nomearVertices(...verticesOpostos.map(v => v.variable.name));
- 
+
+
+        //Usa maior distância, não funciona para todos os casos
+        const diagonal = 
+
+        triangulo1.edges.map(edge => edge.material.visible = false)
+        triangulo2.edges.map(edge => edge.material.visible = false)
+        triangulo1.vertices.map(edge => edge.material.visible = false)
+        triangulo2.vertices.map(edge => edge.material.visible = false)
+        triangulo1.angles.map(edge => edge.material.visible = false)
+        triangulo2.angles.map(edge => edge.material.visible = false)
+
+        const maiorLado = triangulo1.edges.reduce((anterior, atual) => (anterior.length < atual.length)? atual : anterior);
+
+        maiorLado.material.visible = true;
 
         const mostrarTriangulo1 = new ApagarPoligono(triangulo1)
                                 .reverse()

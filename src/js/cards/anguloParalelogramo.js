@@ -44,7 +44,7 @@ export class AnguloParalogramo {
         this.tracejados = {}
     }
 
-    static imagem = imagemAnguloParalelogramo
+    static imagem = imagemAnguloParalelogramo;
 
     dialogos = {
         inicio: "Vamos usar o ângulo conhecido para descobrir os restantes",

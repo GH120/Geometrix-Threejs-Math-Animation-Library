@@ -163,6 +163,8 @@ export class Poligono extends Objeto{
 
             aresta.variable = new Variable(nomes[indice].concat(nomes[proximo]));
         })
+
+        return this;
     }
 
     update(){

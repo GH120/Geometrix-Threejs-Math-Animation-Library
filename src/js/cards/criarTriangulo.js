@@ -82,6 +82,8 @@ export class CriarTriangulo {
 
         this.controle = this.controleGeral();
 
+        this.fase.adicionarControleDaCarta(this.controle);
+
         this.dividirEmTriangulos = new DividirEmTriangulos(this.poligonoSelecionado, this.fase);
 
         this.controle.addInputs(this.dividirEmTriangulos);
@@ -131,14 +133,13 @@ export class CriarTriangulo {
 
                     if(novoEstado.trianguloCompleto){
 
-                        console.log(carta, fase);
-
-
                         const dialogo = carta.fase.animacaoDialogo(carta.dialogos.fim);
 
                         fase.animar(dialogo);
 
-                        carta.handleTermino(novoEstado);
+                        const info = carta.handleTermino(novoEstado);
+
+                        this.notify(info);
                     }
                     
                })
@@ -163,18 +164,24 @@ export class CriarTriangulo {
 
         const lateral = this.checkSentidoTriangulo(estado.VerticesSelecionados);
 
-        this.createTriangulos(estado.VerticesSelecionados);
+        const triangulos = this.createTriangulos(estado.VerticesSelecionados);
                     
         //Botar isso para o controle interface entre carta e fase
-        if(lateral){
-            fase.cartas = [{tipo: AnguloParalogramo, imagem: imagemAnguloParalelogramo}];
-        }
-        else{
-            fase.cartas = [{tipo: SomaDosAngulosTriangulo, imagem: imagemParalelogramoLado}];
-        }
+        // if(lateral){
+        //     fase.cartas = [{tipo: AnguloParalogramo, imagem: imagemAnguloParalelogramo}];
+        // }
+        // else{
+        //     fase.cartas = [{tipo: SomaDosAngulosTriangulo, imagem: imagemParalelogramoLado}];
+        // }
 
-        fase.settings.ativarMenuCartas(false);
-        fase.settings.ativarMenuCartas(true);
+        // fase.settings.ativarMenuCartas(false);
+        // fase.settings.ativarMenuCartas(true);
+
+        return {
+            triangulos: triangulos, 
+            sentido: lateral,
+            carta: "CriarTriangulo"
+        };
     }
 
     //Verifica o tipo de corte diagonal do triângulo
@@ -217,10 +224,13 @@ export class CriarTriangulo {
 
         const triangulo1 = new Poligono(verticesSelecionados.map(v => v.getPosition().toArray()))
                                 .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
-                                .render();
+                                .render()
+                                .nomearVertices(...verticesSelecionados.map(v => v.variable.name));
+
         const triangulo2 = new Poligono(verticesOpostos.map(v => v.getPosition().toArray()))
                                 .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
-                                .render();
+                                .render()
+                                .nomearVertices(...verticesOpostos.map(v => v.variable.name));
  
 
         const mostrarTriangulo1 = new ApagarPoligono(triangulo1)
@@ -231,12 +241,14 @@ export class CriarTriangulo {
                                 .reverse()
                                 .setOnStart(() => triangulo2.addToScene(this.fase.scene));
 
-        console.log(triangulo1, triangulo2);
+        
 
         const animacao = new AnimacaoSimultanea(mostrarTriangulo1, mostrarTriangulo2);
 
         this.fase.animar(animacao);
 
         this.fase.objetos.push(triangulo1, triangulo2);
+
+        return [triangulo1, triangulo2];
     }
 }

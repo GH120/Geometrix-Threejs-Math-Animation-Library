@@ -152,6 +152,8 @@ export class SomaDosAngulosTriangulo {
 
                                 this.notify({dentro: novoEstado.dentro, triangulo: triangulo})
 
+                                this.ativar(false);
+
                             })
                             .addInputs(triangulo.hoverable);
 
@@ -167,7 +169,7 @@ export class SomaDosAngulosTriangulo {
                .setUpdateFunction(function(novoEstado){
 
                     if(novoEstado.dentro){
-                        this.notify(novoEstado);
+                        this.notify({...novoEstado, carta: "SomaDosAngulosTriangulo"});
                     }
                })
     }

@@ -69,10 +69,10 @@ export class AnguloParalogramo {
 
         intermediario: "Dito isso, faltam descobrir mais dois ângulos",
 
-        divisaoAngulosVizinhos1: "Se nós dividirmos o paralelogramo pela outra metade, conseguimos dois triângulos iguais de novo", 
-        divisaoAngulosVizinhos2: "Então esses ângulos desconhecidos são iguais não é?", //Mesma animação de tracejado para aresta central
-        divisaoAngulosVizinhos3: "Como não sabemos seus valores, chame eles de algum nome:", //Aparece text box para digitar o nome da variável
-        divisaoAngulosVizinhos4: "A execução dessa carta terminou, use outra para resolver esse problema"
+        // divisaoAngulosVizinhos1: "Se nós dividirmos o paralelogramo pela outra metade, conseguimos dois triângulos iguais de novo", 
+        // divisaoAngulosVizinhos2: "Então esses ângulos desconhecidos são iguais não é?", //Mesma animação de tracejado para aresta central
+        // divisaoAngulosVizinhos3: "Como não sabemos seus valores, chame eles de algum nome:", //Aparece text box para digitar o nome da variável
+        // divisaoAngulosVizinhos4: "A execução dessa carta terminou, use outra para resolver esse problema"
 
 
     }
@@ -514,7 +514,7 @@ export class AnguloParalogramo {
                                         .setOnTermino(() =>{
                                             mostrarBissetriz1.update({dentro:false});
                                             mostrarBissetriz2.update({dentro:false});
-                                            this.update({etapa: carta.dialogos.divisaoAngulosVizinhos1})
+                                            this.update({etapa: "final"})
                                         });
 
 
@@ -529,19 +529,11 @@ export class AnguloParalogramo {
                         carta.fase.animar(dialogo);
                     }
 
-                    if(novoEstado.etapa == carta.dialogos.divisaoAngulosVizinhos1){
+                    if(novoEstado.etapa == "final"){
 
-                        const dialogo = new AnimacaoSequencial(
-                                            carta.fase.animacaoDialogo(carta.dialogos.intermediario),
-                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAngulosVizinhos1),
-                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAngulosVizinhos2),
-                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAngulosVizinhos3),
-                                            carta.fase.animacaoDialogo(carta.dialogos.divisaoAngulosVizinhos4)
-                        );
-
-                        dialogo.setNome("Dialogo Carta");
-
-                        carta.fase.animar(dialogo);
+                        this.notify({
+                            carta: "AnguloParalelogramo"
+                        })
                     }
                     
                     //Angulos iguais

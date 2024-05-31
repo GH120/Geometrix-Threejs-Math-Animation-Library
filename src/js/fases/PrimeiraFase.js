@@ -62,6 +62,8 @@ export class PrimeiraFase extends Fase{
         this.debug = true;
         this.debugProblem = 3;
 
+        this.controleFluxo = new this.ControleGeral(this);
+
         //A fazer:
         //Debugar problema da hitbox do angulo deletada -> Consertado
         //Mudar dialogo para comportar novas funcionalidades
@@ -735,7 +737,127 @@ export class PrimeiraFase extends Fase{
 
     //Outputs abaixo
 
-    //Muito complexo, melhor não
+    ControleGeral = class extends Output{
+
+
+        constructor(fase){
+
+            super();
+
+            this.fase = fase;
+
+            this.setEstadoInicial({
+                cartasUsadas:[],
+                triangulos: []
+            })
+        }
+
+        update(novoEstado){
+
+            const fase = this.fase;
+
+            const estado = this.estado;
+
+            alert("yes")
+
+            if(novoEstado.repetido) 
+                this.cartaRepetida(estado);
+
+            if(novoEstado.carta == "CriarTriangulo"){
+
+                const tipo = novoEstado.sentido;
+
+                const repetido = estado.cartasUsadas.includes(tipo);
+
+                if(repetido) return this.notify({repetido: true});
+
+                if(tipo){
+                    fase.cartas = [{tipo: AnguloParalogramo, imagem: imagemAnguloParalelogramo}];
+                }
+                else{
+                    fase.cartas = [{tipo: SomaDosAngulosTriangulo, imagem: imagemParalelogramoLado}];
+                }
+
+                fase.settings.ativarMenuCartas(false);
+                fase.settings.ativarMenuCartas(true);
+            }
+
+            if(novoEstado.carta == "AnguloParalelogramo"){
+                
+                //Diria que agora falta apenas um angulo desconhecido igual nos dois lados
+                //Tente desenhar um triângulo com outra diagonal, e uma nova carta aparecerá
+
+                //Se for a primeira carta usada na pilha
+                const primeiro = !this.estado.cartasUsadas.length;
+
+                this.limparTriangulos()
+
+                if(primeiro){
+
+                    const dialogo = [
+                        "Muito bem, descobrimos um novo angulo e que dois dos restantes são iguais",
+                        "Para descobrimos x, vamos ter que usar outra propriedade já conhecida:",
+                        "A soma dos ângulos internos de um triângulo é 180°",
+                        "Divida o paralelogramo em dois usando o criar triângulo: "
+                    ]
+
+                    fase.animar(fase.animacoesDialogo(...dialogo));
+                }
+                else{
+
+                }
+            }
+
+            if(novoEstado.carta == "SomaDosAngulosTriangulo"){
+                
+                //Diria que falta descobrir os ângulos por outra propriedade, já que a fórmula  não consegue calcular duas icognitas ao mesmo tempo
+
+                const primeiro = !this.estado.cartasUsadas.length;
+
+                this.limparTriangulos();
+
+                if(primeiro){
+
+                    const dialogo = [
+                        "Não conseguimos usar direito a fórmula pois temos muitas icognitas",
+                        "Tente criar outro tipo de triângulo e poderemos usar essa equação"
+                    ]
+
+                    fase.animar(fase.animacoesDialogo(...dialogo));
+                }
+                else{
+
+                }
+            }
+        }
+
+        cartaRepetida(){
+
+            const dialogo = [
+                "Esse tipo de triângulo já foi desenhado", 
+                "Tente desenhar outra diagonal na proxima vez e verá algo novo"
+            ];
+
+            this.fase.animar(this.fase.animacoesDialogo(dialogo));
+
+            this.limparTriangulos();
+        }
+
+        limparTriangulos(){
+
+            if(!this.estado.triangulos.length) return;
+
+            const apagar = this.estado.triangulos.map(triangulo => new ApagarPoligono(triangulo, true));
+
+            const animacao = new AnimacaoSimultanea(...apagar);
+
+            this.estado.triangulos = [];
+
+            this.fase.animar(animacao);
+        }
+    }
+
+    
 
     //Adicionar update(estado) ai passa o estado para o problema da fase
     //Assim controles podem mudar o problema da fase satisfazendo uma condição
@@ -1674,11 +1796,13 @@ export class PrimeiraFase extends Fase{
 
     //Termina o setup dos controles de interação das cartas
     //Interface para realizar interações entre cartas e fase
-    adicionarControleDaCarta(controle){
+    adicionarControleDaCarta(controleCarta){
 
         const fase = this;
 
-        if(controle.name == "Controle Arraste") fase.Configuracao7({controle: controle});
+        if(controleCarta.name == "Controle Arraste") fase.Configuracao7({controle: controleCarta});
+
+        this.controleFluxo.addInputs(controleCarta)
     }
 
 

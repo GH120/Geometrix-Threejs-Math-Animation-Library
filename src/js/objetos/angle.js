@@ -14,15 +14,13 @@ export class Angle extends Objeto{
         this.grossura = 0.065;
         this.material = new THREE.MeshBasicMaterial({color:0xff0000})
 
-        let nome = "Ângulo " + index;
-
         // const temNome = vertices.reduce((a,b) => a && b.variable && b.variable.nome, true);
         
         // if(temNome){
         //     nome = vertices.reduce((a,b) => a.variable.nome.concat(b.variable.nome))
         // }
 
-        this.variable = new Variable(nome);
+        this.variable = new Variable('');
 
         // this.mesh = new THREE.Mesh(new THREE.SphereGeometry(1), this.material)
 

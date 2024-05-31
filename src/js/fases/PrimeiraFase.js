@@ -60,7 +60,7 @@ export class PrimeiraFase extends Fase{
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
 
         this.debug = true;
-        this.debugProblem = 3;
+        this.debugProblem = 30;
 
         this.controleFluxo = new this.ControleGeral(this);
 
@@ -798,7 +798,7 @@ export class PrimeiraFase extends Fase{
                 ]
 
                 const atualizarCartas = () => { 
-                    fase.cartas = [CriarTriangulo];
+                    fase.cartas = [SomaDosAngulosTriangulo];
 
                     fase.settings.ativarMenuCartas(false);
                     fase.settings.ativarMenuCartas(true);

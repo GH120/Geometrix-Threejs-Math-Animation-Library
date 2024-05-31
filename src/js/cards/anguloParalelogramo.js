@@ -68,10 +68,11 @@ export class AnguloParalogramo {
 
         intermediario: "Dito isso, faltam descobrir mais dois ângulos",
 
-        // divisaoAngulosVizinhos1: "Se nós dividirmos o paralelogramo pela outra metade, conseguimos dois triângulos iguais de novo", 
-        // divisaoAngulosVizinhos2: "Então esses ângulos desconhecidos são iguais não é?", //Mesma animação de tracejado para aresta central
-        // divisaoAngulosVizinhos3: "Como não sabemos seus valores, chame eles de algum nome:", //Aparece text box para digitar o nome da variável
-        // divisaoAngulosVizinhos4: "A execução dessa carta terminou, use outra para resolver esse problema"
+        divisaoAngulosVizinhos1: "Se nós dividirmos o paralelogramo pela outra metade, conseguimos dois triângulos iguais de novo", 
+        divisaoAngulosVizinhos2: "Então esses ângulos desconhecidos são iguais não é?", //Mesma animação de tracejado para aresta central
+        divisaoAngulosVizinhos3: "Como não sabemos seus valores, chamamos eles de x", //Aparece text box para digitar o nome da variável
+        divisaoAngulosVizinhos4: "Vamos precisar de outra fórmula para descobrir x",
+
 
 
     }
@@ -502,8 +503,8 @@ export class AnguloParalogramo {
                                             carta.animacaoMostrarGrausAparecendo(anguloOposto, false, false),
 
                                             new AnimacaoSimultanea(
-                                                new ApagarPoligono(estado.trianguloSuperior),
-                                                new ApagarPoligono(trianguloInferior),
+                                                new ApagarPoligono(estado.trianguloSuperior, true),
+                                                new ApagarPoligono(trianguloInferior, true),
                                                 apagarCSS2(estado.equacao, carta.fase.scene),
                                                 apagarObjeto(estado.tracejado).setOnTermino(() => estado.tracejado.removeFromScene())
                                             )
@@ -530,8 +531,14 @@ export class AnguloParalogramo {
 
                     if(novoEstado.etapa == "final"){
 
-                        this.notify({
-                            carta: "AnguloParalelogramo"
+                        const animacao = carta.final(anguloConhecido.index, indiceAnguloOposto);
+
+
+                        animacao.setOnTermino(() => {
+
+                            this.notify({
+                                carta: "AnguloParalelogramo"
+                            })
                         })
                     }
                     
@@ -548,6 +555,106 @@ export class AnguloParalogramo {
                     equacao:            null,
                     tracejado:          null
                })
+    }
+
+    final(indice, indiceOposto){
+
+
+        const fase = this.fase;
+        const paralelogramo = this.paralelogramoSelecionado;
+
+        fase.debug = false;
+
+
+        const n = paralelogramo.numeroVertices;
+
+
+        const proximoIndice = (i, step) => (step < 0)? (i + n + step%n) % n : (i + step) % n
+
+        const vertice              = paralelogramo.vertices[indice];
+        const verticeIntermediario = paralelogramo.vertices[proximoIndice(indice, 1)];
+        const verticeOposto        = paralelogramo.vertices[indiceOposto];
+
+        const tracejado = new Tracejado(vertice.getPosition(), verticeOposto.getPosition());
+
+        const desenharTracejado = new MostrarTracejado(tracejado, this.fase.scene);
+
+
+        const positions = [vertice, verticeIntermediario, verticeOposto].map(v => v.getPosition().toArray())
+
+        const trianguloSuperior = new Poligono(positions)
+                                  .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.3})
+                                  .render();
+
+        trianguloSuperior.angles.map(angle => {
+            angle.material.color = 0x0000ff
+            angle.mesh.position.z = 0.08
+        });
+
+        const mostrarTriangulo = new ApagarPoligono(trianguloSuperior).reverse().setOnStart(() => trianguloSuperior.addToScene(fase.scene))
+
+        const dialogo1 = new AnimacaoSimultanea(
+            fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos1),
+            new AnimacaoSequencial(
+                desenharTracejado,
+                mostrarTriangulo, 
+            )
+        );
+
+        const anguloLateral1 = paralelogramo.angles[proximoIndice(indice, 1)];
+        const anguloLateral2 = paralelogramo.angles[proximoIndice(indice, 3)];
+
+        const verticeIntermediarioOposto = paralelogramo.vertices[proximoIndice(indice, 3)];
+
+        const mexerAngulo1 = this.animacaoGirarAngulo(anguloLateral1);
+        const mexerAngulo2 = this.animacaoGirarAngulo(anguloLateral2);
+
+        const diagonal = trianguloSuperior.edges[2];
+
+        const tracejadoBissetriz1 = new Tracejado(verticeIntermediario.getPosition()      , diagonal.getPosition());
+        const tracejadoBissetriz2 = new Tracejado(verticeIntermediarioOposto.getPosition(), diagonal.getPosition());
+
+        const mostrarBissetriz1 = new MostrarTracejado(tracejadoBissetriz1, fase.scene);
+        const mostrarBissetriz2 = new MostrarTracejado(tracejadoBissetriz2, fase.scene);
+
+        const mostrarDiagonal1 = new AnimacaoSequencial(mexerAngulo1, mostrarBissetriz1);
+        const mostrarDiagonal2 = new AnimacaoSequencial(mexerAngulo2, mostrarBissetriz2);
+
+        const animacao2 = new AnimacaoSequencial(
+                            mostrarDiagonal1,
+                            mostrarDiagonal2
+                        )
+
+        const dialogo2 = new AnimacaoSimultanea(
+            fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos2),
+            animacao2
+        )
+
+
+        anguloLateral1.variable.name = 'X';
+        anguloLateral2.variable.name = 'X';
+
+        new MostrarAngulo(anguloLateral1).addToFase(fase);
+        new MostrarAngulo(anguloLateral2).addToFase(fase);
+
+        const animacao3 = new AnimacaoSimultanea(anguloLateral1.mostrarAngulo.animacao(true), anguloLateral2.mostrarAngulo.animacao(true))
+
+        const dialogo3 = new AnimacaoSimultanea(
+            fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos3),
+            animacao3
+        )
+
+        const dialogo4 = new AnimacaoSimultanea(
+            fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos4)
+        )
+
+        const animacao = new AnimacaoSequencial(dialogo1, dialogo2, dialogo3, dialogo4);
+
+        this.fase.animar(animacao);
+
+
+        return animacao;
+    
     }
 
     animacaoDividirParalelogramo(vertice1, vertice2, estado){
@@ -836,6 +943,37 @@ export class AnguloParalogramo {
                         .setNome("Dialogo Carta")
 
         fase.animar(dialogo);
+    }
+
+    animacaoGirarAngulo(angle){
+
+        const quaternionInicial = angle.mesh.quaternion.clone();
+        const quaternionFinal   = angle.mesh.quaternion.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,-1), 0.3));
+
+        function easeInOutBack(x) {
+            const c1 = 1.70158;
+            const c2 = c1 * 1.525;
+            
+            return x < 0.5
+              ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+              : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+            
+        }
+        
+        const giro =  new Animacao(angle)
+                    .setValorInicial(quaternionInicial)
+                    .setValorFinal(quaternionFinal)
+                    .setDuration(30)
+                    .setInterpolacao(function(inicial,final,peso){
+                        return new THREE.Quaternion().slerpQuaternions(inicial,final,peso);
+                    })
+                    .setCurva(x => (y => Math.sin(y*2*Math.PI))(easeInOutBack(x + 0.03*Math.random())))
+                    .setUpdateFunction(function(quaternion){
+                        angle.mesh.quaternion.copy(quaternion);
+                    });
+
+        return giro;
+
     }
 
     

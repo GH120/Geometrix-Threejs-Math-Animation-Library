@@ -40,7 +40,7 @@ export class MostrarAngulo extends Output{
 
             const angulo = this.angulo;
 
-            const isVariable = this.angulo.variable.nome;
+            const isVariable = this.angulo.variable.name;
 
             if(!isVariable){
                 elemento.element.textContent = `${(angulo.degrees).toFixed()}°`;

@@ -206,8 +206,13 @@ export class LadosProporcionais {
 
         console.log(...objetos, objetos.map(objeto => objeto.edges[0].length));
 
+        const unidadeMedida = (x) => `${x*5}cm`
+        
 
-        const dividirLados   = fase.animacaoDividirLadosIguais(objetos[1], objetos[0]);
+        const dividirLados   = new AnimacaoSequencial(
+            fase.animacaoDividirLadosIguais(objetos[1], objetos[0], unidadeMedida),
+            fase.animacaoEquacoesVirandoUmaSo('mostrarRazaoLados', equacoes.ladosIguais, 2)
+        );
 
         fase.animar(dividirLados);
     }

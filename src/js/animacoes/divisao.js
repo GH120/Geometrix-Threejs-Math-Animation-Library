@@ -15,6 +15,8 @@ export class Divisao extends Animacao{
         this.frames = 500;
         this.frameCount = 90;
         this.delay = 60;
+
+        this.MARGEM_ERRO =  0.001;
     }
 
     onStart(){
@@ -110,7 +112,7 @@ export class Divisao extends Animacao{
 
         const resto = numero%1;
 
-        const clones = numero - resto;
+        const clones = Math.round(numero - resto + this.MARGEM_ERRO)
 
         const dividir = [];
 

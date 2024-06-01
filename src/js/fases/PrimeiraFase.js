@@ -75,7 +75,8 @@ export class PrimeiraFase extends Fase{
 
     cartas = [
         LadoParalogramo,
-        AnguloParalogramo
+        AnguloParalogramo,
+        LadosProporcionais
         // Adicione mais cartas conforme necessário
     ];
 
@@ -1326,7 +1327,7 @@ export class PrimeiraFase extends Fase{
                 .setCheckpointAll(false)
     }
 
-    animacaoDividirLadosIguais(poligono1, poligono2){
+    animacaoDividirLadosIguais(poligono1, poligono2, unidadeMedida = x => x){
 
         const fase = this;
 
@@ -1334,11 +1335,11 @@ export class PrimeiraFase extends Fase{
 
             const lado2 = poligono2.edges[index];
 
-            console.log(lado1, lado2);
+            console.log(lado1.length, lado2.length);
 
             const posicaoDivisao = new THREE.Vector3(4.5 + index*0.1,0,0);
 
-            const mostrarEquacao = fase.animacaoEscreverRazao(index,lado1,lado2,posicaoDivisao);
+            const mostrarEquacao = fase.animacaoEscreverRazao(index,lado1,lado2,posicaoDivisao, unidadeMedida);
 
             return new AnimacaoSimultanea(
                     new Divisao(
@@ -1847,7 +1848,7 @@ export class PrimeiraFase extends Fase{
     }
 
     //ANIMAÇÃO ASSINCRONA (processa os dados de entrada apenas em sua execução)
-    animacaoEscreverRazao(index, lado1, lado2, offset = new THREE.Vector3(0,0,0)){
+    animacaoEscreverRazao(index, lado1, lado2, offset = new THREE.Vector3(0,0,0), unidadeMedida = (x) => x){
 
         const fase = this;
 
@@ -1867,12 +1868,14 @@ export class PrimeiraFase extends Fase{
                                         const comprimento1 = Math.floor(lado1.length*100)/100;
                                         const comprimento2 = Math.round(lado2.length*100)/100;
 
+                                        const razao = Math.round(comprimento2/comprimento1)
+
                                         caixaDeTextoMathjax.mudarTexto(
                                             ` {\\color{purple} RAZÃO = 
                                                 \\frac {{\\color{blue}Lado~ ${index + 1}}}
                                                 {{\\color{red} Lado~ ${index + 1}}}  = 
-                                                \\frac {{\\color{blue}${comprimento2}}}
-                                                {{\\color{red}${comprimento1}}} = \\large{2}}`,
+                                                \\frac {{\\color{blue}${unidadeMedida(comprimento2)}}}
+                                                {{\\color{red}${unidadeMedida(comprimento1)}}} = \\large{${razao}}}`,
                                                 0.4
                                         )
 
@@ -1940,6 +1943,7 @@ export class PrimeiraFase extends Fase{
     }
 
     //ANIMAÇÃO ASSINCRONA (processa os dados de entrada apenas em sua execução)
+    //GAMBIARRA, Refatorar depois
     animacaoEquacoesVirandoUmaSo(nomeCaixasDeTexto, texto, tamanhoDaFonte, posicaoTexto=[-4,1,0]){
 
         const fase = this;
@@ -1981,6 +1985,8 @@ export class PrimeiraFase extends Fase{
                             .setOnTermino(() => fase.whiteboard.ativar(false))
 
             fase.animar(animacao);
+
+            fase.textBoxes[nomeCaixasDeTexto] = [];
         }
 
 

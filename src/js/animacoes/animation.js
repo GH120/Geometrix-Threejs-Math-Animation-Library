@@ -134,11 +134,14 @@ export default class Animacao {
         return this;
     }
 
-    idleAnimation(fase, curva = curvas.easeInOutSine){
+    idleAnimation(fase, curva = curvas.easeInOutSine, usarSuavizacao=true){
         this.idle = true;
 
         //Curva sobe e desce
-        this.setCurva(curvas.curvaPeriodicaLinear(curva, 1));
+        if(usarSuavizacao)
+            this.setCurva(curvas.curvaPeriodicaLinear(curva, 1));
+        else
+            this.setCurva(curva);
 
         const animarEmLoop = () => (this.idle)? fase.animar(this.setOnTermino(animarEmLoop)) : null;
 
@@ -561,6 +564,8 @@ export const curvas = {
 
     curvaPeriodica: (curva, voltas) => x => curva(Math.sin(x * Math.PI * voltas)),
 
+    curvaSenoidalCompleta: (curva, voltas) =>  x => curva(Math.sin(x * 2 * Math.PI * voltas)),
+
     decrescimentoLinear: (curva) => x => (1-x) * curva(x),
 
     //Sobe e desce linearmente
@@ -570,9 +575,10 @@ export const curvas = {
 
         x = x % 1;
 
-        if(x > 0.5) x = 1 - x;
+        if(x > 0.5) x = 2 - 2*x;
+        else        x = 2*x;
 
-        return x;
+        return curva(x);
     },
     easeInOutBack: x => {
         const c1 = 1.70158;
@@ -581,5 +587,7 @@ export const curvas = {
         return x < 0.5
           ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
           : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
-    }
+    },
+
+    wobbling: (x, k=0.5, a=4) => (Math.exp(-k * x) - 1) * Math.sin(2 * Math.PI * a * x)
 }

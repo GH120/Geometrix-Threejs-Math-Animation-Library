@@ -1,3 +1,4 @@
+import { Draggable } from "../inputs/draggable";
 import ExecutarAnimacaoIdle from "../outputs/executarAnimacaoIdle";
 import Animacao, { curvas } from "./animation";
 import * as THREE from 'three'
@@ -16,10 +17,10 @@ export function encolherAumentarIdle(css2d){
            })
 }
 
-export function tremedeiraIdle(objeto, eixo = new THREE.Vector3(0,0,-1)){
+export function tremedeiraIdle(objeto, eixo = new THREE.Vector3(0,0,-1), desvio = 0.3){
 
     const quaternionInicial = objeto.mesh.quaternion.clone();
-    const quaternionFinal   = objeto.mesh.quaternion.clone().multiply(new THREE.Quaternion().setFromAxisAngle(eixo, 0.3));
+    const quaternionFinal   = objeto.mesh.quaternion.clone().multiply(new THREE.Quaternion().setFromAxisAngle(eixo, desvio));
     
     const giro =  new Animacao(objeto)
                 .setValorInicial(quaternionInicial)
@@ -42,7 +43,7 @@ export function controleTremedeiraIdle(objeto, fase, delay=5){
     const curva = x => (y => Math.sin(y*2*Math.PI))(curvas.easeInOutBack(x + 0.03*Math.random()))
 
     return new ExecutarAnimacaoIdle(
-                 tremedeiraIdle(objeto).setDelay(delay),
+                 tremedeiraIdle(objeto).setDelay(delay*60).setDuration(delay*60),
                  fase, 
                  delay,
                  curva
@@ -52,15 +53,20 @@ export function controleTremedeiraIdle(objeto, fase, delay=5){
 
 
 
-export function controleTremedeiraIdleAresta(aresta, fase, delay=5){
+export function controleTremedeiraIdleAresta(aresta, fase, delay=3){
 
-    const curva = x => (y => Math.sin(y*2*Math.PI))(curvas.easeInOutBack(x + 0.03*Math.random()))
+    //Começa que começa em 0.5 e termina em 0.5
+
+    const comecarDoMeio = x => Math.abs(0.5 - 2*x) + Math.min(0, 3 - 4*x)
+
+    const curva = x => curvas.wobbling(x, 0.1, 10)
 
     return new ExecutarAnimacaoIdle(
-                    tremedeiraIdle(aresta, new THREE.Vector3(-1,0,0)).setDelay(delay), 
+                    tremedeiraIdle(aresta, new THREE.Vector3(-1,0,0), 0.1).setDelay(delay*60).setDuration(120),
                     fase, 
                     delay, 
-                    curva
+                    curva,
+                    false
                 )
                 .addInputs(aresta.draggable)
 }

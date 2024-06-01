@@ -4,12 +4,12 @@ import { Output } from "./Output";
 /**Controle output que seta timer para iniciar animação idle, qualquer input termina a execução da animação */
 export default class ExecutarAnimacaoIdle extends Output{
 
-    constructor(animacao, fase, delay = 5, curva = curvas.easeInOutSine){
+    constructor(animacao, fase, delay = 5, curva = curvas.easeInOutSine, usarSuavisacao=true){
         super();
 
         this.fase = fase;
 
-        this.animacaoIdle = animacao.idleAnimation(fase, curva);
+        this.animacaoIdle = animacao.idleAnimation(fase, curva, usarSuavisacao);
 
         this.delay = delay;
 

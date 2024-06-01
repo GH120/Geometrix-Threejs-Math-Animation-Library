@@ -12,7 +12,7 @@ import * as THREE from 'three';
 import InsideElipse from "../outputs/insideElipse";
 import MostrarTexto from "../animacoes/MostrarTexto";
 import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
-import { controleTremedeiraIdle } from "../animacoes/idle";
+import { controleTremedeiraIdle, controleTremedeiraIdleAresta } from "../animacoes/idle";
 
 export class LadoParalogramo {
 
@@ -302,8 +302,8 @@ export class LadoParalogramo {
         const moverLadosVerticais = this.criarMoverLados(paralelogramo.edges[3], paralelogramo.edges[1]);
 
         this.arrastarLadosIdle = [
-            controleTremedeiraIdle(paralelogramo.angles[2], carta.fase).start(),
-            controleTremedeiraIdle(paralelogramo.angles[3], carta.fase).start()
+            controleTremedeiraIdleAresta(paralelogramo.edges[2], carta.fase).start(),
+            controleTremedeiraIdleAresta(paralelogramo.edges[3], carta.fase).start()
         ]
 
         const dialogos = {

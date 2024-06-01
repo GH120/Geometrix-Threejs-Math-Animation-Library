@@ -7,6 +7,60 @@ export default class Animacao {
         this.manter = false;
         this.voltar = true;
         this.checkpoint = true;
+        this.idle = false;
+    }
+
+    *getFrames(){
+
+        this.onStart();
+
+        //Executa os frames da animação, interpolando os valores iniciais e finais
+        for(let frame = 1; frame <= this.frames; frame++){
+
+            const lerp = (peso) => this.interpolacao(this.valorInicial, this.valorFinal, this.curva(peso));
+
+            const valor = lerp(frame/this.frames);
+
+            this.update(valor);
+
+            if(this.stop) return;
+
+            while (this.pause) yield this.frame; //se estiver pausado, continua executando// A FAZER
+
+            this.frame = frame;
+
+            // if(this.skip) return this.endExecution(); //se quiser pular a execução, termina a animação// A FAZER
+
+            yield frame;
+        }
+
+        this.onDelay();
+
+        //Parte do delay
+        for(let frame = this.frames; frame <= this.frames + this.delay; frame++){
+
+            this.frame = frame;
+
+            if(this.stop) return;
+
+            while (this.pause) yield this.frame;
+
+            yield this.setProgresso(1);
+        }
+
+        //Enquanto estiver com a flag para manter a execução, continue retornando o ultimo frame
+        while(this.manter) {
+            
+            if(this.stop) return;
+
+            yield this.setProgresso(1);
+        }
+
+        //Se tiver uma função ao terminar, executa ela
+        yield this.onTermino();
+
+        //Se tiver a flag para a volta, retorna ao estado inicial
+        if(this.voltar) this.update(this.valorInicial);
     }
 
     setValorInicial(valorInicial){
@@ -80,6 +134,17 @@ export default class Animacao {
         return this;
     }
 
+    idleAnimation(fase, curva = curvas.easeInOutSine){
+        this.idle = true;
+
+        //Curva sobe e desce
+        this.setCurva(curvas.curvaPeriodicaLinear(curva, 1));
+
+        const animarEmLoop = () => (this.idle)? fase.animar(this.setOnTermino(animarEmLoop)) : null;
+
+        return this.setOnTermino(animarEmLoop);
+    }
+
     /** Usado no update da fase para determinar se substitui animação com mesmo nome
      * Funciona como um identificador para apenas uma thread com esse nome executar no update
     */
@@ -107,59 +172,6 @@ export default class Animacao {
 
     curva(peso){
         return peso;
-    }
-
-    *getFrames(){
-
-        this.onStart();
-
-        //Executa os frames da animação, interpolando os valores iniciais e finais
-        for(let frame = 1; frame <= this.frames; frame++){
-
-            const lerp = (peso) => this.interpolacao(this.valorInicial, this.valorFinal, this.curva(peso));
-
-            const valor = lerp(frame/this.frames);
-
-            this.update(valor);
-
-            if(this.stop) return;
-
-            while (this.pause) yield this.frame; //se estiver pausado, continua executando// A FAZER
-
-            this.frame = frame;
-
-            // if(this.skip) return this.endExecution(); //se quiser pular a execução, termina a animação// A FAZER
-
-            yield frame;
-        }
-
-        this.onDelay();
-
-        //Parte do delay
-        for(let frame = this.frames; frame <= this.frames + this.delay; frame++){
-
-            this.frame = frame;
-
-            if(this.stop) return;
-
-            while (this.pause) yield this.frame;
-
-            yield this.setProgresso(1);
-        }
-
-        //Enquanto estiver com a flag para manter a execução, continue retornando o ultimo frame
-        while(this.manter) {
-            
-            if(this.stop) return;
-
-            yield this.setProgresso(1);
-        }
-
-        //Se tiver uma função ao terminar, executa ela
-        yield this.onTermino();
-
-        //Se tiver a flag para a volta, retorna ao estado inicial
-        if(this.voltar) this.update(this.valorInicial);
     }
 
     setProgresso(progresso){
@@ -549,5 +561,17 @@ export const curvas = {
 
     curvaPeriodica: (curva, voltas) => x => curva(Math.sin(x * Math.PI * voltas)),
 
-    decrescimentoLinear: (curva) => x => (1-x) * curva(x)
+    decrescimentoLinear: (curva) => x => (1-x) * curva(x),
+
+    //Sobe e desce linearmente
+    curvaPeriodicaLinear: (curva, voltas) => x => {
+
+        x = x * voltas;
+
+        x = x % 1;
+
+        if(x > 0.5) x = 1 - x;
+
+        return x;
+    }
 }

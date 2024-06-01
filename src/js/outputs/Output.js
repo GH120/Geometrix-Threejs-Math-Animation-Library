@@ -11,6 +11,7 @@ export class Output{
     }
 
     /**função de update que recebe o estado novo e atualiza o que for necessário*/
+    //REFATORAR DEPOIS, ELIMINAR UPDATE PRIVADO _UPDATE
     update(novoEstado){
 
         this._update(novoEstado); // função update privada

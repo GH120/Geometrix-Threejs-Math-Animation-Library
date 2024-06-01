@@ -4,7 +4,7 @@ import { Poligono } from "../objetos/poligono";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import DesenharPoligono from "../animacoes/DesenharPoligono";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
-import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente } from "../animacoes/animation";
+import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente, curvas } from "../animacoes/animation";
 import { colorirAngulo } from "../animacoes/colorirAngulo";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
 import { apagarObjeto } from "../animacoes/apagarObjeto";
@@ -40,6 +40,7 @@ import { CriarTriangulo } from "../cards/criarTriangulo";
 import ResolverEquacao from "../outputs/resolverEquacao";
 import { LadosProporcionais } from "../cards/ladosProporcionais";
 import { AngulosIguais } from "../cards/angulosIguais";
+import ExecutarAnimacaoIdle from "../outputs/executarAnimacaoIdle";
 
 
 
@@ -62,7 +63,7 @@ export class PrimeiraFase extends Fase{
         this.outputTesteClick();
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
 
-        this.debug = true;
+        this.debug = false;
         this.debugProblem = 30;
 
         this.controleFluxo = new this.ControleGeral(this);
@@ -345,6 +346,30 @@ export class PrimeiraFase extends Fase{
 
             arraste1.tamanhoFonte = 5;
             arraste2.tamanhoFonte = 5;
+
+            fase.debug = false;
+
+
+            //Separar parte de animações idle em um arquivo?
+            const animacaoIdle1 = new ExecutarAnimacaoIdle(
+                                    fase.animacaoIdleEquacao(equacao1.texto)
+                                        .idleAnimation(fase, curvas.easeOutCircle)
+                                        .setDuration(85)
+                                        .setValorFinal(1.1),
+                                    fase
+                                )
+                                .addInputs(equacao1.draggable, equacao2.draggable)
+                                .start()
+
+            const animacaoIdle2 = new ExecutarAnimacaoIdle(
+                                    fase.animacaoIdleEquacao(equacao2.texto)
+                                        .idleAnimation(fase, curvas.easeOutCircle)
+                                        .setDuration(105)
+                                        .setValorFinal(1.1),
+                                    fase
+                                )
+                                .addInputs(equacao2.draggable, equacao1.draggable)
+                                .start()
 
             const mudarProblema = new Output()
                                  .addInputs(arraste1, arraste2)
@@ -901,8 +926,6 @@ export class PrimeiraFase extends Fase{
 
                 if(novoEstado.completo){
 
-                    alert("YES");
-
                     estado.cartasUsadas.push(novoEstado.carta);
 
                     this.verificarCartas();
@@ -1105,8 +1128,6 @@ export class PrimeiraFase extends Fase{
     
                         }
                         else if (novoEstado.novaEquacao && estado.etapa == 2){
-
-                            alert("Terminado");
 
                             this.notify({
                                 equacaoResolvida: true,
@@ -2061,6 +2082,17 @@ export class PrimeiraFase extends Fase{
 
 
         return animacaoIndependente(equacoesVirandoUmaSo);
+    }
+
+    animacaoIdleEquacao(equacao){
+
+        return new Animacao(equacao)
+               .interpolacaoComum()
+               .setValorInicial(1)
+               .setValorFinal(2)
+               .setUpdateFunction(function(valor){
+                    equacao.element.children[0].style.transform = `scale(${valor})`;
+               })
     }
 
     //Fazer depois

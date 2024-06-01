@@ -163,14 +163,18 @@ export class LadosProporcionais {
                             fase.animar(dialogo);
                         }
                         else{
-                            const dialogo = fase.animacaoDialogo(carta.dialogos.fim);
+                            // const dialogo = fase.animacaoDialogo(carta.dialogos.fim);
 
-                            fase.animar(dialogo);
+                            // fase.animar(dialogo);
+
+                            const notificarFimExecucao = () => this.notify({carta: "LadosProporcionais"})
 
                             //Não verifica ainda se são de fato proporcionais
                             carta.animarLadosProporcionais(estado.objetosSelecionados)
+                                 .setOnTermino(notificarFimExecucao)
 
                             this.observed.map(input => input.removeInputs()); //Remove todos os clickVertice
+
                         }
                     }
                })
@@ -186,9 +190,9 @@ export class LadosProporcionais {
 
 
         const equacoes = {
-            ladosIguais: ` {\\color{purple} RAZÃO = 
+            ladosIguais: razao => ` {\\color{purple} RAZÃO = 
                             \\frac {{\\color{blue}Lado~Poligono~2}}
-                            {{\\color{red} Lado~Poligono~1}}= \\Large{2}}`,
+                            {{\\color{red} Lado~Poligono~1}}= \\Large{${razao}}}`,
 
             angulosIguais: `~{\\color{red}~Todos~Ângulos~ do ~P1} = 
                             ~{\\color{blue}~Todos~Ângulos~ do~ P2}`,
@@ -204,17 +208,19 @@ export class LadosProporcionais {
 
         objetos = objetos.sort((a,b) => a.edges[0].length > b.edges[0].length);
 
-        console.log(...objetos, objetos.map(objeto => objeto.edges[0].length));
+        const razao = Math.round(objetos[0].edges[0].length/objetos[1].edges[0].length * 100)/100
 
         const unidadeMedida = (x) => `${x*5}cm`
         
 
         const dividirLados   = new AnimacaoSequencial(
             fase.animacaoDividirLadosIguais(objetos[1], objetos[0], unidadeMedida),
-            fase.animacaoEquacoesVirandoUmaSo('mostrarRazaoLados', equacoes.ladosIguais, 2)
+            fase.animacaoEquacoesVirandoUmaSo('mostrarRazaoLados', equacoes.ladosIguais(razao), 1)
         );
 
         fase.animar(dividirLados);
+
+        return dividirLados;
     }
 
     

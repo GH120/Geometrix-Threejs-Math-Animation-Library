@@ -39,6 +39,7 @@ import { SomaDosAngulosTriangulo } from "../cards/somaDosAngulos";
 import { CriarTriangulo } from "../cards/criarTriangulo";
 import ResolverEquacao from "../outputs/resolverEquacao";
 import { LadosProporcionais } from "../cards/ladosProporcionais";
+import { AngulosIguais } from "../cards/angulosIguais";
 
 
 
@@ -76,7 +77,6 @@ export class PrimeiraFase extends Fase{
     cartas = [
         LadoParalogramo,
         AnguloParalogramo,
-        LadosProporcionais
         // Adicione mais cartas conforme necessário
     ];
 
@@ -767,7 +767,33 @@ export class PrimeiraFase extends Fase{
 
             const estado = this.estado;
 
+            if(novoEstado.novaEquacao){
+
+                const dialogo = [
+                    "Com isso, temos que as duas figuras são semelhantes",
+                    "O exemplo foi bem longo e repetitivo, ",
+                    "Mas espero que tenha aprendido os passos fundamentais",
+                    "Bons Estudos!!!"
+                ];
+
+                const animacao = fase.animacoesDialogo(...dialogo)
+
+                animacao.animacoes[0].setOnTermino(() => fase.whiteboard.ativar(false))
+
+                fase.animar(animacao);
+
+            }
+
             //Lida com eventos internos da própria execução
+            if(novoEstado.finalizado){
+
+                const dialogo = ["Junte as duas equações na lousa e obterá a semelhança"];
+
+                fase.animar(fase.animacoesDialogo(...dialogo));
+
+                this.criarJuntarEquacoesSemelhanca();
+            }
+
             if(novoEstado.reset){
                 fase.cartas = [AnguloParalogramo];
             }
@@ -885,6 +911,34 @@ export class PrimeiraFase extends Fase{
                     this.fase.settings.ativarMenuCartas(true)
                 }
             }
+
+            if(novoEstado.carta == "AngulosIguais"){
+                
+                estado.angulosIguais = true;
+
+                if(estado.ladosProporcionais) return this.update({finalizado: true});
+
+                const dialogo = ["Com ângulos congruentes, falta apenas lados proporcionais para obter semelhança"];
+
+                this.verificarCartas();
+
+                fase.settings.ativarMenuCartas(false);
+                fase.settings.ativarMenuCartas(true);
+            }
+
+            if(novoEstado.carta == "LadosProporcionais"){
+                
+                estado.ladosProporcionais = true;
+
+                if(estado.angulosIguais) return this.update({finalizado: true});
+
+                const dialogo = ["Com lados proporcionais, falta apenas ângulos congruentes para obter semelhança"];
+
+                this.verificarCartas();
+
+                fase.settings.ativarMenuCartas(false);
+                fase.settings.ativarMenuCartas(true);
+            }
         }
 
         cartaRepetida(){
@@ -943,7 +997,7 @@ export class PrimeiraFase extends Fase{
             }
 
             if(angulosIguais){
-                //Cartas.push(ladoProporcional)
+                cartas.push(AngulosIguais)
             }
             else{
                 cartas.push(AnguloParalogramo);
@@ -1091,6 +1145,22 @@ export class PrimeiraFase extends Fase{
                 this.fase.whiteboard.ativar(false);
                 this.fase.whiteboard.removerTodasEquacoes();
             });
+        }
+
+        criarJuntarEquacoesSemelhanca() {
+
+            const fase = this.fase;
+
+            const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
+            const equacao2 = new ElementoCSS2D(fase.whiteboard.equacoes[1], fase.whiteboard);
+
+            const arraste1 = new JuntarEquacoes(equacao1, [equacao2], fase);
+            const arraste2 = new JuntarEquacoes(equacao2, [equacao1], fase);
+
+            arraste1.tamanhoFonte = 5;
+            arraste2.tamanhoFonte = 5;
+
+            this.addInputs(arraste1, arraste2);
         }
     }
 

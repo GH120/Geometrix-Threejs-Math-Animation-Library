@@ -141,6 +141,8 @@ export class MoverGrausParaPosicaoEquacao extends AnimacaoSimultanea{
 
             novoElemento = new CSS2DObject(equacao.html);
 
+            novoElemento.id = "SOMADOSANGULOS"
+
             novoElemento.position.copy(new THREE.Vector3(0,0,0));
 
             novoElemento.equacao = equacao;

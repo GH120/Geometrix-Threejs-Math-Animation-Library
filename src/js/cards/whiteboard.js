@@ -111,6 +111,7 @@ export class Whiteboard {
 
 
     //adiciona a equacao
+    //GAMBIARRA, REFATORAR DEPOIS PARA ACEITAR O OBJETO EQUAÇÃO ELEMENTOCSS2D
     adicionarEquacao(equacao){
 
         const ListaEquacoes = this.equacoes;
@@ -121,6 +122,8 @@ export class Whiteboard {
 
         const elementoCSS2 = new CSS2DObject(htmlElement);
 
+        if(equacao.id) elementoCSS2.id = equacao.id;
+
         //Atualiza a posição para não ter equações em cima das outras
         const position = new THREE.Vector3(-0.5, 2-ListaEquacoes.length*1, 0);
 
@@ -129,6 +132,8 @@ export class Whiteboard {
         this.scene.add(elementoCSS2);
 
         ListaEquacoes.push(elementoCSS2);
+
+        alert(elementoCSS2.id);
 
         return elementoCSS2;
     }

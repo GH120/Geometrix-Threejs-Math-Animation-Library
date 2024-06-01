@@ -1,8 +1,10 @@
 import { AnimacaoSimultanea } from "../animacoes/animation";
 import { apagarCSS2 } from "../animacoes/apagarCSS2";
+import { encolherAumentarIdle } from "../animacoes/idle";
 import { Draggable } from "../inputs/draggable";
 import { Hoverable } from "../inputs/hoverable";
 import { Output } from "./Output";
+import ExecutarAnimacaoIdle from "./executarAnimacaoIdle";
 
 export default class JuntarEquacoes extends Output{
 
@@ -16,6 +18,7 @@ export default class JuntarEquacoes extends Output{
         this.equacoesAlvo  = equacoesAlvo;
         this.equacaoNova   = null;
         this.tamanhoFonte  = 1;
+        this.controleIdling = null;
 
         //Para criar na hora uma equacaoNova mathjax
         this.equacaoResultante = `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
@@ -38,6 +41,8 @@ export default class JuntarEquacoes extends Output{
         equacoesAlvo.forEach(equacao => {
 
             if(!equacao.hoverable) new Hoverable(equacao, fase.whiteboard.camera, fase.whiteboard);
+
+            // this.aumentarTamanhoNoHover(equacao);
         });
 
         this.addInputs(
@@ -172,4 +177,75 @@ export default class JuntarEquacoes extends Output{
         equacaoMovida.removeAllOutputs();
         equacaoSelecionada.removeAllOutputs();
     }
+
+    criarIdling(){
+
+        const fase = this.fase;
+
+        const equacaoMovida = this.equacaoMovida;
+
+        const equacoesAlvo  = this.equacoesAlvo;
+        
+        const animacao = encolherAumentarIdle(equacaoMovida.texto).setDuration(90 + Math.round(30*Math.random()));
+
+        const controleIdle = new ExecutarAnimacaoIdle(animacao, fase, 7)
+                                .addInputs(
+                                    equacaoMovida.draggable, 
+                                    ...equacoesAlvo.filter(equacao => equacao.draggable).map(equacao => equacao.draggable)
+                                )
+                                .start();
+
+
+        this.controleIdling = controleIdle;
+    }
+
+    //Complicado demais
+    // aumentarTamanhoNoHover(equacao){
+
+    //     const fase = this.fase;
+
+    //     return new Output()
+    //             .addInputs(equacao.hoverable)
+    //             .setUpdateFunction(function(novoEstado){
+
+    //                 const estado = this.estado;
+                    
+    //                 if(novoEstado.dentro){
+                        
+    //                     //Gambiarra pois reverter da animação não funciona
+    //                     let valorFinal = 1.1
+
+    //                     if(estado.animacao){
+    //                         valorFinal = estado.animacao.valorInicial;
+    //                     }
+
+    //                     const duration = 90 * (valorFinal - 0.1)/0.1
+
+    //                     estado.animacao = encolherAumentarIdle(equacao.texto)
+    //                                       .setValorFinal(valorFinal)
+    //                                       .setDuration(duration)
+
+    //                     fase.animar(estado.animacao);
+    //                 }
+    //                 else{
+
+    //                     //Gambiarra pois reverter da animação não funciona
+    //                     let valorInicial = 1.1
+
+    //                     if(estado.animacao){
+    //                         valorInicial = estado.animacao.valorInicial;
+    //                     }
+
+    //                     const duration = 90 * (valorInicial - 0.1)/0.1
+
+
+    //                     estado.animacao = encolherAumentarIdle(equacao.texto)
+    //                                       .reverse()
+    //                                       .setValorInicial(valorInicial)
+    //                                       .setDuration(duration)
+
+    //                     fase.animar(estado.animacao);
+    //                 }       
+    //             })
+    // }
 }

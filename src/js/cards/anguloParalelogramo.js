@@ -728,6 +728,8 @@ export class AnguloParalogramo {
 
         const textbox = fase.createTextBox(equacao.html.innerText, [-5,0,0], 17, true);
 
+        textbox.id = "SOMADOSANGULOS";
+
 
         //Passar elementocss2 ao invés da textbox?
         animacoes.push(

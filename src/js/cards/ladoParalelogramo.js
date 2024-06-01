@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import InsideElipse from "../outputs/insideElipse";
 import MostrarTexto from "../animacoes/MostrarTexto";
 import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
+import { controleTremedeiraIdle } from "../animacoes/idle";
 
 export class LadoParalogramo {
 
@@ -291,15 +292,19 @@ export class LadoParalogramo {
         //Outputs auxiliares
 
         carta.colorirArestas = [
-            this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xe828282),
-            this.criarColorirArestaSelecionada(paralelogramo.edges[0], 0xffff00),
-            this.criarColorirArestaSelecionada(paralelogramo.edges[3], 0xe828282),
-            this.criarColorirArestaSelecionada(paralelogramo.edges[1], 0xffff00)
+            this.criarColorirArestaSelecionada(paralelogramo.edges[2], 0xffff00),
+            this.criarColorirArestaSelecionada(paralelogramo.edges[0], 0xe828282),
+            this.criarColorirArestaSelecionada(paralelogramo.edges[3], 0xffff00),
+            this.criarColorirArestaSelecionada(paralelogramo.edges[1], 0xe828282)
         ];
 
         const moverLadosLaterais  = this.criarMoverLados(paralelogramo.edges[2], paralelogramo.edges[0]);
         const moverLadosVerticais = this.criarMoverLados(paralelogramo.edges[3], paralelogramo.edges[1]);
 
+        this.arrastarLadosIdle = [
+            controleTremedeiraIdle(paralelogramo.angles[2], carta.fase).start(),
+            controleTremedeiraIdle(paralelogramo.angles[3], carta.fase).start()
+        ]
 
         const dialogos = {
             primeiroLadoMovido1: `Temos agora três lados conhecidos, `,

@@ -63,7 +63,7 @@ export class PrimeiraFase extends Fase{
         this.outputTesteClick();
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
 
-        this.debug = false;
+        this.debug = true;
         this.debugProblem = 30;
 
         this.controleFluxo = new this.ControleGeral(this);
@@ -287,7 +287,7 @@ export class PrimeiraFase extends Fase{
         //highlight dos ângulos respectivos em cada triângulo
         //highlight dos lados 
 
-        const animarDialogo = dialogo1.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)).setValorFinal(100));
+        const animarDialogo = dialogo1.map(texto => fase.animacaoDialogo(texto));
 
         const desenharPoligonos = new AnimacaoSimultanea(
                                     new DesenharPoligono(this.pentagono,  fase.scene), 
@@ -316,7 +316,8 @@ export class PrimeiraFase extends Fase{
 
         const terceiraLinha = new AnimacaoSequencial(animarDialogo[2])
                               .setOnStart(criarControleJuntarEquacoes)
-                              .setOnTermino(() => fase.whiteboard.ativar(true));
+                              .setOnTermino(() => fase.whiteboard.ativar(true))
+                              .setCheckpoint(false);
 
         const quartaLinha   = animarDialogo[3];
 
@@ -347,29 +348,10 @@ export class PrimeiraFase extends Fase{
             arraste1.tamanhoFonte = 5;
             arraste2.tamanhoFonte = 5;
 
+            arraste1.criarIdling();
+            arraste2.criarIdling();
+
             fase.debug = false;
-
-
-            //Separar parte de animações idle em um arquivo?
-            const animacaoIdle1 = new ExecutarAnimacaoIdle(
-                                    fase.animacaoIdleEquacao(equacao1.texto)
-                                        .idleAnimation(fase, curvas.easeOutCircle)
-                                        .setDuration(85)
-                                        .setValorFinal(1.1),
-                                    fase
-                                )
-                                .addInputs(equacao1.draggable, equacao2.draggable)
-                                .start()
-
-            const animacaoIdle2 = new ExecutarAnimacaoIdle(
-                                    fase.animacaoIdleEquacao(equacao2.texto)
-                                        .idleAnimation(fase, curvas.easeOutCircle)
-                                        .setDuration(105)
-                                        .setValorFinal(1.1),
-                                    fase
-                                )
-                                .addInputs(equacao2.draggable, equacao1.draggable)
-                                .start()
 
             const mudarProblema = new Output()
                                  .addInputs(arraste1, arraste2)
@@ -1039,14 +1021,21 @@ export class PrimeiraFase extends Fase{
 
             const fase = this.fase;
 
-            const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
-            const equacao2 = new ElementoCSS2D(fase.whiteboard.equacoes[1], fase.whiteboard);
+            const objetosCSS2D = fase.whiteboard.equacoes.filter(equacao => equacao.id === "SOMADOSANGULOS");
+
+            console.log("teste equações: " + objetosCSS2D.length == 2, objetosCSS2D, fase.whiteboard.equacoes);
+
+            const equacao1 = new ElementoCSS2D(objetosCSS2D[0], fase.whiteboard);
+            const equacao2 = new ElementoCSS2D(objetosCSS2D[1], fase.whiteboard);
 
             const arraste1 = new JuntarEquacoes(equacao1, [equacao2], fase);
             const arraste2 = new JuntarEquacoes(equacao2, [equacao1], fase);
 
             arraste1.tamanhoFonte = 5;
             arraste2.tamanhoFonte = 5;
+
+            arraste1.criarIdling();
+            arraste2.criarIdling();
 
             const valorConhecido = new Variable(Math.round(this.estado.anguloConhecido.degrees) + '°');
 
@@ -1180,6 +1169,9 @@ export class PrimeiraFase extends Fase{
 
             arraste1.tamanhoFonte = 5;
             arraste2.tamanhoFonte = 5;
+
+            arraste1.criarIdling();
+            arraste2.criarIdling();
 
             this.addInputs(arraste1, arraste2);
         }
@@ -1319,7 +1311,6 @@ export class PrimeiraFase extends Fase{
 
             if(problema.proximo) this.progresso = problema.proximo(this);
 
-            console.log(this.progresso, "Progresso")
         }
     }
 

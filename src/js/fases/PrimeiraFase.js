@@ -1021,7 +1021,9 @@ export class PrimeiraFase extends Fase{
 
             const fase = this.fase;
 
-            const objetosCSS2D = fase.whiteboard.equacoes.filter(equacao => equacao.id === "SOMADOSANGULOS");
+            const objetosCSS2D = fase.whiteboard.equacoes.filter(equacao => equacao.nome === "SOMADOSANGULOS");
+
+            console.log(objetosCSS2D)
 
             console.log("teste equações: " + objetosCSS2D.length == 2, objetosCSS2D, fase.whiteboard.equacoes);
 
@@ -1721,6 +1723,7 @@ export class PrimeiraFase extends Fase{
 
     }
 
+    //Refatorar para usar animação
     moverEquacao(configs){
 
         let {elementoCSS2, equacao, spline, duration1, duration2, delayDoMeio} = configs;
@@ -1747,7 +1750,7 @@ export class PrimeiraFase extends Fase{
             novoElemento.children[0].style.width = '400px';
             novoElemento.children[0].style.height = 'auto';
 
-            equacao = {html: novoElemento}
+            equacao = {html: novoElemento, nome: elementoCSS2.nome}; //Gambiarra
         }
 
         if(!duration1){

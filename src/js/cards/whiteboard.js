@@ -133,7 +133,9 @@ export class Whiteboard {
 
         ListaEquacoes.push(elementoCSS2);
 
-        alert(elementoCSS2.id);
+        alert(equacao.nome);
+
+        console.log(ListaEquacoes, elementoCSS2, equacao)
 
         return elementoCSS2;
     }
@@ -150,6 +152,8 @@ export class Whiteboard {
         this.scene.add(objetoCSS2D);
 
         ListaEquacoes.push(objetoCSS2D);
+
+        console.log(objetoCSS2D, ListaEquacoes);
 
         return objetoCSS2D;
     }

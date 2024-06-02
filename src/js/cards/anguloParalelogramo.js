@@ -24,6 +24,7 @@ import MetalicSheen from "../animacoes/metalicSheen";
 import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
 import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
+import { controleTremedeiraIdleAresta } from "../animacoes/idle";
 
 //Consertar: mostrar igualdade de ângulo (valor inicial cortando delta YZW)
 //           tamanho dos vertices (Muito pequeno)
@@ -49,7 +50,7 @@ export class AnguloParalogramo {
     dialogos = {
         inicio: "Vamos usar o ângulo conhecido para descobrir os restantes",
         divisaoAnguloIgual1: "Podemos dividir o paralelogramo em dois triângulos",
-        divisaoAnguloIgual2: "Arraste os lados cinza para os amarelos",
+        divisaoAnguloIgual2: "Arraste os lados indicados para os seus lados opostos",
 
         //Colore um azul e o outro vermelho
         divisaoAnguloIgual3: "Veja, o triângulo de baixo é igual ao de cima, pois seus lados são iguais",
@@ -390,10 +391,15 @@ export class AnguloParalogramo {
                     if(novoEstado.iniciar){
 
                         carta.colorirLados = lados.concat(ladosOpostos)
-                                                  .map((lado, indice) => carta.criarColorirArestaSelecionada(lado, (indice >= 2)? 0xffff00 : 0x828282))
+                                                  .map((lado, indice) => carta.criarColorirArestaSelecionada(lado, (indice < 2)? 0xffff00 : 0x828282))
                         carta.moverLados   = lados.map((lado, indice) => carta.criarMoverLados(lado, ladosOpostos[indice]))
 
                         carta.colorirLados.forEach(colorir => colorir.update({dentro:true}));
+
+                        carta.arrastarLadosIdle = [
+                            controleTremedeiraIdleAresta(lados[0], carta.fase).start(),
+                            controleTremedeiraIdleAresta(lados[1], carta.fase).start()
+                        ]
 
                         this.addInputs(...carta.moverLados);
 
@@ -520,14 +526,20 @@ export class AnguloParalogramo {
                                                 new ApagarPoligono(estado.trianguloSuperior, true),
                                                 new ApagarPoligono(trianguloInferior, true),
                                                 apagarCSS2(estado.equacao, carta.fase.scene),
-                                                apagarObjeto(estado.tracejado).setOnTermino(() => estado.tracejado.removeFromScene())
+
+                                                apagarObjeto(estado.tracejado)
+                                                .setDuration(30)
+                                                .setOnTermino(() => {
+                                                    estado.tracejado.removeFromScene()
+                                                    mostrarBissetriz1.update({dentro:false});
+                                                    mostrarBissetriz2.update({dentro:false});
+                                                })
+
                                             )
                                         )
                                         .setNome("Dialogo Carta")
                                         .setDelay(100)
                                         .setOnTermino(() =>{
-                                            mostrarBissetriz1.update({dentro:false});
-                                            mostrarBissetriz2.update({dentro:false});
                                             this.update({etapa: "final"})
                                         });
 
@@ -697,7 +709,9 @@ export class AnguloParalogramo {
             fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos4)
         )
 
-        const animacao = new AnimacaoSequencial(dialogo1, dialogo2, dialogo3, dialogo4);
+        const mostrarValorArestas = new AnimacaoSimultanea(...paralelogramo.edges.map(lado => lado.mostrarValorAresta.aparecer(false)))
+
+        const animacao = new AnimacaoSequencial(dialogo1, dialogo2, dialogo3, dialogo4, mostrarValorArestas);
 
         this.fase.animar(animacao);
 
@@ -739,7 +753,8 @@ export class AnguloParalogramo {
 
         const textbox = fase.createTextBox(equacao.html.innerText, [-5,0,0], 17, true);
 
-        textbox.nome = "SOMADOSANGULOS";
+        //Gambiarra
+        equacao.nome = "SOMADOSANGULOS";
 
 
         //Passar elementocss2 ao invés da textbox?
@@ -916,12 +931,24 @@ export class AnguloParalogramo {
 
         trianguloNovo.angles.map(angulo => angulo.material.color = 0x0000aa);
 
+        const edge = trianguloNovo.edges[2];
+
+        edge.material.color = 0xeeeeee;
+        edge.grossura = 0.024;
+        edge.render();
+
+        const aparecerAresta = apagarObjeto(edge)
+                              .reverse()
+                              .setOnTermino(() => null)
+                              .setOnStart(() => edge.addToScene(this.fase.scene));
+
 
         const aparecerTriangulo = new ApagarPoligono(trianguloNovo)
                                   .reverse()
                                   .setOnTermino(() => null)
                                   .setOnStart(() => trianguloNovo.addToScene(this.fase.scene))
                                   .setDuration(300)
+                                  .ignorarObjetos([edge])
                                   .filler(250)
 
         const colorirCinza = animacaoIndependente(() =>
@@ -935,17 +962,6 @@ export class AnguloParalogramo {
                                           )
                                 )
                             )
-
-        const edge = trianguloNovo.edges[2];
-
-        edge.material.color = 0xeeeeee;
-        edge.grossura = 0.024;
-        edge.render();
-
-        const aparecerAresta = apagarObjeto(edge)
-                              .reverse()
-                              .setOnTermino(() => null)
-                              .setOnStart(() => edge.addToScene(this.fase.scene));
 
         const mostrarLados = new AnimacaoSequencial(
                                 new AnimacaoSimultanea(

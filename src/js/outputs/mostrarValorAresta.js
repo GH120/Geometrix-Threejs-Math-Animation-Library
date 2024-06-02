@@ -118,6 +118,6 @@ export default class MostrarValorAresta extends Output{
 
         return  apagarCSS2(this.texto).reverse()
                                     .setOnTermino(() => null)
-                                    .setOnStart(() => this.update({dentro: true}))
+                                    .setOnStart(() => this.update({}))
     }
 }

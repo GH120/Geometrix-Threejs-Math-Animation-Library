@@ -40,7 +40,7 @@ export default class MoverEquacao extends AnimacaoSequencial{
             // novoElemento.children[0].style.width = '400px';
             novoElemento.children[0].style.height = 'auto';
 
-            equacao = {html: novoElemento}
+            equacao = {html: novoElemento, nome: elementoCSS2.nome}
         }
 
         if(!duration1){

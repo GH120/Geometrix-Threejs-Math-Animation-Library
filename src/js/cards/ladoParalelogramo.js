@@ -117,9 +117,12 @@ export class LadoParalogramo {
 
         const corInicial = aresta.material.color.getHex();
 
+
+        if(!aresta.insideElipse) new InsideElipse(aresta, 0.05, fase.camera, fase.scene)
+
         const colorir = new Output()
                         .addInputs(
-                            new InsideElipse(aresta, 0.05, fase.camera, fase.scene) // Para saber se o mouse está proximo da elipse ao redor da aresta
+                            aresta.insideElipse // Para saber se o mouse está proximo da elipse ao redor da aresta
                         )
                         .setUpdateFunction(function(novoEstado){
 
@@ -172,12 +175,21 @@ export class LadoParalogramo {
 
         const carta = this;
 
+        const fase = this.fase;
+
         new Draggable(lado, this.fase.camera);
         new Hoverable(lado, this.fase.camera);
         new Hoverable(ladoOposto, this.fase.camera);
 
+        if(!ladoOposto.InsideElipse) new InsideElipse(ladoOposto, 0.05, fase.camera, fase.scene)
+
 
         const moverLados = new Output()
+                            .addInputs(
+                                lado.draggable, 
+                                lado.hoverable,
+                                ladoOposto.insideElipse
+                            )
                            .setUpdateFunction(function(novoEstado){
 
                                 const estado = this.estado;
@@ -272,11 +284,6 @@ export class LadoParalogramo {
                                 ladoOpostoSelecionado: false,
                                 verificar: false,
                             })
-                           .addInputs(
-                                lado.draggable, 
-                                lado.hoverable,
-                                ladoOposto.hoverable
-                            );
 
         return moverLados;
 

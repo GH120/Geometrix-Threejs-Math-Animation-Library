@@ -100,10 +100,13 @@ export class Draggable extends Input{
 
     hover.object = object;
 
+    //Talvez mudar isso apenas para outputs de arraste?
     this.mudarCursor = new Output([hover])
                       .setUpdateFunction(function(novoEstado){
 
                         const estado = this.estado;
+
+                        const temOutput = draggable.observers.filter(output => !output.ignorarOutput).length;
 
                         //Funções auxiliares
                         const setCursor = (cursor) => {
@@ -115,7 +118,7 @@ export class Draggable extends Input{
 
                           if(estado.ativo){
                             setCursor('grab');
-                            const soltar = () => (!estado.dentro && !estado.segurando) || !draggable.observers.length
+                            const soltar = () => (!estado.dentro && !estado.segurando) || !temOutput
 
                             setTimeout(() => {
 
@@ -136,7 +139,7 @@ export class Draggable extends Input{
                           return estado.ativo = false;
                         
                         //Caso não tenha mais outputs
-                        if(!draggable.observers.length) {
+                        if(!temOutput) {
                           if(estado.cursor =='grabbing') soltarObjeto();
                           return estado.ativo = false;
                         }

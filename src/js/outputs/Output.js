@@ -6,6 +6,7 @@ export class Output{
         this.observers = [];
         this.backup    = [];
         this.observed  = observed; //Inputs ou Outputs que avisam esse daqui
+        this.ignorarCursor = false //Se true, ignora mudança de cursor no draggable e click
 
         for(const watched of observed) watched.observers.push(this);
     }
@@ -106,5 +107,13 @@ export class Output{
         }
 
         
+    }
+
+    //Não conta como output válido para mudar o cursor
+    desativarMudancaCursor(boolean){
+
+        this.ignorarCursor = boolean;
+
+        return this;
     }
 }

@@ -83,7 +83,7 @@ export default class InsideElipse extends Output{
             
             estado.dentroDaElipse = dentroDaElipse;
 
-            this.notify({dentro: estado.dentroDaElipse});
+            this.notify({dentro: estado.dentroDaElipse, alvo: aresta});
         }
     }
 }

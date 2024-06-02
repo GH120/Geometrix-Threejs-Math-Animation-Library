@@ -31,7 +31,7 @@ export class Clickable extends Input{
 
   outputMudarCursor(object, camera, container){
 
-    const hoverable = this;
+    const clickable = this;
 
     //Output mudar cursor
     const hover = new Hoverable({}, camera, container);
@@ -43,13 +43,19 @@ export class Clickable extends Input{
 
                         const setCursor = camera.fase.settings.setCursor;
 
-                        if(!hoverable.observers.length) 
+                        const temOutput = clickable.observers.filter(output => !output.ignorarOutput).length;
+
+                        if(!temOutput) 
                           return setCursor(this.estado.cursorInicial);
 
-                        if(novoEstado.dentro) 
+                        else if(novoEstado.dentro) {
                           setCursor('pointer')
+                        }
                         else 
                           setCursor(this.estado.cursorInicial)
+
+
+                          console.log(clickable, temOutput)
                       })
                       .setEstadoInicial({
                         cursorInicial: 'default'

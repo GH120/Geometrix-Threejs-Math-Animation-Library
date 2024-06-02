@@ -60,7 +60,7 @@ export class PrimeiraFase extends Fase{
         this.createInputs();
         this.createOutputs();
 
-        this.outputTesteClick();
+        // this.outputTesteClick();
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
 
         this.debug = true;

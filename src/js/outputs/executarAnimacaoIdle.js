@@ -13,6 +13,8 @@ export default class ExecutarAnimacaoIdle extends Output{
 
         this.delay = delay;
 
+        this.desativarMudancaCursor(true);
+
         
     }
 

@@ -205,6 +205,8 @@ export class LadosProporcionais {
             semelhanca: `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
         }
 
+        const recolorirArestas = objetos.flatMap(objeto => objeto.edges).map(edge => colorirAngulo(edge.material.color.getHex(), 0x525252));
+
 
         objetos = objetos.sort((a,b) => a.edges[0].length > b.edges[0].length);
 
@@ -215,7 +217,8 @@ export class LadosProporcionais {
 
         const dividirLados   = new AnimacaoSequencial(
             fase.animacaoDividirLadosIguais(objetos[1], objetos[0], unidadeMedida),
-            fase.animacaoEquacoesVirandoUmaSo('mostrarRazaoLados', equacoes.ladosIguais(razao), 1)
+            fase.animacaoEquacoesVirandoUmaSo('mostrarRazaoLados', equacoes.ladosIguais(razao), 1),
+            new AnimacaoSimultanea(...recolorirArestas)
         );
 
         fase.animar(dividirLados);

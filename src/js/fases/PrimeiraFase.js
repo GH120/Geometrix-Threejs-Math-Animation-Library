@@ -1153,7 +1153,7 @@ export class PrimeiraFase extends Fase{
             limparTriangulos.setOnTermino(() => {
                 this.fase.animar(animacao);
                 this.fase.whiteboard.ativar(false);
-                this.fase.whiteboard.removerTodasEquacoes();
+                this.fase.whiteboard.removerEquacoes(x => x.nome === "SOMADOSANGULOS");
             });
         }
 

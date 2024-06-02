@@ -205,7 +205,10 @@ export class LadosProporcionais {
             semelhanca: `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
         }
 
-        const recolorirArestas = objetos.flatMap(objeto => objeto.edges).map(edge => colorirAngulo(edge.material.color.getHex(), 0x525252));
+        const recolorirArestas = objetos.flatMap(objeto => objeto.edges)
+                                        .map(    edge   => colorirAngulo(edge)
+                                                            .setValorInicial(edge.material.color.getHex())
+                                                            .setValorFinal(0x525252));
 
 
         objetos = objetos.sort((a,b) => a.edges[0].length > b.edges[0].length);
@@ -213,6 +216,8 @@ export class LadosProporcionais {
         const razao = Math.round(objetos[0].edges[0].length/objetos[1].edges[0].length * 100)/100
 
         const unidadeMedida = (x) => `${x*5}cm`
+
+        console.log(objetos);
         
 
         const dividirLados   = new AnimacaoSequencial(

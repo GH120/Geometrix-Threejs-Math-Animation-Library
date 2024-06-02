@@ -16,7 +16,7 @@ export class Divisao extends Animacao{
         this.frameCount = 90;
         this.delay = 60;
 
-        this.MARGEM_ERRO =  0.001;
+        this.MARGEM_ERRO =  0.05;
     }
 
     onStart(){
@@ -26,11 +26,11 @@ export class Divisao extends Animacao{
        const colorir = new AnimacaoSimultanea(
                 colorirAngulo(this.divisor)
                 .setValorFinal(0xff0000)
-                .setValorInicial(this.divisor.material.color)
+                .setValorInicial(this.divisor.material.color.getHex())
                 .setDuration(30), 
                 colorirAngulo(this.dividendo)
                 .setValorFinal(0x0000ff)
-                .setValorInicial(this.dividendo.material.color)
+                .setValorInicial(this.dividendo.material.color.getHex())
                 .setDuration(30)
         )
 
@@ -110,9 +110,9 @@ export class Divisao extends Animacao{
 
         const numero = dividendo/divisor;
 
-        const resto = numero%1;
+        const resto = (numero + this.MARGEM_ERRO)%1;
 
-        const clones = Math.round(numero - resto + this.MARGEM_ERRO)
+        const clones = Math.round(numero - resto)
 
         const dividir = [];
 

@@ -109,6 +109,15 @@ export default class MostrarValorAresta extends Output{
         return new MostrarTexto(this.texto)
                 .setDuration(50)
                 .setValorFinal(50)
-                .setOnStart(() => this.update())
+                .setOnStart(() => this.update({}))
+    }
+
+    aparecer(dentro){
+
+        if(dentro == false) return apagarCSS2(this.texto, this.scene);
+
+        return  apagarCSS2(this.texto).reverse()
+                                    .setOnTermino(() => null)
+                                    .setOnStart(() => this.update({dentro: true}))
     }
 }

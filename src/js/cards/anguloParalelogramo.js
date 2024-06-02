@@ -118,6 +118,8 @@ export class AnguloParalogramo {
 
         const fase = this.fase;
 
+        const paralelogramo = this.paralelogramoSelecionado
+
         this.controle = this.controleGeral();
 
         fase.adicionarControleDaCarta(this.controle);
@@ -128,6 +130,9 @@ export class AnguloParalogramo {
 
         fase.animar(dialogo);
 
+        const apagarValoresAresta = new AnimacaoSimultanea(...paralelogramo.edges.map(lado => lado.mostrarValorAresta.aparecer(false)))
+
+        fase.animar(apagarValoresAresta);
         //Planejamento:
 
         //1 - Dividir o paralelogramo em dois triângulos baseado no ângulo conhecido -> feito
@@ -163,24 +168,88 @@ export class AnguloParalogramo {
         this.verificadorDeHover = verificador; 
     }
 
-     //Controle intermediário, move um lado apenas
+    criarColorirArestaSelecionada(aresta, corFinal){
+
+        const fase = this.fase;
+
+        const corInicial = aresta.material.color.getHex();
+
+
+        if(!aresta.insideElipse) new InsideElipse(aresta, 0.05, fase.camera, fase.scene)
+
+        const colorir = new Output()
+                        .addInputs(
+                            aresta.insideElipse // Para saber se o mouse está proximo da elipse ao redor da aresta
+                        )
+                        .setUpdateFunction(function(novoEstado){
+
+                            const estado = this.estado;
+
+                            if(novoEstado.dentro && !estado.ativado){
+                                estado.ativado = true;
+
+                                if(estado.colorirAresta.execucaoTerminada()) 
+                                    estado.colorirAresta = animarColorirAresta(corInicial, corFinal);
+                                else
+                                    estado.colorirAresta.reverse(true);
+                                
+
+                                fase.animar(estado.colorirAresta);
+                            }
+
+                            if(novoEstado.dentro == false && estado.ativado){
+                                estado.ativado = false;
+                                
+                                estado.colorirAresta.reverse(true);
+
+                                fase.animar(estado.colorirAresta);
+                            }
+                        })
+                        .setEstadoInicial({
+                            ativado:false,
+                            colorirAresta: animarColorirAresta(corFinal, corInicial),
+                        });
+
+        function animarColorirAresta(inicial, final){
+            
+            const animacao = colorirAngulo(aresta)
+                            .setValorInicial(inicial)
+                            .setValorFinal(final)
+                            .voltarAoInicio(false)
+                            .setDuration(30)
+                            // .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
+
+            return animacao;
+        }
+
+        return colorir;
+    }
+
+    //Controle intermediário, move um lado apenas
     criarMoverLados(lado, ladoOposto){
 
         //Criar um suboutput para verificar se sobrevoa sobre um elemento?
 
         const carta = this;
 
-        if(!lado.draggable)       new Draggable(lado, this.fase.camera);
-        if(!lado.hoverable)       new Hoverable(lado, this.fase.camera);
-        if(!ladoOposto.hoverable) new Hoverable(ladoOposto, this.fase.camera);
+        const fase = this.fase;
+
+        new Draggable(lado, this.fase.camera);
+        new Hoverable(lado, this.fase.camera);
+        new Hoverable(ladoOposto, this.fase.camera);
+
+        if(!ladoOposto.insideElipse) new InsideElipse(ladoOposto, 0.05, fase.camera, fase.scene)
 
 
         const moverLados = new Output()
+                            .addInputs(
+                                lado.draggable, 
+                                lado.hoverable,
+                                ladoOposto.insideElipse
+                            )
                            .setUpdateFunction(function(novoEstado){
 
                                 const estado = this.estado;
-
-                                if(estado.finalizado) return;
 
                                 //Tratar seleção do lado principal
                                 //Transformar em suboutput?
@@ -196,6 +265,10 @@ export class AnguloParalogramo {
                                 }
                                 
                                 if(estado.mouseSobreLadoPrincipal && novoEstado.dragging && !estado.arrastando){
+
+                                    //Liga o output de arraste ao mostrarValorAresta
+                                    lado.mostrarValorAresta.removeInputs();
+                                    lado.mostrarValorAresta.addInputs(lado.draggable);
 
                                     estado.arrastando    = true;
                                     estado.ultimaPosicao = lado.getPosition();
@@ -248,8 +321,6 @@ export class AnguloParalogramo {
 
                                         estado.verificar = false;
 
-                                        estado.finalizado = true;
-
                                         //Avisa o controle principal qual lado foi selecionado
                                         this.notify({
                                             ladoSelecionado: ladoOposto, 
@@ -273,70 +344,10 @@ export class AnguloParalogramo {
                                 arrastar: false,
                                 ladoOpostoSelecionado: false,
                                 verificar: false,
-                                finalizado: false
                             })
-                           .addInputs(
-                                lado.draggable, 
-                                lado.hoverable,
-                                ladoOposto.hoverable
-                            );
 
         return moverLados;
 
-    }
-
-    criarColorirArestaSelecionada(aresta, corFinal){
-
-        const fase = this.fase;
-
-        const corInicial = aresta.material.color.getHex();
-
-        const colorir = new Output()
-                        .addInputs(
-                            new InsideElipse(aresta, 0.05, fase.camera, fase.scene) // Para saber se o mouse está proximo da elipse ao redor da aresta
-                        )
-                        .setUpdateFunction(function(novoEstado){
-
-                            const estado = this.estado;
-
-                            if(novoEstado.dentro && !estado.ativado){
-                                estado.ativado = true;
-
-                                if(estado.colorirAresta.execucaoTerminada()) 
-                                    estado.colorirAresta = animarColorirAresta(corInicial, corFinal);
-                                else
-                                    estado.colorirAresta.reverse(true);
-                                
-
-                                fase.animar(estado.colorirAresta);
-                            }
-
-                            if(novoEstado.dentro == false && estado.ativado){
-                                estado.ativado = false;
-                                
-                                estado.colorirAresta.reverse(true);
-
-                                fase.animar(estado.colorirAresta);
-                            }
-                        })
-                        .setEstadoInicial({
-                            ativado:false,
-                            colorirAresta: animarColorirAresta(corFinal, corInicial),
-                        });
-
-        function animarColorirAresta(inicial, final){
-            
-            const animacao = colorirAngulo(aresta)
-                            .setValorInicial(inicial)
-                            .setValorFinal(final)
-                            .voltarAoInicio(false)
-                            .setDuration(30)
-                            // .setCurva(x => -(Math.cos(Math.PI * x) - 1) / 2)
-
-            return animacao;
-        }
-
-        return colorir;
     }
 
 
@@ -728,7 +739,7 @@ export class AnguloParalogramo {
 
         const textbox = fase.createTextBox(equacao.html.innerText, [-5,0,0], 17, true);
 
-        textbox.id = "SOMADOSANGULOS";
+        textbox.nome = "SOMADOSANGULOS";
 
 
         //Passar elementocss2 ao invés da textbox?

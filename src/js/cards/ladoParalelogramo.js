@@ -179,7 +179,7 @@ export class LadoParalogramo {
         new Hoverable(lado, this.fase.camera);
         new Hoverable(ladoOposto, this.fase.camera);
 
-        if(!ladoOposto.InsideElipse) new InsideElipse(ladoOposto, 0.05, fase.camera, fase.scene)
+        if(!ladoOposto.insideElipse) new InsideElipse(ladoOposto, 0.05, fase.camera, fase.scene)
 
 
         const moverLados = new Output()
@@ -337,6 +337,9 @@ export class LadoParalogramo {
                     lado.removeAllOutputs();
                     ladoOposto.removeAllOutputs();
 
+                    console.log(lado.insideElipse)
+                    console.log(ladoOposto.insideElipse, carta.colorirArestas, 'testeElipse')
+
                     carta.colorirArestas.map(arestaColorida => arestaColorida.update({dentro:false}));
 
                     estado.ladosConhecidos++;
@@ -425,18 +428,14 @@ export class LadoParalogramo {
         const moverLado = new AnimacaoSequencial(
 
             mover(lado, lado.getPosition(), ladoOposto.getPosition())
-            .setDuration(60 * deslocamento.length()/3)
+            .setDuration(40 * deslocamento.length()/3)
+            .setDelay(60)
             .setOnExecution(atualizarValorAresta),
 
             mover(lado, lado.getPosition(), ultimaPosicao.clone())
-            .setDuration(60)
+            .setDuration(40)
             .setOnExecution(atualizarValorAresta),
-        )
-        .setOnStart(() => {
-            //Liga o output de arraste ao mostrarValorAresta
-            lado.mostrarValorAresta.removeInputs();
-            lado.mostrarValorAresta.addInputs(lado.draggable);
-        })
+        );
 
         const desenharEquacao = this.animacaoCriarEquacao(lado, ladoOposto, direcao.multiplyScalar(0.7))
 

@@ -122,7 +122,7 @@ export class Whiteboard {
 
         const elementoCSS2 = new CSS2DObject(htmlElement);
 
-        if(equacao.id) elementoCSS2.id = equacao.id;
+        if(equacao.nome) elementoCSS2.nome = equacao.nome;
 
         //Atualiza a posição para não ter equações em cima das outras
         const position = new THREE.Vector3(-0.5, 2-ListaEquacoes.length*1, 0);
@@ -161,9 +161,9 @@ export class Whiteboard {
         return this;
     }
 
-    removerTodasEquacoes(){
+    removerTodasEquacoes(filtro = x => x){
 
-        this.equacoes.map(equacao => this.scene.remove(equacao));
+        this.equacoes.filter(filtro).map(equacao => this.scene.remove(equacao));
 
         this.equacoes = [];
 

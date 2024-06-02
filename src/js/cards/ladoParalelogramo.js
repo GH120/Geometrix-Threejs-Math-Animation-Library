@@ -207,8 +207,12 @@ export class LadoParalogramo {
                                 
                                 if(estado.mouseSobreLadoPrincipal && novoEstado.dragging && !estado.arrastando){
 
+                                    //Liga o output de arraste ao mostrarValorAresta
+                                    lado.mostrarValorAresta.removeInputs();
+                                    lado.mostrarValorAresta.addInputs(lado.draggable);
+
                                     estado.arrastando    = true;
-                                    estado.ultimaPosicao = lado.origem.clone();
+                                    estado.ultimaPosicao = lado.getPosition();
                                     estado.direcao = ladoOposto.getPosition().sub(lado.getPosition()).normalize();
 
                                 }
@@ -391,9 +395,8 @@ export class LadoParalogramo {
 
 
     voltarAoInicio(lado, ultimaPosicao){
-        alert("Falhou");
 
-        const deslocamento = ultimaPosicao.clone().sub(lado.origem);
+        const deslocamento = ultimaPosicao.clone().sub(lado.getPosition());
 
         lado.origem.add(deslocamento);
         lado.destino.add(deslocamento);
@@ -412,16 +415,28 @@ export class LadoParalogramo {
     }
 
     criarEquacao(lado, ladoOposto, ultimaPosicao){
-        alert("Sucesso");
 
-        const deslocamento = ultimaPosicao.clone().sub(lado.origem);
+        const deslocamento = ultimaPosicao.clone().sub(lado.getPosition());
 
         const direcao = deslocamento.clone().normalize();
 
+        const atualizarValorAresta = () => lado.mostrarValorAresta.update({})
+
         const moverLado = new AnimacaoSequencial(
-            mover(lado, lado.getPosition(), ladoOposto.getPosition()).setDuration(60 * deslocamento.length()/3),
-            mover(lado, lado.getPosition(), ultimaPosicao.clone()).setDuration(60),
-        );
+
+            mover(lado, lado.getPosition(), ladoOposto.getPosition())
+            .setDuration(60 * deslocamento.length()/3)
+            .setOnExecution(atualizarValorAresta),
+
+            mover(lado, lado.getPosition(), ultimaPosicao.clone())
+            .setDuration(60)
+            .setOnExecution(atualizarValorAresta),
+        )
+        .setOnStart(() => {
+            //Liga o output de arraste ao mostrarValorAresta
+            lado.mostrarValorAresta.removeInputs();
+            lado.mostrarValorAresta.addInputs(lado.draggable);
+        })
 
         const desenharEquacao = this.animacaoCriarEquacao(lado, ladoOposto, direcao.multiplyScalar(0.7))
 
@@ -485,11 +500,11 @@ export class LadoParalogramo {
             new MostrarTexto(igualdade)
             .setOnStart(function(){
 
-                equacao.changeVariable(lado.variable.value + "cm", lado.variable.name);
+                equacao.changeVariable(lado.variable.value, lado.variable.name);
 
                 ladoOposto.variable.value = lado.variable.value;
 
-                igualdade.mudarTexto(equacao.html.textContent)
+                igualdade.mudarTexto(equacao.html.textContent + 'cm')
                 fase.scene.add(igualdade);
                 this.setProgresso(0)
             })

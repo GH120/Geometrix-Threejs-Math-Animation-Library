@@ -23,6 +23,8 @@ export default class Animacao {
 
             this.update(valor);
 
+            this.onExecution();
+
             if(this.stop) return;
 
             while (this.pause) yield this.frame; //se estiver pausado, continua executando// A FAZER
@@ -108,6 +110,11 @@ export default class Animacao {
         return this;
     }
 
+    setOnExecution(onExecution){
+        this.onExecution = onExecution;
+        return this;
+    }
+
     setOnDelay(onDelay){
         this.onDelay = onDelay;
         return this;
@@ -162,6 +169,10 @@ export default class Animacao {
     }
 
     onStart(){
+        return null;
+    }
+
+    onExecution(){
         return null;
     }
 

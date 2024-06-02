@@ -1,5 +1,8 @@
 export class Objeto{
 
+    //Refatorar para também adicionar inputs
+    outputs = {}
+
     //Cria a malha do objeto
     render(){
 

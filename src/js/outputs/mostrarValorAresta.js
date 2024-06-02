@@ -22,6 +22,8 @@ export default class MostrarValorAresta extends Output{
         this.texto = this.createMathJaxTextBox("null", [0,0,0]); 
         this.distanciaTextoAresta = 0.2
         this.tamanhoDaFonte       = 5;
+
+        aresta.mostrarValorAresta = this;
     }
 
     calcularPosicaoTexto(){

@@ -12,8 +12,6 @@ export class Clickable extends Input{
 
     this.outputMudarCursor(object, camera, container)
 
-    this.numeroClicks = 0;
-
     // Add event listeners for mouse down, move, and up events
     window.addEventListener('click', this.onClick.bind(this), false);
   }

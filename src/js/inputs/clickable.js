@@ -41,6 +41,9 @@ export class Clickable extends Input{
     this.mudarCursor = new Output([hover])
                       .setUpdateFunction(function(novoEstado) {
 
+
+                        if(!camera.fase || !camera.fase.settings || !camera.fase.setCursor) return;
+
                         const setCursor = camera.fase.settings.setCursor;
 
                         const temOutput = clickable.observers.filter(output => !output.ignorarOutput).length;

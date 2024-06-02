@@ -13,6 +13,7 @@ import InsideElipse from "../outputs/insideElipse";
 import MostrarTexto from "../animacoes/MostrarTexto";
 import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
 import { controleTremedeiraIdle, controleTremedeiraIdleAresta } from "../animacoes/idle";
+import { mover } from "../animacoes/mover";
 
 export class LadoParalogramo {
 
@@ -72,9 +73,6 @@ export class LadoParalogramo {
         const dialogo = new AnimacaoSequencial(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um conhecido para seu oposto e veja o que acontece"));
         
         dialogo.setNome("Dialogo Carta")
-
-        dialogo.setOnStart(  () => this.colorirArestas.map(colorir => colorir.update({dentro: true})));
-        dialogo.setOnTermino(() => this.colorirArestas.map(colorir => colorir.update({dentro: false})));
 
         fase.animar(dialogo)
 
@@ -418,14 +416,23 @@ export class LadoParalogramo {
 
         const deslocamento = ultimaPosicao.clone().sub(lado.origem);
 
-        lado.origem.add(deslocamento);
-        lado.destino.add(deslocamento);
-
-        lado.update();
-
         const direcao = deslocamento.clone().normalize();
 
-        return this.animacaoCriarEquacao(lado, ladoOposto, direcao.multiplyScalar(0.7));
+        const moverLado = new AnimacaoSequencial(
+            mover(lado, lado.getPosition(), ladoOposto.getPosition()).setDuration(60 * deslocamento.length()/3),
+            mover(lado, lado.getPosition(), ultimaPosicao.clone()).setDuration(60),
+        );
+
+        const desenharEquacao = this.animacaoCriarEquacao(lado, ladoOposto, direcao.multiplyScalar(0.7))
+
+        const animacao = new AnimacaoSequencial(
+                            moverLado,
+                            desenharEquacao
+                        );
+
+        this.fase.animar(animacao);
+
+        return animacao;
     }
 
     animacaoCriarEquacao(lado, ladoOposto, direcao){
@@ -478,7 +485,7 @@ export class LadoParalogramo {
             new MostrarTexto(igualdade)
             .setOnStart(function(){
 
-                equacao.changeVariable(lado.variable.value, lado.variable.name);
+                equacao.changeVariable(lado.variable.value + "cm", lado.variable.name);
 
                 ladoOposto.variable.value = lado.variable.value;
 
@@ -510,8 +517,6 @@ export class LadoParalogramo {
                             desenharChaves,
                             new AnimacaoSequencial(mostrarIgualdade, mudarValor, apagarEquacao),
                         );
-
-        fase.animar(animacao);
 
         return animacao;
     }

@@ -57,7 +57,7 @@ export default class Proporcionalidade {
 
         const fase = this.fase;
 
-        fase.debug = false;
+        // fase.debug = false;
 
 
         const objetosProporcionais = fase.informacao.objetosProporcionais;

@@ -709,7 +709,8 @@ export class AnguloParalogramo {
             fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos4)
         )
 
-        const mostrarValorArestas = new AnimacaoSimultanea(...paralelogramo.edges.map(lado => lado.mostrarValorAresta.aparecer(false)))
+        //Mudar isso para antes do final, 
+        const mostrarValorArestas = new AnimacaoSimultanea(...paralelogramo.edges.map(lado => lado.mostrarValorAresta.aparecer(true)))
 
         const animacao = new AnimacaoSequencial(dialogo1, dialogo2, dialogo3, dialogo4, mostrarValorArestas);
 
@@ -742,7 +743,7 @@ export class AnguloParalogramo {
 
             const offsetPosicional = new THREE.Vector3(-0.1,0.15,0)
 
-            animacoes.push(angulo.mostrarAngulo.animacao(false));
+            if(angulo.mostrarAngulo) animacoes.push(angulo.mostrarAngulo.animacao(false));
 
             animacoes.push(...novosAngulos.map(angle => new MostrarAngulo(angle, 2, offsetPosicional).addToFase(fase).animacao(true).filler(100)))
 
@@ -921,7 +922,10 @@ export class AnguloParalogramo {
                          )
                          .filler(250)
 
-        const posicoesVertices = paralelogramo.vertices.slice(1,4).map(vertice => vertice.getPosition().toArray());
+        //Consegue os vértices ordenados a partir do ângulo conhecido
+        const verticesEmRelacaoAoAngulo = circularShift(paralelogramo.vertices, estado.anguloConhecido.index);
+
+        const posicoesVertices = verticesEmRelacaoAoAngulo.slice(1,4).map(vertice => vertice.getPosition().toArray());
 
         //Mostrar uma nova aresta aparecendo no lugar do tracejado
         //Hard coded, depois generalizar
@@ -933,7 +937,7 @@ export class AnguloParalogramo {
 
         const edge = trianguloNovo.edges[2];
 
-        edge.material.color = 0xeeeeee;
+        edge.material = new THREE.MeshBasicMaterial({color: 0xeeeeee});
         edge.grossura = 0.024;
         edge.render();
 
@@ -975,10 +979,8 @@ export class AnguloParalogramo {
                                 this.animacaoEngrossarLado(edge)
                             )
 
-        console.log(paralelogramo.vertices.slice(0,3))
-
-        const nomeTrianguloSuperior = paralelogramo.vertices.slice(1,4).map(vertice => vertice.variable.name).join('');
-        const nomeTrianguloInferior = paralelogramo.vertices.filter((x,i) => i != 2).map(vertice => vertice.variable.name).join('');
+        const nomeTrianguloSuperior = verticesEmRelacaoAoAngulo.slice(1,4).map(vertice => vertice.variable.name).join('');
+        const nomeTrianguloInferior = verticesEmRelacaoAoAngulo.filter((x,i) => i != 2).map(vertice => vertice.variable.name).join('');
 
         const equacao = this.fase.createMathJaxTextBox(`\\Delta ${nomeTrianguloSuperior}`, trianguloNovo.edges[0].getPosition().clone().add(new THREE.Vector3(0,0.3,0)).toArray(), 5);
 
@@ -1037,6 +1039,8 @@ export class AnguloParalogramo {
                 .setUpdateFunction(function(valor){
                     lado.grossura = valor;
                     lado.update();
+
+                    console.log(lado.material.clone(), 'teste cor')
                 })
                 .setOnTermino(() =>{
                     lado.grossura = 0.024;
@@ -1098,3 +1102,21 @@ export class AnguloParalogramo {
 
     
 }
+
+function arrayRotate(arr, reverse=true) {
+    if (reverse) arr.unshift(arr.pop());
+    else arr.push(arr.shift());
+    return arr;
+  }
+
+  function circularShift(array, count){
+    
+    let copia = array.map(e => e);
+
+    for(let i =0; i< count; i++ ){
+
+        arrayRotate(copia);
+    }
+
+    return copia;
+  }

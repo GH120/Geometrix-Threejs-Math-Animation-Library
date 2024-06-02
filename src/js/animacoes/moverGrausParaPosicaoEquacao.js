@@ -10,17 +10,19 @@ import * as THREE from 'three';
 export class MoverGrausParaPosicaoEquacao extends AnimacaoSimultanea{
 
 
-    constructor(angulos, fase){
+    constructor(angulos, fase, equationFunction = null){
 
         super();
         this.angulos = angulos; 
         this.fase    = fase;
 
         this.setAnimacoes([this.moverGrausParaPosicaoEquacao(angulos)]);
+
+        if(equationFunction) 
+            this.equationFunction = equationFunction.bind(this);
     }
 
     mostrarGrausAparecendo(angle, updateMostrarAnguloCadaFrame = false, mostrarEdesaparecer=true){
-
 
         if(!angle.mostrarAngulo){
 
@@ -119,6 +121,7 @@ export class MoverGrausParaPosicaoEquacao extends AnimacaoSimultanea{
 
         //Funções auxiliares
 
+        //Transformar isso em método da classe que recebe os valores dos ângulos
         function criarEquacao(){
             const valores = angulos.map( angulo => angulo.variable.getValue());
 
@@ -126,22 +129,13 @@ export class MoverGrausParaPosicaoEquacao extends AnimacaoSimultanea{
             const y = new Value(valores[1]);
             const z = new Value(valores[2]);
 
-            const equacao = new Equality(
-                                new Addition(
-                                    new Addition(
-                                        x,
-                                        y
-                                    ),
-                                    z
-                                ),
-                                new Value("180°")
-                            )
+            const equacao = moverGraus.equationFunction(x,y,z);
 
-            fase.informacao.equacao = {equacao:equacao, angulos:[x,y,z]}
+            fase.informacao.equacao = {equacao:equacao, angulos:[x,y,z]} //Gambiarra, refatorar depois
+            moverGraus.equacao = equacao;
+            moverGraus.equacao.nome = "SOMADOSANGULOS" //Gambiarra, juntar objetosCSS2D,elementosCSS2D e equações, id predefinido
 
             novoElemento = new CSS2DObject(equacao.html);
-
-            novoElemento.nome = "SOMADOSANGULOS"
 
             novoElemento.position.copy(new THREE.Vector3(0,0,0));
 
@@ -288,6 +282,20 @@ export class MoverGrausParaPosicaoEquacao extends AnimacaoSimultanea{
             fase.animar(animacao);
         }
 
+    }
+
+    equationFunction(x,y,z){
+
+        return new Equality(
+                    new Addition(
+                        new Addition(
+                            x,
+                            y
+                        ),
+                        z
+                    ),
+                    new Value("180°")
+                );
     }
 
 }

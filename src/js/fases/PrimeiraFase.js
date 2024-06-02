@@ -57,8 +57,6 @@ export class PrimeiraFase extends Fase{
         this.textBoxes = {};
 
         this.setupObjects();
-        this.createInputs();
-        this.createOutputs();
 
         // this.outputTesteClick();
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
@@ -163,93 +161,6 @@ export class PrimeiraFase extends Fase{
         this.objetos = [this.paralelogramo1, this.paralelogramo2];
     }
 
-    //Objetos temporários ou secundários
-    setupObjects2(){
-
-        const vertexPositions = this.triangulo.vertices.map(vertice => vertice.getPosition().toArray());
-
-        this.triangulo2 = new Poligono(vertexPositions)
-                          .configuration({grossura:0.025, raioVertice:0.04, raioAngulo:0.2})
-                          .escala(0.5,0.5,0.5)
-                          .translacao(-3,0,0);
-
-        console.log(this.triangulo2.positions)
-
-        this.triangulo2.render();
-    }
-
-    //Onde toda a lógica da fase é realizada, a sequência de animações/texto
-    levelDesign(){
-
-        const dialogo1 = [
-            "Vimos que dois poligonos são semelhantes quando seus ângulos são congruentes(iguais  overtext )",
-            "e seus respectivos lados são proporcionais.", 
-            "Como os triângulos são os polígonos mais simples,",
-            "também são os mais fáceis de ver se são semelhantes."
-        ]
-
-        const dialogo2 = [
-            "Precisamos que os ângulos sejam iguais e os lados proporcionais para termos semelhança",
-            "Se soubermos dois ângulos, conseguimos descobrir o terceiro",
-            "Vimos isso na soma dos ângulos sendo igual a 180°",
-            "Assim, tente mover os ângulos como na última fase:",
-            
-        ]
-
-        const dialogo3 = [
-            "Arraste os ângulos para os buracos perto do tracejado",
-            "Muito bom!",
-            "Agora faça o mesmo para o ângulo restante"
-        ]
-
-        const dialogo4 = [
-            "Como pode ver, os ângulos somam 180°, como a carta já dizia",
-            "Agora clique nos ângulos vermelhos para apagá-los"
-        ]
-
-        const dialogo5 = [
-            "Como acabou de ver, dois ângulos determinam um terceiro no triângulo",
-            "E com três ângulos temos um único tipo de triângulo",
-            "Agora use a carta de proporcionalidade para ver o que isso significa"
-        ]
-
-        const dialogo6 = [
-            "Está vendo o triângulo maior, ele tem os mesmos ângulos que o primeiro",
-            "Tente arrastar o slider para aumentar o tamanho do primeiro"
-        ]
-
-        const dialogo7 = [
-            "Como pode ver, o segundo triângulo é apenas uma versão maior do primeiro",
-            "Eles são semelhantes",
-            "Todo triângulo com os mesmos três ângulos é o um só, apenas mudando a escala",
-            "Como dois ângulos determinam o terceiro,", //Glow nos dois vermelho, glow azul no terceiro, revesar entre os três
-            "Dois ângulos iguais significam triângulos semelhantes", //Mostra parte da carta aparecendo 
-            "Esse é o primeiro caso de semelhança, AA (Ângulo Ângulo), vamos ver os outros"
-        ]
-
-        const dialogo8 = [
-            "O segundo caso de semelhança de triângulos é bem simples",
-            "LLL (três lados proporcionais)", //glowup dos lados mostrando a razão entre eles
-            "Como pode ver, ele também é só uma escala",
-            "Arraste o slider e observe a proporcionalidade",
-            "Conseguimos então o segundo caso" //Mostra outra parte da carta aparecendo 
-        ]
-
-        const dialogo9 = [
-            "O terceiro caso é o de dois lados do mesmo angulo proporcionais, LAL.", //Glow up dos lados do ângulo
-            "Perceba, é possível pegar esses dois lados e prolongá-los",
-            "e assim se obtem o segundo triângulo",
-            "Tente arrastar os lados",
-            "Conseguimos o ultimo caso" //Mostra a ultima parte da carta
-        ]
-
-        const dialogo10 = [
-            "Com isso temos nossa nova carta, semelhança de triângulos.", //(mostra a carta) 
-            "Se satisfazer algum dos três casos, então dois triângulos são semelhantes.", //Rapidamente ilustra cada um ao lado
-            "Use ela livremente para resolver os problemas a seguir"
-        ]
-    }
-
     aula1(){
 
         const fase = this;
@@ -351,7 +262,7 @@ export class PrimeiraFase extends Fase{
             arraste1.criarIdling();
             arraste2.criarIdling();
 
-            fase.debug = false;
+            // fase.debug = false;
 
             const mudarProblema = new Output()
                                  .addInputs(arraste1, arraste2)
@@ -610,35 +521,6 @@ export class PrimeiraFase extends Fase{
         
         fase.animar(animacao.setOnTermino(() => fase.Configuracao5()))
         
-    }
-
-    createInputs(){
-        //Inputs
-        const vertices = this.triangulo.vertices;
-        const angles   = this.triangulo.angles;
-
-        //Adiciona o clickable ao vertice, agora todo vertice tem vertice.clicable
-        vertices.forEach((vertice) => new Clickable(vertice, this.camera));
-        vertices.forEach((vertice) => new Draggable(vertice, this.camera));
-
-        //Adiciona o draggable ao angulo, agora todo angulo tem angulo.draggable
-        angles.map((angle) => new Draggable(angle, this.camera));
-
-    }
-
-    createInputs2(){
-
-        const copias = this.triangulo.angles.map(angle => angle.copiaDoAngulo);
-
-        copias.filter(x => x != undefined).forEach(copia => new Clickable(copia, this.camera));
-    }
-
-    createOutputs(){
-        //Outputs
-        // this.outputClickVertice   = this.triangulo.vertices.map(vertex =>   this.criarTracejado(vertex))
-        // this.outputDragAngle      = this.triangulo.angles.map(  angle =>    this.criarMovimentacaoDeAngulo(angle))
-        // this.outputEscolheuErrado = this.triangulo.angles.map(  angle =>    this.outputAnguloErrado(angle))
-        // this.outputMoverVertice   = this.triangulo.vertices.map(vertice => new MoverVertice(vertice));
     }
 
     
@@ -1039,9 +921,7 @@ export class PrimeiraFase extends Fase{
             arraste1.criarIdling();
             arraste2.criarIdling();
 
-            const valorConhecido = new Variable(Math.round(this.estado.anguloConhecido.degrees) + '°');
-
-            console.log("valor", valorConhecido);
+            const valorConhecido = Math.round(this.estado.anguloConhecido.degrees) + '°';
 
             const equacao = new Equality(new Addition(new Variable('X'), new Variable(valorConhecido)), new Variable("180°"))
     
@@ -1055,6 +935,7 @@ export class PrimeiraFase extends Fase{
 
         }
 
+        //Talvez mover isso para o controle do somar ângulos
         controleEquacoes(juncao1, juncao2, equacao){
         
             const fase = this.fase;
@@ -1155,7 +1036,7 @@ export class PrimeiraFase extends Fase{
             limparTriangulos.setOnTermino(() => {
                 this.fase.animar(animacao);
                 this.fase.whiteboard.ativar(false);
-                this.fase.whiteboard.removerEquacoes(x => x.nome === "SOMADOSANGULOS");
+                this.fase.whiteboard.removerTodasEquacoes(x => x.nome === "SOMADOSANGULOS");
             });
         }
 

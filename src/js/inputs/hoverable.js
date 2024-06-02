@@ -23,11 +23,11 @@ export class Hoverable extends Input {
     // this.verificarPeriodicamente()
     
     //Manda os observadores atualizarem
-    this.notify({dentro: isInside});
+    this.notify({dentro: isInside, position: (isInside)? this.intersectouObjeto(event,this.object).point : null});
 
     this.isInside = isInside;
 
-    console.log(isInside)
+    console.log(isInside, (isInside)? this.intersectouObjeto(event,this.object).point : null)
   }
 
   verificarPeriodicamente(isInside){

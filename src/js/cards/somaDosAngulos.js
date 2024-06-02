@@ -154,6 +154,9 @@ export class SomaDosAngulosTriangulo {
 
                                 this.estado.valido = novoEstado.dentro && renderizado;
 
+
+                                if(!this.estado.valido) return;
+
                                 carta.trianguloSelecionado = triangulo;
 
                                 this.notify({dentro: novoEstado.dentro, triangulo: triangulo})

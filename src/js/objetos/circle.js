@@ -56,6 +56,8 @@ export default class Circle extends Objeto{
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(posicoes, 3));
 
         this.mesh = new THREE.Mesh(geometry, this.material);
+
+        return this;
     }
 
     circunscrever(triangulo){

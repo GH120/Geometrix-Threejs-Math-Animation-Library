@@ -987,6 +987,8 @@ export class PrimeiraFase extends Fase{
                             const resultado = new Equality(new Variable('X'), new Variable((180 - parseInt(valorConhecido.getValue()) + "°")))
     
                             resolverEquacao.equacaoNova = new CSS2DObject(resultado.html);
+
+                            resolverEquacao.equacaoNova.nome = "SOMADOSANGULOS" //Gambiarra, fazer id para objeto equação
     
                             estado.equacaoAtual = resultado;
     
@@ -1075,7 +1077,7 @@ export class PrimeiraFase extends Fase{
 
         
 
-        if(this.debug && this.debugProblem > this.progresso){
+        if(this.debug){
 
             super.update();
             super.update();

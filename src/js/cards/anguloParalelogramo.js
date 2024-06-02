@@ -25,6 +25,7 @@ import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
 import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
 import { controleTremedeiraIdleAresta } from "../animacoes/idle";
+import Circle from "../objetos/circle";
 
 //Consertar: mostrar igualdade de ângulo (valor inicial cortando delta YZW)
 //           tamanho dos vertices (Muito pequeno)
@@ -157,7 +158,15 @@ export class AnguloParalogramo {
 
                                 const paralelogramoRenderizado = paralelogramo.renderedInScene();
 
+                                const posicao = novoEstado.position;
+
+                                // if(posicao) new Circle(posicao, 0.1, 0.05).render().addToScene(scene).update()
+
                                 this.estado.valido = novoEstado.dentro && paralelogramoRenderizado;
+
+                                if(!this.estado.valido) return;
+
+                                this.ativar(false);
 
                                 carta.paralelogramoSelecionado = paralelogramo;
 
@@ -494,9 +503,10 @@ export class AnguloParalogramo {
                             carta.fase
                         );
 
-                        const posicoesVertices = paralelogramo.vertices.filter((x,i) => i != 2).map(vertice => vertice.getPosition().toArray());
+                        const verticesEmRelacaoAoAngulo = circularShift(paralelogramo.vertices, estado.anguloConhecido.index);
 
-
+                        const posicoesVertices = verticesEmRelacaoAoAngulo.filter((x,i) => i != 2).map(vertice => vertice.getPosition().toArray());
+                
                         const trianguloInferior = new Poligono(posicoesVertices)
                                                     .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.3})
                                                     .render()
@@ -591,6 +601,8 @@ export class AnguloParalogramo {
 
         const fase = this.fase;
         const paralelogramo = this.paralelogramoSelecionado;
+
+        console.log(paralelogramo)
 
         fase.debug = false;
 

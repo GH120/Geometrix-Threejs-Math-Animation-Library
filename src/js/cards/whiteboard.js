@@ -133,8 +133,6 @@ export class Whiteboard {
 
         ListaEquacoes.push(elementoCSS2);
 
-        alert(equacao.nome);
-
         console.log(ListaEquacoes, elementoCSS2, equacao)
 
         return elementoCSS2;
@@ -165,11 +163,11 @@ export class Whiteboard {
         return this;
     }
 
-    removerTodasEquacoes(filtro = x => x){
+    removerTodasEquacoes(eliminar = x => x){
 
-        this.equacoes.filter(filtro).map(equacao => this.scene.remove(equacao));
+        this.equacoes.filter(eliminar).map(equacao => this.scene.remove(equacao));
 
-        this.equacoes = [];
+        this.equacoes = this.equacoes.filter(x => !eliminar(x));
 
         return this;
     }

@@ -75,7 +75,7 @@ export default class ResolverEquacao extends Output{
                                   .reverse()
                                   .setOnStart  (() => {
 
-                                    fase.whiteboard.adicionarEquacao({html:equacaoNova.element});
+                                    fase.whiteboard.adicionarEquacao({html:equacaoNova.element, nome: equacaoNova.nome}); //Gambiarra, mudar depois com classe equação objeto
 
                                     this.notify({
                                         novaEquacao: fase.whiteboard.equacoes[fase.whiteboard.equacoes.length - 1]

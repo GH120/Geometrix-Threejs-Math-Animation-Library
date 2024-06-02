@@ -98,6 +98,11 @@ export class LadoParalogramo {
 
                                 this.estado.valido = novoEstado.dentro && paralelogramoRenderizado;
 
+
+                                if(!this.estado.valido) return;
+
+                                this.ativar(false);
+                                
                                 carta.paralelogramoSelecionado = paralelogramo;
 
                             })

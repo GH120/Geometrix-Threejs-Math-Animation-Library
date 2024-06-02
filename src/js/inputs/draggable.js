@@ -108,7 +108,7 @@ export class Draggable extends Input{
 
                         const temOutput = draggable.observers.filter(output => !output.ignorarOutput).length;
 
-                        if(!camera.fase || !camera.fase.settings || !camera.fase.settings.setCursor) return;
+                        // if(!camera.fase || !camera.fase.settings || !camera.fase.settings.setCursor) return;
 
                         //Funções auxiliares
                         const setCursor = (cursor) => {

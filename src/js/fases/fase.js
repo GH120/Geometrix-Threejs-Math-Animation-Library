@@ -320,7 +320,7 @@ export class Fase {
 
         // Create a CSS2DObject and add it to the scene
         const objectivesLabel = new CSS2DObject(objectivesHtml);
-        objectivesLabel.position.set(-6, 0, 0);
+        objectivesLabel.position.set(6, 1.5, 0);
 
         this.caixaObjetivos = objectivesLabel;
 

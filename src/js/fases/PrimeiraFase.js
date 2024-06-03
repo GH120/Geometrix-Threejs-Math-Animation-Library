@@ -58,6 +58,8 @@ export class PrimeiraFase extends Fase{
 
         this.createCaixaObjetivos();
 
+        this.text.position.copy(new THREE.Vector3(0,4,0))
+
         // this.outputTesteClick();
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
 
@@ -918,9 +920,15 @@ export class PrimeiraFase extends Fase{
 
             this.fase.cartas = cartas;
 
-            // if(ladosProporcionais && angulosIguais){
 
-            // }
+            //Adiciona a caixa de objetivos de novo para orientar o usuário
+            const fase = this.fase;
+
+            const mostrarCaixaObjetivos = apagarCSS2(fase.caixaObjetivos)
+                                         .reverse()
+                                         .setOnStart(() => fase.scene.add(fase.caixaObjetivos))
+
+            fase.animar(mostrarCaixaObjetivos);
         }
 
         criarEquacoes(){

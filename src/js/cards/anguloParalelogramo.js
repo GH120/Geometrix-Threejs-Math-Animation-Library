@@ -460,8 +460,8 @@ export class AnguloParalogramo {
                                             // mover(ladoOposto, ladoOposto.getPosition(), posicaoOriginal.clone())
                                          );
 
-                        const colorir1  = colorirAngulo(lado).setValorInicial(lado.material.color.getHex()).setValorFinal(cor);
-                        const colorir2  = colorirAngulo(ladoOposto).setValorInicial(ladoOposto.material.color.getHex()).setValorFinal(cor);
+                        const colorir1  = colorirAngulo(lado).setValorInicial(lado.material.color.getHex()).setValorFinal(cor).voltarAoInicio(false);
+                        const colorir2  = colorirAngulo(ladoOposto).setValorInicial(ladoOposto.material.color.getHex()).setValorFinal(cor).voltarAoInicio(false);
 
                         if(estado.ladosMovidos == 1){
 
@@ -973,15 +973,18 @@ export class AnguloParalogramo {
 
         const colorirCinza = animacaoIndependente(() =>
                                 this.fase.animar(
-                                          new AnimacaoSequencial()
+                                          new AnimacaoSimultanea()
                                           .setAnimacoes(
                                                 paralelogramo.edges.map(lado => colorirAngulo(lado)
                                                                                 .setValorInicial(lado.material.color.getHex())
                                                                                 .setValorFinal(0x525252)
+                                                                                .voltarAoInicio(false)
+                                                                                .setDuration(60)
                                                                     )
                                           )
                                 )
                             )
+                            .setDuration(60)
 
         const mostrarLados = new AnimacaoSequencial(
                                 new AnimacaoSimultanea(
@@ -1037,11 +1040,8 @@ export class AnguloParalogramo {
                     moverDeVolta
                 ),
                 moverFinal,  
-                mostrarLados,
-                new AnimacaoSimultanea(
-                    colorirCinza,
-                    aparecerTriangulo
-                )
+                mostrarLados.setOnTermino(() => paralelogramo.edges.map(edge => {edge.material = new THREE.MeshBasicMaterial({color:0x525252}); edge.update()})),
+                aparecerTriangulo
         );
     }
 
@@ -1068,7 +1068,6 @@ export class AnguloParalogramo {
                     lado.grossura = valor;
                     lado.update();
 
-                    console.log(lado.material.clone(), 'teste cor')
                 })
                 .setOnTermino(() =>{
                     lado.grossura = 0.024;

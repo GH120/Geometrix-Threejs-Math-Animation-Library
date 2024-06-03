@@ -533,7 +533,7 @@ export class AnguloParalogramo {
 
                                             carta.fase.animacaoDialogo(carta.dialogos.divisaoAnguloIgual7),
                                             
-                                            carta.animacaoMostrarGrausAparecendo(anguloOposto, false, false),
+                                            carta.animacaoMostrarGrausAparecendo(anguloOposto, false, false).setCheckpoint(false),
 
                                             new AnimacaoSimultanea(
                                                 new ApagarPoligono(estado.trianguloSuperior, true),
@@ -549,6 +549,7 @@ export class AnguloParalogramo {
                                                 })
 
                                             )
+                                            .setCheckpoint(false)
                                         )
                                         .setNome("Dialogo Carta")
                                         .setDelay(100)
@@ -997,7 +998,19 @@ export class AnguloParalogramo {
         const nomeTrianguloSuperior = verticesEmRelacaoAoAngulo.slice(1,4).map(vertice => vertice.variable.name).join('');
         const nomeTrianguloInferior = verticesEmRelacaoAoAngulo.filter((x,i) => i != 2).map(vertice => vertice.variable.name).join('');
 
-        const equacao = this.fase.createMathJaxTextBox(`\\Delta ${nomeTrianguloSuperior}`, trianguloNovo.edges[0].getPosition().clone().add(new THREE.Vector3(0,0.3,0)).toArray(), 5);
+
+        const comprimentoLado = paralelogramo.edges[0].length;
+
+        const posicaoEquacao = paralelogramo.vertices[1].getPosition()
+                                                        .add(new THREE.Vector3(paralelogramo.edges[1].length * 0.5, comprimentoLado * 0.1 + 0.1,0))
+                                                        .toArray();
+
+        const tamanhoFonte   = 3 * Math.sqrt(comprimentoLado);
+
+        //Posição das arestas em 0,0,0, algum bug
+        // paralelogramo.edges.map(edge => new Circle(edge.getPosition(), 0.1, 0.1).render().addToScene(this.fase.scene).update())
+
+        const equacao = this.fase.createMathJaxTextBox(`\\Delta ${nomeTrianguloSuperior}`, posicaoEquacao , tamanhoFonte);
 
         const aparecerEquacao = apagarCSS2(equacao)
                                 .reverse()
@@ -1005,7 +1018,7 @@ export class AnguloParalogramo {
                                 .setOnStart(() => this.fase.scene.add(equacao));
 
         const mudarEquacao = new MostrarTexto(equacao)
-                             .setOnStart( () => equacao.mudarTexto(`\\Delta ${nomeTrianguloSuperior} \\equiv \\Delta ${nomeTrianguloInferior}`, 4))
+                             .setOnStart( () => equacao.mudarTexto(`\\Delta ${nomeTrianguloSuperior} \\equiv \\Delta ${nomeTrianguloInferior}`, tamanhoFonte * 0.8))
                              .setValorInicial(80)
                              .setValorFinal(200)
                              .setCurva(x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)

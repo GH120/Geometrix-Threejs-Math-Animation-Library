@@ -51,13 +51,20 @@ export class LadoParalogramo {
     
     accept(){
 
+        const fase = this.fase;
+
         const paralelogramo    = this.paralelogramoSelecionado
 
         const todosLadosConhecidos = paralelogramo.edges.filter(edge => edge.variable.value).length == paralelogramo.edges.length;
 
-        alert(`paralelogramo ${(paralelogramo)? "encontrado" : "não encontrado"}`);
+        if(!paralelogramo){
+            fase.animar(fase.animacaoDialogo('Paralelogramo não encontrado, tente de novo'));
+        }
 
-        alert(`paralelogramo ${(!todosLadosConhecidos) ? "retângulo: ACEITO" : "não retângulo: REJEITADO"}`);
+
+        if(!todosLadosConhecidos){
+            fase.animar(fase.animacaoDialogo('Paralelogramo tem todos os lados conhecidos, tente outro'));
+        }
 
         return paralelogramo && !todosLadosConhecidos;
     }
@@ -92,21 +99,24 @@ export class LadoParalogramo {
         const carta = this;
 
         const verificador = new Output()
+                            .setName('Verificador Hover')
                             .setUpdateFunction(function(novoEstado){
 
                                 const paralelogramoRenderizado = paralelogramo.renderedInScene();
 
                                 this.estado.valido = novoEstado.dentro && paralelogramoRenderizado;
 
-
                                 if(!this.estado.valido) return;
 
-                                this.ativar(false);
-                                
+                                //Desativa todos os verificadores
+                                carta.outputs.filter (output => output.name == 'Vericador Hover')
+                                             .forEach(verificador => verificador.ativar(false));
+
+                                //Verificar de novo, dando problemas
                                 carta.paralelogramoSelecionado = paralelogramo;
 
                             })
-                            .addInputs(paralelogramo.hoverable);
+                            .addInputs(paralelogramo.hoverable)
 
         this.outputs.push(verificador);
 

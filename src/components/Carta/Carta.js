@@ -36,6 +36,9 @@ function Carta(props) {
             //Se sim, processa
             carta.process();
 
+            //Limpa todas as cartas da fase
+            settings.fase.carta = []
+
             settings.ativarMenuCartas(false); //Fecha o menu de cartas
 
         }

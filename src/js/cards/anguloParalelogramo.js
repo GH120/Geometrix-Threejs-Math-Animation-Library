@@ -105,15 +105,26 @@ export class AnguloParalogramo {
     
     accept(){
 
+        const fase = this.fase;
+
         const paralelogramo    = this.paralelogramoSelecionado
 
-        const todosLadosConhecidos = false;
 
-        alert(`paralelogramo ${(paralelogramo)? "encontrado" : "não encontrado"}`);
+        if(!paralelogramo){
+            fase.animar(fase.animacaoDialogo('Paralelogramo não encontrado, tente de novo'));
 
-        alert(`paralelogramo com ângulos desconhecidos:${(!todosLadosConhecidos) ? " SIM - Aceito" : "NÃO - Rejeitado"}`);
+            return false;
+        }
 
-        return paralelogramo && !todosLadosConhecidos;
+        const todosAngulosConhecidos = paralelogramo.angles.filter(angle => angle.variable.value).length == paralelogramo.numeroVertices;
+
+        if(todosAngulosConhecidos){
+            fase.animar(fase.animacaoDialogo('Paralelogramo tem todos os angulos conhecidos, tente outro'));
+
+            return false;
+        }
+
+        return true;
     }
 
     process(){
@@ -156,6 +167,7 @@ export class AnguloParalogramo {
         const carta = this;
 
         const verificador = new Output()
+                            .setName('Verificador Hover')
                             .setUpdateFunction(function(novoEstado){
 
                                 const paralelogramoRenderizado = paralelogramo.renderedInScene();
@@ -168,13 +180,15 @@ export class AnguloParalogramo {
 
                                 if(!this.estado.valido) return;
 
-                                this.ativar(false);
+                                //Desativa todos os verificadores
+                                carta.outputs.filter (output => output.name == 'Vericador Hover')
+                                             .forEach(verificador => verificador.ativar(false));
 
                                 //Verificar de novo, dando problemas
                                 carta.paralelogramoSelecionado = paralelogramo;
 
                             })
-                            .addInputs(paralelogramo.hoverable);
+                            .addInputs(paralelogramo.hoverable)
 
         this.outputs.push(verificador);
 

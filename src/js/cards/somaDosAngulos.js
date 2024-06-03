@@ -83,13 +83,15 @@ export class SomaDosAngulosTriangulo {
     
     accept(){
 
+        const fase = this.fase;
+
         const paralelogramo    = this.trianguloSelecionado
 
         const todosLadosConhecidos = false;
 
-        alert(`paralelogramo ${(paralelogramo)? "encontrado" : "não encontrado"}`);
-
-        alert(`paralelogramo com ângulos desconhecidos:${(!todosLadosConhecidos) ? " SIM - Aceito" : "NÃO - Rejeitado"}`);
+        if(!paralelogramo){
+            fase.animar(fase.animacaoDialogo('Paralelogramo não encontrado, tente de novo'));
+        }
 
         return paralelogramo && !todosLadosConhecidos;
     }
@@ -143,32 +145,37 @@ export class SomaDosAngulosTriangulo {
 
     //OUTPUTS
 
-    criarVerificadorDeHover(triangulo, scene, camera){
+    criarVerificadorDeHover(paralelogramo, scene, camera){
 
         const carta = this;
 
         const verificador = new Output()
+                            .setName('Verificador Hover')
                             .setUpdateFunction(function(novoEstado){
 
-                                const renderizado = triangulo.renderedInScene();
+                                const paralelogramoRenderizado = paralelogramo.renderedInScene();
 
-                                this.estado.valido = novoEstado.dentro && renderizado;
+                                const posicao = novoEstado.position;
 
+                                // if(posicao) new Circle(posicao, 0.1, 0.05).render().addToScene(scene).update()
+
+                                this.estado.valido = novoEstado.dentro && paralelogramoRenderizado;
 
                                 if(!this.estado.valido) return;
 
-                                carta.trianguloSelecionado = triangulo;
+                                //Desativa todos os verificadores
+                                carta.outputs.filter (output => output.name == 'Vericador Hover')
+                                             .forEach(verificador => verificador.ativar(false));
 
-                                this.notify({dentro: novoEstado.dentro, triangulo: triangulo})
-
-                                this.ativar(false);
+                                //Verificar de novo, dando problemas
+                                carta.paralelogramoSelecionado = paralelogramo;
 
                             })
-                            .addInputs(triangulo.hoverable);
+                            .addInputs(paralelogramo.hoverable)
 
         this.outputs.push(verificador);
 
-        return verificador; 
+        this.verificadorDeHover = verificador; 
     }
 
 

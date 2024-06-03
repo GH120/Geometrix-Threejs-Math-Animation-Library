@@ -211,17 +211,18 @@ export class LadosProporcionais {
                                                             .setValorFinal(0x525252));
 
 
-        objetos = objetos.sort((a,b) => a.edges[0].length > b.edges[0].length);
+        console.log([...objetos.map(objeto => objeto.edges[0].length)]);
+        
 
-        const razao = Math.round(objetos[0].edges[0].length/objetos[1].edges[0].length * 100)/100
+        objetos.sort((a,b) => a.edges[0].length - b.edges[0].length);
+
+        const razao = Math.round(objetos[1].edges[0].length/objetos[0].edges[0].length * 100)/100
 
         const unidadeMedida = (x) => `${x*5}cm`
 
-        console.log(objetos);
-        
 
         const dividirLados   = new AnimacaoSequencial(
-            fase.animacaoDividirLadosIguais(objetos[1], objetos[0], unidadeMedida),
+            fase.animacaoDividirLadosIguais(objetos[0], objetos[1], unidadeMedida),
             fase.animacaoEquacoesVirandoUmaSo('mostrarRazaoLados', equacoes.ladosIguais(razao), 1),
             new AnimacaoSimultanea(...recolorirArestas)
         );

@@ -604,7 +604,7 @@ export class AnguloParalogramo {
 
         console.log(paralelogramo)
 
-        fase.debug = false;
+        // fase.debug = false;
 
 
         const n = paralelogramo.numeroVertices;

@@ -35,7 +35,14 @@ export default class ExecutarAnimacaoIdle extends Output{
 
         const fase = this.fase;
 
+        animacaoIdle.idle = true;
+
 
         setTimeout(() => (animacaoIdle.idle)? fase.animar(animacaoIdle) : null, this.delay * 1000);
+    }
+
+    transitionToCompletedAnimation(curva = curvas.easeInOutBack){
+        this.animacaoIdle.idle = false;
+        this.animacaoIdle.setCurva(curva);
     }
 }

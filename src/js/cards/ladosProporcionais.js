@@ -3,7 +3,7 @@
 //Se tiver todos os lados proporcionais, então comprime eles na propriedade lados proporcionais (com razão lado1/lado2 = x)
 //Soma dos angulos internos de um triângulo é 180°
 
-import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente } from "../animacoes/animation";
+import Animacao, { AnimacaoSequencial, AnimacaoSimultanea, animacaoIndependente, curvas } from "../animacoes/animation";
 import { apagarCSS2 } from "../animacoes/apagarCSS2";
 import { colorirAngulo } from "../animacoes/colorirAngulo";
 import { TextoAparecendo } from "../animacoes/textoAparecendo";
@@ -30,6 +30,7 @@ import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
 import imagemGrama from '../../assets/grass_bermuda_01_alpha_4k.png'
 import { MoverGrausParaPosicaoEquacao } from "../animacoes/moverGrausParaPosicaoEquacao";
+import { controleHitboxTransparente, mostrarHitboxTransparente } from "../animacoes/idle";
 
 //Consertar: mostrar igualdade de ângulo (valor inicial cortando delta YZW)
 //           tamanho dos vertices (Muito pequeno)
@@ -47,6 +48,8 @@ export class LadosProporcionais {
         this.whiteboard = whiteboard;
 
         this.outputs = [];
+
+        this.controlesHighlight = [];
     }
 
     static imagem = this.imagem = imagemGrama;
@@ -70,6 +73,7 @@ export class LadosProporcionais {
         for(const objeto of objetos){
 
             if(!objeto.clickable) new Clickable(objeto, fase.camera);
+            if(!objeto.hoverable) new Hoverable(objeto, fase.camera);
             
             const controleClick = this.criarControleClick(objeto);
 
@@ -111,6 +115,8 @@ export class LadosProporcionais {
 
         const carta = this;
 
+        const controleHighlight = controleHitboxTransparente(objeto, this.fase, 0);
+
         const verificador = new Output()
                             .setUpdateFunction(function(novoEstado){
 
@@ -121,16 +127,22 @@ export class LadosProporcionais {
 
                                     this.notify({objeto: objeto});
                                     this.ativar(false);
+
+                                    controleHighlight.transitionToCompletedAnimation();
+
                                 }
 
                                 if(novoEstado.dentro){
+
+                                    controleHighlight.start();
                                     // carta.highlightObjeto(objeto);
                                 }
                                 else if(novoEstado.dentro == false){
+                                    controleHighlight.update({})
                                     // carta.highlightObjeto(objeto, false)
                                 }
                             })
-                            .addInputs(objeto.clickable);
+                            .addInputs(objeto.clickable, objeto.hoverable);
 
         this.outputs.push(verificador);
 
@@ -166,6 +178,9 @@ export class LadosProporcionais {
                             // const dialogo = fase.animacaoDialogo(carta.dialogos.fim);
 
                             // fase.animar(dialogo);
+
+                            //Anima o colorir hitbox ao inverso para desaparecer ela
+                            estado.objetosSelecionados.map(objeto => fase.animar(mostrarHitboxTransparente(objeto).reverse().setDuration(120)));
 
                             const notificarFimExecucao = () => this.notify({carta: "LadosProporcionais"})
 

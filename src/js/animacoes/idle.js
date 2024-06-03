@@ -2,6 +2,8 @@ import { Draggable } from "../inputs/draggable";
 import ExecutarAnimacaoIdle from "../outputs/executarAnimacaoIdle";
 import Animacao, { curvas } from "./animation";
 import * as THREE from 'three'
+import { apagarObjeto } from "./apagarObjeto";
+import { Objeto } from "../objetos/objeto";
 
 //EQUAÇÕES FEITAS PARA OUTPUT EXECUTAR ANIMAÇÃO IDLE
 
@@ -62,11 +64,34 @@ export function controleTremedeiraIdleAresta(aresta, fase, delay=3){
     const curva = x => curvas.wobbling(x, 0.1, 10)
 
     return new ExecutarAnimacaoIdle(
-                    tremedeiraIdle(aresta, new THREE.Vector3(-1,0,0), 0.1).setDelay(delay*60).setDuration(120),
+                    tremedeiraIdle(aresta, new THREE.Vector3(-1,0,0), 0.2).setDelay(delay*60).setDuration(120),
                     fase, 
                     delay, 
-                    curva,
-                    false
+                    curva
                 )
                 .addInputs(aresta.draggable)
+}
+
+export function mostrarHitboxTransparente(objeto){
+
+    const hitbox = objeto.hitbox;
+
+    console.log(objeto)
+
+    hitbox.material = new THREE.MeshBasicMaterial({transparent:true, opacity:0, color:0x049ef4})
+
+    objeto.scene.add(hitbox);
+
+
+    return apagarObjeto(Objeto.fromMesh(hitbox))
+          .setDuration(600)
+          .setValorInicial(0)
+          .setValorFinal(0.5);
+}
+
+export function controleHitboxTransparente(objeto, fase, delay){
+
+    fase.debug = false;
+
+    return new ExecutarAnimacaoIdle(mostrarHitboxTransparente(objeto), fase, delay);
 }

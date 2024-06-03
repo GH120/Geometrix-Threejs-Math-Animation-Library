@@ -170,6 +170,7 @@ export class AnguloParalogramo {
 
                                 this.ativar(false);
 
+                                //Verificar de novo, dando problemas
                                 carta.paralelogramoSelecionado = paralelogramo;
 
                             })
@@ -510,7 +511,7 @@ export class AnguloParalogramo {
                         const posicoesVertices = verticesEmRelacaoAoAngulo.filter((x,i) => i != 2).map(vertice => vertice.getPosition().toArray());
                 
                         const trianguloInferior = new Poligono(posicoesVertices)
-                                                    .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.3})
+                                                    .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:paralelogramo.raioAngulo})
                                                     .render()
                                                     .addToScene(carta.fase.scene);
 
@@ -629,7 +630,7 @@ export class AnguloParalogramo {
         const positions = [vertice, verticeIntermediario, verticeOposto].map(v => v.getPosition().toArray());
 
         const trianguloSuperior = new Poligono(positions)
-                                  .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.3})
+                                  .configuration({grossura:0.024, raioVertice:0.04, raioAngulo: paralelogramo.raioAngulo})
                                   .render();
 
         trianguloSuperior.angles.map(angle => {
@@ -640,7 +641,7 @@ export class AnguloParalogramo {
         const positions2 = [vertice, verticeIntermediarioOposto ,verticeOposto].map(v => v.getPosition().toArray());
 
         const trianguloInferior = new Poligono(positions2)
-                                    .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.3})
+                                    .configuration({grossura:0.024, raioVertice:0.04, raioAngulo: paralelogramo.raioAngulo})
                                     .render();
 
 
@@ -700,8 +701,8 @@ export class AnguloParalogramo {
         )
 
 
-        anguloLateral1.variable.name = 'X';
-        anguloLateral2.variable.name = 'X';
+        anguloLateral1.variable.name = ' X ';
+        anguloLateral2.variable.name = ' X ';
 
         new MostrarAngulo(anguloLateral1).addToFase(fase);
         new MostrarAngulo(anguloLateral2).addToFase(fase);
@@ -749,17 +750,17 @@ export class AnguloParalogramo {
 
             const novosAngulos = triangulo.angles.filter((a,i) => i != 1); //Todos os ângulos menos o do meio
 
-            const names = ['Y', "X", "Z"];
+            const names = [' Y ', " X ", " Z "];
 
             if(indice) names.reverse();
 
             novosAngulos.map(angle => angle.variable.name = names[angle.index])
 
-            const offsetPosicional = new THREE.Vector3(-0.1,0.15,0)
+            const offsetPosicional = new THREE.Vector3(-0.05,0.05,0)
 
             if(angulo.mostrarAngulo) animacoes.push(angulo.mostrarAngulo.animacao(false));
 
-            animacoes.push(...novosAngulos.map(angle => new MostrarAngulo(angle, 2, offsetPosicional).addToFase(fase).animacao(true).filler(100)))
+            animacoes.push(...novosAngulos.map(angle => new MostrarAngulo(angle, 1.5, offsetPosicional).addToFase(fase).animacao(true).filler(100)))
 
             indice++;
         }
@@ -944,7 +945,7 @@ export class AnguloParalogramo {
         //Mostrar uma nova aresta aparecendo no lugar do tracejado
         //Hard coded, depois generalizar
         const trianguloNovo = new Poligono(posicoesVertices)
-                                .configuration({grossura:0.024, raioVertice:0.04, raioAngulo:0.3})
+                                .configuration({grossura:0.024, raioVertice:0.04, raioAngulo: paralelogramo.raioAngulo})
                                 .render();
 
         trianguloNovo.angles.map(angulo => angulo.material.color = 0x0000aa);

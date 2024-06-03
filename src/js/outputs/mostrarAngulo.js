@@ -7,7 +7,7 @@ import { Value } from '../equations/expressions';
 //REFATORAR DEPOIS, DESCULPE QUEM ESTÁ LENDO ISSO
 export class MostrarAngulo extends Output{
 
-    constructor(angle, distanciaTextoParaAngulo=2, offset=null){
+    constructor(angle, distanciaTextoParaAngulo=1.5, offset=null){
         super();
 
         this.angulo = angle;

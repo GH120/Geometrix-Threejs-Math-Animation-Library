@@ -61,7 +61,7 @@ export class PrimeiraFase extends Fase{
         // this.outputTesteClick();
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
 
-        this.debug = true;
+        this.debug = false;
         this.debugProblem = 30;
 
         this.controleFluxo = new this.ControleGeral(this);
@@ -591,10 +591,8 @@ export class PrimeiraFase extends Fase{
         
         fase.mostrarNomeDosVertices.forEach(mostrarNome => mostrarNome.addToScene(fase.scene));
 
-        const mostrarAngulo1 = new MostrarAngulo(fase.paralelogramo1.angles[1]).addToFase(fase);
-        const mostrarAngulo2 = new MostrarAngulo(fase.paralelogramo2.angles[0]).addToFase(fase);
-
-        mostrarAngulo1.distanciaTextoParaAngulo = 1.2
+        const mostrarAngulo1 = new MostrarAngulo(fase.paralelogramo1.angles[1], 1.5).addToFase(fase);
+        const mostrarAngulo2 = new MostrarAngulo(fase.paralelogramo2.angles[0], 1.5).addToFase(fase);
 
         fase.mostrarAngulosParalelogramos = [mostrarAngulo1, mostrarAngulo2];
     }

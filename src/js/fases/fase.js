@@ -30,6 +30,8 @@ import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages'
 import { Operations } from '../equations/operations';
 import { AnimacaoSequencial } from '../animacoes/animation';
 import MostrarTexto from '../animacoes/MostrarTexto';
+import './style.css'
+
 
 
 
@@ -116,17 +118,23 @@ export class Fase {
         this.frames = [];
         this.animacoes = [];
         this.objetos = [];
+        this.dimensoes  = {width: width, height: height}
+
+        //Controles
         this.animationControler = new AnimationControler(null,this,null,null,null);
         this.operadores = new Operations(null,this);
-        this.dimensoes  = {width: width, height: height}
         this.controleDaCarta = null; //Serve para o controle da carta poder avisar os controles da fase
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
         this.calculadorFrameRate = new FrameRateCalculator();
         this.mostrarFrameRate = false;
 
+        //Todos os dados adicionais de estado de cada carta
+        //Meio bagunçado, refatorar depois
         this.informacao = {
             objetosProporcionais: [] //Usado pela carta Proporcionalidade
         }
+
+        this.objetivos = []
     }
 
     cartas = [];
@@ -265,6 +273,59 @@ export class Fase {
         }
 
         return cPointLabel.mudarTexto(inputTex, tamanhoDaFonte);
+    }
+
+    createCaixaObjetivos(){
+
+        const objetivos = this.objetivos;
+
+        // Create the objective list HTML
+        const objectivesHtml = document.createElement('div');
+        objectivesHtml.className = 'objective-list';
+
+
+        objectivesHtml.innerHTML = `
+        <h2>Objetivos</h2>
+        <ul>
+          ${objetivos.map(obj => `
+            <li class="${(obj.completed ? 'completed' : '')}${(obj.expandir ? ' expanded' : '')}" data-id="${obj.id}">
+            
+              <span> 
+                    <span class = 'headline'>${obj.text} </span>  
+                    <span class="status ${obj.completed ? 'completed' : 'incomplete'} headline">
+                        ${obj.completed ? '✓' : '✗'}
+                    </span>
+              </span>
+              <ul class="${'sub-objectives'}">
+                ${obj.subObjectives.map(subObj => `
+                  <li class="${subObj.completed ? 'completed' : ''}">
+                    <span>
+                    ${subObj.text}
+                    <span class="status ${subObj.completed ? 'completed' : 'incomplete'}">
+                      ${subObj.completed ? '✓' : '✗'}
+                    </span>
+                    </span>
+                  </li>`).join('')}
+              </ul>
+            </li>`).join('')}
+        </ul>
+      `;
+
+        const objectiveItems = objectivesHtml.querySelectorAll('li[data-id]');
+            objectiveItems.forEach(item => {
+                item.addEventListener('click', () => {
+                item.classList.toggle('expanded');
+                });
+        });
+
+        // Create a CSS2DObject and add it to the scene
+        const objectivesLabel = new CSS2DObject(objectivesHtml);
+        objectivesLabel.position.set(-6, 0, 0);
+
+        this.caixaObjetivos = objectivesLabel;
+
+
+        return this.caixaObjetivos;
     }
     
     createSidenote(texto, tamanho=17){

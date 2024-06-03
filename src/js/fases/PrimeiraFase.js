@@ -42,8 +42,6 @@ import { LadosProporcionais } from "../cards/ladosProporcionais";
 import { AngulosIguais } from "../cards/angulosIguais";
 import ExecutarAnimacaoIdle from "../outputs/executarAnimacaoIdle";
 
-
-
 export class PrimeiraFase extends Fase{
 
     constructor(){
@@ -57,6 +55,8 @@ export class PrimeiraFase extends Fase{
         this.textBoxes = {};
 
         this.setupObjects();
+
+        this.createCaixaObjetivos();
 
         // this.outputTesteClick();
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
@@ -77,6 +77,31 @@ export class PrimeiraFase extends Fase{
         LadoParalogramo,
         AnguloParalogramo
         // Adicione mais cartas conforme necessário
+    ];
+
+    objetivos = [
+        {
+          id: 1,
+          text: 'Lados Proporcionais',
+          completed: false,
+          expandir: true,
+          subObjectives: [
+            { id: 1.1, text: 'Achar valor dos lados do Paralelogramo maior', completed: false },
+            { id: 1.2, text: 'Achar valor dos lados do Paralelogramo menor', completed: false },
+            { id: 1.3, text: 'Verificar se são proporcionais', completed: false },
+          ],
+        },
+        {
+          id: 2,
+          text: 'Angulos Congruentes',
+          completed: false,
+          expandir: false, 
+          subObjectives: [
+            { id: 2.1, text: 'Achar valor dos ângulos do paralelogramo maior', completed: false },
+            { id: 2.2, text: 'Achar valor dos ângulos do paralelogramo menor', completed: false },
+            { id: 2.3, text: 'Comparar angulos iguais', completed: false },
+          ],
+        },
     ];
 
     //Objetos básicos
@@ -359,7 +384,8 @@ export class PrimeiraFase extends Fase{
                             segundaLinha.setOnTermino(() => fase.whiteboard.removerTodasEquacoes()),
                             terceiraLinha.setOnTermino(() => animacao.setNome('Dialogo Carta')),
                             quartaLinha,
-                            quintaLinha
+                            quintaLinha,
+                            apagarCSS2(fase.caixaObjetivos).reverse().setOnStart(() => fase.scene.add(fase.caixaObjetivos))
                         );
 
         fase.animar(animacao.setNome("Execução Principal"));

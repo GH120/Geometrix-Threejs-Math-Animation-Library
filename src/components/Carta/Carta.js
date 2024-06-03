@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import './style.css'
+import { apagarCSS2 } from '../../js/animacoes/apagarCSS2';
 
 function Carta(props) {
     const { valor, naipe, settings, imagem} = props;
@@ -40,6 +41,13 @@ function Carta(props) {
             settings.fase.carta = []
 
             settings.ativarMenuCartas(false); //Fecha o menu de cartas
+
+            //Remove a caixa de objetivos da fase
+            const caixaObjetivos = settings.fase.caixaObjetivos;
+
+            if(caixaObjetivos){
+                settings.fase.animar(apagarCSS2(caixaObjetivos, settings.fase.scene));
+            }
 
         }
 

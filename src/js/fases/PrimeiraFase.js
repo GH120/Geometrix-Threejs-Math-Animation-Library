@@ -743,24 +743,6 @@ export class PrimeiraFase extends Fase{
 
             //Lida com eventos das cartas abaixo
 
-            if(novoEstado.carta == "CriarTriangulo"){
-
-                const tipo = novoEstado.sentido;
-
-                const repetido = estado.cartasUsadas.includes(tipo);
-
-                if(repetido) return this.notify({repetido: true});
-
-                if(tipo){
-                    fase.cartas = [SomaDosAngulosTriangulo];
-                }
-                else{
-                    fase.cartas = [SomaDosAngulosTriangulo];
-                }
-
-                fase.settings.ativarMenuCartas(false);
-                fase.settings.ativarMenuCartas(true);
-            }
 
             if(novoEstado.carta == "AnguloParalelogramo"){
 
@@ -788,33 +770,43 @@ export class PrimeiraFase extends Fase{
                 const animacao = fase.animacoesDialogo(...dialogo).setOnTermino(atualizarCartas);
 
                 fase.animar(animacao);
+
+                //Refatorar isso depois em uma classe
+
+                const objetivo = (novoEstado.paralelogramo == fase.paralelogramo2)? 2.1 : 2.2;
+
+                fase.objetivos.forEach(objetivo => objetivo.expandir = false);
+
+                fase.completarObjetivo(objetivo);
+
+                fase.updateCaixaObjetivos();
+
+                fase.objetivos[1].expandir = true;
             }
 
             if(novoEstado.carta == "SomaDosAngulosTriangulo"){
                 
                 //Diria que falta descobrir os ângulos por outra propriedade, já que a fórmula  não consegue calcular duas icognitas ao mesmo tempo
 
-                const primeiro = this.estado.cartasUsadas.length == 2;
-
-                if(false){
-
-                    const dialogo = [
-                        "Conseguimos a soma dos ângulos do primeiro triângulo",
-                        "Use a carta de novo para obter a soma do segundo triângulo"
-                    ]
-
-                    fase.animar(fase.animacoesDialogo(...dialogo));
-                }
-                else{
-
-                    //Move etapa para soma de equações
-                    this.update({somarEquacoes: true})
-                }
+                //Move etapa para soma de equações
+                this.update({somarEquacoes: true})
             }
 
             if(novoEstado.carta == "LadoParalelogramo"){
 
                 if(novoEstado.completo){
+
+                    console.log(novoEstado.paralelogramo, fase.paralelogramo2, novoEstado.paralelogramo == fase.paralelogramo2)
+                    //Refatorar isso depois em uma classe
+                    const objetivo = (novoEstado.paralelogramo == fase.paralelogramo2)? 1.1 : 1.2;
+
+                    fase.objetivos.forEach(objetivo => objetivo.expandir = false);
+
+                    fase.completarObjetivo(objetivo);
+
+                    fase.objetivos[0].expandir = true;
+
+                    fase.updateCaixaObjetivos();
 
                     estado.cartasUsadas.push(novoEstado.carta);
 
@@ -837,6 +829,19 @@ export class PrimeiraFase extends Fase{
 
                 fase.settings.ativarMenuCartas(false);
                 fase.settings.ativarMenuCartas(true);
+
+                //Refatorar isso depois em uma classe
+                const objetivo = 2.3
+
+                fase.objetivos.forEach(objetivo => objetivo.expandir = false);
+
+                fase.completarObjetivo(objetivo);
+                fase.completarObjetivo(2);
+
+                fase.objetivos[0].expandir = true;
+
+                fase.updateCaixaObjetivos();
+
             }
 
             if(novoEstado.carta == "LadosProporcionais"){
@@ -851,6 +856,19 @@ export class PrimeiraFase extends Fase{
 
                 fase.settings.ativarMenuCartas(false);
                 fase.settings.ativarMenuCartas(true);
+
+                //Refatorar isso depois em uma classe
+                const objetivo = 1.3
+
+                fase.objetivos.forEach(objetivo => objetivo.expandir = false);
+
+                fase.completarObjetivo(objetivo);
+                fase.completarObjetivo(1)
+
+                fase.objetivos[1].expandir = true;
+
+                fase.updateCaixaObjetivos();
+
             }
         }
 

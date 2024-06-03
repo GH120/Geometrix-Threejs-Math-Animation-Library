@@ -153,13 +153,10 @@ export class SomaDosAngulosTriangulo {
                             .setName('Verificador Hover')
                             .setUpdateFunction(function(novoEstado){
 
-                                const paralelogramoRenderizado = paralelogramo.renderedInScene();
-
-                                const posicao = novoEstado.position;
 
                                 // if(posicao) new Circle(posicao, 0.1, 0.05).render().addToScene(scene).update()
 
-                                this.estado.valido = novoEstado.dentro && paralelogramoRenderizado;
+                                this.estado.valido = novoEstado.dentro;
 
                                 if(!this.estado.valido) return;
 
@@ -185,7 +182,10 @@ export class SomaDosAngulosTriangulo {
                .setUpdateFunction(function(novoEstado){
 
                     if(novoEstado.ativado){
-                        this.notify({...novoEstado, carta: "SomaDosAngulosTriangulo"});
+                        this.notify({
+                            ...novoEstado, 
+                            carta: "SomaDosAngulosTriangulo"
+                        });
                     }
                })
     }

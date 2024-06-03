@@ -352,9 +352,6 @@ export class LadoParalogramo {
                     lado.removeAllOutputs();
                     ladoOposto.removeAllOutputs();
 
-                    console.log(lado.insideElipse)
-                    console.log(ladoOposto.insideElipse, carta.colorirArestas, 'testeElipse')
-
                     carta.colorirArestas.map(arestaColorida => arestaColorida.update({dentro:false}));
 
                     estado.ladosConhecidos++;
@@ -371,7 +368,8 @@ export class LadoParalogramo {
                          .setOnTermino(() =>{
                              this.notify({
                                 carta: "LadoParalelogramo", 
-                                completo: estado.ladosConhecidos == paralelogramo.numeroVertices
+                                completo: estado.ladosConhecidos == paralelogramo.numeroVertices,
+                                paralelogramo:   paralelogramo
                             }) //Atualiza o valor das aresta que tem esse controle como input
                          })
                })

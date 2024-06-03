@@ -274,7 +274,34 @@ export class Fase {
 
         return cPointLabel.mudarTexto(inputTex, tamanhoDaFonte);
     }
+    
+    createSidenote(texto, tamanho=17){
+        return this.createTextBox(texto, [-5.6, 0.6, 0], tamanho, false);
+    }
 
+    
+    //Muda o conteúdo da caixa de texto
+    changeText(texto, target = null){
+
+        console.log(texto);
+
+        if(target == null) target = this.text;
+
+        target.element.textContent = '';
+
+        // Split the text into individual characters
+        const characters = texto.split('');
+
+        // Create spans for each character and apply the fading effect
+        characters.forEach((character,index) => {
+            const span = document.createElement('span');
+            span.textContent = character;
+            target.element.appendChild(span);
+        });
+    }
+
+    /**Contém os objetivos em um CSS2DObject que usa os objetivos da fase para renderizar o html */
+    //Transformar isso numa classe?
     createCaixaObjetivos(){
 
         const objetivos = this.objetivos;
@@ -283,6 +310,30 @@ export class Fase {
         const objectivesHtml = document.createElement('div');
         objectivesHtml.className = 'objective-list';
 
+        const objectiveItems = objectivesHtml.querySelectorAll('li[data-id]');
+            objectiveItems.forEach(item => {
+                item.addEventListener('click', () => {
+                item.classList.toggle('expanded');
+                });
+        });
+
+        // Create a CSS2DObject and add it to the scene
+        const objectivesLabel = new CSS2DObject(objectivesHtml);
+        objectivesLabel.position.set(6, 1.5, 0);
+
+        this.caixaObjetivos = objectivesLabel;
+
+        this.updateCaixaObjetivos();
+
+
+        return this.caixaObjetivos;
+    }
+
+    updateCaixaObjetivos() {
+
+        const objetivos = this.objetivos;
+
+        const objectivesHtml = this.caixaObjetivos.element
 
         objectivesHtml.innerHTML = `
         <h2>Objetivos</h2>
@@ -310,47 +361,30 @@ export class Fase {
             </li>`).join('')}
         </ul>
       `;
-
+  
+        // Add event listeners for expanding/collapsing objectives
         const objectiveItems = objectivesHtml.querySelectorAll('li[data-id]');
-            objectiveItems.forEach(item => {
-                item.addEventListener('click', () => {
-                item.classList.toggle('expanded');
-                });
+        objectiveItems.forEach(item => {
+          item.addEventListener('click', () => {
+            item.classList.toggle('expanded');
+          });
         });
-
-        // Create a CSS2DObject and add it to the scene
-        const objectivesLabel = new CSS2DObject(objectivesHtml);
-        objectivesLabel.position.set(6, 1.5, 0);
-
-        this.caixaObjetivos = objectivesLabel;
-
-
-        return this.caixaObjetivos;
-    }
-    
-    createSidenote(texto, tamanho=17){
-        return this.createTextBox(texto, [-5.6, 0.6, 0], tamanho, false);
     }
 
-    
-    //Muda o conteúdo da caixa de texto
-    changeText(texto, target = null){
-
-        console.log(texto);
-
-        if(target == null) target = this.text;
-
-        target.element.textContent = '';
-
-        // Split the text into individual characters
-        const characters = texto.split('');
-
-        // Create spans for each character and apply the fading effect
-        characters.forEach((character,index) => {
-            const span = document.createElement('span');
-            span.textContent = character;
-            target.element.appendChild(span);
-        });
+    completarObjetivo(id) {
+      const [mainId, subId] = id.toString().split('.').map(Number);
+      const objective = this.objetivos.find(obj => obj.id === mainId);
+      if (objective) {
+        if (subId) {
+          const subObjective = objective.subObjectives.find(subObj => subObj.id === id);
+          if (subObjective) {
+            subObjective.completed = true;
+          }
+        } else {
+          objective.completed = true;
+        }
+        this.updateCaixaObjetivos();
+      }
     }
 
     //Inputs de drag, hover, click...
@@ -616,5 +650,11 @@ export class Fase {
         this.controleDaCarta = controle;
 
         return this;
+    }
+}
+
+class Objetivo {
+    constructor(){
+        
     }
 }

@@ -132,6 +132,7 @@ export class LadosProporcionais {
 
                                 }
 
+                                //Com bug
                                 if(novoEstado.dentro){
 
                                     controleHighlight.start();

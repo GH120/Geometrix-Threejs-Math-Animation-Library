@@ -92,6 +92,8 @@ export class AnguloParalogramo {
 
             //Por algum motivo, precisa sempre criar novos outputs
 
+            fase.debug = false;
+
             if(!paralelogramo.hoverable){
                 new Hoverable(paralelogramo, fase.camera);
             }
@@ -406,8 +408,8 @@ export class AnguloParalogramo {
                         carta.colorirLados.forEach(colorir => colorir.update({dentro:true}));
 
                         carta.arrastarLadosIdle = [
-                            controleTremedeiraIdleAresta(lados[0], carta.fase).start(),
-                            controleTremedeiraIdleAresta(lados[1], carta.fase).start()
+                            controleTremedeiraIdleAresta(lados[0], carta.fase, 5).start(),
+                            controleTremedeiraIdleAresta(lados[1], carta.fase, 7).start()
                         ]
 
                         this.addInputs(...carta.moverLados);

@@ -30,6 +30,7 @@ import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
 import imagemGrama from '../../assets/sky.webp'
 import { MoverGrausParaPosicaoEquacao } from "../animacoes/moverGrausParaPosicaoEquacao";
+import { controleHitboxTransparente, mostrarHitboxTransparente } from "../animacoes/idle";
 
 //Consertar: mostrar igualdade de ângulo (valor inicial cortando delta YZW)
 //           tamanho dos vertices (Muito pequeno)
@@ -111,6 +112,8 @@ export class AngulosIguais {
 
         const carta = this;
 
+        const controleHighlight = controleHitboxTransparente(objeto, this.fase, 0);
+
         const verificador = new Output()
                             .setUpdateFunction(function(novoEstado){
 
@@ -121,21 +124,28 @@ export class AngulosIguais {
 
                                     this.notify({objeto: objeto});
                                     this.ativar(false);
+
+                                    controleHighlight.transitionToCompletedAnimation();
+
                                 }
 
                                 if(novoEstado.dentro){
+
+                                    controleHighlight.start();
                                     // carta.highlightObjeto(objeto);
                                 }
                                 else if(novoEstado.dentro == false){
+                                    controleHighlight.update({})
                                     // carta.highlightObjeto(objeto, false)
                                 }
                             })
-                            .addInputs(objeto.clickable);
+                            .addInputs(objeto.clickable, objeto.hoverable);
 
         this.outputs.push(verificador);
 
         return verificador; 
     }
+
 
 
     criarControleGeral(){
@@ -168,6 +178,10 @@ export class AngulosIguais {
                             // fase.animar(dialogo);
 
                             //Não verifica ainda se são de fato proporcionais
+
+                            //Anima o colorir hitbox ao inverso para desaparecer ela
+                            estado.objetosSelecionados.map(objeto => fase.animar(mostrarHitboxTransparente(objeto).reverse().setDuration(120)));
+
                             const notificarFimExecucao = () => this.notify({carta: "AngulosIguais"})
 
                             carta.animarLadosProporcionais(estado.objetosSelecionados)

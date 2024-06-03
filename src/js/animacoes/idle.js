@@ -61,13 +61,14 @@ export function controleTremedeiraIdleAresta(aresta, fase, delay=3){
 
     const comecarDoMeio = x => Math.abs(0.5 - 2*x) + Math.min(0, 3 - 4*x)
 
-    const curva = x => curvas.wobbling(x, 0.1, 10)
+    const curva = x => curvas.wobbling(x, 0.25, 5)
 
     return new ExecutarAnimacaoIdle(
-                    tremedeiraIdle(aresta, new THREE.Vector3(-1,0,0), 0.2).setDelay(delay*60).setDuration(120),
+                    tremedeiraIdle(aresta, new THREE.Vector3(-1,0,0), 0.1).setDelay(delay*60).setDuration(120),
                     fase, 
                     delay, 
-                    curva
+                    curva,
+                    false
                 )
                 .addInputs(aresta.draggable)
 }

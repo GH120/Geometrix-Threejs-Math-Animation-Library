@@ -75,8 +75,7 @@ export class PrimeiraFase extends Fase{
 
     cartas = [
         LadoParalogramo,
-        AnguloParalogramo,
-        LadosProporcionais
+        AnguloParalogramo
         // Adicione mais cartas conforme necessário
     ];
 

@@ -316,8 +316,8 @@ export class LadoParalogramo {
         const moverLadosVerticais = this.criarMoverLados(paralelogramo.edges[3], paralelogramo.edges[1]);
 
         this.arrastarLadosIdle = [
-            controleTremedeiraIdleAresta(paralelogramo.edges[2], carta.fase).start(),
-            controleTremedeiraIdleAresta(paralelogramo.edges[3], carta.fase).start()
+            controleTremedeiraIdleAresta(paralelogramo.edges[2], carta.fase, 5).start(),
+            controleTremedeiraIdleAresta(paralelogramo.edges[3], carta.fase, 7).start()
         ]
 
         const dialogos = {

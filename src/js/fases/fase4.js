@@ -1022,6 +1022,8 @@ export class Fase4 extends Fase{
 
         const juntar = new JuntarEquacoes(valor,[funcao], this);
 
+        juntar.criarIdling();
+
         juntar.equacaoResultante = equacoes.instanciada("5h");
 
         this.controleEquacoes("5h", funcao, this.informacao.sidenote)

@@ -134,9 +134,11 @@ export class Fase5  extends Fase{
         const trajetoria = [new THREE.Vector3(-3,2,0), new THREE.Vector3(-10, 1, 0)]
 
         const moverVertice = new SimularMovimento(fase.triangulo.vertices[2], trajetoria, 0.3, 5)
-                            .setCurva(curvas.easeOutCircle)
-                            .setDuration(1000)
+                            .setCurva(curvas.easeInOutSine)
+                            .setDuration(300)
                             .comSetinha(fase.scene);
+
+        const acabarArraste = new Output().addInputs(fase.triangulo.vertices[2].draggable).setUpdateFunction(() => moverVertice.stop = true);
 
         const bracket = new Bracket(0.2, new THREE.Vector3(4.2, -2, 0), new THREE.Vector3(4.2, 1.5,0)).addToScene(fase.scene);
         

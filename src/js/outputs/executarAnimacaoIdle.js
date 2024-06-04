@@ -24,8 +24,10 @@ export default class ExecutarAnimacaoIdle extends Output{
             this.start();
         }
         else if(novoEstado){
+            const duration = this.animacaoIdle.frames;
             this.animacaoIdle.idle = false;
-            this.animacaoIdle.setDuration(60);
+            this.animacaoIdle.finalizarExecucao(); 
+            //Se um dia refatorar animação, talvez isso quebre a animação idle pois os frames vão para o final
         }
     }
 

@@ -85,7 +85,7 @@ export function mostrarHitboxTransparente(objeto){
 
 
     return apagarObjeto(Objeto.fromMesh(hitbox))
-          .setDuration(600)
+          .setDuration(90)
           .setValorInicial(0)
           .setValorFinal(0.5);
 }

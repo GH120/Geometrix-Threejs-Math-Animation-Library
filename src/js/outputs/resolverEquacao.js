@@ -1,9 +1,11 @@
 import { AnimacaoSimultanea } from "../animacoes/animation";
 import { apagarCSS2 } from "../animacoes/apagarCSS2";
+import { encolherAumentarIdle } from "../animacoes/idle";
 import { Clickable } from "../inputs/clickable";
 import { Draggable } from "../inputs/draggable";
 import { Hoverable } from "../inputs/hoverable";
 import { Output } from "./Output";
+import ExecutarAnimacaoIdle from "./executarAnimacaoIdle";
 
 export default class ResolverEquacao extends Output{
 
@@ -20,6 +22,8 @@ export default class ResolverEquacao extends Output{
         this.equacaoResultante = `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
         
         this.setup(onResolucao, equacaoResultante);
+
+        this.criarIdling();
     }
 
     setup(onResolucao, equacaoResultante){
@@ -99,5 +103,26 @@ export default class ResolverEquacao extends Output{
         fase.whiteboard.animar(animacao);
 
         equacao.removeAllOutputs();
+    }
+
+    criarIdling(){
+
+        const fase = this.fase;
+
+        const equacaoMovida = this.equacaoMovida;
+
+        const equacoesAlvo  = this.equacoesAlvo;
+        
+        const animacao = encolherAumentarIdle(equacaoMovida.texto).setDuration(90 + Math.round(30*Math.random()));
+
+        const controleIdle = new ExecutarAnimacaoIdle(animacao, fase, 10)
+                                .addInputs(
+                                    equacaoMovida.draggable, 
+                                    ...equacoesAlvo.filter(equacao => equacao.draggable).map(equacao => equacao.draggable)
+                                )
+                                .start();
+
+
+        this.controleIdling = controleIdle;
     }
 }

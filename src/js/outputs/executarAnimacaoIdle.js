@@ -15,6 +15,7 @@ export default class ExecutarAnimacaoIdle extends Output{
 
         this.desativarMudancaCursor(true);
 
+
         
     }
 
@@ -39,8 +40,9 @@ export default class ExecutarAnimacaoIdle extends Output{
 
         animacaoIdle.idle = true;
 
-
         setTimeout(() => (animacaoIdle.idle)? fase.animar(animacaoIdle) : null, this.delay * 1000);
+
+        return this;
     }
 
     transitionToCompletedAnimation(curva = curvas.easeInOutBack){

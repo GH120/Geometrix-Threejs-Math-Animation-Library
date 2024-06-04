@@ -31,6 +31,7 @@ import { Operations } from '../equations/operations';
 import { AnimacaoSequencial } from '../animacoes/animation';
 import MostrarTexto from '../animacoes/MostrarTexto';
 import './style.css'
+import { apagarCSS2 } from '../animacoes/apagarCSS2';
 
 
 
@@ -134,7 +135,7 @@ export class Fase {
             objetosProporcionais: [] //Usado pela carta Proporcionalidade
         }
 
-        this.objetivos = []
+        this.objetivos = null;
     }
 
     cartas = [];
@@ -298,93 +299,6 @@ export class Fase {
             span.textContent = character;
             target.element.appendChild(span);
         });
-    }
-
-    /**Contém os objetivos em um CSS2DObject que usa os objetivos da fase para renderizar o html */
-    //Transformar isso numa classe?
-    createCaixaObjetivos(){
-
-        const objetivos = this.objetivos;
-
-        // Create the objective list HTML
-        const objectivesHtml = document.createElement('div');
-        objectivesHtml.className = 'objective-list';
-
-        const objectiveItems = objectivesHtml.querySelectorAll('li[data-id]');
-            objectiveItems.forEach(item => {
-                item.addEventListener('click', () => {
-                item.classList.toggle('expanded');
-                });
-        });
-
-        // Create a CSS2DObject and add it to the scene
-        const objectivesLabel = new CSS2DObject(objectivesHtml);
-        objectivesLabel.position.set(6, 1.5, 0);
-
-        this.caixaObjetivos = objectivesLabel;
-
-        this.updateCaixaObjetivos();
-
-
-        return this.caixaObjetivos;
-    }
-
-    updateCaixaObjetivos() {
-
-        const objetivos = this.objetivos;
-
-        const objectivesHtml = this.caixaObjetivos.element
-
-        objectivesHtml.innerHTML = `
-        <h2>Objetivos</h2>
-        <ul>
-          ${objetivos.map(obj => `
-            <li class="${(obj.completed ? 'completed' : '')}${(obj.expandir ? ' expanded' : '')}" data-id="${obj.id}">
-            
-              <span> 
-                    <span class = 'headline'>${obj.text} </span>  
-                    <span class="status ${obj.completed ? 'completed' : 'incomplete'} headline">
-                        ${obj.completed ? '✓' : '✗'}
-                    </span>
-              </span>
-              <ul class="${'sub-objectives'}">
-                ${obj.subObjectives.map(subObj => `
-                  <li class="${subObj.completed ? 'completed' : ''}">
-                    <span>
-                    ${subObj.text}
-                    <span class="status ${subObj.completed ? 'completed' : 'incomplete'}">
-                      ${subObj.completed ? '✓' : '✗'}
-                    </span>
-                    </span>
-                  </li>`).join('')}
-              </ul>
-            </li>`).join('')}
-        </ul>
-      `;
-  
-        // Add event listeners for expanding/collapsing objectives
-        const objectiveItems = objectivesHtml.querySelectorAll('li[data-id]');
-        objectiveItems.forEach(item => {
-          item.addEventListener('click', () => {
-            item.classList.toggle('expanded');
-          });
-        });
-    }
-
-    completarObjetivo(id) {
-      const [mainId, subId] = id.toString().split('.').map(Number);
-      const objective = this.objetivos.find(obj => obj.id === mainId);
-      if (objective) {
-        if (subId) {
-          const subObjective = objective.subObjectives.find(subObj => subObj.id === id);
-          if (subObjective) {
-            subObjective.completed = true;
-          }
-        } else {
-          objective.completed = true;
-        }
-        this.updateCaixaObjetivos();
-      }
     }
 
     //Inputs de drag, hover, click...
@@ -653,8 +567,144 @@ export class Fase {
     }
 }
 
-class Objetivo {
-    constructor(){
-        
+export class Objetivos{
+    constructor(fase, objetivos = []){
+
+        this.fase = fase;
+
+        this.objetivos = objetivos;
+
+        this.createCaixaObjetivos();
     }
+
+    /**Contém os objetivos em um CSS2DObject que usa os objetivos da fase para renderizar o html */
+    //Transformar isso numa classe?
+    createCaixaObjetivos(){
+
+        const objetivos = this.objetivos;
+
+        // Create the objective list HTML
+        const objectivesHtml = document.createElement('div');
+        objectivesHtml.className = 'objective-list';
+
+        const objectiveItems = objectivesHtml.querySelectorAll('li[data-id]');
+            objectiveItems.forEach(item => {
+                item.addEventListener('click', () => {
+                item.classList.toggle('expanded');
+                });
+        });
+
+        // Create a CSS2DObject and add it to the scene
+        const objectivesLabel = new CSS2DObject(objectivesHtml);
+        objectivesLabel.position.set(6, 1.5, 0);
+
+        this.caixaObjetivos = objectivesLabel;
+
+        this.updateCaixaObjetivos();
+
+
+        return this.caixaObjetivos;
+    }
+
+    updateCaixaObjetivos() {
+
+        const objetivos = this.objetivos;
+
+        const objectivesHtml = this.caixaObjetivos.element
+
+        objectivesHtml.innerHTML = `
+        <h2>Objetivos</h2>
+        <ul>
+          ${objetivos.map(obj => `
+            <li class="${(obj.completed ? 'completed' : '')}${(obj.expandir ? ' expanded' : '')}" data-id="${obj.id}">
+            
+              <span> 
+                    <span class = 'headline'>${obj.text} </span>  
+                    <span class="status ${obj.completed ? 'completed' : 'incomplete'} headline">
+                        ${obj.completed ? '✓' : '✗'}
+                    </span>
+              </span>
+              <ul class="${'sub-objectives'}">
+                ${obj.subObjectives.map(subObj => `
+                  <li class="${subObj.completed ? 'completed' : ''}">
+                    <span>
+                    ${subObj.text}
+                    <span class="status ${subObj.completed ? 'completed' : 'incomplete'}">
+                      ${subObj.completed ? '✓' : '✗'}
+                    </span>
+                    </span>
+                  </li>`).join('')}
+              </ul>
+            </li>`).join('')}
+        </ul>
+      `;
+  
+        // Add event listeners for expanding/collapsing objectives
+        const objectiveItems = objectivesHtml.querySelectorAll('li[data-id]');
+        objectiveItems.forEach(item => {
+          item.addEventListener('click', () => {
+            item.classList.toggle('expanded');
+          });
+        });
+    }
+
+    completarObjetivo(id) {
+      const [mainId, subId] = id.toString().split('.').map(Number);
+      const objective = this.objetivos.find(obj => obj.id === mainId);
+      if (objective) {
+        if (subId) {
+          const subObjective = objective.subObjectives.find(subObj => subObj.id === id);
+          if (subObjective) {
+            subObjective.completed = true;
+
+            objective.completed = objective.subObjectives.every(sub => sub.completed);
+          }
+        } else {
+          objective.completed = true;
+        }
+        this.updateCaixaObjetivos();
+      }
+    }
+
+    //Talvez mudar novo foco para nome?
+    completarObjetivoMudarFoco(idObjetivo, novoFoco, animar=true){
+
+        this.completarObjetivo(idObjetivo);
+
+        this.objetivos.forEach(objetivo => objetivo.expandir = false);
+
+        this.objetivos.filter(objetivo => objetivo.name == novoFoco)
+                      .map(objetivo => objetivo.expandir = true);
+
+        //Adiciona a caixa de objetivos de novo para orientar o usuário
+        if(animar) this.mostrarObjetivos(true);
+    }
+
+    mostrarObjetivos(executar=false){
+
+        const fase = this.fase;
+
+        this.updateCaixaObjetivos();
+
+        const animacao = apagarCSS2(this.caixaObjetivos).reverse().setOnStart(() => fase.scene.add(this.caixaObjetivos));
+
+
+        if(executar) fase.animar(animacao);
+
+        return animacao;
+
+    }
+
+    apagarObjetivos(executar=false){
+
+        const fase = this.fase;
+
+        const animacao = apagarCSS2(this.caixaObjetivos, fase.scene);
+
+        if(executar) fase.animar(animacao);
+
+       return animacao;
+    }
+
+    
 }

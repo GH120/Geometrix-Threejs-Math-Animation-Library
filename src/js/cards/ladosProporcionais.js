@@ -176,9 +176,9 @@ export class LadosProporcionais {
                             fase.animar(dialogo);
                         }
                         else{
-                            // const dialogo = fase.animacaoDialogo(carta.dialogos.fim);
+                            // const dialogo = fase.animacaoDialogo(carta.dialogos.meio);
 
-                            // fase.animar(dialogo);
+                            // fase.animar(dialogo.reverse().setDuration(60));
 
                             //Anima o colorir hitbox ao inverso para desaparecer ela
                             estado.objetosSelecionados.map(objeto => fase.animar(mostrarHitboxTransparente(objeto).reverse().setDuration(120)));

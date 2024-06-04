@@ -1,5 +1,5 @@
 import { Triangle } from "../objetos/triangle"
-import { Fase } from "./fase";
+import { Fase, Objetivos } from "./fase";
 import { Poligono } from "../objetos/poligono";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import DesenharPoligono from "../animacoes/DesenharPoligono";
@@ -56,8 +56,6 @@ export class PrimeiraFase extends Fase{
 
         this.setupObjects();
 
-        this.createCaixaObjetivos();
-
         this.text.position.copy(new THREE.Vector3(0,4,0))
 
         // this.outputTesteClick();
@@ -81,9 +79,10 @@ export class PrimeiraFase extends Fase{
         // Adicione mais cartas conforme necessário
     ];
 
-    objetivos = [
+    objetivos = new Objetivos(this, [
         {
           id: 1,
+          name: 'lados',
           text: 'Lados Proporcionais',
           completed: false,
           expandir: true,
@@ -95,6 +94,7 @@ export class PrimeiraFase extends Fase{
         },
         {
           id: 2,
+          name: 'angulos',
           text: 'Angulos Congruentes',
           completed: false,
           expandir: false, 
@@ -104,7 +104,7 @@ export class PrimeiraFase extends Fase{
             { id: 2.3, text: 'Comparar angulos iguais', completed: false },
           ],
         },
-    ];
+    ]);
 
     //Objetos básicos
     setupObjects(){
@@ -387,7 +387,7 @@ export class PrimeiraFase extends Fase{
                             terceiraLinha.setOnTermino(() => animacao.setNome('Dialogo Carta')),
                             quartaLinha,
                             quintaLinha,
-                            apagarCSS2(fase.caixaObjetivos).reverse().setOnStart(() => fase.scene.add(fase.caixaObjetivos))
+                            fase.objetivos.mostrarObjetivos()
                         );
 
         fase.animar(animacao.setNome("Execução Principal"));
@@ -775,13 +775,7 @@ export class PrimeiraFase extends Fase{
 
                 const objetivo = (novoEstado.paralelogramo == fase.paralelogramo2)? 2.1 : 2.2;
 
-                fase.objetivos.forEach(objetivo => objetivo.expandir = false);
-
-                fase.completarObjetivo(objetivo);
-
-                fase.updateCaixaObjetivos();
-
-                fase.objetivos[1].expandir = true;
+                fase.objetivos.completarObjetivoMudarFoco(objetivo, 'angulos');
             }
 
             if(novoEstado.carta == "SomaDosAngulosTriangulo"){
@@ -796,24 +790,16 @@ export class PrimeiraFase extends Fase{
 
                 if(novoEstado.completo){
 
-                    console.log(novoEstado.paralelogramo, fase.paralelogramo2, novoEstado.paralelogramo == fase.paralelogramo2)
-                    //Refatorar isso depois em uma classe
+                    estado.cartasUsadas.push(novoEstado.carta);
+
                     const objetivo = (novoEstado.paralelogramo == fase.paralelogramo2)? 1.1 : 1.2;
 
-                    fase.objetivos.forEach(objetivo => objetivo.expandir = false);
-
-                    fase.completarObjetivo(objetivo);
-
-                    fase.objetivos[0].expandir = true;
-
-                    fase.updateCaixaObjetivos();
-
-                    estado.cartasUsadas.push(novoEstado.carta);
+                    fase.objetivos.completarObjetivoMudarFoco(objetivo, 'lados');
 
                     this.verificarCartas();
 
-                    this.fase.settings.ativarMenuCartas(false)
-                    this.fase.settings.ativarMenuCartas(true)
+                    this.fase.settings.ativarMenuCartas(false);
+                    this.fase.settings.ativarMenuCartas(true);
                 }
             }
 
@@ -833,14 +819,7 @@ export class PrimeiraFase extends Fase{
                 //Refatorar isso depois em uma classe
                 const objetivo = 2.3
 
-                fase.objetivos.forEach(objetivo => objetivo.expandir = false);
-
-                fase.completarObjetivo(objetivo);
-                fase.completarObjetivo(2);
-
-                fase.objetivos[0].expandir = true;
-
-                fase.updateCaixaObjetivos();
+                fase.objetivos.completarObjetivoMudarFoco(objetivo, 'lados');
 
             }
 
@@ -860,15 +839,7 @@ export class PrimeiraFase extends Fase{
                 //Refatorar isso depois em uma classe
                 const objetivo = 1.3
 
-                fase.objetivos.forEach(objetivo => objetivo.expandir = false);
-
-                fase.completarObjetivo(objetivo);
-                fase.completarObjetivo(1)
-
-                fase.objetivos[1].expandir = true;
-
-                fase.updateCaixaObjetivos();
-
+                fase.objetivos.completarObjetivoMudarFoco(objetivo, 'angulos');
             }
         }
 
@@ -934,19 +905,7 @@ export class PrimeiraFase extends Fase{
                 cartas.push(AnguloParalogramo);
             }
 
-            console.log(cartas, "cartas")
-
             this.fase.cartas = cartas;
-
-
-            //Adiciona a caixa de objetivos de novo para orientar o usuário
-            const fase = this.fase;
-
-            const mostrarCaixaObjetivos = apagarCSS2(fase.caixaObjetivos)
-                                         .reverse()
-                                         .setOnStart(() => fase.scene.add(fase.caixaObjetivos))
-
-            fase.animar(mostrarCaixaObjetivos);
         }
 
         criarEquacoes(){

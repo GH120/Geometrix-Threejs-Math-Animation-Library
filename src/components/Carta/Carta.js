@@ -43,10 +43,9 @@ function Carta(props) {
             settings.ativarMenuCartas(false); //Fecha o menu de cartas
 
             //Remove a caixa de objetivos da fase
-            const caixaObjetivos = settings.fase.caixaObjetivos;
 
-            if(caixaObjetivos){
-                settings.fase.animar(apagarCSS2(caixaObjetivos, settings.fase.scene));
+            if(settings.fase.objetivos){
+                settings.fase.objetivos.apagarObjetivos(true);
             }
 
         }

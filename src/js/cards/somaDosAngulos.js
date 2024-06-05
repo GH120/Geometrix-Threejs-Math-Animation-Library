@@ -92,7 +92,7 @@ export class SomaDosAngulosTriangulo {
         const todosLadosConhecidos = false;
 
         if(!triangulo){
-            fase.animar(fase.animacaoDialogo('Paralelogramo não encontrado, tente de novo'));
+            fase.animar(fase.animacaoDialogo('Triângulo não encontrado, tente de novo'));
         }
 
         return triangulo && !todosLadosConhecidos;

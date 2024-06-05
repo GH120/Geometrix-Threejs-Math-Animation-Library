@@ -64,6 +64,8 @@ export class PrimeiraFase extends Fase{
         this.debug = false;
         this.debugProblem = 30;
 
+        this.final();
+
         this.controleFluxo = new this.ControleGeral(this);
 
         //A fazer:
@@ -394,75 +396,29 @@ export class PrimeiraFase extends Fase{
         fase.animar(animacao.setNome("Execução Principal"));
     }
 
-    dialogo3(){
-        const dialogo5 = [
-            "Como acabou de ver, dois ângulos determinam um terceiro no triângulo",
-            "Para que isso serve? bem, suponha que temos dois triângulos", // Desenha os triângulos
-            "Se todos seus ângulos forem iguais, um é apenas o outro só que maior", //Mostra a escala e pede para arrastar,
-            "São SEMELHANTES, e tem proporções entre si",
-            "e só precisamos de dois ângulos, pois como vimos o terceiro é determinado por eles", //highlight dos dois ângulos em cada triângulo
-            "mas temos outras maneiras de ver se eles são SEMELHANTES"
-        ]
+    final(){
 
-        const animarDialogo = dialogo5.map(texto => new TextoAparecendo(this.text.element).setOnStart(() => this.changeText(texto)).setValorFinal(100));
+        const fase = this;
 
+        const dialogo = [
+            "Com isso, temos que as duas figuras são semelhantes",
+            "O exemplo foi bem longo e repetitivo, ",
+            "Mas espero que tenha aprendido os passos fundamentais",
+            "Bons Estudos!!!"
+        ];
 
-        //Cleanup da cena antiga
-        const triangulo = this.triangulo;  
-        
-        const verticeSelecionado = this.informacao.verticeSelecionado;
+        const animacao = fase.animacoesDialogo(...dialogo)
 
-        const anguloSelecionado = triangulo.angles[verticeSelecionado.index];
+        animacao.animacoes[0].setOnTermino(() => fase.whiteboard.ativar(false))
 
-        const apagarAngulo  = apagarObjeto(anguloSelecionado);
+        fase.animar(animacao);
 
-        const apagarMostrarAngulo = this.mostrarGrausDesaparecendo(anguloSelecionado);
+        fase.animar(fase.animacoesDialogo(...dialogo).setOnTermino(() => {
 
-        const apagarTracejado = () => {
+            // fase.settings.mostrarSetaProximaFase(true);
 
-            const criarTracejado = this.informacao.criarTracejadoSelecionado;
-
-            criarTracejado.update({clicado:true});
-
-            triangulo.removeFromScene(this.scene)
-
-            criarTracejado.removeInputs();
-        }   
-
-        const cleanupLeftovers = new AnimacaoSimultanea(apagarAngulo, apagarMostrarAngulo)
-                                .setOnTermino(apagarTracejado);
-
-        const primeiraLinha = new AnimacaoSimultanea(cleanupLeftovers, animarDialogo[0])
-
-
-
-        const desenharTriangulos = new AnimacaoSimultanea(
-            new ApagarPoligono(this.triangulo)
-            .reverse()
-            .setOnTermino(() => false)
-            .setOnStart(() => this.triangulo.addToScene(this.scene)),
-
-            new ApagarPoligono(this.triangulo2)
-            .reverse()
-            .setOnTermino(() => false)
-            .setOnStart(() => this.triangulo2.addToScene(this.scene))
-        )
-
-        const segundaLinha = new AnimacaoSimultanea(desenharTriangulos, animarDialogo[1])
-
-
-        const escalarTriangulo2 = this.animacaoEscalarTriangulo2()
-
-        const terceiraLinha = new AnimacaoSimultanea(escalarTriangulo2, animarDialogo[2]);
-
-        return new AnimacaoSequencial(
-            primeiraLinha, 
-            segundaLinha,
-            terceiraLinha,
-            animarDialogo[3],
-            animarDialogo[4],
-            animarDialogo[5]
-        );
+            setTimeout(() => {window.location.href = `/`}, 5000);
+        }));
     }
 
     animar180Graus(){
@@ -685,18 +641,7 @@ export class PrimeiraFase extends Fase{
 
             if(novoEstado.novaEquacao){
 
-                const dialogo = [
-                    "Com isso, temos que as duas figuras são semelhantes",
-                    "O exemplo foi bem longo e repetitivo, ",
-                    "Mas espero que tenha aprendido os passos fundamentais",
-                    "Bons Estudos!!!"
-                ];
-
-                const animacao = fase.animacoesDialogo(...dialogo)
-
-                animacao.animacoes[0].setOnTermino(() => fase.whiteboard.ativar(false))
-
-                fase.animar(animacao);
+                fase.final();
 
             }
 

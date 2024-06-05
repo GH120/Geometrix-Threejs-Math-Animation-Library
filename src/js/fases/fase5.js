@@ -175,13 +175,14 @@ export class Fase5  extends Fase{
         //Vera o uso dela a seguir: Dividir esse triângulo em dois
         //Perceba
 
-        const dialogo = ["Desenhamos uma linha paralela a aresta que esse vértice aponta",
-                         "Vera o uso dela a seguir: Dividir esse triângulo em dois",
-                         "Tente arrastar os vértices não clicados por exemplo"]
+        const dialogo = ["Para facilitar a análise dos ângulos, desenhamos duas linhas paralelas",
+                         "A perpendicular a essas linhas é a altura do triângulo,",
+                         "E tal altura divide o triângulo em dois"]
 
         const animacao = new AnimacaoSequencial(
                             fase.animacaoDialogo(dialogo[0]),
                             fase.animacaoDialogo(dialogo[1]),
+                            fase.animacaoDialogo(dialogo[2]),
                             animacaoIndependente( () => fase.animar(this.animacaoDividirTriangulo()))
         )
 
@@ -206,7 +207,8 @@ export class Fase5  extends Fase{
             "e um angulo reto",
             "se arrastarmos seus lados para fora...",
             "Construimos outro triângulo igual a ele, com os ângulos invertidos de lugar",
-            "O angulo proximo do novo triângulo é o afastado do antigo pois apontam para lados iguais",
+            "Conseguimos descobrir os ângulos desse triângulo clone vendo os lados que eles apontam:",
+            "Ângulos iguais apontam para o mesmo lado, nesse caso o azul",
             "Os dois juntos formam 90°, pois a reta que divide o triângulo é perpendicular ao tracejado",
             "Podemos fazer o mesmo para o outro subtriângulo",
             "Junte as duas fórmulas na lousa, para conseguirmos a soma de todos os ângulos"
@@ -218,14 +220,16 @@ export class Fase5  extends Fase{
                             this.aula3Dialogo2(dialogo.slice(1,4), this.subtriangulo1),
                             this.aula3Dialogo3(dialogo[4], this.subtriangulo1),
                             new AnimacaoSimultanea(dialogo[5]),
-                            this.aula3Dialogo5(dialogo[6], this.subtriangulo1, this.subtriangulo3),
-                            this.aula3Dialogo7(dialogo[7], this.subtriangulo1, this.subtriangulo3),
-                            dialogo[8],
+                            new AnimacaoSimultanea(dialogo[6]),
+                            this.aula3Dialogo5(dialogo[7], this.subtriangulo1, this.subtriangulo3),
+                            this.aula3Dialogo7(dialogo[8], this.subtriangulo1, this.subtriangulo3),
+                            dialogo[9],
                             this.aula3Dialogo2(dialogo.slice(1,4), this.subtriangulo2),
                             this.aula3Dialogo3(dialogo[4], this.subtriangulo2),
                             new AnimacaoSimultanea(dialogo[5]),
-                            this.aula3Dialogo5(dialogo[6], this.subtriangulo2, this.subtriangulo3),
-                            this.aula3Dialogo7(dialogo[7], this.subtriangulo2, this.subtriangulo3),
+                            new AnimacaoSimultanea(dialogo[6]),
+                            this.aula3Dialogo5(dialogo[7], this.subtriangulo2, this.subtriangulo3),
+                            this.aula3Dialogo7(dialogo[8], this.subtriangulo2, this.subtriangulo3),
                             this.removerSubtriangulos()
         )
 
@@ -1426,6 +1430,8 @@ export class Fase5  extends Fase{
 
     //Adcionar texto "Pivô" no ponto de inflexão e arrastável nos outros
     //Escolher pivô quando não tem nenhum
+    //REFATORAR GAMBIARRA, MUITO BAGUNÇADA LÓGICA
+    //SEPARAR EM SEU PRÓPRIO ARQUIVO
     criarTracejado = (vertex) => {
 
         //Input: clickable do vertice, diz se foi o vertice clicado ou não
@@ -1483,7 +1489,7 @@ export class Fase5  extends Fase{
                             this.notify({
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
-                                sentido: vetorTracejado1,
+                                sentido: vetorTracejado1.clone().normalize(),
                                 angulosInvisiveis: [estado.anguloInvisivel1, estado.anguloInvisivel2]
                             });
 
@@ -1523,7 +1529,7 @@ export class Fase5  extends Fase{
                                 tracejadoAtivado: true,
                                 verticeSelecionado: vertex, 
                                 criarTracejadoSelecionado: this,
-                                sentido: vetorTracejado1,
+                                sentido: vetorTracejado1.clone().normalize(),
                                 angulosInvisiveis: [estado.anguloInvisivel1, estado.anguloInvisivel2]
                             });
 

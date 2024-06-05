@@ -323,4 +323,9 @@ export class Angle extends Objeto{
 
         return this;
     }
+
+    vetorSentido(){
+
+        return new THREE.Vector3().lerpVectors(this.vetor1, this.vetor2, 0.5)
+    }
 }

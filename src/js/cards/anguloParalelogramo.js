@@ -72,9 +72,9 @@ export class AnguloParalogramo {
 
         //MELHORAR DIALOGO
         divisaoAngulosVizinhos1: "Se nós dividirmos o paralelogramo pela outra metade, conseguimos dois triângulos iguais de novo", 
-        divisaoAngulosVizinhos2: "Então esses ângulos desconhecidos são iguais não é?", //Mesma animação de tracejado para aresta central
+        divisaoAngulosVizinhos2: "Então esses ângulos desconhecidos são iguais, pois apontam para o mesmo lado", //Mesma animação de tracejado para aresta central
         divisaoAngulosVizinhos3: "Ângulos iguais apontam para lados iguais, assim descobrimos os outros:", //Aparece text box para digitar o nome da variável
-        divisaoAngulosVizinhos4: angulo =>  `Dividimos o ${Math.round(angulo.degrees)}° em dois ângulos Y e Z, e vamos encontrar X `,
+        divisaoAngulosVizinhos4: angulo =>  `Dividindo o ${Math.round(angulo.degrees)}° em dois ângulos Y e Z, vamos encontrar X `,
 
 
 

@@ -112,9 +112,9 @@ export default class AnimationControler {
                                 fase.scene.remove(fase.aviso);
                             }
 
-                            if(novoEstado.keyDown == 83){
-                                fase.debug = !fase.debug
-                            }
+                            // if(novoEstado.keyDown == 83){
+                            //     fase.debug = !fase.debug
+                            // }
                        });
 
         keyInput.addObserver(pausar);

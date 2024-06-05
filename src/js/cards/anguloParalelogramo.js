@@ -1128,7 +1128,6 @@ export class AnguloParalogramo {
     }
 
     voltarAoInicio(lado, ultimaPosicao){
-        alert("Falhou");
 
         const deslocamento = ultimaPosicao.clone().sub(lado.mesh.position);
 
@@ -1140,8 +1139,7 @@ export class AnguloParalogramo {
         const fase = this.fase;
 
         const dialogo = fase.animacoesDialogo(
-                            "Lado não encontrado, arraste ele mais perto do lado oposto",
-                            "Os lados agora são arrastáveis, arraste um para o outro e veja o que acontece"
+                            "Lado não encontrado, arraste ele mais perto do lado oposto"
                         )
                         .setNome("Dialogo Carta")
 

@@ -64,8 +64,6 @@ export class PrimeiraFase extends Fase{
         this.debug = false;
         this.debugProblem = 30;
 
-        this.final();
-
         this.controleFluxo = new this.ControleGeral(this);
 
         //A fazer:

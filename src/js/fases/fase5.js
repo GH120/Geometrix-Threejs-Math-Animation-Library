@@ -42,6 +42,8 @@ import SimularMovimento from '../animacoes/simularMovimento';
 import Bracket from '../objetos/bracket';
 import { apagarCSS2 } from '../animacoes/apagarCSS2';
 import {substituirVariavel} from '../animacoes/substituirVariavel';
+import ExecutarAnimacaoIdle from '../outputs/executarAnimacaoIdle';
+import { moverSetinha, MoverSetinhaIdle } from '../animacoes/idle';
 
 export class Fase5  extends Fase{
 
@@ -53,7 +55,6 @@ export class Fase5  extends Fase{
         this.createInputs();
         this.createOutputs();
         this.setupTextBox();
-        this.Configuracao1(); //É uma versão generalizada do ligar Input ao Output
 
 
         //Mostrar a1,a2,a3 e seus valores indo para lousa
@@ -109,7 +110,7 @@ export class Fase5  extends Fase{
             'Nosso objetivo final é chegar na semelhança,',
             'e para isso vamos ver uma propriedade do triângulo fundamental: Seus ângulos somam 180°',
             'Isso vale para qualquer triângulo, como iremos mostrar',
-            'Para iniciarmos nossa análise, clique em um vértice qualquer'
+            'Para iniciarmos nossa análise, clique no vértice indicado'
         ]
 
         const animacao = new AnimacaoSequencial().setAnimacoes(dialogo.map(linha => this.animacaoDialogo(linha)))
@@ -119,7 +120,7 @@ export class Fase5  extends Fase{
 
         animacao.setNome("dialogo");
 
-        animacao.animacoes[3].setOnTermino(() => fase.controleFluxo.update({terminadoDialogo: true}))
+        animacao.animacoes[4].setOnTermino(() => fase.controleFluxo.update({terminadoDialogo: true}))
 
         this.animar(animacao);
 
@@ -445,7 +446,9 @@ export class Fase5  extends Fase{
 
     }
 
-    aula4(){
+
+
+    aula4o(){
 
         const fase = this;
 
@@ -463,6 +466,29 @@ export class Fase5  extends Fase{
 
 
         const animacao = new AnimacaoSimultanea(fase.reverterTriangulo(), fase.animacaoDialogo(dialogo[0]))
+
+
+        fase.animar(animacao);
+    }
+
+    aula4(){
+
+        const fase = this;
+
+        fase.Configuracao0b();
+
+        const indice = fase.triangulo.vertices.indexOf(fase.informacao.verticeSelecionado);
+
+        const criarTracejado = fase.outputCriarTracejado[indice];
+
+        criarTracejado.estado.ativado = false;
+        criarTracejado.estado.tracejado.removeFromScene();
+        criarTracejado.estado.tracejado2.removeFromScene();
+
+        const dialogo = ['Arraste os vértices para formar qualquer triângulo que quiser'];
+
+
+        const animacao =  fase.animacaoDialogo(dialogo[0]);
 
 
         fase.animar(animacao);
@@ -487,7 +513,7 @@ export class Fase5  extends Fase{
         
         const fase = this;
 
-        const dialogo = ['Arraste os ângulos para os buracos do tracejado']
+        const dialogo = ['Forme os 180° arrastando os ângulos para os espaços mostrados']
 
         fase.animar(fase.animacaoDialogo(dialogo[0]));
     }
@@ -496,9 +522,11 @@ export class Fase5  extends Fase{
         
         const fase = this;
 
+        const triangulosProvados = fase.controleFluxo.estado.triangulosProvados;
+
         const dialogo = [
             'Esse triângulo tem 180°, como queriamos provar',
-            'Vamos testar para outro exemplo?'
+            (triangulosProvados < 2)? 'Vamos testar para outro exemplo?' : ''
         ].map(linha => fase.animacaoDialogo(linha));
 
         const mostrar180 = fase.mostrarEApagar180Graus(fase.informacao.verticeSelecionado, fase.triangulo.angles)
@@ -663,7 +691,7 @@ export class Fase5  extends Fase{
                             dialogo2,
                             dialogo3
                         )
-                        .setOnTermino(() => fase.aula4())
+                        .setOnTermino(() => fase.aula4o())
 
         fase.animar(animacao);
     }
@@ -776,20 +804,38 @@ export class Fase5  extends Fase{
 
         fase.informacao.copiasDosAngulos = [];
         
+        
 
         //Ligações feitas: click vertice => cria tracejado
 
+        const maiorAresta = fase.triangulo.edges.reduce((edge, biggest) => (edge.length < biggest.length)? biggest : edge);
+
+        const indiceMaiorAresta = fase.triangulo.edges.indexOf(maiorAresta);
+
         const vertices = fase.triangulo.vertices;
+
+        const verticeMaiorAresta = fase.triangulo.vertices[(indiceMaiorAresta+2)%3];
+
+        console.log(vertices, verticeMaiorAresta)
 
         //Liga o vertice double click ao output criar tracejado
         //Pipeline: clickable -> doubleClick -> criarTracejado 
         for (let i = 0; i < 3; ++i) {
-
-            const vertice = vertices[i];
-
-            vertice.clickable.addObserver(fase.outputCriarTracejado[i])
             
-            fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable))
+            const vertice = vertices[i];
+            
+            if(vertice != verticeMaiorAresta) continue;
+
+            const colorirVertice = colorirAngulo(vertice).setValorInicial(0x828282).setValorFinal(0xffff00).setDuration(45);
+
+            const controleIdle = new ExecutarAnimacaoIdle(colorirVertice, fase, 0).start();
+
+            vertice.clickable.addObserver(fase.outputCriarTracejado[i]);
+            vertice.clickable.addObserver(controleIdle);
+            
+            fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable));
+
+
         }
 
         //Reseta o estado do output, nenhum ângulo selecionado
@@ -852,7 +898,11 @@ export class Fase5  extends Fase{
             fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable))
         })
 
+        //Elimina as setinhas em execução
+        if(fase.informacao.setinhas) 
+            fase.informacao.setinhas.map(setinha => setinha.update({}));
 
+        fase.informacao.setinhas = [];
     }
 
     //Configurações que ligam inputs aos outputs
@@ -934,6 +984,12 @@ export class Fase5  extends Fase{
 
         //Reseta o estado do output, nenhum ângulo selecionado
         fase.outputDragAngle.map(output => output.estado = {});
+
+        //Elimina as setinhas em execução
+        if(fase.informacao.setinhas) 
+            fase.informacao.setinhas.map(setinha => setinha.update({}));
+
+        fase.informacao.setinhas = [];
     }
     
 
@@ -995,11 +1051,13 @@ export class Fase5  extends Fase{
         //angle.draggable => outputDragAngle
         //angle.draggable => mostrarAngulo
         angles.forEach((angle, index) => {
-                if(angle != anguloSelecionado) {
-                    angle.draggable.addObserver(fase.outputDragAngle[index])
-                    // angle.draggable.addObserver(fase.outputMostrarAngulo[index]) fazer depois...
-                }
-              })
+
+            if(angle == anguloSelecionado) return;
+            
+            angle.draggable.addObserver(fase.outputDragAngle[index])
+            // angle.draggable.addObserver(fase.outputMostrarAngulo[index]) fazer depois...
+            
+        })
 
         //invisivel.hoverable => outputDragAngle
         //invisivel.hoverable => outputErrado
@@ -1029,6 +1087,49 @@ export class Fase5  extends Fase{
             fase.controleFluxo.addInputs(arraste); //Arrastar ângulo avisa o controle de fluxo
         })
 
+
+        //Elimina as setinhas em execução
+        if(fase.informacao.setinhas) 
+            fase.informacao.setinhas.map(setinha => setinha.update({}));
+
+        fase.informacao.setinhas = [];
+
+        console.log({...criarTracejado.estado})
+
+        function criarSetinhas(){
+
+            angulosInvisiveis.map(angulo => {
+                
+                const vetor = angulo.vetor1.clone().lerp(angulo.vetor2, 0.5);   
+
+                const mostrarBuraco = new MoverSetinhaIdle(
+                                        angulo.getPosition().sub(vetor.clone().multiplyScalar(1.4)), 
+                                        angulo.getPosition().sub(vetor.clone().multiplyScalar(1)),
+                                        fase,
+                                        2
+                                    );
+
+                mostrarBuraco.addInputs(criarTracejado);
+
+                setTimeout(() => mostrarBuraco.addInputs(...vertices.map(vertice => vertice.draggable)), 10000)
+
+                //Reseta ao mover vértice -> fazer depois
+
+                // const resetar = new Output()
+                //                 .setUpdateFunction((novoEstado) => {
+                //                     if(novoEstado.dragging == false){
+                //                         criarSetinhas()
+                //                     }
+
+                //                 })
+                //                 .setName("resetar")
+
+                fase.informacao.setinhas.push(mostrarBuraco.start());
+            })
+
+        }
+
+        criarSetinhas();
     }
 
     Configuracao2b(informacao){
@@ -1340,7 +1441,7 @@ export class Fase5  extends Fase{
 
                         //Se um dos outros vértices estiver sendo arrastado, remove tudo e desenha de novo
                         if(estado.dragging && estado.ativado){
-                            
+
                             if(estado.contadorAtualizacao < 5) return;
 
                             estado.contadorAtualizacao = 0;
@@ -1360,9 +1461,13 @@ export class Fase5  extends Fase{
 
                             estado.tracejado.addToScene(fase.scene);
 
-                            estado.tracejado2 = new Tracejado(estado.verticesNaoSelecionados[0].getPosition().sub(vetorTracejado1.multiplyScalar(3)), estado.verticesNaoSelecionados[0].getPosition().add(vetorTracejado1.multiplyScalar(3)))
+                            const posicao2 = estado.verticesNaoSelecionados[0].getPosition().add(estado.verticesNaoSelecionados[1].getPosition()).multiplyScalar(0.5);
+
+                            estado.tracejado2 = new Tracejado(posicao2.clone().sub(vetorTracejado1.multiplyScalar(3)), posicao2.clone().add(vetorTracejado1.multiplyScalar(3)))
 
                             estado.tracejado2.addToScene(fase.scene);
+
+                            console.log('posicao', posicao2, estado.verticesNaoSelecionados.map(v => v.getPosition()));
 
                             estado.arraste = true;
 
@@ -1385,7 +1490,7 @@ export class Fase5  extends Fase{
                             estado.ativado = !estado.ativado
 
                             const posicao = vertex.getPosition();
-                            const posicao2 = estado.verticesNaoSelecionados[0].getPosition();
+                            const posicao2 = estado.verticesNaoSelecionados[0].getPosition().clone().add(estado.verticesNaoSelecionados[1].getPosition()).multiplyScalar(0.5);
                             const vetorTracejado1 = estado.verticesNaoSelecionados[0].mesh.position.clone().sub(estado.verticesNaoSelecionados[1].mesh.position.clone()).normalize().multiplyScalar(10);
                             const vetorTracejado2 = estado.verticesNaoSelecionados[1].mesh.position.clone().sub(estado.verticesNaoSelecionados[0].mesh.position.clone()).normalize().multiplyScalar(10);
 
@@ -1395,11 +1500,15 @@ export class Fase5  extends Fase{
                             estado.tracejado = new Tracejado(posicao.clone().sub(vetorTracejado1), posicao.clone().add(vetorTracejado1))
                             estado.tracejado.addToScene(fase.scene);
 
-                            estado.tracejado2 = new Tracejado(estado.verticesNaoSelecionados[0].getPosition().sub(vetorTracejado1.clone()), estado.verticesNaoSelecionados[0].getPosition().add(vetorTracejado1.clone()))
+                            estado.tracejado2 = new Tracejado(posicao2.clone().sub(vetorTracejado1.multiplyScalar(3)), posicao2.clone().add(vetorTracejado1.multiplyScalar(3)))
+
                             estado.tracejado2.addToScene(fase.scene);
 
                             estado.tracejado = estado.tracejado;
                             estado.tracejado2 = estado.tracejado2;
+
+                            console.log('posicao', posicao2);
+
 
                             animacaoTracejado(estado.tracejado, posicao.clone(), vetorTracejado1.clone(), estado);
                             animacaoTracejado(estado.tracejado2, posicao2, vetorTracejado2, estado);
@@ -1666,6 +1775,13 @@ export class Fase5  extends Fase{
                     else if(estado.angulosArrastados >= 2){
                         estado.angulosArrastados = 0;
                         estado.triangulosProvados++;
+
+
+                        //Elimina as setinhas em execução
+                        if(fase.informacao.setinhas) 
+                            fase.informacao.setinhas.map(setinha => setinha.update({}));
+
+                        fase.informacao.setinhas = [];
 
                         fase.Configuracao4({});
 

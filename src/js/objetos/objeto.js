@@ -26,11 +26,16 @@ export class Objeto{
         this.scene.remove(this.mesh);
 
         //Não abrange grupos recursives, cuidado
-        if(this.mesh.children){
-            this.mesh.children.map(child => child.geometry.dispose());
+        try{
+            if(this.mesh.children){
+                this.mesh.children.map(child => child.geometry.dispose());
+            }
+            else{
+                this.mesh.geometry.dispose();
+            }
         }
-        else{
-            this.mesh.geometry.dispose();
+        catch(e){
+            
         }
 
         if(this.clickable) this.clickable.removeObservers();

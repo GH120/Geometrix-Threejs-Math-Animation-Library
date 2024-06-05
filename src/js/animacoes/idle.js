@@ -4,6 +4,7 @@ import Animacao, { curvas } from "./animation";
 import * as THREE from 'three'
 import { apagarObjeto } from "./apagarObjeto";
 import { Objeto } from "../objetos/objeto";
+import { mover } from "./mover";
 
 //EQUAÇÕES FEITAS PARA OUTPUT EXECUTAR ANIMAÇÃO IDLE
 
@@ -95,4 +96,64 @@ export function controleHitboxTransparente(objeto, fase, delay){
     fase.debug = false;
 
     return new ExecutarAnimacaoIdle(mostrarHitboxTransparente(objeto), fase, delay);
+}
+
+export function moverSetinha(origem, destino, scene){
+
+
+    const dir = destino.clone().sub(origem);
+
+    //normalize the direction vector (convert to vector of length 1)
+    dir.normalize();
+    
+    const origin = new THREE.Vector3( 0, 0, 0 );
+    const length = 0.3;
+    const hex = 0xff0000;
+
+    const group = new THREE.Group();
+
+    const arrowMesh = new THREE.ArrowHelper( dir, origin, length, hex , 0.4*length, 0.2*length);
+
+    arrowMesh.position.copy(dir.clone().negate().multiplyScalar(length));
+
+    group.add(arrowMesh)
+    
+    const arrowHelper = Objeto.fromMesh(group);
+    
+    const moverSetinha = mover(arrowHelper, origem, destino)
+                        .setOnStart(() => {
+                            arrowHelper.addToScene(scene);
+                        })
+
+    moverSetinha.setinha = arrowHelper
+
+    return moverSetinha;
+}
+
+export class MoverSetinhaIdle extends ExecutarAnimacaoIdle{
+
+    constructor(origem, destino, fase, delay){
+
+        super(moverSetinha(origem, destino, fase.scene), fase, delay);
+
+
+    }
+
+    _update(novoEstado){
+
+        if(novoEstado.ativarAnimacaoIdle){
+            this.start();
+        }
+        else if(novoEstado){
+            const duration = this.animacaoIdle.frames;
+            this.animacaoIdle.idle = false;
+            this.animacaoIdle.finalizarExecucao(); 
+            this.animacaoIdle.setinha.removeFromScene();
+
+            // if(this.estado.restart) clearTimeout(this.estado.restart);
+
+            // this.estado.restart = setTimeout(() => (this.estado.restart) ? this.start(): null, this.delay);
+            //Se um dia refatorar animação, talvez isso quebre a animação idle pois os frames vão para o final
+        }
+    }
 }

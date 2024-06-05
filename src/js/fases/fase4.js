@@ -904,7 +904,13 @@ export class Fase4 extends Fase{
             "Para nos prepararmos para semelhança, a ultima fase"
         ]
 
-        fase.animar(fase.animacoesDialogo(...dialogo));
+        fase.animar(fase.animacoesDialogo(...dialogo).setOnTermino(() => {
+
+            fase.settings.mostrarSetaProximaFase(true);
+
+            setTimeout(fase.settings.proximaFase, 15000);
+        }));
+
     }
 
     moverTracejado(tracejado, filler){

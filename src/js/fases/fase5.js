@@ -552,7 +552,12 @@ export class Fase5  extends Fase{
             "Vamos usar esse raciocínio na proxima fase onde veremos semelhança"
         ]
 
-        fase.animar(fase.animacoesDialogo(...dialogo));
+        fase.animar(fase.animacoesDialogo(...dialogo).setOnTermino(() => {
+
+            fase.settings.mostrarSetaProximaFase(true);
+
+            setTimeout(fase.settings.proximaFase, 15000);
+        }));
     }
 
     ////////////////////////////////////////////////////////////////////////

@@ -446,6 +446,16 @@ export class Fase {
         return new AnimacaoSequencial().setAnimacoes(textos.map(texto => this.animacaoDialogo(texto)));
     }
 
+    mostrarSetinhaProximaFase(){
+
+        return () => {
+
+            this.settings.mostrarSetaProximaFase(true);
+
+            setTimeout(this.settings.proximaFase, 15000);
+        }
+    }
+
     getTranslatedPositionRelativeToDocument(element) {
         let x = 0;
         let y = 0;

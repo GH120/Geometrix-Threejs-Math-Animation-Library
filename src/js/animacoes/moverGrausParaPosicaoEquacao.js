@@ -125,9 +125,9 @@ export class MoverGrausParaPosicaoEquacao extends AnimacaoSimultanea{
         function criarEquacao(){
             const valores = angulos.map( angulo => angulo.variable.getValue());
 
-            const x = new Variable(valores[0]);
-            const y = new Value(valores[1]);
-            const z = new Value(valores[2]);
+            const x = new Variable(valores[0].trim());
+            const y = new Variable(valores[1].trim());
+            const z = new Variable(valores[2].trim());
 
             const equacao = moverGraus.equationFunction(x,y,z);
 
@@ -241,9 +241,6 @@ export class MoverGrausParaPosicaoEquacao extends AnimacaoSimultanea{
                                             .setOnStart(() =>{
 
                                                     angulos.map(angulo => angulo.mostrarAngulo.update({dentro:true}));
-
-                                                    //Mudar se tornar escolha de ângulo geral
-                                                    angulos[2].mostrarAngulo.text.elemento.element.textContent = '?';
                                             })
 
             const moverEquacaoParaDiv = new MoverTexto(novoElemento)

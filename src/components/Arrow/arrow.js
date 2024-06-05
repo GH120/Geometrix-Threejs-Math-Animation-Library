@@ -1,20 +1,26 @@
 // TransitionArrow.jsx
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import './styles.css'; // Make sure to import the CSS file
+import imagem from '../../assets/arrow4.png'
 
 const TransitionArrow = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const nextLevel = parseInt(id) + 1;
 
+  const handleNavigation = () => {
+    window.location.href = `/level/${nextLevel}`;
+  };
+
   return (
     <div 
-      style={{ position: 'absolute', right: '10px', bottom: '10px', cursor: 'pointer' }}
-      onClick={() => navigate(`/level/${nextLevel}`)}
+      className="transition-arrow"
+      onClick={handleNavigation}
     >
-      <img src="/path/to/your/arrow/image.png" alt="Next Level" />
-    </div>
-  );
+      <img src={imagem} alt="Next Level" />
+      <span style={{position:'absolute', top: '148px'}}className="transition-text">PRÓXIMA FASE</span>
+  </div>)
 }
 
 export default TransitionArrow;

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Fase1 } from '../../js/fases/fase1';
 import { Fase2 } from '../../js/fases/fase2';
 import { Fase3 } from '../../js/fases/fase3';
@@ -10,6 +10,7 @@ import { Fase7 } from '../../js/fases/fase7';
 import { Whiteboard } from '../../js/cards/whiteboard';
 import Navbar from '../../components/Navbar/Navbar';
 import { PrimeiraFase } from '../../js/fases/PrimeiraFase';
+import TransitionArrow from '../../components/Arrow/arrow';
 
 const fases = {
   '1' : Fase4,
@@ -30,6 +31,8 @@ const LevelScreen = () => {
   const [fase, setFase] = useState(null);
   const [whiteboard, setWhiteboard] = useState(null);
   const [cursor, setCursor] = useState('default');
+  const [proximaFase, mostrarSetinha] = useState(false);
+  const navigate = useNavigate();
 
   // ====== INICIANDO FASE ========
   useEffect(() => {
@@ -70,7 +73,13 @@ const LevelScreen = () => {
     }
   };
 
-  const settings = {fase, whiteboard, setCursor: (tipo) => {setCursor(tipo); settings.tipo = tipo}, tipo: cursor}
+  const settings = {
+    fase, 
+    whiteboard, 
+    setCursor: (tipo) => {setCursor(tipo); settings.tipo = tipo}, tipo: cursor,
+    mostrarSetaProximaFase: mostrarSetinha,
+    proximaFase: () => window.location.href = `/level/${parseInt(id)+1}`
+  }
 
   return (
       <div
@@ -80,6 +89,7 @@ const LevelScreen = () => {
       >
         {levelLoad && <Navbar settings={settings}/>}
         <div className='container de tudo' style={{cursor:cursor}} ref={refContainer}></div>
+        {proximaFase && <TransitionArrow></TransitionArrow>}
       </div>
 
   )

@@ -55,7 +55,7 @@ export class MostrarAngulo extends Output{
             const vetor = new THREE.Vector3(0,0,0)
                         .lerpVectors(angulo.vetor2,     angulo.vetor1,      0.5)
                         .normalize()
-                        .multiplyScalar(this.distanciaTextoParaAngulo * angulo.angleRadius)
+                        .multiplyScalar(this.distanciaTextoParaAngulo * (angulo.angleRadius+ 0.03))
                         .applyMatrix4(new THREE.Matrix4().extractRotation(angulo.mesh.matrixWorld));
 
             if(!angulo.sentidoHorario && angulo.revolucaoCompleta) vetor.negate();

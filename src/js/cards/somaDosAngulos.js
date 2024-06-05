@@ -25,7 +25,7 @@ import { Clickable } from "../inputs/clickable";
 import MetalicSheen from "../animacoes/metalicSheen";
 import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
-import imagemParalelogramoLado from '../../assets/CartaParalalogramoLado.png'
+import imagemSoma from '../../assets/somaDosAngulos.png'
 import { MoverGrausParaPosicaoEquacao } from "../animacoes/moverGrausParaPosicaoEquacao";
 
 //Consertar: mostrar igualdade de ângulo (valor inicial cortando delta YZW)
@@ -46,7 +46,7 @@ export class SomaDosAngulosTriangulo {
         this.outputs = [];
     }
 
-    static imagem = this.imagem = imagemParalelogramoLado;
+    static imagem = this.imagem = imagemSoma;
 
     dialogos = {
         inicio: "A soma dos ângulos internos de um triângulo é 180°",

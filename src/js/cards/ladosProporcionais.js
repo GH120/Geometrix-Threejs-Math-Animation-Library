@@ -28,7 +28,7 @@ import { Clickable } from "../inputs/clickable";
 import MetalicSheen from "../animacoes/metalicSheen";
 import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
-import imagemGrama from '../../assets/grass_bermuda_01_alpha_4k.png'
+import imagem from '../../assets/ladosProporcionais.png'
 import { MoverGrausParaPosicaoEquacao } from "../animacoes/moverGrausParaPosicaoEquacao";
 import { controleHitboxTransparente, mostrarHitboxTransparente } from "../animacoes/idle";
 
@@ -52,7 +52,7 @@ export class LadosProporcionais {
         this.controlesHighlight = [];
     }
 
-    static imagem = this.imagem = imagemGrama;
+    static imagem = this.imagem = imagem;
 
     dialogos = {
         inicio: "Selecione os polígonos com lados proporcionais clicando neles",

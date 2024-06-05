@@ -56,7 +56,7 @@ export class PrimeiraFase extends Fase{
 
         this.setupObjects();
 
-        this.text.position.copy(new THREE.Vector3(0,4,0))
+        this.text.position.copy(new THREE.Vector3(0,3.85,0))
 
         // this.outputTesteClick();
         this.pilhaDeCartas = [] //Talvez criar uma classe para isso, o baralho
@@ -75,7 +75,7 @@ export class PrimeiraFase extends Fase{
 
     cartas = [
         LadoParalogramo,
-        AnguloParalogramo
+        AnguloParalogramo,
         // Adicione mais cartas conforme necessário
     ];
 

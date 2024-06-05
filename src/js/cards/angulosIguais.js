@@ -28,7 +28,7 @@ import { Clickable } from "../inputs/clickable";
 import MetalicSheen from "../animacoes/metalicSheen";
 import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
-import imagemGrama from '../../assets/sky.webp'
+import imagem from '../../assets/angulosCongruentes.png'
 import { MoverGrausParaPosicaoEquacao } from "../animacoes/moverGrausParaPosicaoEquacao";
 import { controleHitboxTransparente, mostrarHitboxTransparente } from "../animacoes/idle";
 
@@ -50,7 +50,7 @@ export class AngulosIguais {
         this.outputs = [];
     }
 
-    static imagem = this.imagem = imagemGrama;
+    static imagem = this.imagem = imagem;
 
     dialogos = {
         inicio: "Selecione os polígonos com angulos iguais clicando neles",

@@ -732,12 +732,15 @@ export class PrimeiraFase extends Fase{
                 this.lidarResolucaoEquacao();
 
                 const dialogo = [
-                    'Muito bem, verifique os ângulos do outro paralelogramo',
-                    'Se eles forem congruentes (iguais) então uma nova carta aparecerá',
-                    "Use as cartas para resolver o problema: "
+                    'Descobrimos o valor dos ângulos laterais',
+                    ' ',
                 ]
 
                 this.verificarCartas();
+
+                fase.objetivos.completarObjetivoMudarFoco(0, 'angulos', true);
+
+                fase.settings.ativarMenuCartas(true);
 
                 fase.animar(fase.animacoesDialogo(...dialogo).setOnTermino(() =>  fase.settings.ativarMenuCartas(true)));
             }
@@ -775,6 +778,10 @@ export class PrimeiraFase extends Fase{
                 const animacao = fase.animacoesDialogo(...dialogo).setOnTermino(atualizarCartas);
 
                 fase.animar(animacao);
+
+                const objetivo = (novoEstado.paralelogramo == fase.paralelogramo2)? 2.1 : 2.2;
+
+                fase.objetivos.completarObjetivoMudarFoco(objetivo, 'angulos', false);
             }
 
             if(novoEstado.carta == "SomaDosAngulosTriangulo"){
@@ -784,9 +791,6 @@ export class PrimeiraFase extends Fase{
                 //Move etapa para soma de equações
                 this.update({somarEquacoes: true})
 
-                const objetivo = (novoEstado.paralelogramo == fase.paralelogramo2)? 2.1 : 2.2;
-
-                fase.objetivos.completarObjetivoMudarFoco(objetivo, 'angulos');
             }
 
             if(novoEstado.carta == "LadoParalelogramo"){

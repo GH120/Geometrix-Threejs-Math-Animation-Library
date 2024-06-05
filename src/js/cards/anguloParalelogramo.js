@@ -62,7 +62,7 @@ export class AnguloParalogramo {
         //Aparece o mostrarAngulo do ângulo desconhecido
         divisaoAnguloIgual4: "Então seus ângulos são iguais",
         divisaoAnguloIgual5: "Olhe para aresta que o angulo conhecido aponta",
-        divisaoAnguloIgual6: "Perceba que o angulo azul também aponta para ela",
+        divisaoAnguloIgual6: "Perceba que o ângulo azul também aponta para ela",
         divisaoAnguloIgual7: "Então ele é igual ao conhecido",
 
         comentario1: "Agora arraste o outro lado restante",
@@ -73,8 +73,8 @@ export class AnguloParalogramo {
         //MELHORAR DIALOGO
         divisaoAngulosVizinhos1: "Se nós dividirmos o paralelogramo pela outra metade, conseguimos dois triângulos iguais de novo", 
         divisaoAngulosVizinhos2: "Então esses ângulos desconhecidos são iguais não é?", //Mesma animação de tracejado para aresta central
-        divisaoAngulosVizinhos3: "Ângulos iguais apontam para lados iguais", //Aparece text box para digitar o nome da variável
-        divisaoAngulosVizinhos4: "Y + Z é o angulo conhecido, e precisamos encontrar x",
+        divisaoAngulosVizinhos3: "Ângulos iguais apontam para lados iguais, assim descobrimos os outros:", //Aparece text box para digitar o nome da variável
+        divisaoAngulosVizinhos4: angulo =>  `Dividimos o ${Math.round(angulo.degrees)}° em dois ângulos Y e Z, e vamos encontrar X `,
 
 
 
@@ -620,6 +620,8 @@ export class AnguloParalogramo {
         const fase = this.fase;
         const paralelogramo = this.paralelogramoSelecionado;
 
+        const anguloConhecido = this.controle.estado.anguloConhecido;
+
         console.log(paralelogramo)
 
         // fase.debug = false;
@@ -699,16 +701,7 @@ export class AnguloParalogramo {
         const mostrarDiagonal1 = new AnimacaoSequencial(mexerAngulo1, mostrarBissetriz1);
         const mostrarDiagonal2 = new AnimacaoSequencial(mexerAngulo2, mostrarBissetriz2);
 
-        const animacao2 = new AnimacaoSequencial(
-                            mostrarDiagonal1,
-                            mostrarDiagonal2,
-
-                        )
-                        .setOnTermino(() => {
-                            tracejadoBissetriz2.removeFromScene();
-                            tracejadoBissetriz1.removeFromScene();
-                            tracejado.removeFromScene();
-                        })
+        const animacao2 = this.mostrarTracejadosAngulosIguais(1,trianguloInferior, trianguloSuperior, tracejado);
 
         const dialogo2 = new AnimacaoSimultanea(
             fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos2),
@@ -727,16 +720,18 @@ export class AnguloParalogramo {
                 anguloLateral1.mostrarAngulo.animacao(true), 
                 anguloLateral2.mostrarAngulo.animacao(true)
             ),
+            this.mostrarTracejadosAngulosIguais(2,trianguloInferior, trianguloSuperior, tracejado),
+            this.mostrarTracejadosAngulosIguais(0,trianguloInferior, trianguloSuperior, tracejado),
             substituirGraus
         )
 
         const dialogo3 = new AnimacaoSimultanea(
             fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos3),
-            animacao3
+            animacao3,
         )
 
         const dialogo4 = new AnimacaoSimultanea(
-            fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos4)
+            fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos4(anguloConhecido)),
         )
 
         //Mudar isso para antes do final, 
@@ -782,7 +777,12 @@ export class AnguloParalogramo {
 
         const equacao = new Equality(new Addition(new Variable('Y'), new Variable('Z')), new Variable(angulos[0].variable.getValue() + "°"));
 
-        const textbox = fase.createTextBox(equacao.html.innerText, [-5,0,0], 17, true);
+
+        const angulo  = this.controle.estado.anguloConhecido;
+
+        const posicao = angulo.getPosition().add(new THREE.Vector3(-1, 0 , 0));
+
+        const textbox = fase.createTextBox(equacao.html.innerText, posicao.toArray(), 17, true);
 
         //Gambiarra
         equacao.nome = "SOMADOSANGULOS";
@@ -793,9 +793,9 @@ export class AnguloParalogramo {
             fase.moverEquacao({
                 elementoCSS2: textbox, 
                 equacao: equacao,
-                duration1: 60,
-                duration2: 60,
-                delayDoMeio: 30
+                duration1: 120,
+                duration2: 120,
+                delayDoMeio: 60
             })
             .filler(120)
 
@@ -804,6 +804,44 @@ export class AnguloParalogramo {
         
 
         return new AnimacaoSimultanea().setAnimacoes(animacoes);
+    }
+
+    mostrarTracejadosAngulosIguais(indice, trianguloInferior, trianguloSuperior, tracejado){
+
+        const fase = this.fase;
+
+        const anguloLateral1 = trianguloSuperior.angles[indice];
+        const anguloLateral2 = trianguloInferior.angles[2-indice];
+
+
+        const mexerAngulo1 = this.animacaoGirarAngulo(anguloLateral1);
+        const mexerAngulo2 = this.animacaoGirarAngulo(anguloLateral2);
+
+        const diagonal1 = trianguloSuperior.edges[(indice + 1)%3];
+        const diagonal2 = trianguloInferior.edges[(3- indice)%3];
+
+
+        const tracejadoBissetriz1 = new Tracejado(anguloLateral1.getPosition()      , diagonal1.getPosition());
+        const tracejadoBissetriz2 = new Tracejado(anguloLateral2.getPosition(), diagonal2.getPosition());
+
+        const mostrarBissetriz1 = new MostrarTracejado(tracejadoBissetriz1, fase.scene);
+        const mostrarBissetriz2 = new MostrarTracejado(tracejadoBissetriz2, fase.scene);
+
+        const mostrarDiagonal1 = new AnimacaoSequencial(mexerAngulo1, mostrarBissetriz1);
+        const mostrarDiagonal2 = new AnimacaoSequencial(mexerAngulo2, mostrarBissetriz2);
+
+        const animacao2 = new AnimacaoSequencial(
+                            mostrarDiagonal1,
+                            mostrarDiagonal2,
+
+                        )
+                        .setOnTermino(() => {
+                            tracejadoBissetriz2.removeFromScene();
+                            tracejadoBissetriz1.removeFromScene();
+                            tracejado.removeFromScene();
+                        });
+
+        return animacao2;
     }
 
 

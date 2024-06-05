@@ -55,15 +55,18 @@ export class LadoParalogramo {
 
         const paralelogramo    = this.paralelogramoSelecionado
 
-        const todosLadosConhecidos = paralelogramo.edges.filter(edge => edge.variable.value).length == paralelogramo.edges.length;
 
         if(!paralelogramo){
             fase.animar(fase.animacaoDialogo('Paralelogramo não encontrado, tente de novo'));
+            return false;
         }
 
+        const todosLadosConhecidos = paralelogramo.edges.filter(edge => edge.variable.value).length == paralelogramo.edges.length;
 
-        if(!todosLadosConhecidos){
+
+        if(todosLadosConhecidos){
             fase.animar(fase.animacaoDialogo('Paralelogramo tem todos os lados conhecidos, tente outro'));
+            return false;
         }
 
         return paralelogramo && !todosLadosConhecidos;

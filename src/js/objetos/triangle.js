@@ -18,6 +18,8 @@ export class Triangle extends Objeto{
         this.positions = positions;
         this.edges = [];
         this.angles = [];
+
+        this.mesh = {}
     }
 
     render(){

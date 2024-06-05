@@ -67,6 +67,8 @@ export class SomaDosAngulosTriangulo {
 
         fase.adicionarControleDaCarta(this.controle);
 
+        console.log(triangulos)
+
         for(const triangulo of triangulos){
 
             //Por algum motivo, precisa sempre criar novos outputs
@@ -85,15 +87,15 @@ export class SomaDosAngulosTriangulo {
 
         const fase = this.fase;
 
-        const paralelogramo    = this.trianguloSelecionado
+        const triangulo    = this.trianguloSelecionado
 
         const todosLadosConhecidos = false;
 
-        if(!paralelogramo){
+        if(!triangulo){
             fase.animar(fase.animacaoDialogo('Paralelogramo não encontrado, tente de novo'));
         }
 
-        return paralelogramo && !todosLadosConhecidos;
+        return triangulo && !todosLadosConhecidos;
     }
 
     process(){
@@ -133,19 +135,19 @@ export class SomaDosAngulosTriangulo {
 
         //Planejamento:
 
-        //1 - Dividir o paralelogramo em dois triângulos baseado no ângulo conhecido -> feito
+        //1 - Dividir o triangulo em dois triângulos baseado no ângulo conhecido -> feito
         //2 - Mostrar que eles são iguais pois os triângulos são iguais -> feito
-        //3 - Dividir o paralelogramo em dois triângulos baseado nos dois ângulos desconhecidos
+        //3 - Dividir o triangulo em dois triângulos baseado nos dois ângulos desconhecidos
         //4 - Usar a carta dos 180° para mostrar que o ângulo restante pode ser calculado
 
-        //1.1 - Animação dividir paralelogramos
+        //1.1 - Animação dividir triangulos
     }
 
 
 
     //OUTPUTS
 
-    criarVerificadorDeHover(paralelogramo, scene, camera){
+    criarVerificadorDeHover(triangulo, scene, camera){
 
         const carta = this;
 
@@ -158,6 +160,8 @@ export class SomaDosAngulosTriangulo {
 
                                 this.estado.valido = novoEstado.dentro;
 
+                                console.log(triangulo, novoEstado.dentro);
+
                                 if(!this.estado.valido) return;
 
                                 //Desativa todos os verificadores
@@ -165,14 +169,13 @@ export class SomaDosAngulosTriangulo {
                                              .forEach(verificador => verificador.ativar(false));
 
                                 //Verificar de novo, dando problemas
-                                carta.paralelogramoSelecionado = paralelogramo;
+                                carta.trianguloSelecionado = triangulo;
 
                             })
-                            .addInputs(paralelogramo.hoverable)
+                            .addInputs(triangulo.hoverable)
 
         this.outputs.push(verificador);
 
-        this.verificadorDeHover = verificador; 
     }
 
 

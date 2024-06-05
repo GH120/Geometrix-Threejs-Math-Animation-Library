@@ -9,15 +9,20 @@ export default class ExecutarAnimacaoIdle extends Output{
 
         this.fase = fase;
 
+        this.curva = curva;
+
         this.animacaoIdle = animacao.idleAnimation(fase, curva, usarSuavisacao);
 
         this.delay = delay;
+
+        this.usarSuavisacao = usarSuavisacao
 
         this.desativarMudancaCursor(true);
 
 
         this.delayToReestart = delay;
         
+        this.framesOriginais = this.animacaoIdle.frames;
     }
 
     _update(novoEstado){
@@ -26,9 +31,11 @@ export default class ExecutarAnimacaoIdle extends Output{
             this.start();
         }
         else if(novoEstado){
-            const duration = this.animacaoIdle.frames;
             this.animacaoIdle.idle = false;
-            this.animacaoIdle.finalizarExecucao(); 
+            this.animacaoIdle.setOnDelay(() => this.animacaoIdle.setDuration(this.framesOriginais));
+
+            this.animacaoIdle.setDuration(10)
+            // this.animacaoIdle.finalizarExecucao(); 
 
             // if(this.estado.restart) clearTimeout(this.estado.restart);
 
@@ -43,7 +50,9 @@ export default class ExecutarAnimacaoIdle extends Output{
 
         const fase = this.fase;
 
-        animacaoIdle.idle = true;
+        // animacaoIdle.onDelay(); //Usa o onDelay em transições de desativação para reativação
+
+        animacaoIdle.idleAnimation(fase, this.curva, this.usarSuavisacao)
 
         setTimeout(() => (animacaoIdle.idle)? fase.animar(animacaoIdle) : null, this.delay * 1000);
 

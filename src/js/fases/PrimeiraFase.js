@@ -206,9 +206,7 @@ export class PrimeiraFase extends Fase{
 
         //Todas as equações em latex usadas nessa aula
         const equacoes = {
-            ladosIguais: ` {\\color{purple} RAZÃO = 
-                            \\frac {{\\color{blue}Lado~Poligono~2}}
-                            {{\\color{red} Lado~Poligono~1}}= \\Large{2}}`,
+            ladosIguais: `\\frac{\\color{red} Lado~P1}{\\color{blue} Lado~P2} ~~~proporcionais ~com~ \\color{purple} RAZ \\tilde{A} O  = \\Large{2}`,
 
             angulosIguais: `~{\\color{red}~Todos~Ângulos~ do ~P1} = 
                             ~{\\color{blue}~Todos~Ângulos~ do~ P2}`,
@@ -218,7 +216,7 @@ export class PrimeiraFase extends Fase{
                             Ângulo~ {\\color{blue} ${index + 1}} ~ do~ P2 = 
                             {\\color{purple} ${valorDoAngulo}°} `,
             
-            semelhanca: `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
+            semelhanca: `{\\color{purple}Semelhantes~(\\color{red} P1~, \\color{blue}~P2 \\color{purple})}`
         }
 
         //Desenhar um polígono pequeno, desenhar outro polígono maior
@@ -283,11 +281,14 @@ export class PrimeiraFase extends Fase{
             const arraste1 = new JuntarEquacoes(equacao1, [equacao2], fase);
             const arraste2 = new JuntarEquacoes(equacao2, [equacao1], fase);
 
-            arraste1.tamanhoFonte = 5;
-            arraste2.tamanhoFonte = 5;
+            arraste1.tamanhoFonte = 3.5;
+            arraste2.tamanhoFonte = 3.5;
 
             arraste1.criarIdling();
             arraste2.criarIdling();
+
+            arraste1.equacaoResultante = equacoes.semelhanca;
+            arraste2.equacaoResultante = equacoes.semelhanca;
 
             // fase.debug = false;
 
@@ -743,6 +744,10 @@ export class PrimeiraFase extends Fase{
 
             //Lida com eventos das cartas abaixo
 
+            if(novoEstado.carta){
+
+                fase.animar(fase.animacaoDialogo(' '))
+            }
 
             if(novoEstado.carta == "AnguloParalelogramo"){
 
@@ -770,12 +775,6 @@ export class PrimeiraFase extends Fase{
                 const animacao = fase.animacoesDialogo(...dialogo).setOnTermino(atualizarCartas);
 
                 fase.animar(animacao);
-
-                //Refatorar isso depois em uma classe
-
-                const objetivo = (novoEstado.paralelogramo == fase.paralelogramo2)? 2.1 : 2.2;
-
-                fase.objetivos.completarObjetivoMudarFoco(objetivo, 'angulos');
             }
 
             if(novoEstado.carta == "SomaDosAngulosTriangulo"){
@@ -784,6 +783,10 @@ export class PrimeiraFase extends Fase{
 
                 //Move etapa para soma de equações
                 this.update({somarEquacoes: true})
+
+                const objetivo = (novoEstado.paralelogramo == fase.paralelogramo2)? 2.1 : 2.2;
+
+                fase.objetivos.completarObjetivoMudarFoco(objetivo, 'angulos');
             }
 
             if(novoEstado.carta == "LadoParalelogramo"){
@@ -2046,6 +2049,7 @@ export class PrimeiraFase extends Fase{
     //Adicionar equação 4 horas = 120 graus, onde graus e horas são variáveis
     //Adicionar possibilidade de resolver equação por meios algébricos
     //Adicionar menu de perguntas
+    //REFATORAR PARA INTEGRAR NO CONTROLE GERAL
     problemas = {
 
         0: {
@@ -2080,12 +2084,12 @@ export class PrimeiraFase extends Fase{
 
             consequencia(fase){
                 
-                const dialogo1 = fase.animacaoDialogo("Ótimo, agora só por precaução faça o mesmo para o outro paralelogramo")
-                const dialogo2 = fase.animacaoDialogo("Queremos ver se os lados são proporcionais, e é útil descobrir os desconhecidos");
+                // const dialogo1 = fase.animacaoDialogo("Ótimo, agora só por precaução faça o mesmo para o outro paralelogramo")
+                // const dialogo2 = fase.animacaoDialogo("Queremos ver se os lados são proporcionais, e é útil descobrir os desconhecidos");
 
-                dialogo1.setOnTermino(() => fase.settings.ativarMenuCartas(true));
+                // dialogo1.setOnTermino(() => fase.settings.ativarMenuCartas(true));
 
-                fase.animar(new AnimacaoSequencial(dialogo1, dialogo2).setNome("Dialogo Cartas"))
+                // fase.animar(new AnimacaoSequencial(dialogo1, dialogo2).setNome("Dialogo Cartas"))
             },
 
             proximo(fase){

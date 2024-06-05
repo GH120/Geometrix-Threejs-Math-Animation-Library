@@ -18,6 +18,9 @@ export class Poligono extends Objeto{
         this.cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xe525252 });
         this.numeroVertices = positions.length;
 
+        //Placeholder
+        this.mesh = {};
+
 
         this.positions = positions;
         this.edges = [];
@@ -128,6 +131,8 @@ export class Poligono extends Objeto{
 
         //Tratar caso onde não foi renderizado
         if(!this.rendered) this.render();
+
+        this.mesh.parent = scene;
 
         this.vertices.map(vertex => vertex.addToScene(scene))
         this.edges.map(   edge   => edge.addToScene(scene));

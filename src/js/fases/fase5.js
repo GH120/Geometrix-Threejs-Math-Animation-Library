@@ -830,8 +830,9 @@ export class Fase5  extends Fase{
 
             const controleIdle = new ExecutarAnimacaoIdle(colorirVertice, fase, 0).start();
 
+            controleIdle.addInputs(vertice.clickable, vertice.draggable)
+
             vertice.clickable.addObserver(fase.outputCriarTracejado[i]);
-            vertice.clickable.addObserver(controleIdle);
             
             fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable));
 

@@ -75,11 +75,16 @@ export class LadoParalogramo {
 
         const fase = this.fase;
 
+        const carta = this;
+
         fase.adicionarControleDaCarta(this.controleArrastarLados());
 
-        const dialogo = new AnimacaoSequencial(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um conhecido para seu oposto e veja o que acontece"));
+        const dialogo = new AnimacaoSequencial(fase.animacaoDialogo("Os lados agora são arrastáveis, arraste um conhecido para seu oposto"));
         
         dialogo.setNome("Dialogo Carta")
+
+        dialogo.setOnStart(() => carta.colorirArestas.map(colorir => colorir.update({dentro: true})));
+        dialogo.setOnTermino(() => carta.colorirArestas.map(colorir => colorir.update({dentro: false})));
 
         fase.animar(dialogo)
 
@@ -331,8 +336,8 @@ export class LadoParalogramo {
         ]
 
         const dialogos = {
-            primeiroLadoMovido1: `Temos agora três lados conhecidos, `,
-            primeiroLadoMovido2: `Use o mesmo raciocinio com o lado restante para obter seu valor`,
+            primeiroLadoMovido1: `Repita para o lado desconhecido restante`,
+            // primeiroLadoMovido2: `Use o mesmo raciocinio com o lado restante para obter seu valor`,
             ultimoLadoMovido: `Muito bem, agora conhecemos todos os lados`
         }
 
@@ -388,7 +393,7 @@ export class LadoParalogramo {
                 
                 animacaoDialogo = new AnimacaoSequencial(
                                     carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido1), 
-                                    carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
+                                    // carta.fase.animacaoDialogo(dialogos.primeiroLadoMovido2)
                                 );
 
                 animacaoDialogo.setNome("Dialogo Carta");

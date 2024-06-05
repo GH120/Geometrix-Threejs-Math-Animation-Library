@@ -185,6 +185,8 @@ export class LadosProporcionais {
 
                             const notificarFimExecucao = () => this.notify({carta: "LadosProporcionais"})
 
+                            fase.animar(fase.animacaoDialogo(' '));
+
                             //Não verifica ainda se são de fato proporcionais
                             carta.animarLadosProporcionais(estado.objetosSelecionados)
                                  .setOnTermino(notificarFimExecucao)
@@ -206,9 +208,7 @@ export class LadosProporcionais {
 
 
         const equacoes = {
-            ladosIguais: razao => ` {\\color{purple} RAZÃO = 
-                            \\frac {{\\color{blue}Lado~Poligono~2}}
-                            {{\\color{red} Lado~Poligono~1}}= \\Large{${razao}}}`,
+            ladosIguais: razao =>`\\frac{\\color{red} Lado~P1}{\\color{blue} Lado~P2} ~~~proporcionais ~com~ \\color{purple} RAZ \\tilde{A} O  = \\Large{${razao}}`,
 
             angulosIguais: `~{\\color{red}~Todos~Ângulos~ do ~P1} = 
                             ~{\\color{blue}~Todos~Ângulos~ do~ P2}`,
@@ -218,7 +218,7 @@ export class LadosProporcionais {
                             Ângulo~ {\\color{blue} ${index + 1}} ~ do~ P2 = 
                             {\\color{purple} ${valorDoAngulo}°} `,
             
-            semelhanca: `{\\color{purple}~Figuras~Semelhantes~(P1 , P2)}`
+            semelhanca: `{\\color{purple}Semelhantes~(\\color{red} P1~, \\color{blue}~P2 \\color{purple})}`
         }
 
         const recolorirArestas = objetos.flatMap(objeto => objeto.edges)
@@ -239,7 +239,7 @@ export class LadosProporcionais {
 
         const dividirLados   = new AnimacaoSequencial(
             fase.animacaoDividirLadosIguais(objetos[0], objetos[1], unidadeMedida),
-            fase.animacaoEquacoesVirandoUmaSo('mostrarRazaoLados', equacoes.ladosIguais(razao), 1),
+            fase.animacaoEquacoesVirandoUmaSo('mostrarRazaoLados', equacoes.ladosIguais(razao), 2, [-4.7,1,0]),
             new AnimacaoSimultanea(...recolorirArestas)
         );
 

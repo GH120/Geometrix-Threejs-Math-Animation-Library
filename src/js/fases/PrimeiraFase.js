@@ -708,6 +708,8 @@ export class PrimeiraFase extends Fase{
                 fase.animar(fase.animacoesDialogo(...dialogo));
 
                 this.criarJuntarEquacoesSemelhanca();
+
+                fase.settings.ativarMenuCartas(true);
             }
 
             if(novoEstado.reset){
@@ -1060,6 +1062,20 @@ export class PrimeiraFase extends Fase{
 
         criarJuntarEquacoesSemelhanca() {
 
+            const equacoes = {
+                ladosIguais: `\\frac{\\color{red} Lado~P1}{\\color{blue} Lado~P2} ~~~proporcionais ~com~ \\color{purple} RAZ \\tilde{A} O  = \\Large{2}`,
+    
+                angulosIguais: `~{\\color{red}~Todos~Ângulos~ do ~P1} = 
+                                ~{\\color{blue}~Todos~Ângulos~ do~ P2}`,
+    
+                compararAngulos: (index, valorDoAngulo) => 
+                                `Ângulo~ {\\color{red}${index + 1}} ~   do ~P1 = 
+                                Ângulo~ {\\color{blue} ${index + 1}} ~ do~ P2 = 
+                                {\\color{purple} ${valorDoAngulo}°} `,
+                
+                semelhanca: `{\\color{purple}Semelhantes~(\\color{red} P1~, \\color{blue}~P2 \\color{purple})}`
+            }
+
             const fase = this.fase;
 
             const equacao1 = new ElementoCSS2D(fase.whiteboard.equacoes[0], fase.whiteboard);
@@ -1068,11 +1084,14 @@ export class PrimeiraFase extends Fase{
             const arraste1 = new JuntarEquacoes(equacao1, [equacao2], fase);
             const arraste2 = new JuntarEquacoes(equacao2, [equacao1], fase);
 
-            arraste1.tamanhoFonte = 5;
-            arraste2.tamanhoFonte = 5;
+            arraste1.tamanhoFonte = 3.5;
+            arraste2.tamanhoFonte = 3.5;
 
             arraste1.criarIdling();
             arraste2.criarIdling();
+
+            arraste1.equacaoResultante = equacoes.semelhanca;
+            arraste2.equacaoResultante = equacoes.semelhanca
 
             this.addInputs(arraste1, arraste2);
         }

@@ -106,9 +106,14 @@ export class Draggable extends Input{
 
                         const estado = this.estado;
 
-                        const temOutput = draggable.observers.filter(output => !output.ignorarOutput).length;
+                        const temOutput = draggable.observers.filter(output => !output.ignorarCursor).length;
 
-                        // if(!camera.fase || !camera.fase.settings || !camera.fase.settings.setCursor) return;
+                        if(!camera.fase || !camera.fase.settings || !camera.fase.settings.setCursor) return;
+
+
+                        const renderizado = object.mesh.parent == camera.fase.scene;
+
+                        if(!renderizado) return;
 
                         //Funções auxiliares
                         const setCursor = (cursor) => {

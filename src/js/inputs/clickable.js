@@ -12,6 +12,8 @@ export class Clickable extends Input{
 
     this.outputMudarCursor(object, camera, container)
 
+    this.numeroClicks = 0;
+
     // Add event listeners for mouse down, move, and up events
     window.addEventListener('click', this.onClick.bind(this), false);
   }
@@ -29,7 +31,7 @@ export class Clickable extends Input{
 
   outputMudarCursor(object, camera, container){
 
-    const clickable = this;
+    const hoverable = this;
 
     //Output mudar cursor
     const hover = new Hoverable({}, camera, container);
@@ -39,24 +41,25 @@ export class Clickable extends Input{
     this.mudarCursor = new Output([hover])
                       .setUpdateFunction(function(novoEstado) {
 
+                        if(!camera.fase || !camera.fase.settings || !camera.fase.settings.setCursor) return;
 
-                        if(!camera.fase || !camera.fase.settings || !camera.fase.setCursor) return;
+                        const setCursor = camera.fase.settings.setCursor; //Gambiarra enquanto não passa fase como parametro
 
-                        const setCursor = camera.fase.settings.setCursor;
+                        const temOutput = hoverable.observers.filter(o => !o.ignorarCursor).length
 
-                        const temOutput = clickable.observers.filter(output => !output.ignorarOutput).length;
+                        const renderizado = object.mesh.parent == camera.fase.scene;
 
-                        if(!temOutput) 
-                          return setCursor(this.estado.cursorInicial);
+                        //O problema é que os outros objetos não mostrados também tem o clickable deles
+                        if(!renderizado) return;
 
-                        else if(novoEstado.dentro) {
-                          setCursor('pointer')
+                        if(!temOutput) {
+                          return setCursor('default');
                         }
+
+                        if(novoEstado.dentro) 
+                          setCursor('pointer')
                         else 
-                          setCursor(this.estado.cursorInicial)
-
-
-                          console.log(clickable, temOutput)
+                          setCursor('default')
                       })
                       .setEstadoInicial({
                         cursorInicial: 'default'

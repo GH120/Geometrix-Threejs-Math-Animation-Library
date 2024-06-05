@@ -107,22 +107,19 @@ export default class ResolverEquacao extends Output{
 
     criarIdling(){
 
-        const fase = this.fase;
+            const fase = this.fase;
 
-        const equacaoMovida = this.equacaoMovida;
+            const equacaoMovida = this.equacao;
+            
+            const animacao = encolherAumentarIdle(equacaoMovida.texto).setDuration(90 + Math.round(30*Math.random()));
 
-        const equacoesAlvo  = this.equacoesAlvo;
-        
-        const animacao = encolherAumentarIdle(equacaoMovida.texto).setDuration(90 + Math.round(30*Math.random()));
-
-        const controleIdle = new ExecutarAnimacaoIdle(animacao, fase, 10)
-                                .addInputs(
-                                    equacaoMovida.draggable, 
-                                    ...equacoesAlvo.filter(equacao => equacao.draggable).map(equacao => equacao.draggable)
-                                )
-                                .start();
+            const controleIdle = new ExecutarAnimacaoIdle(animacao, fase, 2)
+                                    .addInputs(
+                                        equacaoMovida.clickable, 
+                                    )
+                                    .start();
 
 
-        this.controleIdling = controleIdle;
+            this.controleIdling = controleIdle;
     }
 }

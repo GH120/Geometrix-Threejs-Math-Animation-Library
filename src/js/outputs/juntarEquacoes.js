@@ -188,7 +188,7 @@ export default class JuntarEquacoes extends Output{
         
         const animacao = encolherAumentarIdle(equacaoMovida.texto).setDuration(90 + Math.round(30*Math.random()));
 
-        const controleIdle = new ExecutarAnimacaoIdle(animacao, fase, 7)
+        const controleIdle = new ExecutarAnimacaoIdle(animacao, fase, 4)
                                 .addInputs(
                                     equacaoMovida.draggable, 
                                     ...equacoesAlvo.filter(equacao => equacao.draggable).map(equacao => equacao.draggable)

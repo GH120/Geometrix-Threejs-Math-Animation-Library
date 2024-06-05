@@ -16,6 +16,7 @@ export default class ExecutarAnimacaoIdle extends Output{
         this.desativarMudancaCursor(true);
 
 
+        this.delayToReestart = delay;
         
     }
 
@@ -28,6 +29,10 @@ export default class ExecutarAnimacaoIdle extends Output{
             const duration = this.animacaoIdle.frames;
             this.animacaoIdle.idle = false;
             this.animacaoIdle.finalizarExecucao(); 
+
+            // if(this.estado.restart) clearTimeout(this.estado.restart);
+
+            // this.estado.restart = setTimeout(() => (this.estado.restart) ? this.start(): null, this.delay);
             //Se um dia refatorar animação, talvez isso quebre a animação idle pois os frames vão para o final
         }
     }

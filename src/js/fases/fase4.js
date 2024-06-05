@@ -1021,7 +1021,7 @@ export class Fase4 extends Fase{
         const equacoes = {
             formula: '\\color{blue} graus( \\color{red} {hora} \\color{blue}) \\color{black} = \\color{red} {hora} \\cdot \\color{purple} {RAZ \\tilde{A}O}',
             fatorada: '\\color{blue} graus( \\color{red} hora \\color{blue}) \\color{black} = \\color{red} hora  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}',
-            instanciada: (hora) => `\\color{blue} graus( \\color{red} ${hora} \\color{blue}) \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`
+            instanciada: (hora) => `\\color{blue} graus \\color{black} = \\color{red} ${hora}  \\color{blue} \\cdot \\frac{\\color{blue} 30°} {\\color{red} 1h~}`
         } 
 
         //Vai ser a função que vai instanciar as equações

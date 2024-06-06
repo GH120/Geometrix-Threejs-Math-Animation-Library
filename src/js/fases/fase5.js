@@ -51,10 +51,18 @@ export class Fase5  extends Fase{
 
         super();
 
+        const fase = this;
+
         this.setupObjects();
         this.createInputs();
         this.createOutputs();
         this.setupTextBox();
+
+        fase.aula1();
+
+        fase.Configuracao0();
+
+        fase.controleFluxo  = fase.controleGeral(); 
 
 
         //Mostrar a1,a2,a3 e seus valores indo para lousa
@@ -2697,11 +2705,7 @@ export class Fase5  extends Fase{
             satisfeito: () => true,
 
             consequencia: (fase) => {
-                fase.aula1();
-
-                fase.Configuracao0();
-
-                fase.controleFluxo  = fase.controleGeral(); 
+                    ///
             },
 
             proximo: () => "clicouVertice",

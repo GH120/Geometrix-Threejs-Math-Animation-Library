@@ -87,6 +87,7 @@ const LevelScreen = () => {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       >
+        <title>GEOMETRIX</title>
         {levelLoad && <Navbar settings={settings}/>}
         <div className='container de tudo' style={{cursor:cursor}} ref={refContainer}></div>
         {proximaFase && <TransitionArrow></TransitionArrow>}

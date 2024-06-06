@@ -7,9 +7,7 @@ export class Hoverable extends Input {
 
     super(object,camera,container);
 
-    this.object.hoverable = this;
-
-    console.log(this.object.hoverable);
+    object.hoverable = this;
 
     this.onMouseMove = this.onMouseMove.bind(this);
 

@@ -146,6 +146,7 @@ export const MenuPrincipal = () => {
 
   return (
     <div className="menu">
+      <title>GEOMETRIX</title>
       <div className="options">
         <h1>Geometrix</h1>
         <ul>

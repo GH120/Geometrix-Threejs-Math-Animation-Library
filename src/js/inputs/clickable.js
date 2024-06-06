@@ -7,6 +7,8 @@ export class Clickable extends Input{
 
   constructor(object,camera,container) {
     super(object,camera, container);
+
+    this.object.draggable = this;
     
     this.dragging = false;
 

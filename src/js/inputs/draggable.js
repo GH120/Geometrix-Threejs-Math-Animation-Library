@@ -8,6 +8,10 @@ export class Draggable extends Input{
   constructor(object,camera, container) {
     super(object,camera, container);
 
+    console.log(this.object.draggable);
+
+    this.object.draggable = this;
+
     const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(100,100),
       new THREE.MeshBasicMaterial({color:0xffffff})
@@ -16,6 +20,7 @@ export class Draggable extends Input{
     this.plane = plane;
 
     this.dragging = false;
+
 
     this.outputMudarCursor(object, camera, container);
 

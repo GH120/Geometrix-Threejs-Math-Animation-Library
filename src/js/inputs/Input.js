@@ -13,7 +13,11 @@ export class Input{
 
         const input = this.constructor.name.toLowerCase();
         
+        
         this.object[input] = this;
+
+        console.log(input, this.object[input])
+
 
     }
 

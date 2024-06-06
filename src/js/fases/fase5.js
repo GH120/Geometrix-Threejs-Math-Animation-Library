@@ -58,15 +58,6 @@ export class Fase5  extends Fase{
         this.createOutputs();
         this.setupTextBox();
 
-        setTimeout(() => {
-            fase.aula1();
-
-            fase.Configuracao0();
-
-            fase.controleFluxo  = fase.controleGeral(); 
-        }, 5000)
-
-
         //Mostrar a1,a2,a3 e seus valores indo para lousa
         //Quando dividir a2 em dois angulos, mostrar que ele é a soma dos subangulos
         //Mostrar que a soma dos 
@@ -2704,10 +2695,14 @@ export class Fase5  extends Fase{
     problemas = {
 
         start: {
-            satisfeito: () => true,
+            satisfeito: (fase) => fase.settings,
 
             consequencia: (fase) => {
-                    ///
+                fase.aula1();
+    
+                fase.Configuracao0();
+    
+                fase.controleFluxo  = fase.controleGeral();         
             },
 
             proximo: () => "clicouVertice",

@@ -58,11 +58,13 @@ export class Fase5  extends Fase{
         this.createOutputs();
         this.setupTextBox();
 
-        fase.aula1();
+        setTimeout(() => {
+            fase.aula1();
 
-        fase.Configuracao0();
+            fase.Configuracao0();
 
-        fase.controleFluxo  = fase.controleGeral(); 
+            fase.controleFluxo  = fase.controleGeral(); 
+        }, 5000)
 
 
         //Mostrar a1,a2,a3 e seus valores indo para lousa

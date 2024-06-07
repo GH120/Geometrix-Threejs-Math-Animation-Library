@@ -28,7 +28,7 @@ import { Clickable } from "../inputs/clickable";
 import MetalicSheen from "../animacoes/metalicSheen";
 import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
-import imagem from '../../assets/lados.png'
+import imagem from '../../assets/angulos.png'
 import { MoverGrausParaPosicaoEquacao } from "../animacoes/moverGrausParaPosicaoEquacao";
 import { controleHitboxTransparente, mostrarHitboxTransparente } from "../animacoes/idle";
 

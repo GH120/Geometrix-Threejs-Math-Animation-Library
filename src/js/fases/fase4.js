@@ -428,8 +428,6 @@ export class Fase4 extends Fase{
 
         const fase = this;
 
-        this.debug = false;
-
         //Veja, quanto mais horas maior a quantidade de graus, pois elas são ** proporcionais **
         //Por isso que se 1 hora tem 30°, então 5 horas tem 5 vezes o tanto de graus (Mostra animação incrementando a hora e somando 30°)
         //Então chamamos de **razão** o valor de proporção, que nesse caso é 30°/1 hora '30 graus para cada hora' (adiciona razão na whiteboard)
@@ -660,7 +658,6 @@ export class Fase4 extends Fase{
 
         //Criar objeto que contem equação na whiteboard, quando arrastar para perto uma variável hora retornar uma resposta
 
-        this.debug = false;
 
         const animacao = new AnimacaoSimultanea(
                             dialogo, 
@@ -813,8 +810,7 @@ export class Fase4 extends Fase{
                 .filler(200)
                 .setDuration(200)
             )
-            .setDelay(50)
-            .setOnTermino(()=> fase.debug = false),
+            .setDelay(50),
 
             apagarCSS2(textbox3).reverse().setOnStart(() => textbox3.mudarTexto(resultadoParcial1, 1.5)).setDelay(200),
             new AnimacaoSimultanea(
@@ -1113,7 +1109,6 @@ export class Fase4 extends Fase{
 
                     if(novaEquacao && estado.etapa == 1){
 
-                        this.debug = false;
 
                         const objetoEquacao = new ElementoCSS2D(novaEquacao, fase.whiteboard);
 
@@ -1174,12 +1169,14 @@ export class Fase4 extends Fase{
 
                         const apagarEquacao = apagarCSS2(fase.whiteboard.equacoes[0], fase.whiteboard.scene).filler(300);
 
-                        const moverPonteiro = fase.moverPonteiro(fase.angle.degrees, 30 * estado.hora);
+                        //Bugs na renderização do ângulo
+                        const hora = (estado.hora == 9 || estado.hora == 12)? estado.hora - 0.001 : estado.hora
+                        
+                        const moverPonteiro = fase.moverPonteiro(fase.angle.degrees, 30 * hora);
 
                         const animacao = new AnimacaoSimultanea(mudarSidenote, mudarDialogo, apagarEquacao, moverPonteiro)
                                          .setOnTermino(() => this.update({}))
                                          .setDelay(100)
-                                         .setOnStart(() => this.debug = false);
 
                         fase.animar(animacao);
 
@@ -1193,9 +1190,6 @@ export class Fase4 extends Fase{
 
                         estado.hora  = estado.horarios.splice(Math.round(Math.random() * (estado.horarios.length - 1)), 1)[0]; //Escolhe uma e remove do array
                         estado.valor = `${estado.hora}h`;
-
-                        //Bugs na renderização do ângulo
-                        if(estado.hora == 9 || estado.hora == 12) estado.hora -= 0.001
 
                         fase.whiteboard.adicionarTexto(funcao.texto);
 

@@ -6,11 +6,12 @@ import './style.css';
 import BotaoFase from '../../components/BotaoFase/BotaoFase';
 import Modal from '../../components/modal/Modal';
 import MenuFaseNovo from '../../components/MenuFaseNovo/MenuFaseNovo';
-
+import { IoClose } from "react-icons/io5";
 
 export const MenuPrincipal = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen2, setModalOpen2] = useState(false);
 
   useEffect(() => {
     const scene = new THREE.Scene();
@@ -152,13 +153,31 @@ export const MenuPrincipal = () => {
         <ul>
           <li className="elemento-lista-menu"><Link to="/level/1">INICIAR </Link></li>
           <li className="elemento-lista-menu" onClick={() => {setModalOpen(true)}}><a href="#">ESCOLHER FASE</a></li>
-          <li className="elemento-lista-menu"><a href="#">CRÉDITOS</a></li>
+          <li className="elemento-lista-menu" onClick={() => {setModalOpen2(true)}}><a href="#">CRÉDITOS</a></li>
         </ul>
       </div>
       <div id='gameCanvasDiv' className="canvas-container">
         <canvas id="gameCanvas" width="1600" height="900"></canvas>
       </div>
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}><MenuFaseNovo onClose={() => setModalOpen(false)} /></Modal>
+      <Modal isOpen={modalOpen2} onClose={() => setModalOpen2(false)}>
+        <div>
+          <button onClick={() => setModalOpen2(false)} className='botao-invisivel'>
+              <IoClose color='#5A689B' size={50}/>
+          </button>
+          <div className='h2-menu-fase-wrapper-second'>
+              <h1 className='h2-menu-fase efeitos tira-margem'>Créditos</h1>
+              <h3 className='h2-menu-fase efeitos tira-margem'>Programador Líder</h3>
+              <h4 className='tira-margem'>Felipe Vieira Duarte</h4>
+              <h3 className='h2-menu-fase efeitos tira-margem'>Com ajuda de:</h3>
+              <h4 className='tira-margem'>Havillon Freitas<br/>Renan Xerez<br/>Thomaz Ângelo<br/>Vitor Manoel</h4>
+              <h3 className='h2-menu-fase efeitos tira-margem'>Repositório</h3>
+              <a className='tira-margem font-menor' href='https://github.com/GH120/Geometrix-Threejs-Math-Animation-Library'>
+                github.com/GH120/Geometrix-Threejs-Math-Animation-Library
+              </a>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

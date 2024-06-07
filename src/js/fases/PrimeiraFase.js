@@ -1248,6 +1248,8 @@ export class PrimeiraFase extends Fase{
 
     animacaoColorirAngulosIguais(poligono1,poligono2, equacoes){
 
+        this.textBoxes.primeiroDialogo = [];
+
         //Uma série de animações sequenciais
         //Onde para cada angulo do polígono1, um angulo do polígono 2 também sofre highlight ao mesmo tempo
         //Escreve a equação de igualdade dos dois ângulos na esquerda

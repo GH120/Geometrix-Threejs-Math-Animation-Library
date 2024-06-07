@@ -729,7 +729,7 @@ export class AnguloParalogramo {
         )
 
         const dialogo4 = new AnimacaoSimultanea(
-            fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos4(anguloConhecido)),
+            fase.animacaoDialogo(this.dialogos.divisaoAngulosVizinhos4(anguloConhecido)).setDelay(60),
         )
 
         //Mudar isso para antes do final, 

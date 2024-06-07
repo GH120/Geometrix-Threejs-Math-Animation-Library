@@ -178,7 +178,7 @@ export default class JuntarEquacoes extends Output{
         equacaoSelecionada.removeAllOutputs();
     }
 
-    criarIdling(){
+    criarIdling(fatorCrescimento = 1.1){
 
         const fase = this.fase;
 
@@ -186,7 +186,9 @@ export default class JuntarEquacoes extends Output{
 
         const equacoesAlvo  = this.equacoesAlvo;
         
-        const animacao = encolherAumentarIdle(equacaoMovida.texto).setDuration(90 + Math.round(30*Math.random()));
+        const animacao = encolherAumentarIdle(equacaoMovida.texto)
+                         .setDuration(90 + Math.round(30*Math.random()))
+                         .setValorFinal(fatorCrescimento);
 
         const controleIdle = new ExecutarAnimacaoIdle(animacao, fase, 4)
                                 .addInputs(

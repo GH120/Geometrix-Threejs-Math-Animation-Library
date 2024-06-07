@@ -694,7 +694,7 @@ export class Fase4 extends Fase{
                         elementoCSS2: valor
                     });
 
-        const sidenote = this.createTextBox(`Arraste o valor para a função na lousa`, [-5.6, 0.6, 0], 17, false);
+        const sidenote = this.createTextBox(`Arraste 5h para a equação na lousa`, [-5.6, 0.6, 0], 17, false);
 
         const mostrarSidenote = new MostrarTexto(sidenote).setOnStart(() => this.scene.add(sidenote));
 
@@ -1038,7 +1038,7 @@ export class Fase4 extends Fase{
 
         const juntar = new JuntarEquacoes(valor,[funcao], this);
 
-        juntar.criarIdling();
+        juntar.criarIdling(1.3);
 
         juntar.equacaoResultante = equacoes.instanciada("5h");
 
@@ -1207,9 +1207,11 @@ export class Fase4 extends Fase{
 
                         const juntarEquacoes = new JuntarEquacoes(valor, [funcao], fase, null, equacoes.instanciada(estado.valor));
 
+                        juntarEquacoes.criarIdling(1.3)
+
                         this.addInputs(juntarEquacoes);
 
-                        const mudarSidenote = fase.animacaoDialogo("Arraste o valor para a função", estado.sidenote).setDelay(50);
+                        const mudarSidenote = fase.animacaoDialogo(`Arraste ${estado.hora} para a equação na lousa`, estado.sidenote).setDelay(50);
                         const mudarDialogo  = fase.animacaoDialogo("Então quantos graus tem " + estado.valor + "?");
                         const mostrarEquacao = apagarCSS2(funcao.texto).reverse().filler(100);
                         const mostrarValor   = apagarCSS2(valor.texto).reverse().filler(100);

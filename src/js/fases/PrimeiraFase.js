@@ -259,7 +259,7 @@ export class PrimeiraFase extends Fase{
 
         //Cada um desses limpa as equações da tela e coloca a equação resultante
         const TodosOsAngulosIguais = fase.animacaoEquacoesVirandoUmaSo("primeiroDialogo", equacoes.angulosIguais, 3);
-        const TodosOsLadosIguais   = fase.animacaoEquacoesVirandoUmaSo("mostrarRazaoLados", equacoes.ladosIguais, 1);
+        const TodosOsLadosIguais   = fase.animacaoEquacoesVirandoUmaSo("mostrarRazaoLados", equacoes.ladosIguais, 3);
 
         const animacao = new AnimacaoSequencial(
                             primeiraLinha,
@@ -652,7 +652,7 @@ export class PrimeiraFase extends Fase{
 
                 this.criarJuntarEquacoesSemelhanca();
 
-                fase.settings.ativarMenuCartas(true);
+                fase.whiteboard.ativar(true);
             }
 
             if(novoEstado.reset){

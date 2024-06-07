@@ -23,7 +23,7 @@ import { Clickable } from "../inputs/clickable";
 import MetalicSheen from "../animacoes/metalicSheen";
 import { MostrarBissetriz } from "../outputs/mostrarBissetriz";
 import { MostrarAngulo } from "../outputs/mostrarAngulo";
-import imagemAnguloParalelogramo from '../../assets/anguloParalelogramo.png'
+import imagemAnguloParalelogramo from '../../assets/angulos.png'
 import { controleTremedeiraIdleAresta } from "../animacoes/idle";
 import Circle from "../objetos/circle";
 

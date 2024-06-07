@@ -840,9 +840,9 @@ export class Fase5  extends Fase{
 
             const controleIdle = new ExecutarAnimacaoIdle(colorirVertice, fase, 0).start();
 
-            controleIdle.addInputs(vertice.clickable, vertice.draggable)
+            //clickable -> criarTracejado -> controleIdle
+            vertice.clickable.addObserver(fase.outputCriarTracejado[i].addObserver(controleIdle));
 
-            vertice.clickable.addObserver(fase.outputCriarTracejado[i]);
             
             fase.outputMostrarAngulo.map(output => output.addInputs(vertice.draggable));
 
@@ -1900,6 +1900,9 @@ export class Fase5  extends Fase{
         juncao1.equacaoNova = new CSS2DObject(equacao.html);
         juncao2.equacaoNova = new CSS2DObject(equacao.html);
 
+        juncao1.criarIdling();
+        juncao2.criarIdling();
+
         const sidenote = fase.createTextBox('', [-5.6, 0.6, 0], 17, false);
 
         fase.animar(new MostrarTexto(sidenote, fase.scene));
@@ -1922,6 +1925,8 @@ export class Fase5  extends Fase{
                         resolverEquacao.equacaoNova = new CSS2DObject(resultado.html);
 
                         estado.equacaoAtual = resultado;
+
+                        resolverEquacao.criarIdling();
                         
 
                         this.addInputs(resolverEquacao);
@@ -1970,6 +1975,8 @@ export class Fase5  extends Fase{
                         const dialogoMostrando180graus = fase.dialogoMostrando180Graus()
                                                              .setOnTermino(() => {
                                                                 resolverEquacao.ativar(true)
+
+                                                                resolverEquacao.criarIdling();
 
                                                                 const mudarSidenote = fase.animacaoDialogo("Clique mais uma vez", estado.sidenote)
 

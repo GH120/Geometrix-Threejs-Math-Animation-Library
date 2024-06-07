@@ -1417,7 +1417,7 @@ export class Fase4 extends Fase{
 
                 const dialogo1 = fase.animacaoDialogo(`Uma hora tem 30°, como acabou de demonstrar`);
 
-                fase.equacaoUmaHora = fase.createMathJaxTextBox(`\\color{red}{1~h}~\\color{black}{tem}~\\color{blue}{30°}`, [5.5,2,0], 1);
+                fase.equacaoUmaHora = fase.createMathJaxTextBox(`\\color{red}{1~h}~\\color{black}{tem}~\\color{blue}{30°}`, [5.5,2,0], 2);
 
                 const mostrarEquacao = new MostrarTexto(fase.equacaoUmaHora, fase.scene);
 
@@ -1447,7 +1447,7 @@ export class Fase4 extends Fase{
 
                 fase.Configuracao2();
 
-                fase.equacaocincoHoras = fase.createMathJaxTextBox(`\\color{red}{5~h}~\\color{black}{tem}~\\color{blue}{150°}`, [5.5,-2,0], 1);
+                fase.equacaocincoHoras = fase.createMathJaxTextBox(`\\color{red}{5~h}~\\color{black}{tem}~\\color{blue}{150°}`, [5.5,-2,0], 2);
 
                 const mostrarEquacao = new MostrarTexto(fase.equacaocincoHoras, fase.scene);
 

@@ -165,7 +165,7 @@ export const MenuPrincipal = () => {
           <button onClick={() => setModalOpen2(false)} className='botao-invisivel'>
               <IoClose color='#5A689B' size={50}/>
           </button>
-          <div className='h2-menu-fase-wrapper'>
+          <div className='h2-menu-fase-wrapper-second'>
               <h1 className='h2-menu-fase efeitos tira-margem'>Créditos</h1>
               <h3 className='h2-menu-fase efeitos tira-margem'>Programador Líder</h3>
               <h4 className='tira-margem'>Felipe Vieira Duarte</h4>

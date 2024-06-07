@@ -172,7 +172,7 @@ export class Fase {
         console.log('SETUPTEXTBOX SCENE', this.scene)
         console.log('SETUPTEXTBOX TEXT', this.text)
 
-        this.changeText("");
+        this.changeText("Crie um triangulo equilatero");
     }
 
     //Cria elementos css2d a partir de um texto

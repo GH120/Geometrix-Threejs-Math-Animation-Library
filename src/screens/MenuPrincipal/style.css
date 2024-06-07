@@ -85,3 +85,37 @@ canvas {
   background-color: #fff;
   width: 100%; 
 }
+
+.h2-menu-fase-wrapper {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 1.4em;
+  width: 720px;
+}
+
+.efeitos {
+  color: #000000;
+  text-shadow: 1px 1px 5px #5A689B, 0 0 1em rgb(109, 97, 97);
+}
+
+.h2-menu-fase {
+font-family: 'Eagle Lake';
+color: black;
+}
+
+.tira-margem {
+  margin-top: -5px;
+}
+
+.font-menor {
+  font-size: medium;
+  cursor: pointer;
+}
+
+.font-menor:hover {
+  color: blue;
+  text-decoration: underline;
+}

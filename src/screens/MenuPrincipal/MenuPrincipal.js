@@ -7,6 +7,12 @@ import BotaoFase from '../../components/BotaoFase/BotaoFase';
 import Modal from '../../components/modal/Modal';
 import MenuFaseNovo from '../../components/MenuFaseNovo/MenuFaseNovo';
 import { IoClose } from "react-icons/io5";
+import BackgroundMusic from '../../components/backgroundMusic';
+import Resonance from '../../assets/Resonance.mp4'; //CREDITOS THREE BLUE1BROWN https://www.youtube.com/@3blue1brown
+import { Fase } from '../../js/fases/fase';
+import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
+import ExecutarAnimacaoIdle from '../../js/outputs/executarAnimacaoIdle';
+import { apagarCSS2 } from '../../js/animacoes/apagarCSS2';
 
 export const MenuPrincipal = () => {
 
@@ -114,6 +120,21 @@ export const MenuPrincipal = () => {
 
     camera.position.z = 5;
 
+    //Fase fake para animação
+    const fase = {
+      animar: (animacao) => {
+        fase.frames.push(animacao.getFrames());
+      },
+      frames: []
+    }
+
+    const elemento = {element: document.getElementById("click")};
+
+    const controleIdle = new ExecutarAnimacaoIdle(apagarCSS2(elemento).reverse().setValorFinal(0.5).setDuration(120), fase, 0).start()
+
+
+    document.addEventListener('click', () => controleIdle.update({}))
+
     const animate = () => {
       requestAnimationFrame(animate);
 
@@ -122,9 +143,13 @@ export const MenuPrincipal = () => {
       grupo.rotation.y += 0.01;
       
       renderer.render(scene, camera);
+
+      fase.frames.forEach(frame => frame.next())
     };
 
     animate();
+
+
 
     // Atualizar o tamanho do canvas quando a janela for redimensionada
     window.addEventListener('resize', () => {
@@ -148,6 +173,8 @@ export const MenuPrincipal = () => {
   return (
     <div className="menu">
       <title>GEOMETRIX</title>
+      <div className="options" id="click" style={{position: 'absolute', fontSize: '15px', color:'black', left:'80%', top: '90%', opacity: 0}}>MÚSICA AO CLICAR</div>
+      <BackgroundMusic src={Resonance}></BackgroundMusic>
       <div className="options">
         <h1>Geometrix</h1>
         <ul>

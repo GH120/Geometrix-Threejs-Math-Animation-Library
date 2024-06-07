@@ -11,6 +11,8 @@ import { Whiteboard } from '../../js/cards/whiteboard';
 import Navbar from '../../components/Navbar/Navbar';
 import { PrimeiraFase } from '../../js/fases/PrimeiraFase';
 import TransitionArrow from '../../components/Arrow/arrow';
+import BackgroundMusic from '../../components/backgroundMusic';
+import Resonance from '../../assets/Resonance.mp4' //CREDITOS THREE BLUE1BROWN https://www.youtube.com/@3blue1brown
 
 const fases = {
   '1' : Fase4,
@@ -87,7 +89,8 @@ const LevelScreen = () => {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       >
-        <title>GEOMETRIX</title>
+      <BackgroundMusic src={Resonance}></BackgroundMusic>
+
         {levelLoad && <Navbar settings={settings}/>}
         <div className='container de tudo' style={{cursor:cursor}} ref={refContainer}></div>
         {proximaFase && <TransitionArrow></TransitionArrow>}

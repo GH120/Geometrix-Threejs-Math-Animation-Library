@@ -1194,6 +1194,9 @@ export class Fase4 extends Fase{
                         estado.hora  = estado.horarios.splice(Math.round(Math.random() * (estado.horarios.length - 1)), 1)[0]; //Escolhe uma e remove do array
                         estado.valor = `${estado.hora}h`;
 
+                        //Bugs na renderização do ângulo
+                        if(estado.hora == 9 || estado.hora == 12) estado.hora -= 0.001
+
                         fase.whiteboard.adicionarTexto(funcao.texto);
 
                         valor = fase.createMathJaxTextBox("\\color{red}" + estado.valor, [0,0,0], 2);

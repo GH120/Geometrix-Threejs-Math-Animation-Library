@@ -92,8 +92,6 @@ export class AnguloParalogramo {
 
             //Por algum motivo, precisa sempre criar novos outputs
 
-            fase.debug = false;
-
             if(!paralelogramo.hoverable){
                 new Hoverable(paralelogramo, fase.camera);
             }

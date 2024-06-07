@@ -93,8 +93,6 @@ export function mostrarHitboxTransparente(objeto){
 
 export function controleHitboxTransparente(objeto, fase, delay){
 
-    fase.debug = false;
-
     return new ExecutarAnimacaoIdle(mostrarHitboxTransparente(objeto), fase, delay);
 }
 

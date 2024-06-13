@@ -208,7 +208,7 @@ export class LadosProporcionais {
 
 
         const equacoes = {
-            ladosIguais: razao =>`\\frac{\\color{red} Lado~P1}{\\color{blue} Lado~P2} ~~~proporcionais ~com~ \\color{purple} RAZ \\tilde{A} O  = \\Large{${razao}}`,
+            ladosIguais: razao =>`\\frac{\\color{blue} Lado~P2}{\\color{red} Lado~P1} ~~~proporcionais ~com~ \\color{purple} RAZ \\tilde{A} O  = \\Large{${razao}}`,
 
             angulosIguais: `~{\\color{red}~Todos~Ângulos~ do ~P1} = 
                             ~{\\color{blue}~Todos~Ângulos~ do~ P2}`,

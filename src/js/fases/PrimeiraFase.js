@@ -206,7 +206,7 @@ export class PrimeiraFase extends Fase{
 
         //Todas as equações em latex usadas nessa aula
         const equacoes = {
-            ladosIguais: `\\frac{\\color{red} Lado~P1}{\\color{blue} Lado~P2} ~~~proporcionais ~com~ \\color{purple} RAZ \\tilde{A} O  = \\Large{2}`,
+            ladosIguais: `\\frac{\\color{blue} Lado~P2}{\\color{red} Lado~P1} ~~~proporcionais ~com~ \\color{purple} RAZ \\tilde{A} O  = \\Large{2}`,
 
             angulosIguais: `~{\\color{red}~Todos~Ângulos~ do ~P1} = 
                             ~{\\color{blue}~Todos~Ângulos~ do~ P2}`,
